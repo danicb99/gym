@@ -1,0 +1,1849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#070b12">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="icon" type="image/png" href="./icon-192.png">
+  <title>Aesthetic - Elite Workout Tracker</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --surface: #0f1728;
+      --surface-elevated: #162035;
+      --surface-card: rgba(18, 26, 44, 0.75);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(16, 185, 129, 0.4);
+      --text-main: #f8fafc;
+      --text-muted: #8493a8;
+      --text-dim: #54657e;
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --primary-glow: rgba(16, 185, 129, 0.25);
+      --cyan: #06b6d4;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --purple: #8b5cf6;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --safe-bottom: max(85px, env(safe-area-inset-bottom, 85px));
+      --safe-top: max(14px, env(safe-area-inset-top, 14px));
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text-main); padding-bottom: var(--safe-bottom); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* Background Ambient Glow */
+    .ambient-glow { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 320px; background: radial-gradient(ellipse at 50% -20%, rgba(16, 185, 129, 0.15), transparent 70%); z-index: 0; pointer-events: none; }
+
+    /* Top App Bar */
+    .app-header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(7, 11, 20, 0.85); border-bottom: 1px solid var(--border); padding-top: var(--safe-top); }
+    .header-content { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-logo { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #10b981, #06b6d4); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px var(--primary-glow); }
+    .brand-logo svg { width: 20px; height: 20px; fill: #042f2e; }
+    .brand-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.3px; color: #fff; }
+    .brand-subtitle { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; }
+    .header-stats { display: flex; align-items: center; gap: 8px; }
+    .stat-chip { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 0.72rem; font-weight: 600; color: var(--cyan); display: flex; align-items: center; gap: 5px; }
+
+    /* Workout Progress Bar */
+    .workout-progress { width: 100%; height: 3px; background: rgba(255,255,255,0.06); }
+    .workout-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #10b981, #06b6d4); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    /* Navigation Pills */
+    .nav-tabs-wrapper { padding: 10px 16px 12px; overflow-x: auto; scrollbar-width: none; background: rgba(7, 11, 20, 0.95); }
+    .nav-tabs-wrapper::-webkit-scrollbar { display: none; }
+    .nav-tabs { display: flex; gap: 8px; width: max-content; }
+    .nav-pill { background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); border-radius: 24px; padding: 8px 16px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 6px; }
+    .nav-pill.active { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.15)); border-color: var(--primary); color: #fff; box-shadow: 0 0 16px var(--primary-glow); }
+    .nav-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); }
+    .nav-pill.active .dot { background: var(--primary); box-shadow: 0 0 6px var(--primary); }
+
+    /* Content Area */
+    .container { padding: 16px 16px 30px; max-width: 650px; margin: 0 auto; position: relative; z-index: 10; }
+    .day-content { display: none; }
+    .day-content.active { display: block; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Day Header Banner */
+    .day-banner { background: linear-gradient(135deg, rgba(22, 32, 53, 0.8), rgba(15, 23, 40, 0.9)); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .day-banner-title { font-size: 1.05rem; font-weight: 800; color: #fff; }
+    .day-banner-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; display: flex; gap: 8px; }
+    .btn-reset-session { background: rgba(244, 63, 94, 0.12); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 8px; padding: 6px 10px; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
+
+    /* Exercise Card */
+    .exercise-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: border-color 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); }
+    .exercise-card:hover { border-color: rgba(255, 255, 255, 0.14); }
+    
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .ex-meta { display: flex; flex-direction: column; gap: 3px; }
+    .ex-muscle { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--primary); }
+    .ex-title { font-size: 1.02rem; font-weight: 700; color: #fff; letter-spacing: -0.2px; line-height: 1.25; }
+
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .tag { font-size: 0.68rem; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; }
+    .tag-dose { background: rgba(6, 182, 212, 0.12); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.25); }
+    .tag-rir { background: rgba(245, 158, 11, 0.12); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.25); }
+    .tag-rest { background: rgba(16, 185, 129, 0.12); color: var(--primary); border: 1px solid rgba(16, 185, 129, 0.25); cursor: pointer; transition: all 0.15s; }
+    .tag-rest:hover { background: rgba(16, 185, 129, 0.25); }
+
+    /* Action bar for Exercise Card */
+    .card-actions { display: flex; gap: 8px; margin: 12px 0 14px; }
+    .action-btn { background: var(--surface-elevated); border: 1px solid var(--border); color: var(--text-main); border-radius: var(--radius-sm); padding: 7px 12px; font-size: 0.74rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.15s; }
+    .action-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+    .action-btn.active { background: rgba(16, 185, 129, 0.15); border-color: var(--primary); color: var(--primary); }
+
+    /* 3D Demo Preview Player */
+    .demo-player { display: none; background: #000; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 14px; position: relative; }
+    .demo-player.open { display: block; animation: slideUp 0.25s ease-out; }
+    .demo-media { width: 100%; height: auto; max-height: 250px; display: block; object-fit: contain; margin: 0 auto; background: #000; }
+    .demo-footer { padding: 10px 14px; background: rgba(15, 23, 40, 0.95); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); font-size: 0.72rem; }
+    .demo-cadence { color: var(--amber); font-weight: 600; }
+    .demo-links { display: flex; gap: 8px; }
+    .ext-link { color: var(--cyan); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+
+    /* Interactive Sets Table */
+    .sets-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; margin-top: 4px; font-size: 0.8rem; }
+    .sets-table th { text-align: center; color: var(--text-dim); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 4px; }
+    .set-row { background: rgba(255, 255, 255, 0.02); transition: background 0.15s; }
+    .set-row.done { background: rgba(16, 185, 129, 0.08); }
+    .set-cell { padding: 6px 8px; text-align: center; border-top: 1px solid rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .set-cell:first-child { border-left: 1px solid rgba(255,255,255,0.03); border-radius: 8px 0 0 8px; width: 44px; font-weight: 800; color: var(--text-muted); }
+    .set-cell:last-child { border-right: 1px solid rgba(255,255,255,0.03); border-radius: 0 8px 8px 0; width: 48px; }
+    
+    .set-input { width: 62px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; color: #fff; font-size: 0.85rem; font-weight: 700; text-align: center; padding: 6px 4px; outline: none; font-variant-numeric: tabular-nums; transition: border-color 0.15s; }
+    .set-input:focus { border-color: var(--cyan); background: rgba(6, 182, 212, 0.08); }
+    
+    .check-btn { width: 34px; height: 34px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface-elevated); color: var(--text-dim); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); margin: 0 auto; }
+    .check-btn svg { width: 16px; height: 16px; stroke-width: 2.5; stroke: currentColor; fill: none; transition: transform 0.15s; }
+    .set-row.done .check-btn { background: var(--primary); border-color: var(--primary); color: #042f2e; box-shadow: 0 0 10px var(--primary-glow); }
+    .set-row.done .check-btn svg { transform: scale(1.1); stroke: #042f2e; }
+
+    /* Collapsible Details (Tecnica & Alternativas) */
+    .collapsible-drawer { margin-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 8px; }
+    details { margin-bottom: 6px; }
+    summary { font-size: 0.74rem; font-weight: 600; color: var(--cyan); cursor: pointer; outline: none; list-style: none; display: flex; align-items: center; gap: 6px; user-select: none; }
+    summary::-webkit-details-marker { display: none; }
+    summary::before { content: "›"; font-size: 1.1rem; line-height: 1; transition: transform 0.2s; display: inline-block; }
+    details[open] summary::before { transform: rotate(90deg); }
+    .drawer-body { font-size: 0.74rem; color: var(--text-muted); line-height: 1.5; margin-top: 6px; padding: 8px 12px; background: rgba(0, 0, 0, 0.25); border-radius: 8px; border-left: 2px solid var(--cyan); }
+    .alt-badge { color: #fde047; font-weight: 600; }
+
+    /* Fixed Floating Smart Timer Dock */
+    .timer-dock { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; padding: 10px 16px max(14px, env(safe-area-inset-bottom, 14px)); background: rgba(11, 16, 28, 0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top: 1px solid var(--border); box-shadow: 0 -8px 30px rgba(0,0,0,0.6); display: flex; justify-content: space-between; align-items: center; max-width: 650px; margin: 0 auto; }
+    
+    .timer-info { display: flex; align-items: center; gap: 12px; }
+    .timer-circle { width: 44px; height: 44px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; position: relative; }
+    .timer-circle svg { width: 20px; height: 20px; fill: none; stroke: var(--primary); stroke-width: 2; }
+    .timer-digits { font-size: 1.45rem; font-weight: 800; font-variant-numeric: tabular-nums; color: #fff; letter-spacing: -0.5px; }
+    .timer-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+
+    .timer-controls { display: flex; align-items: center; gap: 6px; }
+    .t-btn { background: var(--surface-elevated); border: 1px solid var(--border); color: #fff; border-radius: 10px; padding: 8px 12px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .t-btn:hover { background: rgba(255,255,255,0.1); }
+    .t-btn.play { background: var(--primary); color: #042f2e; border-color: var(--primary); box-shadow: 0 2px 10px var(--primary-glow); }
+    .t-btn.play.paused { background: var(--amber); border-color: var(--amber); color: #3b2202; }
+    .t-btn.skip { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+
+    /* Guide & Warmup Section */
+    .guide-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 16px; }
+    .guide-title { font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .guide-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.78rem; }
+    .guide-table th, .guide-table td { padding: 9px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+    .guide-table th { color: var(--cyan); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43 1.43 1.43 2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+        </div>
+        <div>
+          <div class="brand-title">AESTHETIC PRO</div>
+          <div class="brand-subtitle">Torso / Pierna • Frecuencia 2x</div>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat-chip" id="progressChip">
+          <span>0/23 series</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Progress Indicator -->
+    <div class="workout-progress">
+      <div class="workout-progress-fill" id="workoutProgressBar"></div>
+    </div>
+
+    <!-- Workout Day Selector -->
+    <div class="nav-tabs-wrapper">
+      <div class="nav-tabs">
+        <button class="nav-pill active" onclick="selectDay('torsoA')"><span class="dot"></span> Torso A (Lunes)</button>
+        <button class="nav-pill" onclick="selectDay('piernaA')"><span class="dot"></span> Pierna A (Martes)</button>
+        <button class="nav-pill" onclick="selectDay('torsoB')"><span class="dot"></span> Torso B (Jueves)</button>
+        <button class="nav-pill" onclick="selectDay('piernaB')"><span class="dot"></span> Pierna B (Viernes)</button>
+        <button class="nav-pill" onclick="selectDay('guia')">📖 Guía y Calentamiento</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ==========================================
+         LUNES: TORSO A
+         ========================================== -->
+    <section id="torsoA" class="day-content active">
+      <div class="day-banner">
+        <div>
+          <div class="day-banner-title">Torso A • Fuerza & Empuje</div>
+          <div class="day-banner-meta"><span>7 Ejercicios</span> • <span>23 Series Efectivas</span> • <span>~75 min</span></div>
+        </div>
+        <button class="btn-reset-session" onclick="resetDayChecks('torsoA')">Reiniciar</button>
+      </div>
+
+      <!-- Exercise 1 -->
+      <article class="exercise-card" data-exercise="banca">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Pectoral Mayor • Fuerza</span>
+            <h2 class="ex-title">1. Press de Banca Plano con Barra</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">4 × 6-8 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(150)">⏱️ 150 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-banca')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-banca" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bench-Press.gif" loading="lazy" class="demo-media" alt="Bench Press">
+          <div class="demo-footer">
+            <span class="demo-cadence">Bajada 2s ➔ Pausa 1s ➔ Subida explosiva</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+press+banca+plano+barra" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+barbell+bench+press" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="6" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Retracción escapular activa, pies firmes en el suelo, bajada en 2 s controlados rozando el esternón inferior. Cero rebote.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Press plano en máquina convergente • Press con mancuernas • Press en Multipower.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Exercise 2 -->
+      <article class="exercise-card" data-exercise="jalon">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Dorsal Ancho • Tracción Vertical</span>
+            <h2 class="ex-title">2. Jalón al Pecho (Prono Ancho)</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">4 × 8-10 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(120)">⏱️ 120 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-jalon')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-jalon" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Lat-Pulldown.gif" loading="lazy" class="demo-media" alt="Lat Pulldown">
+          <div class="demo-footer">
+            <span class="demo-cadence">Tira con los codos hacia costados</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+jalon+al+pecho+prono" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+lat+pulldown" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Pecho erguido hacia la polea. Deprime escápulas y lleva los codos en dirección a costados hasta clavícula. Cero balanceo.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Dominadas asistidas o libres • Jalón unilateral en polea • Jalón neutro.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Exercise 3 -->
+      <article class="exercise-card" data-exercise="militar">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Deltoides Anterior & Lateral</span>
+            <h2 class="ex-title">3. Press Militar Sentado con Mancuernas (75°)</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 8-10 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(120)">⏱️ 120 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-militar')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-militar" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Shoulder-Press.gif" loading="lazy" class="demo-media" alt="Shoulder Press">
+          <div class="demo-footer">
+            <span class="demo-cadence">Codos en plano escapular a 45°-60°</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+press+militar+sentado+mancuernas" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+dumbbell+shoulder+press" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="22" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="22" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="22" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Respaldo a 75°-80° (no a 90°). Empuja en el plano escapular con los codos a 45° respecto al torso para cuidar el manguito rotador.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Press en máquina de hombros • Press en Multipower • Press con barra de pie.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Exercise 4 -->
+      <article class="exercise-card" data-exercise="remo">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Espalda Media & Dorsal • Tracción Horizontal</span>
+            <h2 class="ex-title">4. Remo en Polea Baja (Agarre Neutro Estrecho)</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 10-12 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(90)">⏱️ 90 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-remo')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-remo" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Cable-Row.gif" loading="lazy" class="demo-media" alt="Seated Cable Row">
+          <div class="demo-footer">
+            <span class="demo-cadence">Tira guiando codos al ombligo</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+remo+polea+baja+gironda" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+seated+cable+row" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Pecho erguido, hombros deprimidos. Conduce los codos pegados al cuerpo hacia la cadera/ombligo.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Remo en máquina con apoyo de pecho • Remo unilateral con mancuerna en banco.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Exercise 5 -->
+      <article class="exercise-card" data-exercise="laterales1">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Deltoides Lateral • Amplitud</span>
+            <h2 class="ex-title">5. Elevaciones Laterales con Mancuernas</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 12-15 reps</span>
+              <span class="tag tag-rir">RIR 1</span>
+              <span class="tag tag-rest" onclick="triggerRest(75)">⏱️ 75 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-laterales1')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-laterales1" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lateral-Raise.gif" loading="lazy" class="demo-media" alt="Lateral Raise">
+          <div class="demo-footer">
+            <span class="demo-cadence">Subida en diagonal liderando con codos</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+elevaciones+laterales+mancuerna" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+dumbbell+lateral+raise" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Inclina el torso 10° adelante. Sube en diagonal con codos ligeramente doblados, nunca con muñecas por encima del codo.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Elevaciones en polea baja • Elevaciones en máquina de hombro.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Exercise 6 -->
+      <article class="exercise-card" data-exercise="triceps1">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Tríceps • Cabeza Lateral & Medial</span>
+            <h2 class="ex-title">6. Extensión de Tríceps en Polea Alta</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 10-12 reps</span>
+              <span class="tag tag-rir">RIR 1</span>
+              <span class="tag tag-rest" onclick="triggerRest(75)">⏱️ 75 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-triceps1')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-triceps1" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Pushdown.gif" loading="lazy" class="demo-media" alt="Pushdown">
+          <div class="demo-footer">
+            <span class="demo-cadence">Codos pegados al cuerpo, solo mueve antebrazo</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+extension+triceps+polea+alta" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+triceps+pushdown" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Codos fijos pegados a los costados. Extiende completamente sin balancear el torso.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Press francés con mancuernas • Fondos en paralelas asistidos.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Exercise 7 -->
+      <article class="exercise-card" data-exercise="biceps1">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Bíceps Braquial • Supinación</span>
+            <h2 class="ex-title">7. Curl de Bíceps con Mancuernas (Supinación)</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 10-12 reps</span>
+              <span class="tag tag-rir">RIR 1</span>
+              <span class="tag tag-rest" onclick="triggerRest(75)">⏱️ 75 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-biceps1')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-biceps1" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Curl.gif" loading="lazy" class="demo-media" alt="Dumbbell Curl">
+          <div class="demo-footer">
+            <span class="demo-cadence">Gira muñeca afuera (supinación) al subir</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+curl+biceps+supinacion+mancuerna" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+dumbbell+curl" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Codos estables a los costados. Gira la muñeca activamente hacia afuera arriba y frena la bajada en 2 s.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Curl con barra Z de pie • Curl en polea baja con barra recta.</div>
+          </details>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- ==========================================
+         MARTES: PIERNA A
+         ========================================== -->
+    <section id="piernaA" class="day-content">
+      <div class="day-banner">
+        <div>
+          <div class="day-banner-title">Pierna A • Sentadilla & Cuádriceps</div>
+          <div class="day-banner-meta"><span>5 Ejercicios</span> • <span>17 Series Efectivas</span> • <span>~70 min</span></div>
+        </div>
+        <button class="btn-reset-session" onclick="resetDayChecks('piernaA')">Reiniciar</button>
+      </div>
+
+      <!-- Squat -->
+      <article class="exercise-card" data-exercise="squat">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Cuádriceps & Glúteo • Básico Pesado</span>
+            <h2 class="ex-title">1. Sentadilla Trasera con Barra (Back Squat)</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">4 × 6-8 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(180)">⏱️ 180 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-squat')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-squat" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-SQUAT.gif" loading="lazy" class="demo-media" alt="Barbell Squat">
+          <div class="demo-footer">
+            <span class="demo-cadence">Baja a la paralela con columna neutra</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+sentadilla+con+barra+profunda" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+barbell+squat" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="6" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Bracing abdominal, flexiona cadera y rodillas a la vez, baja al menos hasta la paralela con columna neutra. Sin despegar talones.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Sentadilla en Multipower • Prensa de piernas 45° • Sentadilla Hack.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Leg Ext -->
+      <article class="exercise-card" data-exercise="legext">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Cuádriceps • Aislamiento</span>
+            <h2 class="ex-title">2. Extensiones de Cuádriceps en Máquina</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 10-12 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(90)">⏱️ 90 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-legext')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-legext" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-EXTENSION.gif" loading="lazy" class="demo-media" alt="Leg Extension">
+          <div class="demo-footer">
+            <span class="demo-cadence">Pausa 1s arriba apretando cuádriceps</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+extensiones+de+cuadriceps+maquina" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+leg+extension" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Alinea el eje de la máquina con tus rodillas. Pausa de 1 s arriba y baja frenando en 2 s.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Zancadas caminando con mancuernas • Sentadilla Sissy con disco.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Leg Curl Tumbado -->
+      <article class="exercise-card" data-exercise="curltumbado">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Isquiosurales • Cadera Neutra</span>
+            <h2 class="ex-title">3. Curl Femoral Tumbado</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 10-12 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(90)">⏱️ 90 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-curltumbado')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-curltumbado" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Leg-Curl.gif" loading="lazy" class="demo-media" alt="Lying Leg Curl">
+          <div class="demo-footer">
+            <span class="demo-cadence">Pelvis pegada al tapiz todo el recorrido</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+curl+femoral+tumbado" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+lying+leg+curl" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Presiona la pelvis contra el acolchado para evitar arquear la zona lumbar. Flexiona explosivo y frena el regreso sin soltar el peso de golpe.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Curl femoral sentado • Curl unilateral de pie • Curl con mancuerna entre pies.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Gemelo Pie -->
+      <article class="exercise-card" data-exercise="gemelopie">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Gastrocnemio (Gemelos) • Rodilla Recta</span>
+            <h2 class="ex-title">4. Elevación de Talones de Pie en Máquina</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">4 × 12-15 reps</span>
+              <span class="tag tag-rir">RIR 1</span>
+              <span class="tag tag-rest" onclick="triggerRest(75)">⏱️ 75 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-gemelopie')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-gemelopie" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/06/Standing-Calf-Raise.gif" loading="lazy" class="demo-media" alt="Standing Calf Raise">
+          <div class="demo-footer">
+            <span class="demo-cadence">Pausa de 2s abajo para eliminar rebote</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+gemelos+de+pie+maquina" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+standing+calf+raise" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Rodillas casi rectas (microflexión mínima). Pausa de 2 segundos en el fondo del estiramiento para eliminar el rebote del tendón de Aquiles.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Gemelos en prensa 45° • Elevación unilateral en escalón con mancuerna.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Plancha -->
+      <article class="exercise-card" data-exercise="plancha">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Core • Anti-Extensión</span>
+            <h2 class="ex-title">5. Plancha Abdominal Isométrica (o Rueda)</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 45-60 s</span>
+              <span class="tag tag-rir">RIR —</span>
+              <span class="tag tag-rest" onclick="triggerRest(60)">⏱️ 60 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-plancha')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-plancha" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/plank.gif" loading="lazy" class="demo-media" alt="Plank">
+          <div class="demo-footer">
+            <span class="demo-cadence">Retroversión pélvica y bloqueo de glúteos</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+plancha+abdominal+correcta" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+plank" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>Segundos</th><th>Completado</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell" style="color:var(--text-dim)">Seg</td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell" style="color:var(--text-dim)">Seg</td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell" style="color:var(--text-dim)">Seg</td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Aprieta glúteos con fuerza y mete el ombligo hacia dentro en retroversión pélvica. Sin que caiga la cadera.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Rueda abdominal (Ab Wheel) • Paseo del granjero con mancuernas.</div>
+          </details>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- ==========================================
+         JUEVES: TORSO B
+         ========================================== -->
+    <section id="torsoB" class="day-content">
+      <div class="day-banner">
+        <div>
+          <div class="day-banner-title">Torso B • Tracción & Hipertrofia</div>
+          <div class="day-banner-meta"><span>7 Ejercicios</span> • <span>23 Series Efectivas</span> • <span>~80 min</span></div>
+        </div>
+        <button class="btn-reset-session" onclick="resetDayChecks('torsoB')">Reiniciar</button>
+      </div>
+
+      <!-- Exercise 1 -->
+      <article class="exercise-card" data-exercise="remouni">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Dorsal Ancho • Corrección Asimetrías</span>
+            <h2 class="ex-title">1. Remo Unilateral con Mancuerna</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">4 × 8-10 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(105)">⏱️ 105 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-remouni')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-remouni" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Row.gif" loading="lazy" class="demo-media" alt="Dumbbell Row">
+          <div class="demo-footer">
+            <span class="demo-cadence">Lleva el codo hacia el bolsillo trasero</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+remo+unilateral+con+mancuerna" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+dumbbell+row" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Conduce el movimiento desde el codo hacia la cadera para focalizar el dorsal. No rotes el torso al subir.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Remo unilateral en máquina • Remo con mancuernas en banco inclinado con pecho apoyado.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Incline Bench -->
+      <article class="exercise-card" data-exercise="inclinado">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Pectoral Superior (Clavicular)</span>
+            <h2 class="ex-title">2. Press Inclinado con Mancuernas (30°)</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">4 × 8-10 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(120)">⏱️ 120 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-inclinado')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-inclinado" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Press.gif" loading="lazy" class="demo-media" alt="Incline Dumbbell Press">
+          <div class="demo-footer">
+            <span class="demo-cadence">Banco a 30° exactos para aislar clavicular</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+press+inclinado+mancuernas+30+grados" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+incline+dumbbell+press" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">No subas el banco a más de 30° para no derivar el trabajo al hombro frontal. Baja abriendo el pecho sintiendo un estiramiento marcado en la zona clavicular.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Press inclinado en máquina • Press en Multipower • Press inclinado con barra.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Jalon Neutro -->
+      <article class="exercise-card" data-exercise="jalonneutro">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Dorsal Ancho • Estiramiento</span>
+            <h2 class="ex-title">3. Jalón al Pecho con Agarre Neutro Cerrado</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 10-12 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(90)">⏱️ 90 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-jalonneutro')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-jalonneutro" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Lat-Pulldown.gif" loading="lazy" class="demo-media" alt="Lat Pulldown">
+          <div class="demo-footer">
+            <span class="demo-cadence">Codos hacia delante, énfasis directo en dorsal</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+jalon+agarre+neutro+cerrado" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+close+grip+lat+pulldown" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Tira con los codos juntos hacia delante incidiendo directo en el dorsal con menor molestia en muñecas.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Pullover en polea alta con cuerda • Dominadas neutras • Jalón supino.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Laterales 2 -->
+      <article class="exercise-card" data-exercise="laterales2">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Deltoides Lateral • Tensión Continua</span>
+            <h2 class="ex-title">4. Elevaciones Laterales en Polea (o Mancuernas)</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 12-15 reps</span>
+              <span class="tag tag-rir">RIR 1</span>
+              <span class="tag tag-rest" onclick="triggerRest(75)">⏱️ 75 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-laterales2')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-laterales2" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lateral-Raise.gif" loading="lazy" class="demo-media" alt="Lateral Raise">
+          <div class="demo-footer">
+            <span class="demo-cadence">Tensión continua en todo el rango</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+elevaciones+laterales+polea+baja" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+cable+lateral+raise" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Tensión continua en todo el rango gracias a la polea. Cruza el cable por detrás o delante y eleva en diagonal guiando con los codos.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Elevaciones con mancuernas • Elevaciones en máquina de laterales.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Face Pull -->
+      <article class="exercise-card" data-exercise="facepull">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Deltoides Posterior & Manguito</span>
+            <h2 class="ex-title">5. Face Pull en Polea Alta</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 12-15 reps</span>
+              <span class="tag tag-rir">RIR 1</span>
+              <span class="tag tag-rest" onclick="triggerRest(60)">⏱️ 60 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-facepull')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-facepull" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Face-Pull.gif" loading="lazy" class="demo-media" alt="Face Pull">
+          <div class="demo-footer">
+            <span class="demo-cadence">Tira a la frente con rotación externa</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+face+pull+polea+alta" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+face+pull" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="20" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="20" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="20" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Polea a la altura de los ojos. Separa los extremos de la cuerda terminando con las muñecas más retrasadas que los codos.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Pájaros con mancuernas en banco inclinado • Pájaros en máquina pec-deck.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Frances -->
+      <article class="exercise-card" data-exercise="frances">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Tríceps • Cabeza Larga</span>
+            <h2 class="ex-title">6. Press Francés con Barra Z o Mancuernas</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 10-12 reps</span>
+              <span class="tag tag-rir">RIR 1</span>
+              <span class="tag tag-rest" onclick="triggerRest(75)">⏱️ 75 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-frances')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-frances" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Triceps-Extension.gif" loading="lazy" class="demo-media" alt="Skull Crusher">
+          <div class="demo-footer">
+            <span class="demo-cadence">Brazos inclinados atrás para tensión continua</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+press+frances+barra+z" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+skull+crusher" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Brazos ligeramente inclinados hacia atrás para mantener la cabeza larga del tríceps bajo tensión continua. Codos estables y fijos.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Extensión de tríceps tras nuca en polea • Katana extensions en polea.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Martillo -->
+      <article class="exercise-card" data-exercise="martillo">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Braquial & Antebrazo • Grosor</span>
+            <h2 class="ex-title">7. Curl Martillo con Mancuernas</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 10-12 reps</span>
+              <span class="tag tag-rir">RIR 1</span>
+              <span class="tag tag-rest" onclick="triggerRest(75)">⏱️ 75 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-martillo')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-martillo" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Hammer-Curl.gif" loading="lazy" class="demo-media" alt="Hammer Curl">
+          <div class="demo-footer">
+            <span class="demo-cadence">Palmas mirándose todo el recorrido</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+curl+martillo+mancuernas" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+hammer+curl" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="16" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="16" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="16" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Palmas mirándose todo el recorrido. Incide en el braquial y antebrazo (grosor de brazo y protección de codos).</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Curl martillo en polea con cuerda • Curl predicador agarre neutro.</div>
+          </details>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- ==========================================
+         VIERNES: PIERNA B
+         ========================================== -->
+    <section id="piernaB" class="day-content">
+      <div class="day-banner">
+        <div>
+          <div class="day-banner-title">Pierna B • Cadena Posterior & Búlgaras</div>
+          <div class="day-banner-meta"><span>6 Ejercicios</span> • <span>20 Series Efectivas</span> • <span>~75 min</span></div>
+        </div>
+        <button class="btn-reset-session" onclick="resetDayChecks('piernaB')">Reiniciar</button>
+      </div>
+
+      <!-- RDL -->
+      <article class="exercise-card" data-exercise="rdl">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Isquiosurales & Glúteo Mayor • Bisagra</span>
+            <h2 class="ex-title">1. Peso Muerto Rumano (RDL) con Barra o Mancuernas</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">4 × 8-10 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(150)">⏱️ 150 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-rdl')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-rdl" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Romanian-Deadlift.gif" loading="lazy" class="demo-media" alt="Romanian Deadlift">
+          <div class="demo-footer">
+            <span class="demo-cadence">Empuja el culo atrás con rodillas fijas</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+peso+muerto+rumano+barra" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+barbell+romanian+deadlift" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Bisagra de cadera estricta: empuja el culo hacia la pared de atrás con rodillas fijas. Baja rozando espinillas sintiendo el estiramiento en isquios. Espalda neutra.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">RDL en Multipower • RDL con mancuernas pesadas • Hip Thrust.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Bulgarian -->
+      <article class="exercise-card" data-exercise="bulgarian">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Glúteos & Cuádriceps • Cero Fatiga Lumbar</span>
+            <h2 class="ex-title">2. Sentadilla Búlgara con Mancuernas</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 8-10 reps/p</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(105)">⏱️ 105 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-bulgarian')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-bulgarian" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/05/Dumbbell-Bulgarian-Split-Squat.gif" loading="lazy" class="demo-media" alt="Bulgarian Split Squat">
+          <div class="demo-footer">
+            <span class="demo-cadence">Torso inclinado 15° para reclutar glúteo</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+sentadilla+bulgara+con+mancuernas" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+bulgarian+split+squat" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps/p</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="18" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="18" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="18" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Empeine trasero en banco. Inclina el torso levemente (15°) hacia delante para maximizar carga en glúteo y cuádriceps sin compresión en columna.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Sentadilla Hack en máquina • Prensa de piernas 45° • Zancadas estáticas.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Curl Sentado -->
+      <article class="exercise-card" data-exercise="curlsentado">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Isquiosurales • Cadera Flexionada</span>
+            <h2 class="ex-title">3. Curl Femoral Sentado</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 10-12 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(90)">⏱️ 90 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-curlsentado')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-curlsentado" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/08/Seated-Leg-Curl.gif" loading="lazy" class="demo-media" alt="Seated Leg Curl">
+          <div class="demo-footer">
+            <span class="demo-cadence">Máxima hipertrofia por estiramiento</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+curl+femoral+sentado" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+seated+leg+curl" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Rodillo superior bien firme sobre los muslos. La cadera flexionada preestira el isquiosural logrando el mayor estímulo de crecimiento.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Curl femoral tumbado • Curl nórdico asistido • Curl de pie con polea.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Leg Ext B -->
+      <article class="exercise-card" data-exercise="legextb">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Cuádriceps • Bombeo Final</span>
+            <h2 class="ex-title">4. Extensiones de Cuádriceps en Máquina</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 12-15 reps</span>
+              <span class="tag tag-rir">RIR 1</span>
+              <span class="tag tag-rest" onclick="triggerRest(75)">⏱️ 75 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-legextb')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-legextb" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-EXTENSION.gif" loading="lazy" class="demo-media" alt="Leg Extension">
+          <div class="demo-footer">
+            <span class="demo-cadence">Bombeo continuo y quemazón pura</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+extensiones+cuadriceps+bombeo" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+leg+extension" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Ejercicio final de bombeo. Movimiento continuo sin pausas largas abajo, quemazón pura en el vientre muscular sin fatiga de espalda.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Sentadilla goblet profunda con talones elevados en disco • Step-ups en cajón.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Gemelo Sentado -->
+      <article class="exercise-card" data-exercise="gemelosentado">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Sóleo • Rodilla a 90°</span>
+            <h2 class="ex-title">5. Elevación de Talones Sentado en Máquina</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">4 × 12-15 reps</span>
+              <span class="tag tag-rir">RIR 1</span>
+              <span class="tag tag-rest" onclick="triggerRest(60)">⏱️ 60 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-gemelosentado')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-gemelosentado" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/06/Lever-Seated-Calf-Raise.gif" loading="lazy" class="demo-media" alt="Seated Calf Raise">
+          <div class="demo-footer">
+            <span class="demo-cadence">Pausa 2s en estiramiento abajo</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+gemelos+sentado+soleo" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+seated+calf+raise" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Rodillas a 90° para aislar el sóleo (ensancha la pantorrilla inferior). Pausa obligatoria de 2 segundos en el fondo del estiramiento.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Sentado en banco con barra acolchada sobre las rodillas • Mancuernas pesadas sobre muslos.</div>
+          </details>
+        </div>
+      </article>
+
+      <!-- Crunch -->
+      <article class="exercise-card" data-exercise="crunch">
+        <div class="card-top">
+          <div class="ex-meta">
+            <span class="ex-muscle">Recto Abdominal • Flexión Espinal</span>
+            <h2 class="ex-title">6. Crunch en Polea Alta Arrodillado</h2>
+            <div class="tag-row">
+              <span class="tag tag-dose">3 × 12-15 reps</span>
+              <span class="tag tag-rir">RIR 1-2</span>
+              <span class="tag tag-rest" onclick="triggerRest(60)">⏱️ 60 s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn" onclick="togglePlayer('player-crunch')">
+            <span>🎥 3D Demo</span>
+          </button>
+        </div>
+
+        <div id="player-crunch" class="demo-player">
+          <img src="https://fitnessprogramer.com/wp-content/uploads/2021/02/Kneeling-Cable-Crunch.gif" loading="lazy" class="demo-media" alt="Kneeling Cable Crunch">
+          <div class="demo-footer">
+            <span class="demo-cadence">Enrolla las costillas hacia la pelvis</span>
+            <div class="demo-links">
+              <a href="https://www.youtube.com/results?search_query=tecnica+crunch+polea+alta+arrodillado" target="_blank" class="ext-link">YouTube ↗</a>
+              <a href="https://www.google.com/search?q=site:musclewiki.com+kneeling+cable+crunch" target="_blank" class="ext-link">MuscleWiki ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <table class="sets-table">
+          <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
+          <tbody>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="30" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="30" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="30" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="collapsible-drawer">
+          <details>
+            <summary>Técnica clave</summary>
+            <div class="drawer-body">Fija la cadera en el espacio. El movimiento es pura flexión de columna enrollando las costillas hacia la pelvis, sin sentarte sobre los talones.</div>
+          </details>
+          <details>
+            <summary>Alternativas si está ocupado</summary>
+            <div class="drawer-body alt-badge">Elevación de piernas colgado en barra o paralelas • Crunch en el suelo con disco al pecho.</div>
+          </details>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- ==========================================
+         GUÍA & CALENTAMIENTO
+         ========================================== -->
+    <section id="guia" class="day-content">
+      <div class="guide-card">
+        <h2 class="guide-title">🔥 Protocolo de Calentamiento y Aproximación</h2>
+        <p style="font-size:0.78rem; color:var(--text-muted); line-height:1.5;">Las series de aproximación <strong>NO cuentan como series efectivas</strong>. Su único objetivo es lubricar articulaciones y potenciar el sistema nervioso:</p>
+        <table class="guide-table">
+          <thead><tr><th>Fase</th><th>Carga aprox.</th><th>Reps</th><th>Descanso</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1. Ligera</strong></td><td>Barra sola / ~40%</td><td>8 - 10</td><td>30 - 45 s</td></tr>
+            <tr><td><strong>2. Media</strong></td><td>~60% - 70%</td><td>3 - 5</td><td>60 - 90 s</td></tr>
+            <tr><td><strong>3. Potenciación</strong></td><td>~85% - 90%</td><td>1</td><td><strong>2 a 3 min</strong></td></tr>
+            <tr><td><strong>➡️ Efectiva 1</strong></td><td><strong>100% peso objetivo</strong></td><td><strong>Objetivo</strong></td><td>Descanso oficial</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="guide-card">
+        <h2 class="guide-title">📈 Doble Progresión Dinámica</h2>
+        <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.55;">
+          1. <strong>Fijar carga:</strong> Mantén el mismo peso en un ejercicio hasta que seas capaz de hacer el techo máximo de repeticiones en <strong>todas</strong> las series.<br><br>
+          2. <strong>Incremento:</strong> Cuando lo logres, añade el salto mínimo disponible (+2.5 kg en barra, +1 a +2 kg en mancuerna) y vuelve a empezar en el extremo inferior de repeticiones.
+        </p>
+      </div>
+
+      <div class="guide-card">
+        <h2 class="guide-title">⚡ Ahorrar 15-20 Minutos (Biseries Antagonistas)</h2>
+        <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.55;">
+          Si un día vas justo de tiempo, alterna sin descanso solapado:<br>
+          • <strong>Torso:</strong> Serie de Tríceps ➔ descansa 45 s ➔ Serie de Bíceps ➔ descansa 45 s y repite.<br>
+          • <strong>Pierna:</strong> Alterna Gemelos con Extensiones, o Gemelos sentado con Crunch.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       SMART REST TIMER DOCK (Floating Bottom App Bar)
+       ========================================== -->
+  <aside class="timer-dock">
+    <div class="timer-info">
+      <div class="timer-circle">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      </div>
+      <div>
+        <div class="timer-label" id="timerLabel">DESCANSO</div>
+        <div class="timer-digits" id="timerDisplay">00:00</div>
+      </div>
+    </div>
+    <div class="timer-controls">
+      <button class="t-btn" onclick="adjustTimer(30)">+30s</button>
+      <button class="t-btn play" id="timerPlayBtn" onclick="togglePlayTimer()">Iniciar</button>
+      <button class="t-btn skip" onclick="resetTimerDock()">✕</button>
+    </div>
+  </aside>
+
+  <!-- ==========================================
+       APP SCRIPTS & LOCALSTORAGE STATE ENGINE
+       ========================================== -->
+  <script>
+    // Navigation / Tabs
+    function selectDay(dayId) {
+      document.querySelectorAll('.nav-pill').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.day-content').forEach(content => content.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById(dayId).classList.add('active');
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Toggle 3D Player
+    function togglePlayer(playerId) {
+      const player = document.getElementById(playerId);
+      if (player) {
+        player.classList.toggle('open');
+      }
+    }
+
+    // Set Completion Logic
+    function completeSet(btn, restSeconds) {
+      const row = btn.closest('.set-row');
+      const isDone = row.classList.toggle('done');
+      
+      // Haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate(isDone ? [35] : [15]);
+      }
+
+      // Auto start timer if set completed
+      if (isDone && restSeconds) {
+        triggerRest(restSeconds);
+      }
+
+      updateProgress();
+      saveWorkoutState();
+    }
+
+    // Workout Progress Calculator
+    function updateProgress() {
+      const activeContent = document.querySelector('.day-content.active');
+      if (!activeContent || activeContent.id === 'guia') return;
+
+      const totalSets = activeContent.querySelectorAll('.set-row').length;
+      const doneSets = activeContent.querySelectorAll('.set-row.done').length;
+      const percentage = totalSets > 0 ? (doneSets / totalSets) * 100 : 0;
+
+      const bar = document.getElementById('workoutProgressBar');
+      const chip = document.getElementById('progressChip');
+      
+      if (bar) bar.style.width = percentage + '%';
+      if (chip) chip.innerText = `${doneSets}/${totalSets} series (${Math.round(percentage)}%)`;
+    }
+
+    // Reset Day Checks
+    function resetDayChecks(dayId) {
+      if (!confirm('¿Quieres reiniciar las series de este entrenamiento?')) return;
+      const container = document.getElementById(dayId);
+      if (container) {
+        container.querySelectorAll('.set-row').forEach(row => row.classList.remove('done'));
+      }
+      updateProgress();
+      saveWorkoutState();
+    }
+
+    // Rest Timer Engine
+    let timerDuration = 90;
+    let timerRemaining = 90;
+    let timerInterval = null;
+    let isTimerActive = false;
+
+    function formatClock(seconds) {
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function updateTimerUI() {
+      const display = document.getElementById('timerDisplay');
+      if (display) display.innerText = formatClock(timerRemaining);
+    }
+
+    function triggerRest(seconds) {
+      timerDuration = seconds;
+      timerRemaining = seconds;
+      updateTimerUI();
+      if (!isTimerActive) {
+        startTimerLoop();
+      }
+    }
+
+    function adjustTimer(sec) {
+      timerRemaining += sec;
+      updateTimerUI();
+    }
+
+    function togglePlayTimer() {
+      if (isTimerActive) {
+        pauseTimerLoop();
+      } else {
+        if (timerRemaining <= 0) timerRemaining = timerDuration;
+        startTimerLoop();
+      }
+    }
+
+    function startTimerLoop() {
+      clearInterval(timerInterval);
+      isTimerActive = true;
+      const btn = document.getElementById('timerPlayBtn');
+      if (btn) {
+        btn.innerText = "Pausa";
+        btn.classList.add('paused');
+      }
+      
+      timerInterval = setInterval(() => {
+        if (timerRemaining > 0) {
+          timerRemaining--;
+          updateTimerUI();
+        } else {
+          finishTimer();
+        }
+      }, 1000);
+    }
+
+    function pauseTimerLoop() {
+      clearInterval(timerInterval);
+      isTimerActive = false;
+      const btn = document.getElementById('timerPlayBtn');
+      if (btn) {
+        btn.innerText = "Reanudar";
+        btn.classList.remove('paused');
+      }
+    }
+
+    function resetTimerDock() {
+      clearInterval(timerInterval);
+      isTimerActive = false;
+      timerRemaining = timerDuration;
+      updateTimerUI();
+      const btn = document.getElementById('timerPlayBtn');
+      if (btn) {
+        btn.innerText = "Iniciar";
+        btn.classList.remove('paused');
+      }
+    }
+
+    function finishTimer() {
+      clearInterval(timerInterval);
+      isTimerActive = false;
+      const btn = document.getElementById('timerPlayBtn');
+      if (btn) {
+        btn.innerText = "Listo";
+        btn.classList.remove('paused');
+      }
+      playAlertTone();
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 300]);
+    }
+
+    function playAlertTone() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+        osc.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.3); // E6
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      } catch (e) {}
+    }
+
+    // LocalStorage Persistent State
+    function saveInput(input) {
+      saveWorkoutState();
+    }
+
+    function saveWorkoutState() {
+      const state = { inputs: {}, completed: [] };
+      document.querySelectorAll('.set-input').forEach((input, idx) => {
+        if (input.value) state.inputs[idx] = input.value;
+      });
+      document.querySelectorAll('.set-row').forEach((row, idx) => {
+        if (row.classList.contains('done')) state.completed.push(idx);
+      });
+      localStorage.setItem('aesthetic_routine_data', JSON.stringify(state));
+    }
+
+    function loadWorkoutState() {
+      const saved = localStorage.getItem('aesthetic_routine_data');
+      if (!saved) return;
+      try {
+        const state = JSON.parse(saved);
+        if (state.inputs) {
+          document.querySelectorAll('.set-input').forEach((input, idx) => {
+            if (state.inputs[idx]) input.value = state.inputs[idx];
+          });
+        }
+        if (state.completed) {
+          const rows = document.querySelectorAll('.set-row');
+          state.completed.forEach(idx => {
+            if (rows[idx]) rows[idx].classList.add('done');
+          });
+        }
+      } catch (e) {}
+      updateProgress();
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadWorkoutState();
+      updateTimerUI();
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+    });
+  </script>
+</body>
+</html>
