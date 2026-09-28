@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigorexiapp-v15';
+const CACHE_NAME = 'vigorexiapp-v16';
 const ASSETS = [
   './',
   './index.html',
@@ -19,12 +19,12 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
+  self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS);
     })
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
@@ -33,23 +33,47 @@ self.addEventListener('activate', (e) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('[SW] Purgando caché obsoleta:', key);
             return caches.delete(key);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((res) => {
-      return res || fetch(e.request).catch(() => {
-        if (e.request.destination === 'document') {
-          return caches.match('./index.html');
+  const url = new URL(e.request.url);
+  const isNav = e.request.mode === 'navigate' || e.request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname.endsWith('/gym/') || url.pathname.endsWith('/gym');
+
+  // Network-first para páginas HTML para que cualquier actualización en GitHub se aplique de inmediato
+  if (isNav) {
+    e.respondWith(
+      fetch(e.request).then((networkRes) => {
+        if (networkRes && networkRes.status === 200) {
+          const clone = networkRes.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
         }
-      });
+        return networkRes;
+      }).catch(() => {
+        return caches.match(e.request).then((res) => res || caches.match('./index.html'));
+      })
+    );
+    return;
+  }
+
+  // Stale-while-revalidate / Cache-first con actualización en segundo plano para recursos estáticos
+  e.respondWith(
+    caches.match(e.request).then((cachedRes) => {
+      const fetchPromise = fetch(e.request).then((networkRes) => {
+        if (networkRes && networkRes.status === 200) {
+          const clone = networkRes.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+        }
+        return networkRes;
+      }).catch(() => null);
+
+      return cachedRes || fetchPromise;
     })
   );
 });
@@ -87,6 +111,7 @@ self.addEventListener('message', (event) => {
       clearTimeout(bgTimerId);
       bgTimerId = null;
     }
+  } else if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
-

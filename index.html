@@ -5181,6 +5181,23 @@
       updateProgress();
     }
 
+    function clearAppCacheAndReload() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(r => r.unregister());
+        });
+      }
+      if (window.caches) {
+        caches.keys().then(keys => {
+          Promise.all(keys.map(k => caches.delete(k))).then(() => {
+            window.location.href = window.location.pathname + '?v=' + Date.now();
+          });
+        });
+      } else {
+        window.location.href = window.location.pathname + '?v=' + Date.now();
+      }
+    }
+
     // Initialize on load
     window.addEventListener('DOMContentLoaded', () => {
       loadWorkoutState();
@@ -5188,7 +5205,22 @@
       updateTimerUI();
       runSessionTimerTicker();
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(reg => { reg.update(); }).catch(() => {});
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+          reg.update();
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+                }
+              });
+            }
+          });
+        }).catch(() => {});
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload();
+        });
       }
     });
   </script>
