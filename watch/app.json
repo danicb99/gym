@@ -30,6 +30,7 @@
             "page/day_select/index",
             "page/workout/index",
             "page/timer/index",
+            "page/options/index",
             "page/alternatives/index",
             "page/summary/index"
           ]

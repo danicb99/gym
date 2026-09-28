@@ -82,14 +82,14 @@ Page(BasePage({
     const currentSlotNum = app.globalData.currentSlotIndex + 1
     const totalSlots = day.slots.length
     const currentSetNum = app.globalData.currentSetIndex + 1
-    const totalSets = (slot.sets && slot.sets.length) || 4
+    const totalSets = app.getTotalSetsForSlot ? app.getTotalSetsForSlot(slot) : ((slot.sets && slot.sets.length) || 4)
 
-    // 1. BARRA SUPERIOR (Pulsaciones, Duración, Slot #)
+    // 1. BARRA SUPERIOR (Pulsaciones, Duración, Botón Menú Ajustes ⚙️)
     this.state.hrWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 45,
-      y: 35,
-      w: 110,
-      h: 24,
+      x: 48,
+      y: 28,
+      w: 96,
+      h: 34,
       color: 0xf43f5e, // Rose red
       text_size: 16,
       align_h: hmUI.align.LEFT,
@@ -102,10 +102,10 @@ Page(BasePage({
     const isResting = app.globalData.restTimer && app.globalData.restTimer.active
     this.state.timerWidget = hmUI.createWidget(hmUI.widget.BUTTON, {
       x: 148,
-      y: 28,
-      w: 170,
-      h: 36,
-      radius: 18,
+      y: 24,
+      w: 168,
+      h: 38,
+      radius: 19,
       normal_color: isResting ? 0x1e293b : 0x0f172a,
       press_color: 0x334155,
       color: isResting ? 0xfbbf24 : 0x94a3b8,
@@ -120,55 +120,61 @@ Page(BasePage({
       }
     })
 
-    hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 310,
-      y: 35,
-      w: 110,
-      h: 24,
-      color: 0x38bdf8, // Cyan
-      text_size: 16,
-      align_h: hmUI.align.RIGHT,
-      align_v: hmUI.align.CENTER_V,
-      text: `Ej ${currentSlotNum}/${totalSlots}`
+    // Botón de Menú / Ajustes (Opción A: arriba a la derecha)
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 324,
+      y: 24,
+      w: 50,
+      h: 38,
+      radius: 19,
+      normal_color: 0x1e293b,
+      press_color: 0x334155,
+      color: 0xfbbf24,
+      text_size: 20,
+      text: '⚙️',
+      click_func: () => {
+        vibrateShort()
+        push({ url: 'page/options/index' })
+      }
     })
 
-    // 2. NOMBRE DEL EJERCICIO Y SERIE
+    // 2. NOMBRE DEL EJERCICIO Y SERIE (Texto grande y claro)
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 40,
-      y: 65,
-      w: 386,
-      h: 36,
+      x: 38,
+      y: 66,
+      w: 390,
+      h: 34,
       color: 0xfbbf24, // Gold / Amber
-      text_size: 22,
+      text_size: 23,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: ex ? ex.name : 'Ejercicio'
     })
 
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 40,
-      y: 98,
-      w: 386,
+      x: 38,
+      y: 100,
+      w: 390,
       h: 26,
       color: 0x38bdf8, // Cyan
       text_size: 16,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: `SERIE ${currentSetNum} DE ${totalSets}`
+      text: `SERIE ${currentSetNum} DE ${totalSets} • Ej ${currentSlotNum}/${totalSlots}`
     })
 
-    // 3. CONTROL DE KILOS ( [-]  80.0 kg  [+] )
-    const rowKgY = 132
+    // 3. CONTROL DE KILOS ( [-]  80.0 kg  [+] ) - TAMAÑO XL
+    const rowKgY = 136
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 75,
+      x: 60,
       y: rowKgY,
-      w: 52,
-      h: 52,
-      radius: 26,
+      w: 60,
+      h: 58,
+      radius: 29,
       normal_color: 0x1e293b,
       press_color: 0x334155,
       color: 0xffffff,
-      text_size: 26,
+      text_size: 32,
       text: '-',
       click_func: () => {
         vibrateShort()
@@ -177,27 +183,27 @@ Page(BasePage({
     })
 
     this.state.kgWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 135,
+      x: 125,
       y: rowKgY,
-      w: 196,
-      h: 52,
+      w: 216,
+      h: 58,
       color: 0xffffff,
-      text_size: 28,
+      text_size: 36,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: `${this.state.currentKg.toFixed(1)} kg`
     })
 
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 339,
+      x: 346,
       y: rowKgY,
-      w: 52,
-      h: 52,
-      radius: 26,
+      w: 60,
+      h: 58,
+      radius: 29,
       normal_color: 0x1e293b,
       press_color: 0x334155,
       color: 0xffffff,
-      text_size: 26,
+      text_size: 32,
       text: '+',
       click_func: () => {
         vibrateShort()
@@ -205,18 +211,18 @@ Page(BasePage({
       }
     })
 
-    // 4. CONTROL DE REPETICIONES ( [-]  8 reps  [+] )
-    const rowRepsY = 196
+    // 4. CONTROL DE REPETICIONES ( [-]  8 reps  [+] ) - TAMAÑO XL
+    const rowRepsY = 206
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 75,
+      x: 60,
       y: rowRepsY,
-      w: 52,
-      h: 52,
-      radius: 26,
+      w: 60,
+      h: 58,
+      radius: 29,
       normal_color: 0x1e293b,
       press_color: 0x334155,
       color: 0xffffff,
-      text_size: 26,
+      text_size: 32,
       text: '-',
       click_func: () => {
         vibrateShort()
@@ -225,27 +231,27 @@ Page(BasePage({
     })
 
     this.state.repsWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 135,
+      x: 125,
       y: rowRepsY,
-      w: 196,
-      h: 52,
+      w: 216,
+      h: 58,
       color: 0xffffff,
-      text_size: 28,
+      text_size: 36,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: `${this.state.currentReps} reps`
     })
 
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 339,
+      x: 346,
       y: rowRepsY,
-      w: 52,
-      h: 52,
-      radius: 26,
+      w: 60,
+      h: 58,
+      radius: 29,
       normal_color: 0x1e293b,
       press_color: 0x334155,
       color: 0xffffff,
-      text_size: 26,
+      text_size: 32,
       text: '+',
       click_func: () => {
         vibrateShort()
@@ -253,73 +259,31 @@ Page(BasePage({
       }
     })
 
-    // 5. BOTÓN PRINCIPAL: COMPLETAR SERIE (Grande y accesible)
+    // 5. BOTÓN PRINCIPAL: COMPLETAR SERIE (Grande y prominente)
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 65,
-      y: 262,
-      w: 336,
-      h: 56,
-      radius: 28,
+      x: 60,
+      y: 280,
+      w: 346,
+      h: 64,
+      radius: 32,
       normal_color: 0x10b981, // Emerald green
       press_color: 0x059669,
       color: 0xffffff,
-      text_size: 19,
+      text_size: 22,
       text: '✓ COMPLETAR SERIE',
       click_func: () => {
         this.completeCurrentSet()
       }
     })
 
-    // 6. ACCIONES SECUNDARIAS INFERIORES: ALTERNATIVAS & SIGUIENTE / FIN
-    const bottomY = 330
-    hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 65,
-      y: bottomY,
-      w: 160,
-      h: 46,
-      radius: 23,
-      normal_color: 0x1e293b,
-      press_color: 0x334155,
-      color: 0xfbbf24,
-      text_size: 15,
-      text: '⇄ Alternativas',
-      click_func: () => {
-        vibrateShort()
-        push({ url: 'page/alternatives/index' })
-      }
-    })
-
-    const isLastExercise = currentSlotNum >= totalSlots && currentSetNum >= totalSets
-    hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 241,
-      y: bottomY,
-      w: 160,
-      h: 46,
-      radius: 23,
-      normal_color: isLastExercise ? 0xef4444 : 0x1e293b,
-      press_color: 0x334155,
-      color: 0xf8fafc,
-      text_size: 15,
-      text: isLastExercise ? '🏁 Fin Entreno' : 'Saltar Ej. ➔',
-      click_func: () => {
-        vibrateShort()
-        if (isLastExercise) {
-          app.finishWorkout()
-          replace({ url: 'page/summary/index' })
-        } else {
-          this.advanceToNextExercise()
-        }
-      }
-    })
-
-    // 7. HORA ACTUAL INFERIOR
+    // 6. HORA ACTUAL INFERIOR (Grande, nítida, sin emoji)
     this.state.clockWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 103,
-      y: 390,
-      w: 260,
-      h: 30,
-      color: 0x94a3b8, // Slate gray
-      text_size: 17,
+      x: 108,
+      y: 368,
+      w: 250,
+      h: 46,
+      color: 0xf1f5f9, // Blanco suave de alto contraste
+      text_size: 30,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.getClockStr()
@@ -336,7 +300,7 @@ Page(BasePage({
     const m = now.getMinutes()
     const hStr = h < 10 ? '0' + h : '' + h
     const mStr = m < 10 ? '0' + m : '' + m
-    return `🕒 ${hStr}:${mStr}`
+    return `${hStr}:${mStr}`
   },
 
   updateClockDisplay() {
@@ -463,7 +427,7 @@ Page(BasePage({
     // Registrar serie en la memoria de la sesión
     app.recordSet(slot.slotId, app.globalData.currentSetIndex, this.state.currentKg, this.state.currentReps)
 
-    const totalSetsInSlot = (slot.sets && slot.sets.length) || 4
+    const totalSetsInSlot = app.getTotalSetsForSlot ? app.getTotalSetsForSlot(slot) : ((slot.sets && slot.sets.length) || 4)
     const restDuration = (ex && ex.rest) ? ex.rest : 90
 
     // Avanzar contador de series

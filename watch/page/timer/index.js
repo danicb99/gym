@@ -135,9 +135,9 @@ Page({
     // Subtexto motivacional inferior
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 33,
-      y: 345,
+      y: 338,
       w: 400,
-      h: 26,
+      h: 24,
       color: 0x64748b,
       text_size: 14,
       align_h: hmUI.align.CENTER_H,
@@ -145,14 +145,14 @@ Page({
       text: 'Vibrará en la muñeca al terminar'
     })
 
-    // Reloj inferior (Hora actual)
+    // Reloj inferior (Hora actual - Grande y limpio)
     this.state.clockWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 103,
-      y: 388,
-      w: 260,
-      h: 30,
-      color: 0x94a3b8, // Slate gray
-      text_size: 17,
+      x: 108,
+      y: 368,
+      w: 250,
+      h: 46,
+      color: 0xf1f5f9,
+      text_size: 30,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.getClockStr()
@@ -168,7 +168,7 @@ Page({
     const m = now.getMinutes()
     const hStr = h < 10 ? '0' + h : '' + h
     const mStr = m < 10 ? '0' + m : '' + m
-    return `🕒 ${hStr}:${mStr}`
+    return `${hStr}:${mStr}`
   },
 
   updateClockDisplay() {

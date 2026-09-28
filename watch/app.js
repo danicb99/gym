@@ -17,6 +17,7 @@ App(
       sessionStartTime: null,
       sessionLoggedSets: {},  // slotId -> [ { kg: 80, reps: 8, completed: true } ]
       slotExOverrides: {},    // slotId -> exId (sustituciones en caliente)
+      slotExtraSets: {},      // slotId -> delta de series añadidas/quitadas
       phoneLiveSession: null, // Datos del entreno activo en el móvil si existe
       isPhoneSynced: false,   // True si la sesión actual está enlazada al móvil
       restTimer: {
@@ -41,6 +42,7 @@ App(
         this.globalData.sessionStartTime = saved.activeSession.sessionStartTime
         this.globalData.sessionLoggedSets = saved.activeSession.sessionLoggedSets || {}
         this.globalData.slotExOverrides = saved.activeSession.slotExOverrides || {}
+        this.globalData.slotExtraSets = saved.activeSession.slotExtraSets || {}
       }
 
       // 2. Comprobar en segundo plano si el móvil tiene un entreno en curso
@@ -56,7 +58,8 @@ App(
           currentSetIndex: this.globalData.currentSetIndex,
           sessionStartTime: this.globalData.sessionStartTime,
           sessionLoggedSets: this.globalData.sessionLoggedSets,
-          slotExOverrides: this.globalData.slotExOverrides
+          slotExOverrides: this.globalData.slotExOverrides,
+          slotExtraSets: this.globalData.slotExtraSets
         })
       }
     },
@@ -151,6 +154,41 @@ App(
       return EXERCISE_CATALOG[effectiveExId] || EXERCISE_CATALOG[slot.defaultExId]
     },
 
+    getTotalSetsForSlot(slot) {
+      if (!slot) return 4
+      const base = (slot.sets && slot.sets.length) || 4
+      const extra = (this.globalData.slotExtraSets && this.globalData.slotExtraSets[slot.slotId]) || 0
+      return Math.max(1, base + extra)
+    },
+
+    addExtraSet(slotId) {
+      if (!this.globalData.slotExtraSets) this.globalData.slotExtraSets = {}
+      this.globalData.slotExtraSets[slotId] = (this.globalData.slotExtraSets[slotId] || 0) + 1
+      saveActiveSession({
+        activeDayId: this.globalData.activeDayId,
+        currentSlotIndex: this.globalData.currentSlotIndex,
+        currentSetIndex: this.globalData.currentSetIndex,
+        sessionStartTime: this.globalData.sessionStartTime,
+        sessionLoggedSets: this.globalData.sessionLoggedSets,
+        slotExOverrides: this.globalData.slotExOverrides,
+        slotExtraSets: this.globalData.slotExtraSets
+      })
+    },
+
+    removeSet(slotId) {
+      if (!this.globalData.slotExtraSets) this.globalData.slotExtraSets = {}
+      this.globalData.slotExtraSets[slotId] = (this.globalData.slotExtraSets[slotId] || 0) - 1
+      saveActiveSession({
+        activeDayId: this.globalData.activeDayId,
+        currentSlotIndex: this.globalData.currentSlotIndex,
+        currentSetIndex: this.globalData.currentSetIndex,
+        sessionStartTime: this.globalData.sessionStartTime,
+        sessionLoggedSets: this.globalData.sessionLoggedSets,
+        slotExOverrides: this.globalData.slotExOverrides,
+        slotExtraSets: this.globalData.slotExtraSets
+      })
+    },
+
     recordSet(slotId, setIndex, kg, reps) {
       if (!this.globalData.sessionLoggedSets[slotId]) {
         this.globalData.sessionLoggedSets[slotId] = []
@@ -169,7 +207,8 @@ App(
         currentSetIndex: this.globalData.currentSetIndex,
         sessionStartTime: this.globalData.sessionStartTime,
         sessionLoggedSets: this.globalData.sessionLoggedSets,
-        slotExOverrides: this.globalData.slotExOverrides
+        slotExOverrides: this.globalData.slotExOverrides,
+        slotExtraSets: this.globalData.slotExtraSets
       })
 
       // Notificar al smartphone por BLE -> Side Service -> WebApp

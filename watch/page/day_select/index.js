@@ -202,14 +202,14 @@ Page(
         })
       })
 
-      // Reloj inferior (Hora actual)
+      // Reloj inferior (Hora actual - Limpio)
       this.state.clockWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-        x: 103,
-        y: 395,
-        w: 260,
-        h: 28,
-        color: 0x94a3b8,
-        text_size: 16,
+        x: 108,
+        y: 388,
+        w: 250,
+        h: 38,
+        color: 0xf1f5f9,
+        text_size: 26,
         align_h: hmUI.align.CENTER_H,
         align_v: hmUI.align.CENTER_V,
         text: this.getClockStr()
@@ -222,7 +222,7 @@ Page(
       const m = now.getMinutes()
       const hStr = h < 10 ? '0' + h : '' + h
       const mStr = m < 10 ? '0' + m : '' + m
-      return `🕒 ${hStr}:${mStr}`
+      return `${hStr}:${mStr}`
     },
 
     onResume() {
