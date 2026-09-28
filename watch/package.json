@@ -8,5 +8,8 @@
     "preview": "wsl -e bash -c \"export PATH=~/.npm-global/bin:$PATH && cd /mnt/c/_DESARROLLO/VIGOREXIAPP_DEV/watch && zeus preview\""
   },
   "author": "VigorexiApp",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@zeppos/zml": "^0.0.43"
+  }
 }

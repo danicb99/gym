@@ -6,10 +6,11 @@
 import * as hmUI from '@zos/ui'
 import { push, replace } from '@zos/router'
 import { HeartRate } from '@zos/sensor'
+import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
 import { vibrateShort } from '../../utils/haptics'
 
-Page({
+Page(BasePage({
   state: {
     app: null,
     heartRateSensor: null,
@@ -388,4 +389,4 @@ Page({
       } catch (e) {}
     }
   }
-})
+}))
