@@ -1,11 +1,14 @@
-const CACHE_NAME = 'vigorexiapp-v1';
+const CACHE_NAME = 'vigorexiapp-v2';
 const ASSETS = [
   './',
   './index.html',
   './rutina_movil.html',
   './manifest.json',
+  './manifest.json?v=2',
   './icon-192.png',
+  './icon-192.png?v=2',
   './icon-512.png',
+  './icon-512.png?v=2',
   './favicon.png'
 ];
 

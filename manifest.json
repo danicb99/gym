@@ -1,24 +1,38 @@
 {
+  "id": "/gym/",
   "name": "Vigorexiapp - Rutina Elite Torso/Pierna",
   "short_name": "Vigorexiapp",
   "description": "Tu app de entrenamiento inteligente con registro de series, temporizador superior, alternativas 3D y backup.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#070b14",
   "theme_color": "#070b14",
   "icons": [
     {
-      "src": "./icon-192.png",
+      "src": "./icon-192.png?v=2",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "./icon-512.png",
+      "src": "./icon-192.png?v=2",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-512.png?v=2",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png?v=2",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

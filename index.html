@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#070b12">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href="./manifest.json">
-  <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="icon" type="image/png" href="./icon-192.png">
+  <link rel="manifest" href="./manifest.json?v=2">
+  <link rel="apple-touch-icon" href="./icon-192.png?v=2">
+  <link rel="icon" type="image/png" href="./icon-192.png?v=2">
   <title>Vigorexiapp - Elite Workout Tracker</title>
   <style>
     :root {
@@ -288,6 +288,98 @@
     .guide-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.78rem; }
     .guide-table th, .guide-table td { padding: 9px 8px; text-align: left; border-bottom: 1px solid var(--border); }
     .guide-table th { color: var(--cyan); font-weight: 700; }
+
+    /* Body Modal Lock */
+    body.modal-open { overflow: hidden !important; height: 100vh !important; }
+
+    /* Exercise Card Top with Avatar */
+    .card-top { display: flex; align-items: center; gap: 12px; }
+    .ex-icon-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      user-select: none;
+    }
+    .summary-icon-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      margin-right: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Day Bottom Actions */
+    .day-bottom-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 32px 0 16px;
+      order: 999;
+    }
+    .btn-bottom-finish {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border: 1px solid var(--primary);
+      color: #042f2e;
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px var(--primary-glow);
+      transition: all 0.15s;
+    }
+    .btn-bottom-finish:active { transform: scale(0.98); }
+    .btn-bottom-history {
+      background: var(--surface-card);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: var(--cyan);
+      border-radius: var(--radius-md);
+      padding: 13px 18px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+    .btn-bottom-history:hover { background: rgba(6, 182, 212, 0.1); }
+    .btn-bottom-history:active { transform: scale(0.98); }
+
+    /* History View Top Nav Return Button */
+    .history-top-nav { margin-bottom: 14px; }
+    .btn-history-back {
+      background: var(--surface-elevated);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: var(--cyan);
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.15s;
+    }
+    .btn-history-back:active { transform: scale(0.97); }
+
   </style>
 </head>
 <body>
@@ -304,7 +396,6 @@
           <option value="piernaA">Día 2: Pierna A • Cuádriceps</option>
           <option value="torsoB">Día 3: Torso B • Tracción</option>
           <option value="piernaB">Día 4: Pierna B • Isquios</option>
-          <option value="historialView">📊 Historial & Backup</option>
         </select>
       </div>
 
@@ -315,7 +406,6 @@
           <span class="timer-digits" id="timerDisplay">00:00</span>
         </div>
         <div class="top-timer-controls">
-          <button class="t-btn-top" onclick="adjustTimer(30)" title="+30s">+30s</button>
           <button class="t-btn-top play" id="timerPlayBtn" onclick="togglePlayTimer()">Iniciar</button>
           <button class="t-btn-top skip" onclick="resetTimerDock()" title="Reiniciar / Cancelar">✕</button>
         </div>
@@ -362,6 +452,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoA_1')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoA_1" style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.35);">🏋️‍♂️</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoA_1">1. Press de Banca Plano con Barra</span>
               <span class="summary-sub" id="summary-sub-torsoA_1">4/4 series completadas</span>
@@ -373,6 +464,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_1">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoA_1" style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.35);">
+              <span class="ex-emoji">🏋️‍♂️</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoA_1">Pectoral Mayor • Fuerza</span>
               <h2 class="ex-title" id="title-torsoA_1">1. Press de Banca Plano con Barra</h2>
@@ -455,6 +549,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoA_2')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoA_2" style="background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.35);">🧗‍♂️</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoA_2">2. Jalón al Pecho (Prono Ancho)</span>
               <span class="summary-sub" id="summary-sub-torsoA_2">4/4 series completadas</span>
@@ -466,6 +561,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_2">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoA_2" style="background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.35);">
+              <span class="ex-emoji">🧗‍♂️</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoA_2">Dorsal Ancho • Tracción Vertical</span>
               <h2 class="ex-title" id="title-torsoA_2">2. Jalón al Pecho (Prono Ancho)</h2>
@@ -548,6 +646,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoA_3')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoA_3" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35);">🎖️</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoA_3">3. Press Militar Sentado con Mancuernas (75°)</span>
               <span class="summary-sub" id="summary-sub-torsoA_3">3/3 series completadas</span>
@@ -559,6 +658,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_3">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoA_3" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35);">
+              <span class="ex-emoji">🎖️</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoA_3">Deltoides Anterior & Lateral</span>
               <h2 class="ex-title" id="title-torsoA_3">3. Press Militar Sentado con Mancuernas (75°)</h2>
@@ -635,6 +737,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoA_4')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoA_4" style="background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.35);">🚣‍♂️</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoA_4">4. Remo en Polea Baja (Agarre Neutro Estrecho)</span>
               <span class="summary-sub" id="summary-sub-torsoA_4">3/3 series completadas</span>
@@ -646,6 +749,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_4">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoA_4" style="background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.35);">
+              <span class="ex-emoji">🚣‍♂️</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoA_4">Espalda Media & Dorsal • Tracción Horizontal</span>
               <h2 class="ex-title" id="title-torsoA_4">4. Remo en Polea Baja (Agarre Neutro Estrecho)</h2>
@@ -722,6 +828,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoA_5')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoA_5" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35);">🦅</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoA_5">5. Elevaciones Laterales con Mancuernas</span>
               <span class="summary-sub" id="summary-sub-torsoA_5">4/4 series completadas</span>
@@ -733,6 +840,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_5">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoA_5" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35);">
+              <span class="ex-emoji">🦅</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoA_5">Deltoides Lateral • Amplitud</span>
               <h2 class="ex-title" id="title-torsoA_5">5. Elevaciones Laterales con Mancuernas</h2>
@@ -815,6 +925,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoA_6')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoA_6" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.35);">🏹</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoA_6">6. Extensión de Tríceps en Polea Alta</span>
               <span class="summary-sub" id="summary-sub-torsoA_6">3/3 series completadas</span>
@@ -826,6 +937,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_6">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoA_6" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.35);">
+              <span class="ex-emoji">🏹</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoA_6">Tríceps • Cabeza Lateral & Medial</span>
               <h2 class="ex-title" id="title-torsoA_6">6. Extensión de Tríceps en Polea Alta</h2>
@@ -902,6 +1016,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoA_7')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoA_7" style="background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.35);">💪</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoA_7">7. Curl de Bíceps con Mancuernas (Supinación)</span>
               <span class="summary-sub" id="summary-sub-torsoA_7">3/3 series completadas</span>
@@ -913,6 +1028,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_7">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoA_7" style="background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.35);">
+              <span class="ex-emoji">💪</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoA_7">Bíceps Braquial • Supinación</span>
               <h2 class="ex-title" id="title-torsoA_7">7. Curl de Bíceps con Mancuernas (Supinación)</h2>
@@ -981,6 +1099,18 @@
           </div>
         </div>
       </article>
+
+      <!-- Day Bottom Actions -->
+      <div class="day-bottom-actions">
+        <button class="btn-bottom-finish" onclick="finishDaySession('torsoA')" title="Guardar marcas y finalizar sesión">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Finalizar y Guardar Día</span>
+        </button>
+        <button class="btn-bottom-history" onclick="selectDay('historialView')" title="Ver registros históricos, 1RM y copias de seguridad">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-3 3"/></svg>
+          <span>📊 Ver Historial Completo & Copias de Seguridad</span>
+        </button>
+      </div>
     </section>
 
     <!-- ==========================================
@@ -1015,6 +1145,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('piernaA_1')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-piernaA_1" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35);">🧲</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-piernaA_1">1. Sentadilla Trasera con Barra (Back Squat)</span>
               <span class="summary-sub" id="summary-sub-piernaA_1">4/4 series completadas</span>
@@ -1026,6 +1157,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaA_1">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-piernaA_1" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35);">
+              <span class="ex-emoji">🧲</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-piernaA_1">Cuádriceps & Glúteo • Básico Pesado</span>
               <h2 class="ex-title" id="title-piernaA_1">1. Sentadilla Trasera con Barra (Back Squat)</h2>
@@ -1108,6 +1242,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('piernaA_2')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-piernaA_2" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35);">⚡</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-piernaA_2">2. Extensiones de Cuádriceps en Máquina</span>
               <span class="summary-sub" id="summary-sub-piernaA_2">3/3 series completadas</span>
@@ -1119,6 +1254,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaA_2">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-piernaA_2" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35);">
+              <span class="ex-emoji">⚡</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-piernaA_2">Cuádriceps • Aislamiento</span>
               <h2 class="ex-title" id="title-piernaA_2">2. Extensiones de Cuádriceps en Máquina</h2>
@@ -1195,6 +1333,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('piernaA_3')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-piernaA_3" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35);">🧲</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-piernaA_3">3. Curl Femoral Tumbado</span>
               <span class="summary-sub" id="summary-sub-piernaA_3">4/4 series completadas</span>
@@ -1206,6 +1345,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaA_3">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-piernaA_3" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35);">
+              <span class="ex-emoji">🧲</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-piernaA_3">Isquiosurales • Cadera Neutra</span>
               <h2 class="ex-title" id="title-piernaA_3">3. Curl Femoral Tumbado</h2>
@@ -1288,6 +1430,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('piernaA_4')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-piernaA_4" style="background: rgba(244, 114, 182, 0.15); border: 1px solid rgba(244, 114, 182, 0.35);">🦶</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-piernaA_4">4. Elevación de Talones de Pie en Máquina</span>
               <span class="summary-sub" id="summary-sub-piernaA_4">3/3 series completadas</span>
@@ -1299,6 +1442,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaA_4">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-piernaA_4" style="background: rgba(244, 114, 182, 0.15); border: 1px solid rgba(244, 114, 182, 0.35);">
+              <span class="ex-emoji">🦶</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-piernaA_4">Gastrocnemio (Gemelos) • Rodilla Recta</span>
               <h2 class="ex-title" id="title-piernaA_4">4. Elevación de Talones de Pie en Máquina</h2>
@@ -1375,6 +1521,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('piernaA_5')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-piernaA_5" style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35);">🧱</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-piernaA_5">5. Plancha Abdominal Isométrica (o Rueda)</span>
               <span class="summary-sub" id="summary-sub-piernaA_5">3/3 series completadas</span>
@@ -1386,6 +1533,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaA_5">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-piernaA_5" style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35);">
+              <span class="ex-emoji">🧱</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-piernaA_5">Core • Anti-Extensión</span>
               <h2 class="ex-title" id="title-piernaA_5">5. Plancha Abdominal Isométrica (o Rueda)</h2>
@@ -1454,6 +1604,18 @@
           </div>
         </div>
       </article>
+
+      <!-- Day Bottom Actions -->
+      <div class="day-bottom-actions">
+        <button class="btn-bottom-finish" onclick="finishDaySession('piernaA')" title="Guardar marcas y finalizar sesión">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Finalizar y Guardar Día</span>
+        </button>
+        <button class="btn-bottom-history" onclick="selectDay('historialView')" title="Ver registros históricos, 1RM y copias de seguridad">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-3 3"/></svg>
+          <span>📊 Ver Historial Completo & Copias de Seguridad</span>
+        </button>
+      </div>
     </section>
 
     <!-- ==========================================
@@ -1488,6 +1650,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoB_1')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoB_1" style="background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.35);">🚣‍♂️</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoB_1">1. Remo Unilateral con Mancuerna</span>
               <span class="summary-sub" id="summary-sub-torsoB_1">4/4 series completadas</span>
@@ -1499,6 +1662,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_1">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoB_1" style="background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.35);">
+              <span class="ex-emoji">🚣‍♂️</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoB_1">Dorsal Ancho • Corrección Asimetrías</span>
               <h2 class="ex-title" id="title-torsoB_1">1. Remo Unilateral con Mancuerna</h2>
@@ -1581,6 +1747,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoB_2')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoB_2" style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.35);">📐</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoB_2">2. Press Inclinado con Mancuernas (30°)</span>
               <span class="summary-sub" id="summary-sub-torsoB_2">4/4 series completadas</span>
@@ -1592,6 +1759,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_2">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoB_2" style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.35);">
+              <span class="ex-emoji">📐</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoB_2">Pectoral Superior (Clavicular)</span>
               <h2 class="ex-title" id="title-torsoB_2">2. Press Inclinado con Mancuernas (30°)</h2>
@@ -1674,6 +1844,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoB_3')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoB_3" style="background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.35);">🧗‍♂️</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoB_3">3. Jalón al Pecho con Agarre Neutro Cerrado</span>
               <span class="summary-sub" id="summary-sub-torsoB_3">4/4 series completadas</span>
@@ -1685,6 +1856,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_3">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoB_3" style="background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.35);">
+              <span class="ex-emoji">🧗‍♂️</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoB_3">Dorsal Ancho • Estiramiento</span>
               <h2 class="ex-title" id="title-torsoB_3">3. Jalón al Pecho con Agarre Neutro Cerrado</h2>
@@ -1767,6 +1941,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoB_4')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoB_4" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35);">🦅</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoB_4">4. Elevaciones Laterales en Polea (o Mancuernas)</span>
               <span class="summary-sub" id="summary-sub-torsoB_4">4/4 series completadas</span>
@@ -1778,6 +1953,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_4">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoB_4" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35);">
+              <span class="ex-emoji">🦅</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoB_4">Deltoides Lateral • Tensión Continua</span>
               <h2 class="ex-title" id="title-torsoB_4">4. Elevaciones Laterales en Polea (o Mancuernas)</h2>
@@ -1860,6 +2038,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoB_5')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoB_5" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35);">🎯</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoB_5">5. Face Pull en Polea Alta</span>
               <span class="summary-sub" id="summary-sub-torsoB_5">3/3 series completadas</span>
@@ -1871,6 +2050,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_5">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoB_5" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35);">
+              <span class="ex-emoji">🎯</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoB_5">Deltoides Posterior & Manguito</span>
               <h2 class="ex-title" id="title-torsoB_5">5. Face Pull en Polea Alta</h2>
@@ -1947,6 +2129,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoB_6')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoB_6" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.35);">🥋</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoB_6">6. Press Francés con Barra Z o Mancuernas</span>
               <span class="summary-sub" id="summary-sub-torsoB_6">3/3 series completadas</span>
@@ -1958,6 +2141,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_6">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoB_6" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.35);">
+              <span class="ex-emoji">🥋</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoB_6">Tríceps • Cabeza Larga</span>
               <h2 class="ex-title" id="title-torsoB_6">6. Press Francés con Barra Z o Mancuernas</h2>
@@ -2034,6 +2220,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoB_7')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-torsoB_7" style="background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.35);">🔨</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-torsoB_7">7. Curl Martillo con Mancuernas</span>
               <span class="summary-sub" id="summary-sub-torsoB_7">3/3 series completadas</span>
@@ -2045,6 +2232,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_7">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-torsoB_7" style="background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.35);">
+              <span class="ex-emoji">🔨</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-torsoB_7">Braquial & Antebrazo • Grosor</span>
               <h2 class="ex-title" id="title-torsoB_7">7. Curl Martillo con Mancuernas</h2>
@@ -2113,6 +2303,18 @@
           </div>
         </div>
       </article>
+
+      <!-- Day Bottom Actions -->
+      <div class="day-bottom-actions">
+        <button class="btn-bottom-finish" onclick="finishDaySession('torsoB')" title="Guardar marcas y finalizar sesión">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Finalizar y Guardar Día</span>
+        </button>
+        <button class="btn-bottom-history" onclick="selectDay('historialView')" title="Ver registros históricos, 1RM y copias de seguridad">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-3 3"/></svg>
+          <span>📊 Ver Historial Completo & Copias de Seguridad</span>
+        </button>
+      </div>
     </section>
 
     <!-- ==========================================
@@ -2147,6 +2349,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('piernaB_1')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-piernaB_1" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35);">🪵</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-piernaB_1">1. Peso Muerto Rumano (RDL) con Barra</span>
               <span class="summary-sub" id="summary-sub-piernaB_1">4/4 series completadas</span>
@@ -2158,6 +2361,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_1">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-piernaB_1" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35);">
+              <span class="ex-emoji">🪵</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-piernaB_1">Isquiosurales & Glúteo Mayor • Bisagra</span>
               <h2 class="ex-title" id="title-piernaB_1">1. Peso Muerto Rumano (RDL) con Barra</h2>
@@ -2240,6 +2446,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('piernaB_2')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-piernaB_2" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35);">🧲</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-piernaB_2">2. Sentadilla Búlgara con Mancuernas</span>
               <span class="summary-sub" id="summary-sub-piernaB_2">3/3 series completadas</span>
@@ -2251,6 +2458,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_2">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-piernaB_2" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35);">
+              <span class="ex-emoji">🧲</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-piernaB_2">Glúteos & Cuádriceps • Cero Fatiga Lumbar</span>
               <h2 class="ex-title" id="title-piernaB_2">2. Sentadilla Búlgara con Mancuernas</h2>
@@ -2327,6 +2537,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('piernaB_3')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-piernaB_3" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35);">🧲</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-piernaB_3">3. Curl Femoral Sentado</span>
               <span class="summary-sub" id="summary-sub-piernaB_3">4/4 series completadas</span>
@@ -2338,6 +2549,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_3">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-piernaB_3" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35);">
+              <span class="ex-emoji">🧲</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-piernaB_3">Isquiosurales • Cadera Flexionada</span>
               <h2 class="ex-title" id="title-piernaB_3">3. Curl Femoral Sentado</h2>
@@ -2420,6 +2634,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('piernaB_4')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-piernaB_4" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35);">⚡</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-piernaB_4">4. Extensiones de Cuádriceps en Máquina</span>
               <span class="summary-sub" id="summary-sub-piernaB_4">3/3 series completadas</span>
@@ -2431,6 +2646,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_4">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-piernaB_4" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35);">
+              <span class="ex-emoji">⚡</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-piernaB_4">Cuádriceps • Bombeo Final</span>
               <h2 class="ex-title" id="title-piernaB_4">4. Extensiones de Cuádriceps en Máquina</h2>
@@ -2507,6 +2725,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('piernaB_5')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-piernaB_5" style="background: rgba(244, 114, 182, 0.15); border: 1px solid rgba(244, 114, 182, 0.35);">🦶</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-piernaB_5">5. Elevación de Talones Sentado en Máquina</span>
               <span class="summary-sub" id="summary-sub-piernaB_5">3/3 series completadas</span>
@@ -2518,6 +2737,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_5">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-piernaB_5" style="background: rgba(244, 114, 182, 0.15); border: 1px solid rgba(244, 114, 182, 0.35);">
+              <span class="ex-emoji">🦶</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-piernaB_5">Sóleo • Rodilla a 90°</span>
               <h2 class="ex-title" id="title-piernaB_5">5. Elevación de Talones Sentado en Máquina</h2>
@@ -2594,6 +2816,7 @@
         <div class="completed-summary-bar" onclick="toggleManualExpand('piernaB_6')">
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
+            <span class="summary-icon-badge" id="summary-icon-piernaB_6" style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35);">🛡️</span>
             <div class="summary-text-wrap">
               <span class="summary-title" id="summary-title-piernaB_6">6. Crunch en Polea Alta Arrodillado</span>
               <span class="summary-sub" id="summary-sub-piernaB_6">3/3 series completadas</span>
@@ -2605,6 +2828,9 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_6">
           <div class="card-top">
+            <div class="ex-icon-avatar" id="icon-badge-piernaB_6" style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35);">
+              <span class="ex-emoji">🛡️</span>
+            </div>
             <div class="ex-meta">
               <span class="ex-muscle" id="muscle-piernaB_6">Recto Abdominal • Flexión Espinal</span>
               <h2 class="ex-title" id="title-piernaB_6">6. Crunch en Polea Alta Arrodillado</h2>
@@ -2673,12 +2899,31 @@
           </div>
         </div>
       </article>
+
+      <!-- Day Bottom Actions -->
+      <div class="day-bottom-actions">
+        <button class="btn-bottom-finish" onclick="finishDaySession('piernaB')" title="Guardar marcas y finalizar sesión">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Finalizar y Guardar Día</span>
+        </button>
+        <button class="btn-bottom-history" onclick="selectDay('historialView')" title="Ver registros históricos, 1RM y copias de seguridad">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-3 3"/></svg>
+          <span>📊 Ver Historial Completo & Copias de Seguridad</span>
+        </button>
+      </div>
     </section>
 
     <!-- ==========================================
          PESTAÑA: HISTORIAL & BACKUP
          ========================================== -->
     <section id="historialView" class="day-content">
+      <div class="history-top-nav">
+        <button class="btn-history-back" onclick="exitHistoryView()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          <span id="historyBackText">← Volver al Entrenamiento</span>
+        </button>
+      </div>
+
       <div class="day-banner">
         <div>
           <div class="day-banner-title">📊 Historial & Backup</div>
@@ -2948,9 +3193,14 @@
     let sessionTickerInterval = null;
 
     // Navigation via dropdown selector
+    let lastActiveWorkoutDay = 'torsoA';
+
     function selectDay(dayId) {
-      const sel = document.getElementById('daySelector');
-      if (sel && sel.value !== dayId) sel.value = dayId;
+      if (dayId !== 'historialView') {
+        lastActiveWorkoutDay = dayId;
+        const sel = document.getElementById('daySelector');
+        if (sel && sel.value !== dayId) sel.value = dayId;
+      }
 
       document.querySelectorAll('.day-content').forEach(content => content.classList.remove('active'));
       const target = document.getElementById(dayId);
@@ -2958,10 +3208,19 @@
       
       if (dayId === 'historialView') {
         renderGlobalHistoryView();
+        const retTxt = document.getElementById('historyBackText');
+        if (retTxt) {
+          const dData = ROUTINE_SLOTS[lastActiveWorkoutDay];
+          retTxt.innerText = `← Volver a ${dData ? dData.shortName : 'Entrenamiento'}`;
+        }
       } else {
         updateProgress();
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function exitHistoryView() {
+      selectDay(lastActiveWorkoutDay || 'torsoA');
     }
 
     // Auto-select the next workout day based on the last finished session (or keep current if ongoing)
@@ -3023,11 +3282,13 @@
       }
 
       document.getElementById('guideModal').classList.add('open');
+      document.body.classList.add('modal-open');
     }
 
     function closeGuideModal(e) {
       if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn')) return;
       document.getElementById('guideModal').classList.remove('open');
+      document.body.classList.remove('modal-open');
     }
 
     function renderGuideWarmupTable(exId) {
@@ -3561,6 +3822,7 @@
       }
 
       document.getElementById('swapModal').classList.add('open');
+      document.body.classList.add('modal-open');
     }
 
     function toggleAltPreview(btn) {
@@ -3572,6 +3834,7 @@
     function closeSwapModal(e) {
       if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn')) return;
       document.getElementById('swapModal').classList.remove('open');
+      document.body.classList.remove('modal-open');
       currentSwapSlotId = null;
     }
 
@@ -3591,6 +3854,7 @@
       renderSlotExercise(slotId, newExId);
       saveWorkoutState();
       document.getElementById('swapModal').classList.remove('open');
+      document.body.classList.remove('modal-open');
       showToast(`Cambiado a: ${newEx.name} (${isPermanent ? 'Predeterminado' : 'Solo hoy'})`);
     }
 
@@ -3670,11 +3934,13 @@
       body.innerHTML = generateExerciseHistoryHTML(exId);
 
       document.getElementById('historyModal').classList.add('open');
+      document.body.classList.add('modal-open');
     }
 
     function closeHistoryModal(e) {
       if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn')) return;
       document.getElementById('historyModal').classList.remove('open');
+      document.body.classList.remove('modal-open');
     }
 
     function generateExerciseHistoryHTML(exId) {
@@ -4043,7 +4309,8 @@
 
     function playAlertTone() {
       try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (!window._vigorexiappAudioCtx) window._vigorexiappAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const audioCtx = window._vigorexiappAudioCtx;
         if (audioCtx.state === 'suspended') {
           audioCtx.resume();
         }
@@ -4387,7 +4654,7 @@
       updateTimerUI();
       runSessionTimerTicker();
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        navigator.serviceWorker.register('./sw.js').then(reg => { reg.update(); }).catch(() => {});
       }
     });
   </script>
