@@ -16,7 +16,7 @@ export const ROUTINE_SLOTS = {
       { slotId: "torsoA_2", defaultExId: "jalon", num: 2, sets: [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]] },
       { slotId: "torsoA_3", defaultExId: "militar", num: 3, sets: [["24", "10"], ["24", "10"], ["24", "8"]] },
       { slotId: "torsoA_4", defaultExId: "remo", num: 4, sets: [["65", "10"], ["65", "10"], ["65", "9"]] },
-      { slotId: "torsoA_5", defaultExId: "laterales1", num: 5, sets: [["12", "15"], ["12", "14"], ["12", "12"], ["12", "12"]] },
+      { slotId: "torsoA_5", defaultExId: "laterales1", num: 5, sets: [["12", "15"], ["12", "14"], ["12", "12"]] },
       { slotId: "torsoA_6", defaultExId: "triceps1", num: 6, sets: [["30", "12"], ["30", "11"], ["30", "10"]] },
       { slotId: "torsoA_7", defaultExId: "biceps1", num: 7, sets: [["16", "12"], ["16", "10"], ["16", "10"]] }
     ]
@@ -27,11 +27,11 @@ export const ROUTINE_SLOTS = {
     subtitle: "Sentadilla & Cuádriceps",
     dayNum: "Día 2",
     shortName: "Pierna A (Cuádriceps)",
-    totalSets: 17,
+    totalSets: 15,
     slots: [
-      { slotId: "piernaA_1", defaultExId: "squat", num: 1, sets: [["100", "8"], ["100", "8"], ["100", "7"], ["100", "6"]] },
+      { slotId: "piernaA_1", defaultExId: "squat", num: 1, sets: [["100", "8"], ["100", "8"], ["100", "7"]] },
       { slotId: "piernaA_2", defaultExId: "legext", num: 2, sets: [["60", "12"], ["60", "11"], ["60", "10"]] },
-      { slotId: "piernaA_3", defaultExId: "curltumbado", num: 3, sets: [["45", "12"], ["45", "11"], ["45", "10"], ["45", "10"]] },
+      { slotId: "piernaA_3", defaultExId: "curltumbado", num: 3, sets: [["45", "12"], ["45", "11"], ["45", "10"]] },
       { slotId: "piernaA_4", defaultExId: "gemelopie", num: 4, sets: [["70", "12"], ["70", "12"], ["70", "10"]] },
       { slotId: "piernaA_5", defaultExId: "plancha", num: 5, sets: [["0", "60"], ["0", "50"], ["0", "45"]] }
     ]
@@ -42,12 +42,12 @@ export const ROUTINE_SLOTS = {
     subtitle: "Tracción & Hipertrofia",
     dayNum: "Día 3",
     shortName: "Torso B (Tracción)",
-    totalSets: 23,
+    totalSets: 24,
     slots: [
       { slotId: "torsoB_1", defaultExId: "remouni", num: 1, sets: [["34", "10"], ["34", "10"], ["34", "9"], ["34", "8"]] },
       { slotId: "torsoB_2", defaultExId: "inclinado", num: 2, sets: [["30", "10"], ["30", "10"], ["30", "8"], ["30", "8"]] },
       { slotId: "torsoB_3", defaultExId: "jalonneutro", num: 3, sets: [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]] },
-      { slotId: "torsoB_4", defaultExId: "laterales2", num: 4, sets: [["10", "15"], ["10", "14"], ["10", "13"], ["10", "12"]] },
+      { slotId: "torsoB_4", defaultExId: "laterales2", num: 4, sets: [["10", "15"], ["10", "14"], ["10", "12"]] },
       { slotId: "torsoB_5", defaultExId: "facepull", num: 5, sets: [["25", "15"], ["25", "14"], ["25", "12"]] },
       { slotId: "torsoB_6", defaultExId: "frances", num: 6, sets: [["32", "12"], ["32", "10"], ["32", "10"]] },
       { slotId: "torsoB_7", defaultExId: "martillo", num: 7, sets: [["16", "12"], ["16", "11"], ["16", "10"]] }
@@ -59,11 +59,11 @@ export const ROUTINE_SLOTS = {
     subtitle: "Cadena Posterior & Búlgaras",
     dayNum: "Día 4",
     shortName: "Pierna B (Isquios)",
-    totalSets: 20,
+    totalSets: 18,
     slots: [
-      { slotId: "piernaB_1", defaultExId: "rdl", num: 1, sets: [["90", "10"], ["90", "10"], ["90", "9"], ["90", "8"]] },
+      { slotId: "piernaB_1", defaultExId: "rdl", num: 1, sets: [["90", "10"], ["90", "10"], ["90", "8"]] },
       { slotId: "piernaB_2", defaultExId: "bulgarian", num: 2, sets: [["20", "10"], ["20", "10"], ["20", "8"]] },
-      { slotId: "piernaB_3", defaultExId: "curlsentado", num: 3, sets: [["55", "12"], ["55", "11"], ["55", "10"], ["55", "10"]] },
+      { slotId: "piernaB_3", defaultExId: "curlsentado", num: 3, sets: [["55", "12"], ["55", "11"], ["55", "10"]] },
       { slotId: "piernaB_4", defaultExId: "legextb", num: 4, sets: [["55", "15"], ["55", "14"], ["55", "12"]] },
       { slotId: "piernaB_5", defaultExId: "gemelosentado", num: 5, sets: [["45", "15"], ["45", "14"], ["45", "12"]] },
       { slotId: "piernaB_6", defaultExId: "crunch", num: 6, sets: [["40", "15"], ["40", "14"], ["40", "12"]] }

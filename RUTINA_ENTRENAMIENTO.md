@@ -42,17 +42,17 @@
 ---
 
 ## 🗓️ DÍA 1: LUNES – TORSO A (Fuerza / Empuje Primario)
-*Duración estimada en hora punta: **75 - 85 minutos***
+*Duración estimada optimizada: **58 - 62 minutos***
 
 | Ejercicio | Series × Reps | RIR | Descanso |
 | :--- | :---: | :---: | :---: |
-| **1. Press de banca plano con barra** | 4 × 6-8 | 1-2 | 120 - 150 s |
-| **2. Jalón al pecho (agarre prono ancho)** | 4 × 8-10 | 1-2 | 90 - 120 s |
-| **3. Press militar sentado mancuernas (75°-80°)** | 3 × 8-10 | 1-2 | 90 - 120 s |
-| **4. Remo en polea baja (agarre neutro)** | 3 × 10-12 | 1-2 | 90 s |
-| **5. Elevaciones laterales con mancuernas** | 3 × 12-15 | 1 | 60 - 90 s |
-| **6. Extensión de tríceps en polea alta** | 3 × 10-12 | 1 | 60 - 90 s |
-| **7. Curl de bíceps con mancuernas (supinación)**| 3 × 10-12 | 1 | 60 - 90 s |
+| **1. Press de banca plano con barra** | 4 × 6-8 | 1-2 | 120 - 150 s *(Prioridad Pecho)* |
+| **2. Jalón al pecho (agarre prono ancho)** | 4 × 8-10 | 1-2 | 90 - 120 s *(Prioridad Dorsal)* |
+| **3. Press militar sentado mancuernas (75°-80°)** | 3 × 8-10 | 1-2 | 90 s |
+| **4. Remo en polea baja (agarre neutro)** | 3 × 10-12 | 1-2 | 90 s *(Prioridad Espalda)* |
+| **5. Elevaciones laterales con mancuernas** | 3 × 12-15 | 1 | 75 s |
+| **6. Extensión de tríceps en polea alta** | 3 × 10-12 | 1 | **⚡ 45 s (Biserie con Bíceps)** |
+| **7. Curl de bíceps con mancuernas (supinación)**| 3 × 10-12 | 1 | **⚡ 45 s (Biserie con Tríceps)** |
 
 ### 🔍 Técnica y Alternativas si la zona está ocupada:
 * **Press banca plano:** Retracción escapular activa, pies plantados, bajada en 2 s controlados.
@@ -65,50 +65,47 @@
   * *Alternativas:* Remo en máquina con apoyo de pecho | Remo unilateral con mancuerna en banco.
 * **Elevaciones laterales:** Torso inclinado 10° hacia delante, sube en diagonal liderando con los codos.
   * *Alternativas:* Elevaciones laterales en polea baja unilateral | Elevaciones laterales en máquina.
-* **Extensión de tríceps:** Codos pegados a los costados y fijos; solo se mueve el antebrazo.
-  * *Alternativas:* Press francés con mancuernas en banco | Fondos en paralelas asistidos.
-* **Curl con supinación:** No adelantes los codos al subir; gira la muñeca hacia afuera en la subida.
-  * *Alternativas:* Curl con barra Z de pie | Curl en polea baja con barra recta.
+* **⚡ Biserie Brazos (Tríceps + Bíceps):** Ten las mancuernas preparadas al lado de la polea. Haz tu serie de tríceps $\rightarrow$ descansa 45 s $\rightarrow$ haz tu serie de bíceps $\rightarrow$ descansa 45 s y repite 3 rondas. Ahorras 8 minutos directos.
 
 ---
 
 ## 🗓️ DÍA 2: MARTES – PIERNA A (Dominante Cuádriceps / Sentadilla Pesada)
-*Duración estimada en hora punta: **70 - 80 minutos***
+*Duración estimada optimizada: **50 - 55 minutos***
 
 | Ejercicio | Series × Reps | RIR | Descanso |
 | :--- | :---: | :---: | :---: |
-| **1. Sentadilla trasera con barra (Back Squat)** | 4 × 6-8 | 1-2 | 150 - 180 s |
+| **1. Sentadilla trasera con barra (Back Squat)** | 3 × 6-8 | 1-2 | 150 - 180 s *(Máxima Carga)* |
 | **2. Extensiones de cuádriceps en máquina** | 3 × 10-12 | 1-2 | 90 s |
 | **3. Curl femoral tumbado** | 3 × 10-12 | 1-2 | 90 s |
-| **4. Elevación de talones de pie en máquina (Gastrocnemio)** | 4 × 12-15 | 1 | 60 - 90 s |
-| **5. Plancha abdominal isométrica (o Rueda)** | 3 × 45-60 s *(o 10-12 reps)* | — | 60 s |
+| **4. Elevación de talones de pie en máquina (Gastrocnemio)** | 3 × 12-15 | 1 | 60 s *(Individual)* |
+| **5. Plancha abdominal isométrica (o Rueda)** | 3 × 45-60 s *(o 10-12 reps)* | — | 45 s *(En colchoneta)* |
 
 ### 🔍 Técnica y Alternativas si la zona está ocupada:
-* **Sentadilla trasera:** Coge aire al abdomen (*bracing*), rompe en cadera y rodillas a la vez, baja al menos hasta la paralela.
+* **Sentadilla trasera:** Coge aire al abdomen (*bracing*), rompe en cadera y rodillas a la vez, baja al menos hasta la paralela. 3 series pesadas efectivas reducen la fatiga del SNC.
   * *Alternativas:* Sentadilla en Multipower | Prensa de piernas 45° | Sentadilla Hack en máquina.
 * **Extensiones de cuádriceps:** Pausa de 1 s arriba apretando, bajada en 2 s controlados.
   * *Alternativas:* Zancadas caminando con mancuernas | Sentadilla Sissy con peso corporal o disco.
 * **Curl femoral tumbado:** Presiona la pelvis contra el acolchado para no tirar de zona lumbar.
   * *Alternativas:* Curl femoral sentado | Curl femoral unilateral de pie | Curl con mancuerna entre los pies.
-* **Elevación de talones de pie:** Rodillas casi estiradas (microflexión mínima). Pausa de 2 s abajo para evitar el rebote del tendón de Aquiles.
+* **Elevación de talones de pie:** Rodillas casi estiradas (microflexión mínima). Pausa de 2 s abajo. Recuperación rápida en 60 s sin desplazamientos.
   * *Alternativas:* Elevación de gemelos en prensa 45° | Elevación unilateral en escalón con mancuerna.
-* **Plancha abdominal:** Bloquea glúteos y mete ombligo en retroversión pélvica.
+* **Plancha abdominal:** Bloquea glúteos y mete ombligo en retroversión pélvica. Al terminar gemelos, se realiza cómodamente en el suelo en 4 minutos.
   * *Alternativas:* Rueda abdominal (*Ab Wheel*) | Paseo del granjero con mancuernas pesadas.
 
 ---
 
 ## 🗓️ DÍA 3: JUEVES – TORSO B (Hipertrofia / Tracción + Deltoide Posterior y Lateral)
-*Duración estimada en hora punta: **80 - 90 minutos***
+*Duración estimada optimizada: **60 - 64 minutos***
 
 | Ejercicio | Series × Reps | RIR | Descanso |
 | :--- | :---: | :---: | :---: |
-| **1. Remo unilateral con mancuerna (o máquina)** | 4 × 8-10 | 1-2 | 90 - 120 s |
-| **2. Press inclinado con mancuernas (30°)** | 4 × 8-10 | 1-2 | 90 - 120 s |
-| **3. Jalón al pecho con agarre neutro cerrado** | 3 × 10-12 | 1-2 | 90 s |
-| **4. Elevaciones laterales en polea (o mancuernas)** | 3 × 12-15 | 1 | 60 - 90 s |
+| **1. Remo unilateral con mancuerna (o máquina)** | 4 × 8-10 | 1-2 | 90 - 120 s *(Prioridad Dorsal)* |
+| **2. Press inclinado con mancuernas (30°)** | 4 × 8-10 | 1-2 | 90 - 120 s *(Prioridad Pecho)* |
+| **3. Jalón al pecho con agarre neutro cerrado** | 4 × 8-10 | 1-2 | 90 - 120 s *(Prioridad Dorsal)* |
+| **4. Elevaciones laterales en polea (o mancuernas)** | 3 × 12-15 | 1 | 75 s |
 | **5. Face Pull en polea alta** | 3 × 12-15 | 1 | 60 s |
-| **6. Press francés con mancuernas o barra Z** | 3 × 10-12 | 1 | 60 - 90 s |
-| **7. Curl martillo con mancuernas** | 3 × 10-12 | 1 | 60 - 90 s |
+| **6. Press francés con mancuernas o barra Z** | 3 × 10-12 | 1 | **⚡ 45 s (Biserie con Martillo)** |
+| **7. Curl martillo con mancuernas** | 3 × 10-12 | 1 | **⚡ 45 s (Biserie con Francés)** |
 
 ### 🔍 Técnica y Alternativas si la zona está ocupada:
 * **Remo unilateral:** Conduce el codo rozando el costado hacia la cadera.
@@ -121,27 +118,24 @@
   * *Alternativas:* Elevaciones laterales con mancuernas | Elevaciones en máquina de hombro.
 * **Face Pull:** Polea a la altura de los ojos. Tira hacia la frente separando activamente los extremos de la cuerda.
   * *Alternativas:* Pájaros con mancuernas en banco inclinado | Pájaros en máquina pec-deck invertida.
-* **Press francés:** Brazos ligeramente inclinados hacia atrás para mantener la cabeza larga del tríceps bajo tensión continua.
-  * *Alternativas:* Extensión de tríceps tras nuca en polea con cuerda | Extensiones unilaterales en polea (katana).
-* **Curl martillo:** Palmas mirándose entre sí todo el recorrido. Desarrolla el braquial y el antebrazo.
-  * *Alternativas:* Curl martillo en polea con cuerda | Curl en banco predicador con agarre neutro.
+* **⚡ Biserie Brazos (Francés + Martillo):** En el mismo banco con mancuernas. Haz press francés $\rightarrow$ descansa 45 s $\rightarrow$ ponte sentado para curl martillo $\rightarrow$ descansa 45 s y repite.
 
 ---
 
 ## 🗓️ DÍA 4: VIERNES – PIERNA B (Cadena Posterior / Peso Muerto + Búlgaras)
-*Duración estimada en hora punta: **75 - 85 minutos***
+*Duración estimada optimizada: **52 - 56 minutos***
 
 | Ejercicio | Series × Reps | RIR | Descanso |
 | :--- | :---: | :---: | :---: |
-| **1. Peso Muerto Rumano (RDL) con barra o mancuernas** | 4 × 8-10 | 1-2 | 120 - 150 s |
-| **2. Sentadilla búlgara con mancuernas** | 3 × 8-10 /pierna | 1-2 | 90 - 120 s |
+| **1. Peso Muerto Rumano (RDL) con barra o mancuernas** | 3 × 8-10 | 1-2 | 120 - 150 s *(Alta Carga)* |
+| **2. Sentadilla búlgara con mancuernas** | 3 × 8-10 /pierna | 1-2 | 90 s /pierna |
 | **3. Curl femoral sentado** | 3 × 10-12 | 1-2 | 90 s |
-| **4. Extensiones de cuádriceps en máquina** | 3 × 12-15 | 1 | 60 - 90 s |
-| **5. Elevación de talones sentado en máquina (Sóleo)** | 4 × 12-15 | 1 | 60 s |
-| **6. Crunch en polea alta arrodillado** | 3 × 12-15 | 1-2 | 60 s |
+| **4. Extensiones de cuádriceps en máquina** | 3 × 12-15 | 1 | 75 s |
+| **5. Elevación de talones sentado en máquina (Sóleo)** | 3 × 12-15 | 1 | 60 s *(Individual)* |
+| **6. Crunch en polea alta arrodillado** | 3 × 12-15 | 1-2 | 60 s *(Individual al final)* |
 
 ### 🔍 Técnica y Alternativas si la zona está ocupada:
-* **Peso Muerto Rumano:** Bisagra de cadera pura: empuja el glúteo hacia la pared trasera con rodillas semirrígidas. Siente el tirón en isquios.
+* **Peso Muerto Rumano:** Bisagra de cadera pura: empuja el glúteo hacia la pared trasera con rodillas semirrígidas. 3 series pesadas de calidad.
   * *Alternativas:* RDL en Multipower | RDL con mancuernas pesadas | Hip Thrust en máquina o barra.
 * **Sentadilla búlgara:** Apoya empeine trasero en banco, paso adelante, inclina el torso 15° para reclutar glúteo y cuádriceps sin comprimir la espalda.
   * *Alternativas:* Sentadilla Hack en máquina | Prensa 45° con pies medios-altos | Zancadas estáticas con mancuernas.
@@ -149,15 +143,7 @@
   * *Alternativas:* Curl femoral tumbado | Curl femoral unilateral de pie | Curl nórdico asistido.
 * **Extensiones de cuádriceps:** Bombeo final continuo sin balanceos.
   * *Alternativas:* Sentadilla goblet profunda con talones elevados en disco | Step-ups en cajón.
-* **Elevación de talones sentado:** Rodilla a 90° para aislar el sóleo (ensancha la pantorrilla inferior). Pausa de 2 s abajo.
+* **Elevación de talones sentado:** Rodilla a 90° para aislar el sóleo. 3 series consecutivas con descansos de 60 s sin cambios de máquina.
   * *Alternativas:* Sentado en banco con barra acolchada sobre las rodillas | Dos mancuernas pesadas sobre los muslos.
-* **Crunch en polea alta:** Flexiona únicamente la columna acercando las costillas a la cadera; no muevas los brazos ni flexiones la cadera.
+* **Crunch en polea alta:** Flexiona únicamente la columna acercando las costillas a la cadera. Se realiza como cierre final individual.
   * *Alternativas:* Elevación de piernas colgado en barra o paralelas | Crunch en el suelo con disco al pecho.
-
----
-
-## ⚡ Estrategias para ahorrar 15-20 minutos si tienes prisa
-
-Si algún día vas corto de tiempo, ejecuta **biseries de antagonistas** en los ejercicios accesorios:
-* **En Torso:** Haz tu serie de Tríceps $\rightarrow$ descansa 45 s $\rightarrow$ haz tu serie de Bíceps $\rightarrow$ descansa 45 s y repite.
-* **En Pierna:** Alterna las Extensiones de cuádriceps con los Gemelos, o los Gemelos sentado con el Crunch abdominal.
