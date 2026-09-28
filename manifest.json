@@ -1,6 +1,6 @@
 {
-  "name": "GYM Poderoso - Rutina Elite Torso/Pierna",
-  "short_name": "GYM Poderoso",
+  "name": "Vigorexiapp - Rutina Elite Torso/Pierna",
+  "short_name": "Vigorexiapp",
   "description": "Tu app de entrenamiento inteligente con registro de series, temporizador superior, alternativas 3D y backup.",
   "start_url": "./index.html",
   "display": "standalone",

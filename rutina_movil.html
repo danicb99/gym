@@ -9,7 +9,7 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="icon" type="image/png" href="./icon-192.png">
-  <title>GYM Poderoso - Elite Workout Tracker</title>
+  <title>Vigorexiapp - Elite Workout Tracker</title>
   <style>
     :root {
       --bg: #070b14;
@@ -3909,7 +3909,7 @@
           const file = new File([jsonContent], filename, { type: "application/json" });
           if (navigator.canShare({ files: [file] })) {
             await navigator.share({
-              title: "GYM Poderoso Backup",
+              title: "Vigorexiapp Backup",
               text: `Copia de seguridad de mis entrenamientos (${dateSlug})`,
               files: [file]
             });
@@ -4010,7 +4010,7 @@
       if ('Notification' in window && Notification.permission === 'granted') {
         const title = '¡Descanso Terminado! ⏱️';
         const options = {
-          body: 'Hora de la siguiente serie en GYM Poderoso 💪',
+          body: 'Hora de la siguiente serie en Vigorexiapp 💪',
           icon: './icon-192.png',
           badge: './icon-192.png',
           vibrate: [200, 100, 200, 100, 300],

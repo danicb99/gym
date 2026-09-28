@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gym-poderoso-v6';
+const CACHE_NAME = 'vigorexiapp-v1';
 const ASSETS = [
   './',
   './index.html',
@@ -64,7 +64,7 @@ self.addEventListener('message', (event) => {
     const delay = Math.max(0, event.data.endTime - Date.now());
     bgTimerId = setTimeout(() => {
       self.registration.showNotification('¡Descanso Terminado! 🔔', {
-        body: 'Hora de la siguiente serie en GYM Poderoso 💪',
+        body: 'Hora de la siguiente serie en Vigorexiapp 💪',
         icon: './icon-192.png',
         badge: './icon-192.png',
         vibrate: [200, 100, 200, 100, 300],
