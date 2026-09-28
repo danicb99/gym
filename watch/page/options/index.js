@@ -242,7 +242,7 @@ Page(
       })
       curY += btnH + btnGap
 
-      // BOTÓN FINAL: VOLVER / CERRAR MENÚ
+      // BOTÓN FINAL: VOLVER / CERRAR MENÚ (Flecha hacia abajo)
       hmUI.createWidget(hmUI.widget.BUTTON, {
         x: btnX,
         y: curY,
@@ -253,7 +253,7 @@ Page(
         press_color: 0x475569,
         color: 0xf8fafc,
         text_size: 16,
-        text: '✕ Volver al Ejercicio',
+        text: '▼ Cerrar Menú (Volver)',
         click_func: () => {
           vibrateShort()
           back()

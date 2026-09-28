@@ -84,9 +84,9 @@ Page(BasePage({
     const currentSetNum = app.globalData.currentSetIndex + 1
     const totalSets = app.getTotalSetsForSlot ? app.getTotalSetsForSlot(slot) : ((slot.sets && slot.sets.length) || 4)
 
-    // 1. BARRA SUPERIOR (Pulsaciones, Duración, Botón Menú Ajustes ⚙️)
+    // 1. BARRA SUPERIOR (Pulsaciones, Duración, Slot #)
     this.state.hrWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 48,
+      x: 46,
       y: 28,
       w: 96,
       h: 34,
@@ -120,22 +120,17 @@ Page(BasePage({
       }
     })
 
-    // Botón de Menú / Ajustes (Opción A: arriba a la derecha)
-    hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 324,
-      y: 24,
-      w: 50,
-      h: 38,
-      radius: 19,
-      normal_color: 0x1e293b,
-      press_color: 0x334155,
-      color: 0xfbbf24,
-      text_size: 20,
-      text: '⚙️',
-      click_func: () => {
-        vibrateShort()
-        push({ url: 'page/options/index' })
-      }
+    // Indicador Ejercicio X/Y (arriba a la derecha, limpio y visible)
+    hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 322,
+      y: 28,
+      w: 98,
+      h: 34,
+      color: 0x38bdf8, // Cyan
+      text_size: 16,
+      align_h: hmUI.align.RIGHT,
+      align_v: hmUI.align.CENTER_V,
+      text: `Ej ${currentSlotNum}/${totalSlots}`
     })
 
     // 2. NOMBRE DEL EJERCICIO Y SERIE (Texto grande y claro)
@@ -157,10 +152,10 @@ Page(BasePage({
       w: 390,
       h: 26,
       color: 0x38bdf8, // Cyan
-      text_size: 16,
+      text_size: 17,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: `SERIE ${currentSetNum} DE ${totalSets} • Ej ${currentSlotNum}/${totalSlots}`
+      text: `SERIE ${currentSetNum} DE ${totalSets}`
     })
 
     // 3. CONTROL DE KILOS ( [-]  80.0 kg  [+] ) - TAMAÑO XL
@@ -259,13 +254,13 @@ Page(BasePage({
       }
     })
 
-    // 5. BOTÓN PRINCIPAL: COMPLETAR SERIE (Grande y prominente)
+    // 5. BOTÓN PRINCIPAL: COMPLETAR SERIE (Grande y accesible)
     hmUI.createWidget(hmUI.widget.BUTTON, {
       x: 60,
-      y: 280,
+      y: 276,
       w: 346,
-      h: 64,
-      radius: 32,
+      h: 60,
+      radius: 30,
       normal_color: 0x10b981, // Emerald green
       press_color: 0x059669,
       color: 0xffffff,
@@ -279,14 +274,32 @@ Page(BasePage({
     // 6. HORA ACTUAL INFERIOR (Grande, nítida, sin emoji)
     this.state.clockWidget = hmUI.createWidget(hmUI.widget.TEXT, {
       x: 108,
-      y: 368,
+      y: 346,
       w: 250,
-      h: 46,
+      h: 36,
       color: 0xf1f5f9, // Blanco suave de alto contraste
-      text_size: 30,
+      text_size: 28,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.getClockStr()
+    })
+
+    // 7. BOTÓN INFERIOR DESPLEGABLE: FLECHA HACIA ARRIBA (▲ Menú / Opciones)
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 148,
+      y: 390,
+      w: 170,
+      h: 42,
+      radius: 21,
+      normal_color: 0x1e293b,
+      press_color: 0x334155,
+      color: 0x38bdf8, // Cyan vibrante
+      text_size: 17,
+      text: '▲ Menú',
+      click_func: () => {
+        vibrateShort()
+        push({ url: 'page/options/index' })
+      }
     })
 
     // Iniciar sensor de frecuencia cardíaca y ticker de descanso/entreno
