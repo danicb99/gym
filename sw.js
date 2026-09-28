@@ -1,9 +1,10 @@
-const CACHE_NAME = 'vigorexiapp-v9';
+const CACHE_NAME = 'vigorexiapp-v10';
 const ASSETS = [
   './',
   './index.html',
   './rutina_movil.html',
   './reloj.html',
+  './qr_zepp.png',
   './watch_bridge.js',
   './icon-round-192.png',
   './icon-round-512.png',
