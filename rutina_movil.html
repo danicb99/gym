@@ -2855,30 +2855,24 @@
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
         <div>
-          <div class="modal-title">📖 Protocolo de Calentamiento y Sobrecarga</div>
+          <div class="modal-title">📖 Protocolo de Calentamiento</div>
           <div class="modal-subtitle">Series de aproximación y técnica progresiva</div>
         </div>
         <button class="modal-close-btn" onclick="closeGuideModal()">✕</button>
       </div>
       
-      <div class="guide-card">
-        <div class="guide-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-          <span>Series de Aproximación</span>
-        </div>
-        <p style="font-size:0.75rem; color:var(--text-muted); line-height:1.5;">
-          Nunca empieces con tu peso de trabajo. Prepara el sistema nervioso, lubrica articulaciones y previene roturas sin fatigar:
-        </p>
-        <table class="guide-table">
-          <thead><tr><th>Serie</th><th>Carga (% Trabajo)</th><th>Reps</th><th>Descanso</th></tr></thead>
-          <tbody>
-            <tr><td>1. Movilidad</td><td>Solo la barra (20 kg)</td><td>10-12</td><td>30 s</td></tr>
-            <tr><td>2. Rampa 1</td><td>50% del peso de trabajo</td><td>5</td><td>60 s</td></tr>
-            <tr><td>3. Rampa 2</td><td>70% del peso de trabajo</td><td>3</td><td>90 s</td></tr>
-            <tr><td>4. Activación</td><td>90% del peso de trabajo</td><td>1</td><td>120 s</td></tr>
-            <tr><td style="color:var(--primary); font-weight:700;">5. EFECTIVAS</td><td style="color:var(--primary); font-weight:700;">100% (Peso de la sesión)</td><td>Al objetivo</td><td>Descanso completo</td></tr>
-          </tbody>
-        </table>
+      <!-- Dynamic Exercise Selector for Warmup -->
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 0.74rem; font-weight: 700; color: var(--cyan); margin-bottom: 6px; display: block;">
+          🏋️ Ejercicio para calcular calentamiento:
+        </label>
+        <select id="guideExPicker" class="ex-select" onchange="renderGuideWarmupTable(this.value)">
+          <!-- Populated dynamically based on active day -->
+        </select>
+      </div>
+
+      <div class="guide-card" id="guideWarmupCard">
+        <!-- Rendered dynamically by renderGuideWarmupTable -->
       </div>
 
       <div class="guide-card">
@@ -2946,7 +2940,8 @@
       sessions: [],            // Array of finished workouts with date, dayId, durationMinutes, exercises
       customSlots: {},        // slotId -> exId (permanent user swaps)
       tempSlots: {},          // slotId -> exId (temporary for current workout)
-      sessionStartTime: {}    // dayId -> timestamp (Date.now())
+      sessionStartTime: {},   // dayId -> timestamp (Date.now())
+      lastActivityTime: {}    // dayId -> timestamp of last input/set marked
     };
 
     // Active session live ticker interval
@@ -2969,14 +2964,147 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Guide Modal
+    // Auto-select the next workout day based on the last finished session (or keep current if ongoing)
+    function autoSelectInitialDay() {
+      const sequence = ['torsoA', 'piernaA', 'torsoB', 'piernaB'];
+      const now = Date.now();
+
+      // 1. If there is an ongoing workout (< 2 hours), keep user on that day
+      if (workoutState.sessionStartTime) {
+        for (const dayId of sequence) {
+          const sTime = workoutState.sessionStartTime[dayId];
+          if (sTime && (now - sTime < 2 * 3600 * 1000)) {
+            selectDay(dayId);
+            return;
+          }
+        }
+      }
+
+      // 2. Otherwise, select the next day in rotation after the last completed session
+      const sessions = workoutState.sessions || [];
+      if (sessions.length > 0) {
+        const lastSession = sessions[0];
+        const lastDayId = lastSession.dayId;
+        const lastIdx = sequence.indexOf(lastDayId);
+        if (lastIdx !== -1) {
+          const nextDayId = sequence[(lastIdx + 1) % sequence.length];
+          selectDay(nextDayId);
+          return;
+        }
+      }
+      // Default to Día 1 (torsoA)
+      selectDay('torsoA');
+    }
+
+    // Guide Modal & Auto-calculation of warmup kilos from history
     function openGuideModal() {
+      const activeSection = document.querySelector('.day-content.active');
+      const dayId = (activeSection && activeSection.id !== 'historialView') ? activeSection.id : 'torsoA';
+      const dayData = ROUTINE_SLOTS[dayId];
+
+      const picker = document.getElementById('guideExPicker');
+      picker.innerHTML = '';
+
+      if (dayData && dayData.slots) {
+        dayData.slots.forEach(slot => {
+          const activeExId = getSlotExerciseId(slot.slotId);
+          const ex = EXERCISE_CATALOG[activeExId];
+          if (ex) {
+            const opt = document.createElement('option');
+            opt.value = activeExId;
+            opt.innerText = `${slot.num}. ${ex.name} (${ex.equipment})`;
+            picker.appendChild(opt);
+          }
+        });
+      }
+
+      if (picker.options.length > 0) {
+        renderGuideWarmupTable(picker.options[0].value);
+      }
+
       document.getElementById('guideModal').classList.add('open');
     }
+
     function closeGuideModal(e) {
       if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn')) return;
       document.getElementById('guideModal').classList.remove('open');
     }
+
+    function renderGuideWarmupTable(exId) {
+      const card = document.getElementById('guideWarmupCard');
+      if (!card) return;
+      const ex = EXERCISE_CATALOG[exId] || { name: exId };
+
+      let targetWeight = 0;
+      // 1. Check history
+      if (workoutState.exerciseHistory && workoutState.exerciseHistory[exId] && workoutState.exerciseHistory[exId].length > 0) {
+        const lastSession = workoutState.exerciseHistory[exId][workoutState.exerciseHistory[exId].length - 1];
+        targetWeight = lastSession.bestKg || 0;
+      }
+      // 2. Check previous
+      if (!targetWeight && workoutState.previous && workoutState.previous[exId]) {
+        for (const val of Object.values(workoutState.previous[exId])) {
+          const match = val.match(/^([\d\.]+)/);
+          if (match) { targetWeight = parseFloat(match[1]); break; }
+        }
+      }
+      // 3. Check current card inputs
+      if (!targetWeight) {
+        const cardEl = document.querySelector(`.exercise-card[data-current-ex="${exId}"]`);
+        if (cardEl) {
+          const inp = cardEl.querySelector('.input-kg');
+          if (inp && inp.value) targetWeight = parseFloat(inp.value) || 0;
+        }
+      }
+
+      const isBarbell = (ex.equipment || '').toLowerCase().includes('barra');
+      const roundPlate = (kg) => Math.round(kg / 2.5) * 2.5;
+
+      let tableBody = '';
+      let noteHTML = '';
+
+      if (targetWeight && targetWeight > 0) {
+        const minBarWeight = (isBarbell && targetWeight >= 40) ? 20 : (targetWeight > 10 ? 5 : 2);
+        const rampa1 = Math.max(minBarWeight, roundPlate(targetWeight * 0.5));
+        const rampa2 = Math.max(rampa1, roundPlate(targetWeight * 0.7));
+        const activacion = Math.max(rampa2, roundPlate(targetWeight * 0.9));
+        const mobilityDesc = (isBarbell && targetWeight >= 30) ? 'Solo la barra (20 kg)' : (isBarbell ? 'Barra o mancuernas ligeras' : 'Carga muy liviana (~20%)');
+
+        tableBody = `
+          <tr><td>1. Movilidad</td><td>${mobilityDesc}</td><td>10-12</td><td>30 s</td></tr>
+          <tr><td>2. Rampa 1</td><td style="color:var(--cyan); font-weight:700;">50% = ${rampa1} kg</td><td>5</td><td>60 s</td></tr>
+          <tr><td>3. Rampa 2</td><td style="color:var(--cyan); font-weight:700;">70% = ${rampa2} kg</td><td>3</td><td>90 s</td></tr>
+          <tr><td>4. Activación</td><td style="color:var(--amber); font-weight:700;">90% = ${activacion} kg</td><td>1</td><td>120 s</td></tr>
+          <tr><td style="color:var(--primary); font-weight:700;">5. EFECTIVAS</td><td style="color:var(--primary); font-weight:800;">100% = ${targetWeight} kg</td><td>Al objetivo</td><td>Descanso completo</td></tr>
+        `;
+        noteHTML = `<div style="font-size:0.72rem; color:#34d399; margin-top:8px; font-weight:600;">⚡ Kilos calculados automáticamente con tu marca previa de ${targetWeight} kg en ${ex.name}.</div>`;
+      } else {
+        const mobilityDesc = isBarbell ? 'Solo la barra (20 kg)' : 'Carga muy liviana (~20%)';
+        tableBody = `
+          <tr><td>1. Movilidad</td><td>${mobilityDesc}</td><td>10-12</td><td>30 s</td></tr>
+          <tr><td>2. Rampa 1</td><td>50% del peso de trabajo</td><td>5</td><td>60 s</td></tr>
+          <tr><td>3. Rampa 2</td><td>70% del peso de trabajo</td><td>3</td><td>90 s</td></tr>
+          <tr><td>4. Activación</td><td>90% del peso de trabajo</td><td>1</td><td>120 s</td></tr>
+          <tr><td style="color:var(--primary); font-weight:700;">5. EFECTIVAS</td><td style="color:var(--primary); font-weight:700;">100% (Peso de la sesión)</td><td>Al objetivo</td><td>Descanso completo</td></tr>
+        `;
+        noteHTML = `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:8px;">ℹ️ Sin marcas previas registradas para ${ex.name}. Se muestran los porcentajes estándar.</div>`;
+      }
+
+      card.innerHTML = `
+        <div class="guide-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          <span>Series de Aproximación: ${ex.name}</span>
+        </div>
+        <table class="guide-table">
+          <thead><tr><th>Serie</th><th>Carga</th><th>Reps</th><th>Descanso</th></tr></thead>
+          <tbody>
+            ${tableBody}
+          </tbody>
+        </table>
+        ${noteHTML}
+      `;
+    }
+
 
     // Toggle 3D Player
     function togglePlayer(playerId) {
@@ -3016,10 +3144,13 @@
     function startSessionTimerIfNeeded(dayId) {
       if (!dayId || dayId === 'historialView') return;
       if (!workoutState.sessionStartTime) workoutState.sessionStartTime = {};
+      if (!workoutState.lastActivityTime) workoutState.lastActivityTime = {};
+
       if (!workoutState.sessionStartTime[dayId]) {
         workoutState.sessionStartTime[dayId] = Date.now();
-        saveWorkoutState();
       }
+      workoutState.lastActivityTime[dayId] = Date.now();
+      saveWorkoutState();
       updateSessionTimerDisplay(dayId);
     }
 
@@ -3046,7 +3177,46 @@
         if (activeSection && activeSection.id) {
           updateSessionTimerDisplay(activeSection.id);
         }
+        checkAutoSave();
       }, 1000);
+    }
+
+    // Auto-Save after 2 hours of session start taking duration from the last completed set/activity
+    function checkAutoSave() {
+      if (!workoutState.sessionStartTime) return;
+      const days = ['torsoA', 'piernaA', 'torsoB', 'piernaB'];
+      const now = Date.now();
+
+      days.forEach(dayId => {
+        const startTime = workoutState.sessionStartTime[dayId];
+        if (!startTime) return;
+
+        // If more than 2 hours (2 * 3600 * 1000 ms)
+        if (now - startTime >= 2 * 3600 * 1000) {
+          const daySection = document.getElementById(dayId);
+          if (!daySection) return;
+
+          const doneRows = daySection.querySelectorAll('.set-row.done');
+          const inputs = daySection.querySelectorAll('.set-input');
+          let hasInputs = false;
+          inputs.forEach(inp => { if (inp.value) hasInputs = true; });
+
+          if (doneRows.length > 0 || hasInputs) {
+            const lastActivity = (workoutState.lastActivityTime && workoutState.lastActivityTime[dayId])
+              ? workoutState.lastActivityTime[dayId]
+              : (startTime + 60 * 60 * 1000);
+            const durationMin = Math.max(1, Math.min(150, Math.round((lastActivity - startTime) / 60000)));
+
+            executeDayArchive(dayId, durationMin, true);
+          } else {
+            // Empty session, just clean up
+            delete workoutState.sessionStartTime[dayId];
+            if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[dayId];
+            saveWorkoutState();
+            updateSessionTimerDisplay(dayId);
+          }
+        }
+      });
     }
 
     // Handle Set Input
@@ -3061,7 +3231,6 @@
       const row = btn.closest('.set-row');
       const card = btn.closest('.exercise-card');
       const section = btn.closest('.day-content');
-      const slotId = card.getAttribute('data-slot');
 
       if (section) startSessionTimerIfNeeded(section.id);
 
@@ -3160,6 +3329,17 @@
         return;
       }
 
+      executeDayArchive(dayId, durationMin, false);
+    }
+
+    function executeDayArchive(dayId, durationMin, isAutoSave) {
+      const daySection = document.getElementById(dayId);
+      if (!daySection) return;
+
+      const durationFormatted = durationMin >= 60 
+        ? `${Math.floor(durationMin / 60)}h ${durationMin % 60}m` 
+        : `${durationMin} min`;
+
       const sessionRecord = {
         id: 'ses_' + Date.now(),
         date: new Date().toISOString(),
@@ -3171,6 +3351,7 @@
       };
 
       let countArchived = 0;
+      const dayCards = Array.from(daySection.querySelectorAll('.exercise-card'));
 
       dayCards.forEach(card => {
         const slotId = card.getAttribute('data-slot');
@@ -3260,16 +3441,27 @@
           delete workoutState.tempSlots[slotId];
         });
       }
-      if (workoutState.sessionStartTime) {
-        delete workoutState.sessionStartTime[dayId];
-      }
+      if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[dayId];
+      if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[dayId];
 
       saveWorkoutState();
       updateSessionTimerDisplay(dayId);
       updateProgress();
 
-      showToast(`🎉 ¡Entrenamiento completado en ${durationFormatted}! ${countArchived} marcas archivadas.`);
-      if (navigator.vibrate) navigator.vibrate([70, 50, 70, 50, 100]);
+      if (isAutoSave) {
+        showToast(`⚡ Guardado automático: ${sessionRecord.dayName} (${durationFormatted})`);
+      } else {
+        showToast(`🎉 ¡Entrenamiento completado en ${durationFormatted}! ${countArchived} marcas archivadas.`);
+        if (navigator.vibrate) navigator.vibrate([70, 50, 70, 50, 100]);
+      }
+
+      // Switch view to next workout day in rotation
+      const sequence = ['torsoA', 'piernaA', 'torsoB', 'piernaB'];
+      const currentIdx = sequence.indexOf(dayId);
+      if (currentIdx !== -1) {
+        const nextDayId = sequence[(currentIdx + 1) % sequence.length];
+        selectDay(nextDayId);
+      }
     }
 
     // Reset Day Checks
@@ -3289,6 +3481,7 @@
         });
       }
       if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[dayId];
+      if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[dayId];
       updateSessionTimerDisplay(dayId);
       saveWorkoutState();
       updateProgress();
@@ -3787,7 +3980,8 @@
             sessions: parsed.sessions || [],
             customSlots: parsed.customSlots || {},
             tempSlots: parsed.tempSlots || {},
-            sessionStartTime: parsed.sessionStartTime || {}
+            sessionStartTime: parsed.sessionStartTime || {},
+            lastActivityTime: parsed.lastActivityTime || {}
           };
 
           localStorage.setItem('aesthetic_routine_data', JSON.stringify(workoutState));
@@ -3801,6 +3995,85 @@
       reader.readAsText(file);
       fileInput.value = '';
     }
+
+    // ==========================================
+    // NOTIFICATIONS & ALERTS (Android PWA + Audio + Vibration)
+    // ==========================================
+    function initNotifications() {
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().catch(() => {});
+      }
+    }
+
+    function sendRestFinishedNotification() {
+      // 1. Android Notification API
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const title = '¡Descanso Terminado! ⏱️';
+        const options = {
+          body: 'Hora de la siguiente serie en GYM Poderoso 💪',
+          icon: './icon-192.png',
+          badge: './icon-192.png',
+          vibrate: [200, 100, 200, 100, 300],
+          tag: 'rest-finish',
+          renotify: true,
+          silent: false
+        };
+
+        if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.showNotification(title, options).catch(() => {
+              try { new Notification(title, options); } catch(e) {}
+            });
+          }).catch(() => {
+            try { new Notification(title, options); } catch(e) {}
+          });
+        } else {
+          try { new Notification(title, options); } catch(e) {}
+        }
+      }
+
+      // 2. Discrete Audio Tone (Smooth double chime)
+      playAlertTone();
+
+      // 3. Vibration
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200, 100, 300]);
+      }
+    }
+
+    function playAlertTone() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const now = audioCtx.currentTime;
+
+        // Two-tone discrete chime: Tone 1 (880Hz / A5) -> Tone 2 (1108.73Hz / C#6)
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(880, now);
+        gain1.gain.setValueAtTime(0.2, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.18);
+
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(1108.73, now + 0.18);
+        gain2.gain.setValueAtTime(0.25, now + 0.18);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(now + 0.18);
+        osc2.stop(now + 0.55);
+      } catch (e) {}
+    }
+
 
     // ==========================================
     // TOP REST TIMER ENGINE (Date.now() background fix)
@@ -3829,6 +4102,7 @@
     }
 
     function triggerRest(seconds) {
+      initNotifications();
       timerDuration = seconds;
       timerRemaining = seconds;
       timerEndTime = Date.now() + seconds * 1000;
@@ -3843,6 +4117,7 @@
     }
 
     function togglePlayTimer() {
+      initNotifications();
       if (isTimerActive) {
         pauseTimerLoop();
       } else {
@@ -3854,10 +4129,34 @@
       }
     }
 
+    // Wake Lock & Service Worker background rest sync
+    let timerWakeLock = null;
+    async function acquireWakeLock() {
+      try {
+        if ('wakeLock' in navigator && !timerWakeLock) {
+          timerWakeLock = await navigator.wakeLock.request('screen');
+          timerWakeLock.addEventListener('release', () => { timerWakeLock = null; });
+        }
+      } catch (e) {}
+    }
+    function releaseWakeLock() {
+      if (timerWakeLock) {
+        timerWakeLock.release().catch(() => {});
+        timerWakeLock = null;
+      }
+    }
+
     function startTimerLoop() {
       clearInterval(timerInterval);
       isTimerActive = true;
       if (!timerEndTime) timerEndTime = Date.now() + timerRemaining * 1000;
+      acquireWakeLock();
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'START_REST_TIMER',
+          endTime: timerEndTime
+        });
+      }
 
       const btn = document.getElementById('timerPlayBtn');
       if (btn) {
@@ -3880,6 +4179,12 @@
     function pauseTimerLoop() {
       clearInterval(timerInterval);
       isTimerActive = false;
+      releaseWakeLock();
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'CANCEL_REST_TIMER'
+        });
+      }
       const btn = document.getElementById('timerPlayBtn');
       if (btn) {
         btn.innerText = "Reanudar";
@@ -3893,6 +4198,12 @@
       isTimerActive = false;
       timerEndTime = null;
       timerRemaining = timerDuration;
+      releaseWakeLock();
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'CANCEL_REST_TIMER'
+        });
+      }
       updateTimerUI();
       const btn = document.getElementById('timerPlayBtn');
       if (btn) {
@@ -3905,30 +4216,19 @@
       clearInterval(timerInterval);
       isTimerActive = false;
       timerEndTime = null;
+      releaseWakeLock();
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'CANCEL_REST_TIMER'
+        });
+      }
       const btn = document.getElementById('timerPlayBtn');
       if (btn) {
         btn.innerText = "Listo";
         btn.classList.remove('paused');
       }
       updateTimerUI();
-      playAlertTone();
-      if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 300]);
-    }
-
-    function playAlertTone() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.3);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.4);
-      } catch (e) {}
+      sendRestFinishedNotification();
     }
 
     // When screen wakes up or app is focused, re-evaluate timer instantly
@@ -3983,7 +4283,8 @@
             sessions: [],
             customSlots: {},
             tempSlots: {},
-            sessionStartTime: {}
+            sessionStartTime: {},
+            lastActivityTime: {}
           }, loaded);
         } catch (e) {
           console.error(e);
@@ -4031,6 +4332,9 @@
         checkExerciseCardCompletion(card);
       });
 
+      // Auto select next day based on last finished workout session
+      checkAutoSave();
+      autoSelectInitialDay();
       updateProgress();
     }
 

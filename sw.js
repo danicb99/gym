@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gym-poderoso-v4';
+const CACHE_NAME = 'gym-poderoso-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -43,3 +43,40 @@ self.addEventListener('fetch', (e) => {
     })
   );
 });
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      if (clientList.length > 0) {
+        return clientList[0].focus();
+      }
+      return clients.openWindow('./index.html');
+    })
+  );
+});
+
+let bgTimerId = null;
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'START_REST_TIMER') {
+    if (bgTimerId) clearTimeout(bgTimerId);
+    const delay = Math.max(0, event.data.endTime - Date.now());
+    bgTimerId = setTimeout(() => {
+      self.registration.showNotification('¡Descanso Terminado! 🔔', {
+        body: 'Hora de la siguiente serie en GYM Poderoso 💪',
+        icon: './icon-192.png',
+        badge: './icon-192.png',
+        vibrate: [200, 100, 200, 100, 300],
+        tag: 'rest-finish',
+        renotify: true
+      });
+      bgTimerId = null;
+    }, delay);
+  } else if (event.data && event.data.type === 'CANCEL_REST_TIMER') {
+    if (bgTimerId) {
+      clearTimeout(bgTimerId);
+      bgTimerId = null;
+    }
+  }
+});
+
