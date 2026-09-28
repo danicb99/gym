@@ -1,9 +1,12 @@
-const CACHE_NAME = 'vigorexiapp-v6';
+const CACHE_NAME = 'vigorexiapp-v7';
 const ASSETS = [
   './',
   './index.html',
   './rutina_movil.html',
   './watch_bridge.js',
+  './icon-round-192.png',
+  './icon-round-512.png',
+  './badge-round.png',
   './manifest.json',
   './manifest.json?v=2',
   './icon-192.png',
@@ -69,8 +72,8 @@ self.addEventListener('message', (event) => {
     bgTimerId = setTimeout(() => {
       self.registration.showNotification('¡Descanso Terminado! 🔔', {
         body: 'Hora de la siguiente serie en Vigorexiapp 💪',
-        icon: './icon-192.png',
-        badge: './icon-192.png',
+        icon: './icon-round-192.png',
+        badge: './badge-round.png',
         vibrate: [200, 100, 200, 100, 300],
         tag: 'rest-finish',
         renotify: true
