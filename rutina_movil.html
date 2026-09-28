@@ -478,25 +478,31 @@
 
   <main class="container">
 
-    <!-- DAY SECTION: torsoA -->
-    <section class="workout-day" id="torsoA">
-      <div class="day-hero-card">
-        <div class="day-hero-info">
-          <div class="day-title-row">
-            <span class="day-num-tag">Día 1</span>
-            <span class="day-main-name">Torso A</span>
+    <!-- ==========================================
+         Día 1: Torso A • Fuerza & Empuje
+         ========================================== -->
+    <section id="torsoA" class="day-content active">
+      <div class="day-banner">
+        <div class="day-banner-main">
+          <div class="day-banner-title">Día 1: Torso A • Fuerza & Empuje</div>
+          <div class="day-banner-meta">
+            <span class="progress-chip" id="progressChip-torsoA">0/23 series (0%)</span>
+            <span class="session-timer-chip" id="sessionTimer-torsoA">⏱️ 00:00</span>
           </div>
-          <div class="day-focus-label">Fuerza & Empuje</div>
         </div>
-        <div class="day-hero-actions">
-          <button class="btn-guide-inline" onclick="openGuideModal('torsoA')">
-            <span>📖 Guía y Calentamiento</span>
+        <div class="day-banner-actions">
+          <button class="btn-guide-modal" onclick="openGuideModal('torsoA')" title="Ver protocolo de calentamiento y aproximación">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Guía y Calentamiento</span>
           </button>
-          <div class="day-sets-badge" id="badge-torsoA">0/23 series (0%)</div>
+          <button class="btn-finish-day" onclick="finishDaySession('torsoA')" title="Guardar marcas en 'Anterior', registrar duración e historial">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Guardar día</span>
+          </button>
+          <button class="btn-reset-session" onclick="resetDayChecks('torsoA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
       </div>
 
-      <div class="exercise-list" id="list-torsoA">
       <!-- Exercise 1: torsoA_1 -->
       <article class="exercise-card" id="card-torsoA_1" data-slot="torsoA_1" data-default-ex="banca" data-current-ex="banca" data-total-sets="4" style="order: 1;">
         
@@ -556,17 +562,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -596,10 +593,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoA_1" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoA_1', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoA_1">Retracción escapular activa, pies firmes en el suelo, bajada en 2 s controlados rozando el esternón inferior. Cero rebote.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -663,17 +661,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -703,10 +692,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoA_2" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoA_2', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoA_2">Torso ligeramente inclinado (10-15°), tirar llevando los codos hacia los bolsillos traseros, estirar dorsal 2s arriba.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -770,17 +760,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -804,10 +785,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoA_3" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoA_3', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoA_3">Banco a 75° (no a 90°) para proteger la cápsula articular del hombro. Codos a 45° del torso.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -871,17 +853,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -905,10 +878,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoA_4" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoA_4', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoA_4">Columna neutra sin balancear la espalda baja. Traccionar hacia el ombligo apretando escápulas 1s.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -972,17 +946,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -1012,10 +977,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoA_5" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoA_5', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoA_5">Inclinación leve de 10° hacia delante, elevar en el plano escapular (30° adelantado), pausa de 1 s arriba.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1079,17 +1045,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -1113,10 +1070,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoA_6" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoA_6', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoA_6">Codos clavados al costado sin adelantarlos, extensión completa con bloqueo de 1 s, subida controlada hasta 90°.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1180,17 +1138,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -1214,45 +1163,53 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoA_7" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoA_7', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoA_7">Iniciar neutro y supinar fuertemente la muñeca a mitad de subida para acortar ambas cabezas del bíceps.</div>
+            </details>
           </div>
         </div>
       </article>
 
-        <!-- Bottom Actions (End of routine) -->
-        <div class="day-bottom-actions">
-          <button class="btn-bottom-finish" onclick="finishWorkoutDay('torsoA')">
-            <span>✅ Finalizar y Guardar Día 1</span>
-          </button>
-          <button class="btn-bottom-history" onclick="openHistoryFromDay()">
-            <span>📊 Ver Historial & Backup</span>
-          </button>
-        </div>
+      <!-- Bottom Actions (End of routine) -->
+      <div class="day-bottom-actions">
+        <button class="btn-bottom-finish" onclick="finishDaySession('torsoA')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Finalizar y Guardar Día 1</span>
+        </button>
+        <button class="btn-bottom-history" onclick="openHistoryFromDay()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          <span>Ver Historial & Backup</span>
+        </button>
       </div>
     </section>
 
-    <!-- DAY SECTION: piernaA -->
-    <section class="workout-day" id="piernaA">
-      <div class="day-hero-card">
-        <div class="day-hero-info">
-          <div class="day-title-row">
-            <span class="day-num-tag">Día 2</span>
-            <span class="day-main-name">Pierna A</span>
+    <!-- ==========================================
+         Día 2: Pierna A • Sentadilla & Cuádriceps
+         ========================================== -->
+    <section id="piernaA" class="day-content">
+      <div class="day-banner">
+        <div class="day-banner-main">
+          <div class="day-banner-title">Día 2: Pierna A • Sentadilla & Cuádriceps</div>
+          <div class="day-banner-meta">
+            <span class="progress-chip" id="progressChip-piernaA">0/17 series (0%)</span>
+            <span class="session-timer-chip" id="sessionTimer-piernaA">⏱️ 00:00</span>
           </div>
-          <div class="day-focus-label">Sentadilla & Cuádriceps</div>
         </div>
-        <div class="day-hero-actions">
-          <button class="btn-guide-inline" onclick="openGuideModal('piernaA')">
-            <span>📖 Guía y Calentamiento</span>
+        <div class="day-banner-actions">
+          <button class="btn-guide-modal" onclick="openGuideModal('piernaA')" title="Ver protocolo de calentamiento y aproximación">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Guía y Calentamiento</span>
           </button>
-          <div class="day-sets-badge" id="badge-piernaA">0/17 series (0%)</div>
+          <button class="btn-finish-day" onclick="finishDaySession('piernaA')" title="Guardar marcas en 'Anterior', registrar duración e historial">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Guardar día</span>
+          </button>
+          <button class="btn-reset-session" onclick="resetDayChecks('piernaA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
       </div>
 
-      <div class="exercise-list" id="list-piernaA">
       <!-- Exercise 1: piernaA_1 -->
       <article class="exercise-card" id="card-piernaA_1" data-slot="piernaA_1" data-default-ex="squat" data-current-ex="squat" data-total-sets="4" style="order: 1;">
         
@@ -1312,17 +1269,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -1352,10 +1300,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-piernaA_1" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('piernaA_1', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-piernaA_1">Pies a anchura de hombros, brace abdominal 360°, romper en caderas y rodillas simultáneamente, profundidad mínima paralelo.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1419,17 +1368,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -1453,10 +1393,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-piernaA_2" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('piernaA_2', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-piernaA_2">Almohadilla en el empeine, sujetar los agarres para no levantar el glúteo, extensión completa con 1 s de contracción.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1520,17 +1461,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -1560,10 +1492,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-piernaA_3" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('piernaA_3', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-piernaA_3">Presionar la pelvis contra el banco para no arquear la zona lumbar. Flexión explosiva y bajada en 3 s.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1627,17 +1560,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -1661,10 +1585,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-piernaA_4" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('piernaA_4', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-piernaA_4">Rodillas bloqueadas rectas, pausa de 2 s en máximo estiramiento abajo (elimina el reflejo miotático del Aquiles).</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1728,17 +1653,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -1762,45 +1678,53 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-piernaA_5" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('piernaA_5', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-piernaA_5">Retroversión pélvica activa (meter el ombligo y apretar glúteos al máximo). Cero hundimiento lumbar.</div>
+            </details>
           </div>
         </div>
       </article>
 
-        <!-- Bottom Actions (End of routine) -->
-        <div class="day-bottom-actions">
-          <button class="btn-bottom-finish" onclick="finishWorkoutDay('piernaA')">
-            <span>✅ Finalizar y Guardar Día 2</span>
-          </button>
-          <button class="btn-bottom-history" onclick="openHistoryFromDay()">
-            <span>📊 Ver Historial & Backup</span>
-          </button>
-        </div>
+      <!-- Bottom Actions (End of routine) -->
+      <div class="day-bottom-actions">
+        <button class="btn-bottom-finish" onclick="finishDaySession('piernaA')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Finalizar y Guardar Día 2</span>
+        </button>
+        <button class="btn-bottom-history" onclick="openHistoryFromDay()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          <span>Ver Historial & Backup</span>
+        </button>
       </div>
     </section>
 
-    <!-- DAY SECTION: torsoB -->
-    <section class="workout-day" id="torsoB">
-      <div class="day-hero-card">
-        <div class="day-hero-info">
-          <div class="day-title-row">
-            <span class="day-num-tag">Día 3</span>
-            <span class="day-main-name">Torso B</span>
+    <!-- ==========================================
+         Día 3: Torso B • Tracción & Hipertrofia
+         ========================================== -->
+    <section id="torsoB" class="day-content">
+      <div class="day-banner">
+        <div class="day-banner-main">
+          <div class="day-banner-title">Día 3: Torso B • Tracción & Hipertrofia</div>
+          <div class="day-banner-meta">
+            <span class="progress-chip" id="progressChip-torsoB">0/23 series (0%)</span>
+            <span class="session-timer-chip" id="sessionTimer-torsoB">⏱️ 00:00</span>
           </div>
-          <div class="day-focus-label">Tracción & Hipertrofia</div>
         </div>
-        <div class="day-hero-actions">
-          <button class="btn-guide-inline" onclick="openGuideModal('torsoB')">
-            <span>📖 Guía y Calentamiento</span>
+        <div class="day-banner-actions">
+          <button class="btn-guide-modal" onclick="openGuideModal('torsoB')" title="Ver protocolo de calentamiento y aproximación">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Guía y Calentamiento</span>
           </button>
-          <div class="day-sets-badge" id="badge-torsoB">0/23 series (0%)</div>
+          <button class="btn-finish-day" onclick="finishDaySession('torsoB')" title="Guardar marcas en 'Anterior', registrar duración e historial">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Guardar día</span>
+          </button>
+          <button class="btn-reset-session" onclick="resetDayChecks('torsoB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
       </div>
 
-      <div class="exercise-list" id="list-torsoB">
       <!-- Exercise 1: torsoB_1 -->
       <article class="exercise-card" id="card-torsoB_1" data-slot="torsoB_1" data-default-ex="remouni" data-current-ex="remouni" data-total-sets="4" style="order: 1;">
         
@@ -1860,17 +1784,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -1900,10 +1815,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoB_1" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoB_1', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoB_1">Rodilla y mano apoyadas; traccionar hacia la cresta ilíaca (cadera) con el codo pegado al torso.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1967,17 +1883,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -2007,10 +1914,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoB_2" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoB_2', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoB_2">Inclinación a 30° (no a 45° para que no robe el trabajo el deltoides anterior). Codos a 45-60°.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2074,17 +1982,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -2114,10 +2013,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoB_3" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoB_3', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoB_3">Foco en acercar los codos a las costillas en el punto de contracción. Estirar dorsal arriba 2 s.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2181,17 +2081,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -2221,10 +2112,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoB_4" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoB_4', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoB_4">Polea ajustada a la altura de la rodilla o muñeca. Tensión desde el milímetro cero del recorrido.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2288,17 +2180,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -2322,10 +2205,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoB_5" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoB_5', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoB_5">Tirar hacia el puente de la nariz con rotación externa (pulgares hacia atrás), aguantar 1 s apretando escápulas.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2389,17 +2273,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -2423,10 +2298,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoB_6" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoB_6', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoB_6">Bajar la barra hacia detrás de la coronilla (no hacia la frente) para mantener tensión en la cabeza larga del tríceps.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2490,17 +2366,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -2524,45 +2391,53 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-torsoB_7" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('torsoB_7', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-torsoB_7">Palmas enfrentadas en todo el recorrido. Empuja el bíceps hacia arriba ensanchando el brazo de perfil.</div>
+            </details>
           </div>
         </div>
       </article>
 
-        <!-- Bottom Actions (End of routine) -->
-        <div class="day-bottom-actions">
-          <button class="btn-bottom-finish" onclick="finishWorkoutDay('torsoB')">
-            <span>✅ Finalizar y Guardar Día 3</span>
-          </button>
-          <button class="btn-bottom-history" onclick="openHistoryFromDay()">
-            <span>📊 Ver Historial & Backup</span>
-          </button>
-        </div>
+      <!-- Bottom Actions (End of routine) -->
+      <div class="day-bottom-actions">
+        <button class="btn-bottom-finish" onclick="finishDaySession('torsoB')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Finalizar y Guardar Día 3</span>
+        </button>
+        <button class="btn-bottom-history" onclick="openHistoryFromDay()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          <span>Ver Historial & Backup</span>
+        </button>
       </div>
     </section>
 
-    <!-- DAY SECTION: piernaB -->
-    <section class="workout-day" id="piernaB">
-      <div class="day-hero-card">
-        <div class="day-hero-info">
-          <div class="day-title-row">
-            <span class="day-num-tag">Día 4</span>
-            <span class="day-main-name">Pierna B</span>
+    <!-- ==========================================
+         Día 4: Pierna B • Cadena Posterior & Búlgaras
+         ========================================== -->
+    <section id="piernaB" class="day-content">
+      <div class="day-banner">
+        <div class="day-banner-main">
+          <div class="day-banner-title">Día 4: Pierna B • Cadena Posterior & Búlgaras</div>
+          <div class="day-banner-meta">
+            <span class="progress-chip" id="progressChip-piernaB">0/20 series (0%)</span>
+            <span class="session-timer-chip" id="sessionTimer-piernaB">⏱️ 00:00</span>
           </div>
-          <div class="day-focus-label">Cadena Posterior & Búlgaras</div>
         </div>
-        <div class="day-hero-actions">
-          <button class="btn-guide-inline" onclick="openGuideModal('piernaB')">
-            <span>📖 Guía y Calentamiento</span>
+        <div class="day-banner-actions">
+          <button class="btn-guide-modal" onclick="openGuideModal('piernaB')" title="Ver protocolo de calentamiento y aproximación">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Guía y Calentamiento</span>
           </button>
-          <div class="day-sets-badge" id="badge-piernaB">0/20 series (0%)</div>
+          <button class="btn-finish-day" onclick="finishDaySession('piernaB')" title="Guardar marcas en 'Anterior', registrar duración e historial">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Guardar día</span>
+          </button>
+          <button class="btn-reset-session" onclick="resetDayChecks('piernaB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
       </div>
 
-      <div class="exercise-list" id="list-piernaB">
       <!-- Exercise 1: piernaB_1 -->
       <article class="exercise-card" id="card-piernaB_1" data-slot="piernaB_1" data-default-ex="rdl" data-current-ex="rdl" data-total-sets="4" style="order: 1;">
         
@@ -2622,17 +2497,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -2662,10 +2528,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-piernaB_1" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('piernaB_1', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-piernaB_1">Rodillas semirrígidas (15-20° de flexión fija), empujar el glúteo hacia la pared trasera, barra rozando los muslos. Cero flexión lumbar.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2729,17 +2596,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -2763,10 +2621,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-piernaB_2" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('piernaB_2', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-piernaB_2">Empeine trasero apoyado en banco; inclinación leve del torso (15°) para mayor reclutamiento de glúteo.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2830,17 +2689,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -2870,10 +2720,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-piernaB_3" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('piernaB_3', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-piernaB_3">Ajustar el rodillo superior firmemente contra los muslos para evitar que las caderas se levanten. Aguantar 1 s abajo.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2937,17 +2788,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -2971,10 +2813,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-piernaB_4" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('piernaB_4', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-piernaB_4">Rango completo con pausa arriba de 1 s; en la última serie aplicar dropset o pausa isométrica final de 10 s.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -3038,17 +2881,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -3072,10 +2906,11 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-piernaB_5" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('piernaB_5', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-piernaB_5">Con la rodilla flexionada a 90° el gastrocnemio queda inhibido por insuficiencia activa, focalizando el sóleo.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -3139,17 +2974,8 @@
             </div>
           </div>
 
-          <!-- Series Table -->
-          <table class="set-table">
-            <thead>
-              <tr>
-                <th class="col-set">SET</th>
-                <th class="col-prev">ANTERIOR</th>
-                <th class="col-kg">KG</th>
-                <th class="col-reps">REPS</th>
-                <th class="col-check">OK</th>
-              </tr>
-            </thead>
+          <table class="sets-table">
+            <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
@@ -3173,23 +2999,25 @@
             </tbody>
           </table>
 
-          <!-- Notes Row -->
-          <div class="notes-row">
-            <span class="notes-label">Notas</span>
-            <input type="text" class="notes-input" id="notes-piernaB_6" placeholder="Sensaciones, agarre, molestias..." onchange="handleNoteChange('piernaB_6', this.value)">
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-piernaB_6">Fijar la cadera en el espacio; no flexionar caderas, sino doblar la columna dorsal enrollando la caja torácica hacia la pelvis.</div>
+            </details>
           </div>
         </div>
       </article>
 
-        <!-- Bottom Actions (End of routine) -->
-        <div class="day-bottom-actions">
-          <button class="btn-bottom-finish" onclick="finishWorkoutDay('piernaB')">
-            <span>✅ Finalizar y Guardar Día 4</span>
-          </button>
-          <button class="btn-bottom-history" onclick="openHistoryFromDay()">
-            <span>📊 Ver Historial & Backup</span>
-          </button>
-        </div>
+      <!-- Bottom Actions (End of routine) -->
+      <div class="day-bottom-actions">
+        <button class="btn-bottom-finish" onclick="finishDaySession('piernaB')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Finalizar y Guardar Día 4</span>
+        </button>
+        <button class="btn-bottom-history" onclick="openHistoryFromDay()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          <span>Ver Historial & Backup</span>
+        </button>
       </div>
     </section>
 
