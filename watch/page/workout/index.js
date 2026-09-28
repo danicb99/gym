@@ -6,6 +6,7 @@
 import * as hmUI from '@zos/ui'
 import { push, replace } from '@zos/router'
 import { HeartRate } from '@zos/sensor'
+import { setWakeUpRelaunch, resetWakeUpRelaunch } from '@zos/display'
 import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
 import { vibrateShort } from '../../utils/haptics'
@@ -27,6 +28,7 @@ Page(BasePage({
 
   onInit() {
     this.state.app = getApp()
+    this.enableWakeUpRelaunch()
     this.initCurrentValues()
   },
 
@@ -538,8 +540,41 @@ Page(BasePage({
     this.updateTimerDisplay()
   },
 
+  enableWakeUpRelaunch() {
+    try {
+      if (typeof setWakeUpRelaunch === 'function') {
+        setWakeUpRelaunch({ relaunch: true })
+      }
+    } catch (e) {
+      try {
+        setWakeUpRelaunch(true)
+      } catch (e2) {}
+    }
+    try {
+      if (typeof hmApp !== 'undefined' && hmApp.setScreenKeep) {
+        hmApp.setScreenKeep(true)
+      }
+    } catch (e3) {}
+  },
+
+  disableWakeUpRelaunch() {
+    try {
+      if (typeof resetWakeUpRelaunch === 'function') {
+        resetWakeUpRelaunch()
+      } else if (typeof setWakeUpRelaunch === 'function') {
+        setWakeUpRelaunch({ relaunch: false })
+      }
+    } catch (e) {}
+    try {
+      if (typeof hmApp !== 'undefined' && hmApp.setScreenKeep) {
+        hmApp.setScreenKeep(false)
+      }
+    } catch (e2) {}
+  },
+
   onDestroy() {
     this.stopWorkoutTicker()
+    this.disableWakeUpRelaunch()
     if (this.state.heartRateSensor) {
       try {
         this.state.heartRateSensor.offCurrentChange()

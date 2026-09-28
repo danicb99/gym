@@ -4,6 +4,7 @@
 
 import * as hmUI from '@zos/ui'
 import { replace } from '@zos/router'
+import { setWakeUpRelaunch, resetWakeUpRelaunch } from '@zos/display'
 import { vibrateShort, vibrateRestFinished } from '../../utils/haptics'
 
 Page({
@@ -19,6 +20,7 @@ Page({
 
   onInit() {
     this.state.app = getApp()
+    this.enableWakeUpRelaunch()
     const timerData = this.state.app.globalData.restTimer
     this.state.totalSeconds = (timerData && timerData.totalSeconds) || 90
     if (timerData && timerData.endTime && timerData.endTime > Date.now()) {
@@ -256,7 +258,40 @@ Page({
     this.updateClockDisplay()
   },
 
+  enableWakeUpRelaunch() {
+    try {
+      if (typeof setWakeUpRelaunch === 'function') {
+        setWakeUpRelaunch({ relaunch: true })
+      }
+    } catch (e) {
+      try {
+        setWakeUpRelaunch(true)
+      } catch (e2) {}
+    }
+    try {
+      if (typeof hmApp !== 'undefined' && hmApp.setScreenKeep) {
+        hmApp.setScreenKeep(true)
+      }
+    } catch (e3) {}
+  },
+
+  disableWakeUpRelaunch() {
+    try {
+      if (typeof resetWakeUpRelaunch === 'function') {
+        resetWakeUpRelaunch()
+      } else if (typeof setWakeUpRelaunch === 'function') {
+        setWakeUpRelaunch({ relaunch: false })
+      }
+    } catch (e) {}
+    try {
+      if (typeof hmApp !== 'undefined' && hmApp.setScreenKeep) {
+        hmApp.setScreenKeep(false)
+      }
+    } catch (e2) {}
+  },
+
   onDestroy() {
     this.clearCountdown()
+    this.disableWakeUpRelaunch()
   }
 })
