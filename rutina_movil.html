@@ -47,10 +47,11 @@
     .app-header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(7, 11, 20, 0.92); border-bottom: 1px solid var(--border); padding-top: var(--safe-top); }
     .header-content { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; gap: 8px; }
 
-    /* Header Day Picker (Native Styled Dropdown) */
-    .header-day-picker { flex: 1; max-width: 250px; }
+    /* Header Day Picker (Native Styled Dropdown & History Button) */
+    .header-day-picker { display: flex; align-items: center; gap: 6px; flex: 1; max-width: 275px; }
     .header-day-select {
-      width: 100%;
+      flex: 1;
+      min-width: 0;
       background: var(--surface-elevated);
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -70,6 +71,27 @@
       transition: border-color 0.15s;
     }
     .header-day-select:focus { border-color: var(--cyan); }
+    .header-history-btn {
+      background: var(--surface-elevated);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: var(--amber);
+      border-radius: 12px;
+      padding: 7px 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .header-history-btn:hover {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: var(--amber);
+    }
+    .header-history-btn:active {
+      transform: scale(0.95);
+    }
 
     /* Top Rest Timer Dock */
     .top-timer-widget {
@@ -494,14 +516,20 @@
   <!-- Top App Header with Day Dropdown & Top Rest Timer -->
   <header class="app-header">
     <div class="header-content">
-      <!-- Left: Day Selector Dropdown -->
+      <!-- Left: Day Selector Dropdown & Quick History Button -->
       <div class="header-day-picker">
         <select id="daySelector" class="header-day-select" onchange="selectDay(this.value)">
           <option value="torsoA">Día 1: Torso A • Empuje</option>
           <option value="piernaA">Día 2: Pierna A • Cuádriceps</option>
           <option value="torsoB">Día 3: Torso B • Tracción</option>
           <option value="piernaB">Día 4: Pierna B • Isquios</option>
+          <option value="historialView">📊 Historial & Backup</option>
         </select>
+        <button class="header-history-btn" onclick="openHistoryFromDay()" title="Ver Historial, duración de entrenamientos y marcas">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+            <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
+          </svg>
+        </button>
       </div>
 
       <!-- Right: Compact Top Rest Timer Dock -->
@@ -534,7 +562,7 @@
           <div class="day-banner-title">Día 1: Torso A • Fuerza & Empuje</div>
           <div class="day-banner-meta">
             <span class="progress-chip" id="progressChip-torsoA">0/23 series (0%)</span>
-            <span class="session-timer-chip" id="sessionTimer-torsoA">⏱️ 00:00</span>
+            <span class="session-timer-chip" id="sessionTimer-torsoA" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">⏱️ 00:00</span>
           </div>
         </div>
         <div class="day-banner-actions">
@@ -1307,7 +1335,7 @@
           <div class="day-banner-title">Día 2: Pierna A • Sentadilla & Cuádriceps</div>
           <div class="day-banner-meta">
             <span class="progress-chip" id="progressChip-piernaA">0/17 series (0%)</span>
-            <span class="session-timer-chip" id="sessionTimer-piernaA">⏱️ 00:00</span>
+            <span class="session-timer-chip" id="sessionTimer-piernaA" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">⏱️ 00:00</span>
           </div>
         </div>
         <div class="day-banner-actions">
@@ -1870,7 +1898,7 @@
           <div class="day-banner-title">Día 3: Torso B • Tracción & Hipertrofia</div>
           <div class="day-banner-meta">
             <span class="progress-chip" id="progressChip-torsoB">0/23 series (0%)</span>
-            <span class="session-timer-chip" id="sessionTimer-torsoB">⏱️ 00:00</span>
+            <span class="session-timer-chip" id="sessionTimer-torsoB" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">⏱️ 00:00</span>
           </div>
         </div>
         <div class="day-banner-actions">
@@ -2649,7 +2677,7 @@
           <div class="day-banner-title">Día 4: Pierna B • Cadena Posterior & Búlgaras</div>
           <div class="day-banner-meta">
             <span class="progress-chip" id="progressChip-piernaB">0/20 series (0%)</span>
-            <span class="session-timer-chip" id="sessionTimer-piernaB">⏱️ 00:00</span>
+            <span class="session-timer-chip" id="sessionTimer-piernaB" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">⏱️ 00:00</span>
           </div>
         </div>
         <div class="day-banner-actions">
@@ -3590,9 +3618,9 @@
     function selectDay(dayId) {
       if (dayId !== 'historialView') {
         lastActiveWorkoutDay = dayId;
-        const sel = document.getElementById('daySelector');
-        if (sel && sel.value !== dayId) sel.value = dayId;
       }
+      const sel = document.getElementById('daySelector');
+      if (sel && sel.value !== dayId) sel.value = dayId;
 
       // Enforce strict day isolation
       document.querySelectorAll('.day-content').forEach(content => {
@@ -3620,6 +3648,10 @@
 
     function exitHistoryView() {
       selectDay(lastActiveWorkoutDay || 'torsoA');
+    }
+
+    function openHistoryFromDay() {
+      selectDay('historialView');
     }
 
     // Auto-select the next workout day based on the last finished session (or keep current if ongoing)
@@ -3819,14 +3851,34 @@
       if (!chip) return;
       const startTime = workoutState.sessionStartTime ? workoutState.sessionStartTime[dayId] : null;
       if (!startTime) {
-        chip.innerText = '⏱️ 00:00';
+        const sessions = workoutState.sessions || [];
+        const lastSes = sessions.find(s => s.dayId === dayId);
+        if (lastSes) {
+          const isToday = new Date(lastSes.date).toDateString() === new Date().toDateString();
+          chip.innerText = isToday ? `⏱️ Hoy: ${lastSes.durationFormatted}` : `⏱️ Ant: ${lastSes.durationFormatted}`;
+          chip.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+          chip.style.color = '#fbbf24';
+        } else {
+          chip.innerText = '⏱️ 00:00';
+          chip.style.borderColor = '';
+          chip.style.color = '';
+        }
         chip.classList.remove('active');
         return;
       }
+      chip.style.borderColor = '';
+      chip.style.color = '';
       const elapsedSec = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
-      const m = Math.floor(elapsedSec / 60).toString().padStart(2, '0');
-      const s = (elapsedSec % 60).toString().padStart(2, '0');
-      chip.innerText = `⏱️ ${m}:${s}`;
+      if (elapsedSec >= 3600) {
+        const h = Math.floor(elapsedSec / 3600);
+        const m = Math.floor((elapsedSec % 3600) / 60).toString().padStart(2, '0');
+        const s = (elapsedSec % 60).toString().padStart(2, '0');
+        chip.innerText = `⏱️ ${h}:${m}:${s}`;
+      } else {
+        const m = Math.floor(elapsedSec / 60).toString().padStart(2, '0');
+        const s = (elapsedSec % 60).toString().padStart(2, '0');
+        chip.innerText = `⏱️ ${m}:${s}`;
+      }
       chip.classList.add('active');
     }
 
@@ -4376,6 +4428,12 @@
             </div>
           </div>
           <div class="history-empty">Aún no hay sesiones guardadas para este ejercicio.</div>
+          <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border);">
+            <button class="btn-bottom-history" style="width:100%; justify-content:center;" onclick="closeHistoryModal(); openHistoryFromDay();">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+              <span>Ver Historial General & Duración de Sesiones</span>
+            </button>
+          </div>
         `;
       }
 
@@ -4440,6 +4498,12 @@
             ${tableRows}
           </tbody>
         </table>
+        <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border);">
+          <button class="btn-bottom-history" style="width:100%; justify-content:center;" onclick="closeHistoryModal(); openHistoryFromDay();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            <span>Ver Historial General & Duración de Sesiones</span>
+          </button>
+        </div>
       `;
     }
 
@@ -4531,19 +4595,65 @@
         renderHistoryTabChart(selector.value);
       }
 
+      // Check for active sessions ongoing today
+      let ongoingHTML = '';
+      if (workoutState.sessionStartTime) {
+        for (const [dayId, sTime] of Object.entries(workoutState.sessionStartTime)) {
+          if (sTime) {
+            const elapsedMin = Math.max(1, Math.round((Date.now() - sTime) / 60000));
+            const elapsedFormatted = elapsedMin >= 60 
+              ? `${Math.floor(elapsedMin / 60)}h ${elapsedMin % 60}m` 
+              : `${elapsedMin} min`;
+            const dData = ROUTINE_SLOTS[dayId];
+            const dayTitle = dData ? dData.title : dayId;
+            const startTimeStr = new Date(sTime).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            
+            let doneCount = 0;
+            if (workoutState.completed) {
+              doneCount = workoutState.completed.filter(id => id.startsWith(dayId)).length;
+            }
+
+            ongoingHTML += `
+              <div class="session-item" style="border: 1.5px solid var(--primary); background: rgba(16, 185, 129, 0.08); box-shadow: 0 4px 18px rgba(16, 185, 129, 0.15); margin-bottom: 14px;">
+                <div class="session-item-header">
+                  <div class="session-item-name" style="color:var(--primary); display:flex; align-items:center; gap:8px;">
+                    <span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--primary); box-shadow:0 0 8px var(--primary);"></span>
+                    ${dayTitle} <span style="font-size:0.75rem; background:rgba(16,185,129,0.2); padding:2px 8px; border-radius:10px;">En curso</span>
+                  </div>
+                  <div class="session-item-date" style="color:var(--text-muted); font-size:0.8rem;">Iniciado hoy a las ${startTimeStr}</div>
+                </div>
+                <div class="session-item-meta" style="margin-top:8px; display:flex; gap:14px; align-items:center;">
+                  <span style="font-size:1.05rem; font-weight:800; color:#fff;">⏱️ Tiempo hoy: <strong style="color:var(--amber);">${elapsedFormatted}</strong></span>
+                  <span style="color:var(--cyan); font-weight:700;">✓ ${doneCount} series marcadas</span>
+                </div>
+                <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                  <button onclick="finishDaySession('${dayId}')" class="btn-bottom-finish" style="padding:9px 14px; font-size:0.82rem; border-radius:10px; width:auto;">
+                    ✓ Finalizar y Guardar Día
+                  </button>
+                  <button onclick="selectDay('${dayId}')" class="btn-bottom-history" style="padding:9px 14px; font-size:0.82rem; border-radius:10px; width:auto;">
+                    ← Volver a Rutina
+                  </button>
+                </div>
+              </div>
+            `;
+          }
+        }
+      }
+
       // Render timeline list
       const timelineList = document.getElementById('sessionsTimelineList');
-      if (sessions.length === 0) {
+      if (sessions.length === 0 && !ongoingHTML) {
         timelineList.innerHTML = '<div class="history-empty">Aún no has completado entrenamientos. Cuando guardes un día, aparecerá aquí.</div>';
       } else {
-        let timelineHTML = '';
-        sessions.slice(0, 15).forEach(s => {
+        let timelineHTML = ongoingHTML;
+        sessions.slice(0, 20).forEach(s => {
           const dateStr = new Date(s.date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
           const exCount = s.exercises ? s.exercises.length : 0;
           let totalSets = 0;
           if (s.exercises) {
             s.exercises.forEach(e => { totalSets += e.sets ? e.sets.length : 0; });
           }
+          const durDisplay = s.durationFormatted || (s.durationMinutes ? `${s.durationMinutes} min` : '45 min');
           timelineHTML += `
             <div class="session-item">
               <div class="session-item-header">
@@ -4551,7 +4661,7 @@
                 <div class="session-item-date">${dateStr}</div>
               </div>
               <div class="session-item-meta">
-                <span>⏱️ ${s.durationFormatted || (s.durationMinutes + ' min')}</span>
+                <span>⏱️ Duración: <strong style="color:var(--amber); font-weight:800;">${durDisplay}</strong></span>
                 <span>🏋️ ${exCount} ejercicios (${totalSets} series)</span>
               </div>
             </div>

@@ -227,7 +227,45 @@
   // 4. Manejar fin de entreno desde el reloj
   function handleWorkoutFinishedFromWatch(data) {
     console.log('[WatchBridge] Fin de entreno recibido desde el reloj:', data);
-    showWatchToast('⌚ ¡Entrenamiento completado y guardado desde el reloj!');
+    try {
+      const summary = data.summary || data;
+      if (summary && summary.dayId && typeof workoutState !== 'undefined') {
+        const durMin = summary.durationMinutes || 45;
+        const durationFormatted = durMin >= 60 
+          ? `${Math.floor(durMin / 60)}h ${durMin % 60}m` 
+          : `${durMin} min`;
+        
+        const record = {
+          id: 'ses_' + Date.now(),
+          date: summary.date || new Date().toISOString(),
+          dayId: summary.dayId,
+          dayName: summary.dayName || summary.dayId,
+          durationMinutes: durMin,
+          durationFormatted: durationFormatted,
+          exercises: summary.exercises || []
+        };
+
+        if (!workoutState.sessions) workoutState.sessions = [];
+        // Evitar duplicar si ya se guardó hace menos de 60 segundos
+        const exists = workoutState.sessions.some(s => 
+          s.dayId === record.dayId && Math.abs(new Date(s.date) - new Date(record.date)) < 60000
+        );
+        if (!exists) {
+          workoutState.sessions.unshift(record);
+        }
+
+        if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[summary.dayId];
+        if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[summary.dayId];
+
+        if (typeof saveWorkoutState === 'function') saveWorkoutState();
+        if (typeof updateProgress === 'function') updateProgress();
+      }
+    } catch (e) {
+      console.warn('[WatchBridge] Error archivando sesión del reloj:', e);
+    }
+
+    const durText = (data.summary && data.summary.durationMinutes) ? ` (${data.summary.durationMinutes} min)` : '';
+    showWatchToast(`⌚ ¡Entrenamiento completado y guardado desde el reloj!${durText}`);
     if (typeof loadWorkoutState === 'function') {
       loadWorkoutState();
     }

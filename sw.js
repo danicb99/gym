@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigorexiapp-v14';
+const CACHE_NAME = 'vigorexiapp-v15';
 const ASSETS = [
   './',
   './index.html',
