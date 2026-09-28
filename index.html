@@ -4114,6 +4114,7 @@
       timerRemaining = Math.max(0, timerRemaining + sec);
       timerEndTime = Date.now() + timerRemaining * 1000;
       updateTimerUI();
+      saveRestTimerState();
     }
 
     function togglePlayTimer() {
@@ -4146,6 +4147,43 @@
       }
     }
 
+    // Persistence for Rest Timer across page reloads
+    function saveRestTimerState() {
+      if (timerEndTime && isTimerActive) {
+        localStorage.setItem('vigorexiapp_rest_timer', JSON.stringify({
+          endTime: timerEndTime,
+          duration: timerDuration,
+          isActive: isTimerActive
+        }));
+      } else {
+        localStorage.removeItem('vigorexiapp_rest_timer');
+      }
+    }
+
+    function restoreRestTimerState() {
+      const saved = localStorage.getItem('vigorexiapp_rest_timer');
+      if (!saved) return;
+      try {
+        const data = JSON.parse(saved);
+        if (data.endTime) {
+          const now = Date.now();
+          const remaining = Math.round((data.endTime - now) / 1000);
+          if (remaining > 0) {
+            timerDuration = data.duration || 90;
+            timerEndTime = data.endTime;
+            timerRemaining = remaining;
+            if (data.isActive) {
+              startTimerLoop();
+            } else {
+              updateTimerUI();
+            }
+          } else {
+            localStorage.removeItem('vigorexiapp_rest_timer');
+          }
+        }
+      } catch (e) {}
+    }
+
     function startTimerLoop() {
       clearInterval(timerInterval);
       isTimerActive = true;
@@ -4164,6 +4202,7 @@
         btn.classList.add('paused');
       }
       updateTimerUI();
+      saveRestTimerState();
       
       timerInterval = setInterval(() => {
         const now = Date.now();
@@ -4191,6 +4230,7 @@
         btn.classList.remove('paused');
       }
       updateTimerUI();
+      saveRestTimerState();
     }
 
     function resetTimerDock() {
@@ -4205,6 +4245,7 @@
         });
       }
       updateTimerUI();
+      saveRestTimerState();
       const btn = document.getElementById('timerPlayBtn');
       if (btn) {
         btn.innerText = "Iniciar";
@@ -4228,6 +4269,7 @@
         btn.classList.remove('paused');
       }
       updateTimerUI();
+      saveRestTimerState();
       sendRestFinishedNotification();
     }
 
@@ -4341,6 +4383,7 @@
     // Initialize on load
     window.addEventListener('DOMContentLoaded', () => {
       loadWorkoutState();
+      restoreRestTimerState();
       updateTimerUI();
       runSessionTimerTicker();
       if ('serviceWorker' in navigator) {
