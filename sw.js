@@ -1,11 +1,12 @@
-const CACHE_NAME = 'gym-poderoso-v5';
+const CACHE_NAME = 'gym-poderoso-v6';
 const ASSETS = [
   './',
   './index.html',
   './rutina_movil.html',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './favicon.png'
 ];
 
 self.addEventListener('install', (e) => {
