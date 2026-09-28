@@ -47,11 +47,10 @@
     .app-header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(7, 11, 20, 0.92); border-bottom: 1px solid var(--border); padding-top: var(--safe-top); }
     .header-content { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; gap: 8px; }
 
-    /* Header Day Picker (Native Styled Dropdown & History Button) */
-    .header-day-picker { display: flex; align-items: center; gap: 6px; flex: 1; max-width: 275px; }
+    /* Header Day Picker (Native Styled Dropdown) */
+    .header-day-picker { flex: 1; max-width: 250px; }
     .header-day-select {
-      flex: 1;
-      min-width: 0;
+      width: 100%;
       background: var(--surface-elevated);
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -71,27 +70,6 @@
       transition: border-color 0.15s;
     }
     .header-day-select:focus { border-color: var(--cyan); }
-    .header-history-btn {
-      background: var(--surface-elevated);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      color: var(--amber);
-      border-radius: 12px;
-      padding: 7px 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      transition: all 0.15s;
-      flex-shrink: 0;
-    }
-    .header-history-btn:hover {
-      background: rgba(245, 158, 11, 0.15);
-      border-color: var(--amber);
-    }
-    .header-history-btn:active {
-      transform: scale(0.95);
-    }
 
     /* Top Rest Timer Dock */
     .top-timer-widget {
@@ -516,20 +494,14 @@
   <!-- Top App Header with Day Dropdown & Top Rest Timer -->
   <header class="app-header">
     <div class="header-content">
-      <!-- Left: Day Selector Dropdown & Quick History Button -->
+      <!-- Left: Day Selector Dropdown -->
       <div class="header-day-picker">
         <select id="daySelector" class="header-day-select" onchange="selectDay(this.value)">
           <option value="torsoA">Día 1: Torso A • Empuje</option>
           <option value="piernaA">Día 2: Pierna A • Cuádriceps</option>
           <option value="torsoB">Día 3: Torso B • Tracción</option>
           <option value="piernaB">Día 4: Pierna B • Isquios</option>
-          <option value="historialView">📊 Historial & Backup</option>
         </select>
-        <button class="header-history-btn" onclick="openHistoryFromDay()" title="Ver Historial, duración de entrenamientos y marcas">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
-            <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
-          </svg>
-        </button>
       </div>
 
       <!-- Right: Compact Top Rest Timer Dock -->
@@ -3620,7 +3592,13 @@
         lastActiveWorkoutDay = dayId;
       }
       const sel = document.getElementById('daySelector');
-      if (sel && sel.value !== dayId) sel.value = dayId;
+      if (sel) {
+        if (dayId === 'historialView') {
+          sel.selectedIndex = -1;
+        } else if (sel.value !== dayId) {
+          sel.value = dayId;
+        }
+      }
 
       // Enforce strict day isolation
       document.querySelectorAll('.day-content').forEach(content => {
