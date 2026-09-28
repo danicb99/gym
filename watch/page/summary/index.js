@@ -116,5 +116,23 @@ Page({
         replace({ url: 'page/day_select/index' })
       }
     })
+
+    // Reloj inferior (Hora actual)
+    const now = new Date()
+    const h = now.getHours()
+    const m = now.getMinutes()
+    const hStr = h < 10 ? '0' + h : '' + h
+    const mStr = m < 10 ? '0' + m : '' + m
+    hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 103,
+      y: 392,
+      w: 260,
+      h: 28,
+      color: 0x94a3b8,
+      text_size: 16,
+      align_h: hmUI.align.CENTER_H,
+      align_v: hmUI.align.CENTER_V,
+      text: `🕒 ${hStr}:${mStr}`
+    })
   }
 })

@@ -6,7 +6,6 @@
 import * as hmUI from '@zos/ui'
 import { push, replace } from '@zos/router'
 import { HeartRate } from '@zos/sensor'
-import { pauseDropWristScreenOff, resetDropWristScreenOff, pausePalmScreenOff, resetPalmScreenOff, setPageBrightTime, resetPageBrightTime } from '@zos/display'
 import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
 import { vibrateShort } from '../../utils/haptics'
@@ -19,6 +18,7 @@ Page(BasePage({
     timerWidget: null,
     kgWidget: null,
     repsWidget: null,
+    clockWidget: null,
     currentKg: 80,
     currentReps: 8,
     stepKg: 2.5,
@@ -27,7 +27,6 @@ Page(BasePage({
 
   onInit() {
     this.state.app = getApp()
-    this.keepScreenAwake()
     this.initCurrentValues()
   },
 
@@ -311,9 +310,37 @@ Page(BasePage({
       }
     })
 
+    // 7. HORA ACTUAL INFERIOR
+    this.state.clockWidget = hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 103,
+      y: 390,
+      w: 260,
+      h: 30,
+      color: 0x94a3b8, // Slate gray
+      text_size: 17,
+      align_h: hmUI.align.CENTER_H,
+      align_v: hmUI.align.CENTER_V,
+      text: this.getClockStr()
+    })
+
     // Iniciar sensor de frecuencia cardíaca y ticker de descanso/entreno
     this.startHeartRateMonitor()
     this.startWorkoutTicker()
+  },
+
+  getClockStr() {
+    const now = new Date()
+    const h = now.getHours()
+    const m = now.getMinutes()
+    const hStr = h < 10 ? '0' + h : '' + h
+    const mStr = m < 10 ? '0' + m : '' + m
+    return `🕒 ${hStr}:${mStr}`
+  },
+
+  updateClockDisplay() {
+    if (this.state.clockWidget) {
+      this.state.clockWidget.setProperty(hmUI.prop.TEXT, this.getClockStr())
+    }
   },
 
   adjustKg(delta) {
@@ -333,9 +360,11 @@ Page(BasePage({
   startWorkoutTicker() {
     this.stopWorkoutTicker()
     this.updateTimerDisplay()
+    this.updateClockDisplay()
     let tickCount = 0
     this.state.tickerTimer = setInterval(() => {
       this.updateTimerDisplay()
+      this.updateClockDisplay()
       tickCount++
       if (tickCount % 5 === 0) {
         this.syncWithPhoneInBackground()
@@ -504,27 +533,13 @@ Page(BasePage({
     }
   },
 
-  keepScreenAwake() {
-    try {
-      pauseDropWristScreenOff({ duration: 0 })
-      pausePalmScreenOff({ duration: 0 })
-      setPageBrightTime({ brightTime: 1800000 })
-    } catch (e) {
-      console.log('[Workout] Display keep screen awake no disponible:', e)
-    }
-  },
-
-  releaseScreenAwake() {
-    try {
-      resetDropWristScreenOff()
-      resetPalmScreenOff()
-      resetPageBrightTime()
-    } catch (e) {}
+  onResume() {
+    this.updateClockDisplay()
+    this.updateTimerDisplay()
   },
 
   onDestroy() {
     this.stopWorkoutTicker()
-    this.releaseScreenAwake()
     if (this.state.heartRateSensor) {
       try {
         this.state.heartRateSensor.offCurrentChange()

@@ -4,7 +4,6 @@
 
 import * as hmUI from '@zos/ui'
 import { replace } from '@zos/router'
-import { pauseDropWristScreenOff, resetDropWristScreenOff, pausePalmScreenOff, resetPalmScreenOff, setPageBrightTime, resetPageBrightTime } from '@zos/display'
 import { vibrateShort, vibrateRestFinished } from '../../utils/haptics'
 
 Page({
@@ -14,12 +13,12 @@ Page({
     remainingSeconds: 90,
     digitsWidget: null,
     arcWidget: null,
+    clockWidget: null,
     timerInterval: null
   },
 
   onInit() {
     this.state.app = getApp()
-    this.keepScreenAwake()
     const timerData = this.state.app.globalData.restTimer
     this.state.totalSeconds = (timerData && timerData.totalSeconds) || 90
     if (timerData && timerData.endTime && timerData.endTime > Date.now()) {
@@ -134,9 +133,9 @@ Page({
     // Subtexto motivacional inferior
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 33,
-      y: 350,
+      y: 345,
       w: 400,
-      h: 30,
+      h: 26,
       color: 0x64748b,
       text_size: 14,
       align_h: hmUI.align.CENTER_H,
@@ -144,8 +143,36 @@ Page({
       text: 'Vibrará en la muñeca al terminar'
     })
 
+    // Reloj inferior (Hora actual)
+    this.state.clockWidget = hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 103,
+      y: 388,
+      w: 260,
+      h: 30,
+      color: 0x94a3b8, // Slate gray
+      text_size: 17,
+      align_h: hmUI.align.CENTER_H,
+      align_v: hmUI.align.CENTER_V,
+      text: this.getClockStr()
+    })
+
     // Iniciar cuenta atrás
     this.startCountdown()
+  },
+
+  getClockStr() {
+    const now = new Date()
+    const h = now.getHours()
+    const m = now.getMinutes()
+    const hStr = h < 10 ? '0' + h : '' + h
+    const mStr = m < 10 ? '0' + m : '' + m
+    return `🕒 ${hStr}:${mStr}`
+  },
+
+  updateClockDisplay() {
+    if (this.state.clockWidget) {
+      this.state.clockWidget.setProperty(hmUI.prop.TEXT, this.getClockStr())
+    }
   },
 
   formatTime(totalSec) {
@@ -180,6 +207,7 @@ Page({
   },
 
   startCountdown() {
+    this.updateClockDisplay()
     this.state.timerInterval = setInterval(() => {
       const timerData = this.state.app ? this.state.app.globalData.restTimer : null
       if (timerData && timerData.endTime) {
@@ -188,6 +216,7 @@ Page({
         this.state.remainingSeconds -= 1
       }
       this.updateUI()
+      this.updateClockDisplay()
 
       if (this.state.remainingSeconds === 0) {
         this.onTimerExpired()
@@ -222,26 +251,12 @@ Page({
     }
   },
 
-  keepScreenAwake() {
-    try {
-      pauseDropWristScreenOff({ duration: 0 })
-      pausePalmScreenOff({ duration: 0 })
-      setPageBrightTime({ brightTime: 1800000 })
-    } catch (e) {
-      console.log('[Timer] Display keep screen awake no disponible:', e)
-    }
-  },
-
-  releaseScreenAwake() {
-    try {
-      resetDropWristScreenOff()
-      resetPalmScreenOff()
-      resetPageBrightTime()
-    } catch (e) {}
+  onResume() {
+    this.updateUI()
+    this.updateClockDisplay()
   },
 
   onDestroy() {
     this.clearCountdown()
-    this.releaseScreenAwake()
   }
 })
