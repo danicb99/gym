@@ -1,0 +1,12 @@
+{
+  "name": "vigorexiapp-watch",
+  "version": "1.0.0",
+  "description": "VigorexiApp Watch Tracker para Amazfit Active 2",
+  "main": "app.js",
+  "scripts": {
+    "build": "wsl -e bash -c \"export PATH=~/.npm-global/bin:$PATH && cd /mnt/c/_DESARROLLO/VIGOREXIAPP_DEV/watch && zeus build\"",
+    "preview": "wsl -e bash -c \"export PATH=~/.npm-global/bin:$PATH && cd /mnt/c/_DESARROLLO/VIGOREXIAPP_DEV/watch && zeus preview\""
+  },
+  "author": "VigorexiApp",
+  "license": "MIT"
+}

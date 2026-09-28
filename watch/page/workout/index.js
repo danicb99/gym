@@ -1,0 +1,391 @@
+/**
+ * VigorexiApp Watch - Pantalla Principal de Serie Activa (Round 466x466)
+ * "Glance & Tap" optimizado para entrenamiento de fuerza
+ */
+
+import * as hmUI from '@zos/ui'
+import { push, replace } from '@zos/router'
+import { HeartRate } from '@zos/sensor'
+import { ROUTINE_SLOTS } from '../../utils/routine_data'
+import { vibrateShort } from '../../utils/haptics'
+
+Page({
+  state: {
+    app: null,
+    heartRateSensor: null,
+    hrWidget: null,
+    timerWidget: null,
+    kgWidget: null,
+    repsWidget: null,
+    currentKg: 80,
+    currentReps: 8,
+    stepKg: 2.5,
+    tickerTimer: null
+  },
+
+  onInit() {
+    this.state.app = getApp()
+    this.initCurrentValues()
+  },
+
+  initCurrentValues() {
+    const app = this.state.app
+    const slot = app.getActiveSlot()
+    const ex = app.getActiveExercise()
+
+    this.state.stepKg = (ex && ex.stepKg) ? ex.stepKg : 2.5
+
+    // Si ya hay series guardadas en esta sesión para este slot, cargar la actual
+    const logged = app.globalData.sessionLoggedSets[slot.slotId]
+    if (logged && logged[app.globalData.currentSetIndex]) {
+      this.state.currentKg = logged[app.globalData.currentSetIndex].kg
+      this.state.currentReps = logged[app.globalData.currentSetIndex].reps
+    } else {
+      // Cargar peso y reps por defecto de la rutina
+      const defaultSet = (slot.sets && slot.sets[app.globalData.currentSetIndex]) || ["60", "10"]
+      this.state.currentKg = parseFloat(defaultSet[0]) || 60
+      this.state.currentReps = parseInt(defaultSet[1], 10) || 10
+    }
+  },
+
+  build() {
+    const app = this.state.app
+    const day = ROUTINE_SLOTS[app.globalData.activeDayId]
+    const slot = app.getActiveSlot()
+    const ex = app.getActiveExercise()
+
+    if (!slot || !day) {
+      push({ url: 'page/day_select/index' })
+      return
+    }
+
+    const currentSlotNum = app.globalData.currentSlotIndex + 1
+    const totalSlots = day.slots.length
+    const currentSetNum = app.globalData.currentSetIndex + 1
+    const totalSets = (slot.sets && slot.sets.length) || 4
+
+    // 1. BARRA SUPERIOR (Pulsaciones, Duración, Slot #)
+    this.state.hrWidget = hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 45,
+      y: 35,
+      w: 110,
+      h: 24,
+      color: 0xf43f5e, // Rose red
+      text_size: 16,
+      align_h: hmUI.align.LEFT,
+      align_v: hmUI.align.CENTER_V,
+      text: '❤️ --'
+    })
+
+    // Ticker duración entreno
+    const elapsedMinutes = Math.floor((Date.now() - (app.globalData.sessionStartTime || Date.now())) / 60000)
+    this.state.timerWidget = hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 160,
+      y: 35,
+      w: 146,
+      h: 24,
+      color: 0x94a3b8,
+      text_size: 15,
+      align_h: hmUI.align.CENTER_H,
+      align_v: hmUI.align.CENTER_V,
+      text: `⏱️ ${elapsedMinutes}m`
+    })
+
+    hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 310,
+      y: 35,
+      w: 110,
+      h: 24,
+      color: 0x38bdf8, // Cyan
+      text_size: 16,
+      align_h: hmUI.align.RIGHT,
+      align_v: hmUI.align.CENTER_V,
+      text: `Ej ${currentSlotNum}/${totalSlots}`
+    })
+
+    // 2. NOMBRE DEL EJERCICIO Y SERIE
+    hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 40,
+      y: 65,
+      w: 386,
+      h: 36,
+      color: 0xfbbf24, // Gold / Amber
+      text_size: 22,
+      align_h: hmUI.align.CENTER_H,
+      align_v: hmUI.align.CENTER_V,
+      text: ex ? ex.name : 'Ejercicio'
+    })
+
+    hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 40,
+      y: 98,
+      w: 386,
+      h: 26,
+      color: 0x38bdf8, // Cyan
+      text_size: 16,
+      align_h: hmUI.align.CENTER_H,
+      align_v: hmUI.align.CENTER_V,
+      text: `SERIE ${currentSetNum} DE ${totalSets}`
+    })
+
+    // 3. CONTROL DE KILOS ( [-]  80.0 kg  [+] )
+    const rowKgY = 132
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 75,
+      y: rowKgY,
+      w: 52,
+      h: 52,
+      radius: 26,
+      normal_color: 0x1e293b,
+      press_color: 0x334155,
+      color: 0xffffff,
+      text_size: 26,
+      text: '-',
+      click_func: () => {
+        vibrateShort()
+        this.adjustKg(-this.state.stepKg)
+      }
+    })
+
+    this.state.kgWidget = hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 135,
+      y: rowKgY,
+      w: 196,
+      h: 52,
+      color: 0xffffff,
+      text_size: 28,
+      align_h: hmUI.align.CENTER_H,
+      align_v: hmUI.align.CENTER_V,
+      text: `${this.state.currentKg.toFixed(1)} kg`
+    })
+
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 339,
+      y: rowKgY,
+      w: 52,
+      h: 52,
+      radius: 26,
+      normal_color: 0x1e293b,
+      press_color: 0x334155,
+      color: 0xffffff,
+      text_size: 26,
+      text: '+',
+      click_func: () => {
+        vibrateShort()
+        this.adjustKg(this.state.stepKg)
+      }
+    })
+
+    // 4. CONTROL DE REPETICIONES ( [-]  8 reps  [+] )
+    const rowRepsY = 196
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 75,
+      y: rowRepsY,
+      w: 52,
+      h: 52,
+      radius: 26,
+      normal_color: 0x1e293b,
+      press_color: 0x334155,
+      color: 0xffffff,
+      text_size: 26,
+      text: '-',
+      click_func: () => {
+        vibrateShort()
+        this.adjustReps(-1)
+      }
+    })
+
+    this.state.repsWidget = hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 135,
+      y: rowRepsY,
+      w: 196,
+      h: 52,
+      color: 0xffffff,
+      text_size: 28,
+      align_h: hmUI.align.CENTER_H,
+      align_v: hmUI.align.CENTER_V,
+      text: `${this.state.currentReps} reps`
+    })
+
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 339,
+      y: rowRepsY,
+      w: 52,
+      h: 52,
+      radius: 26,
+      normal_color: 0x1e293b,
+      press_color: 0x334155,
+      color: 0xffffff,
+      text_size: 26,
+      text: '+',
+      click_func: () => {
+        vibrateShort()
+        this.adjustReps(1)
+      }
+    })
+
+    // 5. BOTÓN PRINCIPAL: COMPLETAR SERIE (Grande y accesible)
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 65,
+      y: 262,
+      w: 336,
+      h: 56,
+      radius: 28,
+      normal_color: 0x10b981, // Emerald green
+      press_color: 0x059669,
+      color: 0xffffff,
+      text_size: 19,
+      text: '✓ COMPLETAR SERIE',
+      click_func: () => {
+        this.completeCurrentSet()
+      }
+    })
+
+    // 6. ACCIONES SECUNDARIAS INFERIORES: ALTERNATIVAS & SIGUIENTE / FIN
+    const bottomY = 330
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 65,
+      y: bottomY,
+      w: 160,
+      h: 46,
+      radius: 23,
+      normal_color: 0x1e293b,
+      press_color: 0x334155,
+      color: 0xfbbf24,
+      text_size: 15,
+      text: '⇄ Alternativas',
+      click_func: () => {
+        vibrateShort()
+        push({ url: 'page/alternatives/index' })
+      }
+    })
+
+    const isLastExercise = currentSlotNum >= totalSlots && currentSetNum >= totalSets
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 241,
+      y: bottomY,
+      w: 160,
+      h: 46,
+      radius: 23,
+      normal_color: isLastExercise ? 0xef4444 : 0x1e293b,
+      press_color: 0x334155,
+      color: 0xf8fafc,
+      text_size: 15,
+      text: isLastExercise ? '🏁 Fin Entreno' : 'Saltar Ej. ➔',
+      click_func: () => {
+        vibrateShort()
+        if (isLastExercise) {
+          app.finishWorkout()
+          replace({ url: 'page/summary/index' })
+        } else {
+          this.advanceToNextExercise()
+        }
+      }
+    })
+
+    // Iniciar sensor de frecuencia cardíaca
+    this.startHeartRateMonitor()
+  },
+
+  adjustKg(delta) {
+    this.state.currentKg = Math.max(0, Math.round((this.state.currentKg + delta) * 10) / 10)
+    if (this.state.kgWidget) {
+      this.state.kgWidget.setProperty(hmUI.prop.TEXT, `${this.state.currentKg.toFixed(1)} kg`)
+    }
+  },
+
+  adjustReps(delta) {
+    this.state.currentReps = Math.max(1, this.state.currentReps + delta)
+    if (this.state.repsWidget) {
+      this.state.repsWidget.setProperty(hmUI.prop.TEXT, `${this.state.currentReps} reps`)
+    }
+  },
+
+  completeCurrentSet() {
+    vibrateShort()
+    const app = this.state.app
+    const slot = app.getActiveSlot()
+    const ex = app.getActiveExercise()
+    const day = ROUTINE_SLOTS[app.globalData.activeDayId]
+
+    // Registrar serie en la memoria de la sesión
+    app.recordSet(slot.slotId, app.globalData.currentSetIndex, this.state.currentKg, this.state.currentReps)
+
+    const totalSetsInSlot = (slot.sets && slot.sets.length) || 4
+    const restDuration = (ex && ex.rest) ? ex.rest : 90
+
+    // Avanzar contador de series
+    if (app.globalData.currentSetIndex + 1 < totalSetsInSlot) {
+      app.globalData.currentSetIndex += 1
+      app.globalData.restTimer = {
+        active: true,
+        remainingSeconds: restDuration,
+        totalSeconds: restDuration,
+        nextExerciseName: ex ? ex.name : '',
+        nextSetNum: app.globalData.currentSetIndex + 1
+      }
+    } else {
+      // Pasamos al siguiente ejercicio
+      if (app.globalData.currentSlotIndex + 1 < day.slots.length) {
+        app.globalData.currentSlotIndex += 1
+        app.globalData.currentSetIndex = 0
+        const nextSlot = app.getActiveSlot()
+        const nextEx = app.getActiveExercise()
+        app.globalData.restTimer = {
+          active: true,
+          remainingSeconds: restDuration,
+          totalSeconds: restDuration,
+          nextExerciseName: nextEx ? nextEx.name : '',
+          nextSetNum: 1
+        }
+      } else {
+        // Fin del entrenamiento
+        app.finishWorkout()
+        replace({ url: 'page/summary/index' })
+        return
+      }
+    }
+
+    // Saltar automáticamente a la pantalla del temporizador de descanso
+    replace({ url: 'page/timer/index' })
+  },
+
+  advanceToNextExercise() {
+    const app = this.state.app
+    const day = ROUTINE_SLOTS[app.globalData.activeDayId]
+    if (app.globalData.currentSlotIndex + 1 < day.slots.length) {
+      app.globalData.currentSlotIndex += 1
+      app.globalData.currentSetIndex = 0
+      replace({ url: 'page/workout/index' })
+    } else {
+      app.finishWorkout()
+      replace({ url: 'page/summary/index' })
+    }
+  },
+
+  startHeartRateMonitor() {
+    try {
+      this.state.heartRateSensor = new HeartRate()
+      const current = this.state.heartRateSensor.getLast()
+      if (current && this.state.hrWidget) {
+        this.state.hrWidget.setProperty(hmUI.prop.TEXT, `❤️ ${current}`)
+      }
+      this.state.heartRateSensor.onCurrentChange(() => {
+        const bpm = this.state.heartRateSensor.getCurrent()
+        if (this.state.hrWidget && bpm > 0) {
+          this.state.hrWidget.setProperty(hmUI.prop.TEXT, `❤️ ${bpm}`)
+        }
+      })
+    } catch (e) {
+      console.log('[Workout] Sensor de pulso no disponible:', e)
+    }
+  },
+
+  onDestroy() {
+    if (this.state.heartRateSensor) {
+      try {
+        this.state.heartRateSensor.offCurrentChange()
+      } catch (e) {}
+    }
+  }
+})

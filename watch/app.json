@@ -1,0 +1,62 @@
+{
+  "configVersion": "v3",
+  "app": {
+    "appId": 33112,
+    "appName": "VigorexiApp",
+    "appType": "app",
+    "version": {
+      "code": 1,
+      "name": "1.0.0"
+    },
+    "icon": "icon.png",
+    "vender": "danicb99",
+    "description": "VigorexiApp Watch Tracker para Amazfit Active 2"
+  },
+  "permissions": [
+    "data:user.hd.heart_rate"
+  ],
+  "runtime": {
+    "apiVersion": {
+      "compatible": "3.0.0",
+      "target": "3.0.0",
+      "minVersion": "3.0"
+    }
+  },
+  "targets": {
+    "default": {
+      "module": {
+        "page": {
+          "pages": [
+            "page/day_select/index",
+            "page/workout/index",
+            "page/timer/index",
+            "page/alternatives/index",
+            "page/summary/index"
+          ]
+        },
+        "app-side": {
+          "path": "app-side/index"
+        }
+      },
+      "platforms": [
+        {
+          "st": "r",
+          "dw": 466
+        },
+        {
+          "st": "s",
+          "dw": 390
+        }
+      ]
+    }
+  },
+  "i18n": {
+    "es-ES": {
+      "appName": "VigorexiApp"
+    },
+    "en-US": {
+      "appName": "VigorexiApp"
+    }
+  },
+  "defaultLanguage": "es-ES"
+}
