@@ -112,7 +112,6 @@ Page(BasePage({
       text_size: 15,
       text: isResting ? '⏳ Descanso' : `⏱️ ${elapsedMinutes}m`,
       click_func: () => {
-        vibrateShort()
         const rt = app.globalData.restTimer
         if (rt && rt.active) {
           push({ url: 'page/timer/index' })
@@ -172,7 +171,6 @@ Page(BasePage({
       text_size: 32,
       text: '-',
       click_func: () => {
-        vibrateShort()
         this.adjustKg(-this.state.stepKg)
       }
     })
@@ -201,7 +199,6 @@ Page(BasePage({
       text_size: 32,
       text: '+',
       click_func: () => {
-        vibrateShort()
         this.adjustKg(this.state.stepKg)
       }
     })
@@ -220,7 +217,6 @@ Page(BasePage({
       text_size: 32,
       text: '-',
       click_func: () => {
-        vibrateShort()
         this.adjustReps(-1)
       }
     })
@@ -249,7 +245,6 @@ Page(BasePage({
       text_size: 32,
       text: '+',
       click_func: () => {
-        vibrateShort()
         this.adjustReps(1)
       }
     })
@@ -297,7 +292,6 @@ Page(BasePage({
       text_size: 17,
       text: '▲ Menú',
       click_func: () => {
-        vibrateShort()
         push({ url: 'page/options/index' })
       }
     })

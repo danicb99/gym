@@ -1,6 +1,6 @@
 /**
  * VigorexiApp Watch - Menú de Opciones y Ajustes Rápidos (Round 466x466)
- * Scrollable list con todas las acciones secundarias del entrenamiento
+ * Scrollable list con tarjetas grandes de 68px (sin vibraciones molestas)
  */
 
 import * as hmUI from '@zos/ui'
@@ -8,14 +8,11 @@ import { back, push, replace } from '@zos/router'
 import { setWakeUpRelaunch, resetWakeUpRelaunch } from '@zos/display'
 import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
-import { vibrateShort } from '../../utils/haptics'
-import { requestPhoneLiveWorkout } from '../../utils/sync_bridge'
 
 Page(
   BasePage({
     state: {
-      app: null,
-      syncFeedbackWidget: null
+      app: null
     },
 
     onInit() {
@@ -37,17 +34,17 @@ Page(
         hmUI.createWidget(hmUI.widget.PAGE_SCROLLBAR)
       } catch (e) {}
 
-      // 1. TÍTULO SUPERIOR
+      // 1. TÍTULO SUPERIOR (Grande)
       hmUI.createWidget(hmUI.widget.TEXT, {
         x: 33,
-        y: 35,
+        y: 32,
         w: 400,
-        h: 32,
+        h: 34,
         color: 0xfbbf24, // Gold / Amber
-        text_size: 22,
+        text_size: 24,
         align_h: hmUI.align.CENTER_H,
         align_v: hmUI.align.CENTER_V,
-        text: '⚙️ AJUSTES / MENÚ'
+        text: '▲ MENÚ DE AJUSTES'
       })
 
       // 2. SUBTÍTULO CON CONTEXTO ACTUAL
@@ -56,20 +53,21 @@ Page(
         x: 40,
         y: 68,
         w: 386,
-        h: 26,
+        h: 28,
         color: 0x38bdf8, // Cyan
-        text_size: 15,
+        text_size: 16,
         align_h: hmUI.align.CENTER_H,
         align_v: hmUI.align.CENTER_V,
         text: `Ej. ${currentSlotNum}/${totalSlots}: ${exName}`
       })
 
-      const btnX = 48
-      const btnW = 370
-      const btnH = 54
-      const btnRadius = 27
-      const btnGap = 12
-      let curY = 105
+      // Tarjetas de opciones en tamaño XL (68px de alto, fuente 19px)
+      const btnX = 45
+      const btnW = 376
+      const btnH = 68
+      const btnRadius = 34
+      const btnGap = 14
+      let curY = 108
 
       // OPCIÓN 1: CAMBIAR MÁQUINA (ALTERNATIVAS)
       hmUI.createWidget(hmUI.widget.BUTTON, {
@@ -81,10 +79,9 @@ Page(
         normal_color: 0x1e293b,
         press_color: 0x334155,
         color: 0xfbbf24,
-        text_size: 16,
-        text: '⇄ Cambiar Máquina (Alternativas)',
+        text_size: 19,
+        text: '⇄ Cambiar Máquina',
         click_func: () => {
-          vibrateShort()
           push({ url: 'page/alternatives/index' })
         }
       })
@@ -101,10 +98,9 @@ Page(
         normal_color: 0x1e293b,
         press_color: 0x334155,
         color: 0x38bdf8,
-        text_size: 16,
-        text: isLastSlot ? '⏭️ Saltar al Resumen' : '⏭️ Saltar este ejercicio',
+        text_size: 19,
+        text: isLastSlot ? '⏭️ Saltar al Resumen' : '⏭️ Saltar este Ejercicio',
         click_func: () => {
-          vibrateShort()
           if (!isLastSlot) {
             app.globalData.currentSlotIndex += 1
             app.globalData.currentSetIndex = 0
@@ -127,10 +123,9 @@ Page(
         normal_color: 0x1e293b,
         press_color: 0x334155,
         color: 0x38bdf8,
-        text_size: 16,
-        text: '⏮️ Ejercicio anterior',
+        text_size: 19,
+        text: '⏮️ Ejercicio Anterior',
         click_func: () => {
-          vibrateShort()
           if (app.globalData.currentSlotIndex > 0) {
             app.globalData.currentSlotIndex -= 1
             app.globalData.currentSetIndex = 0
@@ -152,10 +147,9 @@ Page(
         normal_color: 0x1e293b,
         press_color: 0x334155,
         color: 0x10b981,
-        text_size: 16,
-        text: `➕ Añadir serie extra (Ahora ${totalSets + 1})`,
+        text_size: 19,
+        text: `➕ Serie Extra (Total: ${totalSets + 1})`,
         click_func: () => {
-          vibrateShort()
           if (slot) {
             if (app.addExtraSet) {
               app.addExtraSet(slot.slotId)
@@ -179,10 +173,9 @@ Page(
         normal_color: 0x1e293b,
         press_color: 0x334155,
         color: 0xf59e0b,
-        text_size: 16,
-        text: `➖ Quitar 1 serie (Mínimo 1)`,
+        text_size: 19,
+        text: `➖ Quitar 1 Serie (Total: ${Math.max(1, totalSets - 1)})`,
         click_func: () => {
-          vibrateShort()
           if (slot && totalSets > 1) {
             if (app.removeSet) {
               app.removeSet(slot.slotId)
@@ -209,13 +202,11 @@ Page(
         normal_color: 0x1e293b,
         press_color: 0x334155,
         color: 0x38bdf8,
-        text_size: 16,
+        text_size: 19,
         text: '🔄 Sincronizar con Móvil',
         click_func: async () => {
-          vibrateShort()
           try {
             await app.checkPhoneLiveSession()
-            vibrateShort()
           } catch (e) {}
           back()
         }
@@ -232,10 +223,9 @@ Page(
         normal_color: 0xef4444, // Red
         press_color: 0xdc2626,
         color: 0xffffff,
-        text_size: 16,
+        text_size: 19,
         text: '🏁 Finalizar Entrenamiento',
         click_func: () => {
-          vibrateShort()
           app.finishWorkout()
           replace({ url: 'page/summary/index' })
         }
@@ -247,19 +237,18 @@ Page(
         x: btnX,
         y: curY,
         w: btnW,
-        h: btnH,
-        radius: btnRadius,
+        h: 62,
+        radius: 31,
         normal_color: 0x334155,
         press_color: 0x475569,
         color: 0xf8fafc,
-        text_size: 16,
+        text_size: 18,
         text: '▼ Cerrar Menú (Volver)',
         click_func: () => {
-          vibrateShort()
           back()
         }
       })
-      curY += btnH + 60 // Espacio inferior de seguridad para la curvatura de la pantalla
+      curY += 62 + 70 // Margen inferior generoso para librar la curvatura redonda del bisel
 
       // Widget espaciador invisible inferior para scroll suave
       hmUI.createWidget(hmUI.widget.TEXT, {

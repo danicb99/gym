@@ -6,7 +6,6 @@
 import * as hmUI from '@zos/ui'
 import { back, replace } from '@zos/router'
 import { EXERCISE_CATALOG } from '../../utils/routine_data'
-import { vibrateShort } from '../../utils/haptics'
 
 Page({
   state: {
@@ -24,76 +23,89 @@ Page({
       return
     }
 
+    // Activar barra de scroll nativa
+    hmUI.createWidget(hmUI.widget.PAGE_SCROLLBAR)
+
     // 1. TÍTULO
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 33,
-      y: 40,
+      y: 35,
       w: 400,
-      h: 30,
+      h: 32,
       color: 0xfbbf24, // Gold / Amber
-      text_size: 19,
+      text_size: 21,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: '⇄ CAMBIAR MÁQUINA'
+      text: '⇄ ALTERNATIVAS'
     })
 
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 40,
       y: 72,
       w: 386,
-      h: 24,
+      h: 26,
       color: 0x94a3b8,
-      text_size: 14,
+      text_size: 15,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: `Actual: ${currentEx.name}`
     })
 
     const alternatives = currentEx.alternatives || []
-    let startY = 108
-    const btnHeight = 52
-    const btnGap = 10
+    let curY = 112
+    const btnW = 376
+    const btnH = 68
+    const btnRadius = 34
+    const btnGap = 14
 
-    alternatives.slice(0, 3).forEach((altId, idx) => {
+    alternatives.forEach((altId) => {
       const altEx = EXERCISE_CATALOG[altId]
       if (!altEx) return
 
       hmUI.createWidget(hmUI.widget.BUTTON, {
-        x: 63,
-        y: startY + idx * (btnHeight + btnGap),
-        w: 340,
-        h: btnHeight,
-        radius: 26,
+        x: 45,
+        y: curY,
+        w: btnW,
+        h: btnH,
+        radius: btnRadius,
         normal_color: 0x1e293b,
         press_color: 0x38bdf8,
         color: 0xf8fafc,
-        text_size: 16,
+        text_size: 19,
         text: altEx.name,
         click_func: () => {
-          vibrateShort()
           app.globalData.slotExOverrides[slot.slotId] = altId
           replace({ url: 'page/workout/index' })
         }
       })
+      curY += btnH + btnGap
     })
 
-    // Botón cancelar en la parte inferior
-    const cancelY = startY + Math.min(3, alternatives.length) * (btnHeight + btnGap) + 12
+    // Botón cancelar grande
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 133,
-      y: Math.min(380, cancelY),
-      w: 200,
-      h: 44,
-      radius: 22,
+      x: 45,
+      y: curY,
+      w: btnW,
+      h: btnH,
+      radius: btnRadius,
       normal_color: 0x334155,
       press_color: 0x475569,
       color: 0x94a3b8,
-      text_size: 15,
-      text: '✕ Cancelar',
+      text_size: 18,
+      text: '✕ Cancelar (Volver)',
       click_func: () => {
-        vibrateShort()
         back()
       }
+    })
+    curY += btnH + btnGap
+
+    // Espacio inferior para scroll holgado
+    hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 45,
+      y: curY,
+      w: btnW,
+      h: 70,
+      text: ''
     })
   }
 })

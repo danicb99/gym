@@ -4,8 +4,7 @@
 
 import * as hmUI from '@zos/ui'
 import { replace } from '@zos/router'
-import { setWakeUpRelaunch, resetWakeUpRelaunch } from '@zos/display'
-import { vibrateShort, vibrateRestFinished } from '../../utils/haptics'
+import { vibrateRestFinished } from '../../utils/haptics'
 
 Page({
   state: {
@@ -110,7 +109,6 @@ Page({
       text_size: 17,
       text: '+30s',
       click_func: () => {
-        vibrateShort()
         this.addTime(30)
       }
     })
@@ -127,7 +125,6 @@ Page({
       text_size: 17,
       text: '¡Listo! ➔',
       click_func: () => {
-        vibrateShort()
         this.finishRest()
       }
     })

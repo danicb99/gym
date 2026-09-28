@@ -5,7 +5,6 @@
 import * as hmUI from '@zos/ui'
 import { replace } from '@zos/router'
 import { loadWorkoutData } from '../../utils/storage'
-import { vibrateShort } from '../../utils/haptics'
 
 Page({
   build() {
@@ -112,7 +111,6 @@ Page({
       text_size: 18,
       text: '🏠 Volver al Inicio',
       click_func: () => {
-        vibrateShort()
         replace({ url: 'page/day_select/index' })
       }
     })
