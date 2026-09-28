@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aesthetic-pro-v3';
+const CACHE_NAME = 'gym-poderoso-v4';
 const ASSETS = [
   './',
   './index.html',

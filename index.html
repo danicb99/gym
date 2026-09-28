@@ -9,7 +9,7 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="icon" type="image/png" href="./icon-192.png">
-  <title>Aesthetic - Elite Workout Tracker</title>
+  <title>GYM Poderoso - Elite Workout Tracker</title>
   <style>
     :root {
       --bg: #070b14;
@@ -31,62 +31,110 @@
       --radius-sm: 8px;
       --radius-md: 14px;
       --radius-lg: 20px;
-      --safe-bottom: max(85px, env(safe-area-inset-bottom, 85px));
-      --safe-top: max(14px, env(safe-area-inset-top, 14px));
+      --safe-bottom: max(24px, env(safe-area-inset-bottom, 24px));
+      --safe-top: max(12px, env(safe-area-inset-top, 12px));
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg); color: var(--text-main); padding-bottom: var(--safe-bottom); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
     /* Background Ambient Glow */
-    .ambient-glow { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 320px; background: radial-gradient(ellipse at 50% -20%, rgba(16, 185, 129, 0.15), transparent 70%); z-index: 0; pointer-events: none; }
+    .ambient-glow { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 300px; background: radial-gradient(ellipse at 50% -20%, rgba(16, 185, 129, 0.15), transparent 70%); z-index: 0; pointer-events: none; }
 
-    /* Top App Bar */
-    .app-header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(7, 11, 20, 0.85); border-bottom: 1px solid var(--border); padding-top: var(--safe-top); }
-    .header-content { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; }
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-logo { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #10b981, #06b6d4); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px var(--primary-glow); }
-    .brand-logo svg { width: 20px; height: 20px; fill: #042f2e; }
-    .brand-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.3px; color: #fff; }
-    .brand-subtitle { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; }
-    .header-stats { display: flex; align-items: center; gap: 8px; }
-    .stat-chip { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 0.72rem; font-weight: 600; color: var(--cyan); display: flex; align-items: center; gap: 5px; }
+    /* Compact Top App Header with Day Selector & Top Rest Timer */
+    .app-header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(7, 11, 20, 0.92); border-bottom: 1px solid var(--border); padding-top: var(--safe-top); }
+    .header-content { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; gap: 8px; }
+
+    /* Header Day Picker (Native Styled Dropdown) */
+    .header-day-picker { flex: 1; max-width: 250px; }
+    .header-day-select {
+      width: 100%;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: #fff;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 28px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      transition: border-color 0.15s;
+    }
+    .header-day-select:focus { border-color: var(--cyan); }
+
+    /* Top Rest Timer Dock */
+    .top-timer-widget {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 23, 40, 0.75);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px 8px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+    .top-timer-widget.timer-active {
+      border-color: var(--primary);
+      background: rgba(16, 185, 129, 0.12);
+      box-shadow: 0 0 14px var(--primary-glow);
+    }
+    .timer-digits-wrap { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    .timer-icon { font-size: 0.85rem; }
+    .timer-digits { font-size: 1.12rem; font-weight: 800; font-variant-numeric: tabular-nums; color: #fff; letter-spacing: -0.3px; }
+    .top-timer-controls { display: flex; align-items: center; gap: 4px; }
+    .t-btn-top {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: #fff;
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .t-btn-top:hover { background: rgba(255, 255, 255, 0.1); }
+    .t-btn-top.play { background: var(--primary); color: #042f2e; border-color: var(--primary); box-shadow: 0 2px 8px var(--primary-glow); }
+    .t-btn-top.play.paused { background: var(--amber); border-color: var(--amber); color: #3b2202; }
+    .t-btn-top.skip { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); padding: 5px 7px; }
 
     /* Workout Progress Bar */
     .workout-progress { width: 100%; height: 3px; background: rgba(255,255,255,0.06); }
     .workout-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #10b981, #06b6d4); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
-    /* Navigation Pills */
-    .nav-tabs-wrapper { padding: 10px 16px 12px; overflow-x: auto; scrollbar-width: none; background: rgba(7, 11, 20, 0.95); }
-    .nav-tabs-wrapper::-webkit-scrollbar { display: none; }
-    .nav-tabs { display: flex; gap: 8px; width: max-content; }
-    .nav-pill { background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); border-radius: 24px; padding: 8px 16px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 6px; }
-    .nav-pill.active { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.15)); border-color: var(--primary); color: #fff; box-shadow: 0 0 16px var(--primary-glow); }
-    .nav-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); }
-    .nav-pill.active .dot { background: var(--primary); box-shadow: 0 0 6px var(--primary); }
-
     /* Content Area */
-    .container { padding: 16px 16px 30px; max-width: 650px; margin: 0 auto; position: relative; z-index: 10; }
+    .container { padding: 14px 14px 24px; max-width: 650px; margin: 0 auto; position: relative; z-index: 10; }
     .day-content { display: none; }
     .day-content.active { display: flex; flex-direction: column; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Day Header Banner */
-    .day-banner { background: linear-gradient(135deg, rgba(22, 32, 53, 0.8), rgba(15, 23, 40, 0.9)); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; order: 0 !important; }
-    .day-banner-title { font-size: 1.05rem; font-weight: 800; color: #fff; }
-    .day-banner-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; display: flex; gap: 8px; }
-    .day-banner-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    
-    .session-timer-chip { background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--cyan); border-radius: 8px; padding: 6px 9px; font-size: 0.72rem; font-weight: 700; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 4px; }
-    .session-timer-chip.active { border-color: var(--primary); color: #34d399; background: rgba(16, 185, 129, 0.12); box-shadow: 0 0 10px var(--primary-glow); }
+    .day-banner { background: linear-gradient(135deg, rgba(22, 32, 53, 0.85), rgba(15, 23, 40, 0.95)); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 10px; order: 0 !important; }
+    .day-banner-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .day-banner-title { font-size: 1.05rem; font-weight: 800; color: #fff; line-height: 1.25; }
+    .day-banner-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .progress-chip { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 14px; padding: 3px 8px; font-size: 0.70rem; font-weight: 700; color: #34d399; display: inline-flex; align-items: center; gap: 4px; }
+    .session-timer-chip { background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--cyan); border-radius: 14px; padding: 3px 8px; font-size: 0.70rem; font-weight: 700; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 4px; }
+    .session-timer-chip.active { border-color: var(--primary); color: #34d399; background: rgba(16, 185, 129, 0.15); box-shadow: 0 0 10px var(--primary-glow); }
 
-    .btn-finish-day { background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 182, 212, 0.2)); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 8px; padding: 7px 11px; font-size: 0.74rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.15); transition: all 0.15s ease; }
+    .day-banner-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn-guide-modal { background: rgba(6, 182, 212, 0.12); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 8px; padding: 6px 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all 0.15s ease; }
+    .btn-guide-modal:active { transform: scale(0.96); background: rgba(6, 182, 212, 0.25); }
+    .btn-finish-day { background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 182, 212, 0.2)); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 8px; padding: 6px 11px; font-size: 0.72rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.15); transition: all 0.15s ease; }
     .btn-finish-day:active { transform: scale(0.96); background: rgba(16, 185, 129, 0.35); }
-    .btn-reset-session { background: rgba(255, 255, 255, 0.05); color: var(--text-dim); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .btn-reset-session { background: rgba(255, 255, 255, 0.05); color: var(--text-dim); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
     .btn-reset-session:hover, .btn-reset-session:active { background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.3); }
 
     /* Exercise Card */
-    .exercise-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: border-color 0.2s, box-shadow 0.2s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); }
+    .exercise-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: border-color 0.2s, box-shadow 0.2s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); }
     .exercise-card:hover { border-color: rgba(255, 255, 255, 0.14); }
     
     /* Auto-collapse / Reorder styles (Zero scroll) */
@@ -161,27 +209,12 @@
     summary::before { content: "›"; font-size: 1.1rem; line-height: 1; transition: transform 0.2s; display: inline-block; }
     details[open] summary::before { transform: rotate(90deg); }
     .drawer-body { font-size: 0.74rem; color: var(--text-muted); line-height: 1.5; margin-top: 6px; padding: 8px 12px; background: rgba(0, 0, 0, 0.25); border-radius: 8px; border-left: 2px solid var(--cyan); }
-    .alt-badge { color: #fde047; font-weight: 600; }
-
-    /* Fixed Floating Smart Timer Dock */
-    .timer-dock { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; padding: 10px 16px max(14px, env(safe-area-inset-bottom, 14px)); background: rgba(11, 16, 28, 0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top: 1px solid var(--border); box-shadow: 0 -8px 30px rgba(0,0,0,0.6); display: flex; justify-content: space-between; align-items: center; max-width: 650px; margin: 0 auto; }
-    .timer-info { display: flex; align-items: center; gap: 12px; }
-    .timer-circle { width: 44px; height: 44px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; position: relative; }
-    .timer-circle svg { width: 20px; height: 20px; fill: none; stroke: var(--primary); stroke-width: 2; }
-    .timer-digits { font-size: 1.45rem; font-weight: 800; font-variant-numeric: tabular-nums; color: #fff; letter-spacing: -0.5px; }
-    .timer-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
-    .timer-controls { display: flex; align-items: center; gap: 6px; }
-    .t-btn { background: var(--surface-elevated); border: 1px solid var(--border); color: #fff; border-radius: 10px; padding: 8px 12px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
-    .t-btn:hover { background: rgba(255,255,255,0.1); }
-    .t-btn.play { background: var(--primary); color: #042f2e; border-color: var(--primary); box-shadow: 0 2px 10px var(--primary-glow); }
-    .t-btn.play.paused { background: var(--amber); border-color: var(--amber); color: #3b2202; }
-    .t-btn.skip { background: rgba(255,255,255,0.06); color: var(--text-muted); }
 
     /* Toast Notification */
     .toast-msg { position: fixed; top: 72px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(15, 23, 40, 0.95); border: 1px solid var(--primary); box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 16px var(--primary-glow); color: #fff; padding: 10px 18px; border-radius: 30px; font-size: 0.82rem; font-weight: 700; z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 8px; max-width: 90vw; text-align: center; }
     .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* Bottom-sheet Modals (Alternativas & Historial) */
+    /* Bottom-sheet Modals (Alternativas, Historial & Guía) */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3, 7, 18, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
     .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease-out; }
     .modal-sheet { background: var(--surface); border: 1px solid var(--border); border-radius: 24px 24px 0 0; width: 100%; max-width: 650px; max-height: 85vh; overflow-y: auto; padding: 20px 18px 34px; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7); animation: sheetSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -249,9 +282,9 @@
     .session-item-date { font-size: 0.70rem; color: var(--text-muted); }
     .session-item-meta { font-size: 0.72rem; color: var(--cyan); margin-top: 4px; display: flex; gap: 10px; }
 
-    /* Guide & Warmup Section */
-    .guide-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 16px; }
-    .guide-title { font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    /* Guide Modal Cards */
+    .guide-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px; }
+    .guide-title { font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     .guide-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.78rem; }
     .guide-table th, .guide-table td { padding: 9px 8px; text-align: left; border-bottom: 1px solid var(--border); }
     .guide-table th { color: var(--cyan); font-weight: 700; }
@@ -261,58 +294,59 @@
 
   <div class="ambient-glow"></div>
 
-  <!-- Header -->
+  <!-- Top App Header with Day Dropdown & Top Rest Timer -->
   <header class="app-header">
     <div class="header-content">
-      <div class="brand">
-        <div class="brand-logo">
-          <svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43 1.43 1.43 2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
-        </div>
-        <div>
-          <div class="brand-title">AESTHETIC PRO</div>
-          <div class="brand-subtitle">Torso / Pierna • Frecuencia 2x</div>
-        </div>
+      <!-- Left: Day Selector Dropdown -->
+      <div class="header-day-picker">
+        <select id="daySelector" class="header-day-select" onchange="selectDay(this.value)">
+          <option value="torsoA">Día 1: Torso A • Empuje</option>
+          <option value="piernaA">Día 2: Pierna A • Cuádriceps</option>
+          <option value="torsoB">Día 3: Torso B • Tracción</option>
+          <option value="piernaB">Día 4: Pierna B • Isquios</option>
+          <option value="historialView">📊 Historial & Backup</option>
+        </select>
       </div>
-      <div class="header-stats">
-        <div class="stat-chip" id="progressChip">
-          <span>0/23 series</span>
+
+      <!-- Right: Compact Top Rest Timer Dock -->
+      <div class="top-timer-widget" id="topTimerWidget">
+        <div class="timer-digits-wrap" onclick="togglePlayTimer()" title="Iniciar / Pausar descanso">
+          <span class="timer-icon">⏱️</span>
+          <span class="timer-digits" id="timerDisplay">00:00</span>
+        </div>
+        <div class="top-timer-controls">
+          <button class="t-btn-top" onclick="adjustTimer(30)" title="+30s">+30s</button>
+          <button class="t-btn-top play" id="timerPlayBtn" onclick="togglePlayTimer()">Iniciar</button>
+          <button class="t-btn-top skip" onclick="resetTimerDock()" title="Reiniciar / Cancelar">✕</button>
         </div>
       </div>
     </div>
     
-    <!-- Progress Indicator -->
+    <!-- Progress Indicator directly underneath -->
     <div class="workout-progress">
       <div class="workout-progress-fill" id="workoutProgressBar"></div>
-    </div>
-
-    <!-- Workout Day Selector -->
-    <div class="nav-tabs-wrapper">
-      <div class="nav-tabs">
-        <button class="nav-pill active" onclick="selectDay('torsoA')"><span class="dot"></span> Torso A (Lunes)</button>
-        <button class="nav-pill" onclick="selectDay('piernaA')"><span class="dot"></span> Pierna A (Martes)</button>
-        <button class="nav-pill" onclick="selectDay('torsoB')"><span class="dot"></span> Torso B (Jueves)</button>
-        <button class="nav-pill" onclick="selectDay('piernaB')"><span class="dot"></span> Pierna B (Viernes)</button>
-        <button class="nav-pill" onclick="selectDay('historialView')">📊 Historial & Backup</button>
-        <button class="nav-pill" onclick="selectDay('guia')">📖 Guía y Calentamiento</button>
-      </div>
     </div>
   </header>
 
   <main class="container">
 
     <!-- ==========================================
-         Torso A • Fuerza & Empuje
+         Día 1: Torso A • Fuerza & Empuje
          ========================================== -->
     <section id="torsoA" class="day-content active">
       <div class="day-banner">
-        <div>
-          <div class="day-banner-title">Torso A • Fuerza & Empuje</div>
+        <div class="day-banner-main">
+          <div class="day-banner-title">Día 1: Torso A • Fuerza & Empuje</div>
           <div class="day-banner-meta">
-            <span>7 Ejercicios • 23 Series Efectivas • ~75 min</span>
+            <span class="progress-chip" id="progressChip-torsoA">0/23 series (0%)</span>
+            <span class="session-timer-chip" id="sessionTimer-torsoA">⏱️ 00:00</span>
           </div>
         </div>
         <div class="day-banner-actions">
-          <div class="session-timer-chip" id="sessionTimer-torsoA">⏱️ 00:00</div>
+          <button class="btn-guide-modal" onclick="openGuideModal()" title="Ver protocolo de calentamiento y aproximación">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Calentamiento</span>
+          </button>
           <button class="btn-finish-day" onclick="finishDaySession('torsoA')" title="Guardar marcas en 'Anterior', registrar duración e historial">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             <span>Guardar día</span>
@@ -410,10 +444,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoA_1">Retracción escapular activa, pies firmes en el suelo, bajada en 2 s controlados rozando el esternón inferior. Cero rebote.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoA_1">Press Plano con Mancuernas • Press de Pecho en Máquina Convergente • Press Plano en Multipower (Smith)</div>
-            </details>
           </div>
         </div>
       </article>
@@ -507,10 +537,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoA_2">Torso ligeramente inclinado (10-15°), tirar llevando los codos hacia los bolsillos traseros, estirar dorsal 2s arriba.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoA_2">Dominadas Libres o Asistidas • Jalón Unilateral en Polea • Jalón al Pecho con Agarre Neutro</div>
-            </details>
           </div>
         </div>
       </article>
@@ -598,10 +624,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoA_3">Banco a 75° (no a 90°) para proteger la cápsula articular del hombro. Codos a 45° del torso.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoA_3">Press de Hombro en Máquina • Press Militar de Pie con Barra • Press Militar en Multipower Sentado</div>
-            </details>
           </div>
         </div>
       </article>
@@ -688,10 +710,6 @@
             <details>
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoA_4">Columna neutra sin balancear la espalda baja. Traccionar hacia el ombligo apretando escápulas 1s.</div>
-            </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoA_4">Remo en Máquina con Pecho Apoyado • Remo Unilateral con Mancuerna en Banco • Remo en Barra T (T-Bar Row)</div>
             </details>
           </div>
         </div>
@@ -786,10 +804,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoA_5">Inclinación leve de 10° hacia delante, elevar en el plano escapular (30° adelantado), pausa de 1 s arriba.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoA_5">Elevaciones Laterales en Polea Baja • Elevaciones Laterales en Máquina • Elevaciones Laterales en Banco Inclinado</div>
-            </details>
           </div>
         </div>
       </article>
@@ -876,10 +890,6 @@
             <details>
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoA_6">Codos clavados al costado sin adelantarlos, extensión completa con bloqueo de 1 s, subida controlada hasta 90°.</div>
-            </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoA_6">Extensión de Tríceps con Cuerda • Fondos en Paralelas para Tríceps • Extensión Unilateral de Tríceps en Polea</div>
             </details>
           </div>
         </div>
@@ -968,28 +978,28 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoA_7">Iniciar neutro y supinar fuertemente la muñeca a mitad de subida para acortar ambas cabezas del bíceps.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoA_7">Curl con Barra Z de Pie • Curl de Bíceps en Polea Baja • Curl de Bíceps en Banco Inclinado (60°)</div>
-            </details>
           </div>
         </div>
       </article>
     </section>
 
     <!-- ==========================================
-         Pierna A • Sentadilla & Cuádriceps
+         Día 2: Pierna A • Sentadilla & Cuádriceps
          ========================================== -->
     <section id="piernaA" class="day-content">
       <div class="day-banner">
-        <div>
-          <div class="day-banner-title">Pierna A • Sentadilla & Cuádriceps</div>
+        <div class="day-banner-main">
+          <div class="day-banner-title">Día 2: Pierna A • Sentadilla & Cuádriceps</div>
           <div class="day-banner-meta">
-            <span>5 Ejercicios • 17 Series Efectivas • ~70 min</span>
+            <span class="progress-chip" id="progressChip-piernaA">0/17 series (0%)</span>
+            <span class="session-timer-chip" id="sessionTimer-piernaA">⏱️ 00:00</span>
           </div>
         </div>
         <div class="day-banner-actions">
-          <div class="session-timer-chip" id="sessionTimer-piernaA">⏱️ 00:00</div>
+          <button class="btn-guide-modal" onclick="openGuideModal()" title="Ver protocolo de calentamiento y aproximación">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Calentamiento</span>
+          </button>
           <button class="btn-finish-day" onclick="finishDaySession('piernaA')" title="Guardar marcas en 'Anterior', registrar duración e historial">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             <span>Guardar día</span>
@@ -1087,10 +1097,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-piernaA_1">Pies a anchura de hombros, brace abdominal 360°, romper en caderas y rodillas simultáneamente, profundidad mínima paralelo.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-piernaA_1">Prensa de Piernas 45° • Sentadilla Hack en Máquina • Sentadilla en Multipower (Smith)</div>
-            </details>
           </div>
         </div>
       </article>
@@ -1177,10 +1183,6 @@
             <details>
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-piernaA_2">Almohadilla en el empeine, sujetar los agarres para no levantar el glúteo, extensión completa con 1 s de contracción.</div>
-            </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-piernaA_2">Sentadilla Sissy con Disco / Banco • Zancadas Caminando con Mancuernas • Step-Ups en Cajón / Banco</div>
             </details>
           </div>
         </div>
@@ -1275,10 +1277,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-piernaA_3">Presionar la pelvis contra el banco para no arquear la zona lumbar. Flexión explosiva y bajada en 3 s.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-piernaA_3">Curl Femoral Sentado • Curl Femoral Unilateral de Pie • Curl Femoral Tumbado con Mancuerna</div>
-            </details>
           </div>
         </div>
       </article>
@@ -1365,10 +1363,6 @@
             <details>
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-piernaA_4">Rodillas bloqueadas rectas, pausa de 2 s en máximo estiramiento abajo (elimina el reflejo miotático del Aquiles).</div>
-            </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-piernaA_4">Gemelos en Prensa de Piernas • Elevación Unilateral de Gemelos en Escalón • Gemelos en Multipower sobre Step</div>
             </details>
           </div>
         </div>
@@ -1457,28 +1451,28 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-piernaA_5">Retroversión pélvica activa (meter el ombligo y apretar glúteos al máximo). Cero hundimiento lumbar.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-piernaA_5">Rueda Abdominal (Ab Wheel Rollout) • Paseo del Granjero Pesado (Farmer's Walk) • Press Pallof en Polea</div>
-            </details>
           </div>
         </div>
       </article>
     </section>
 
     <!-- ==========================================
-         Torso B • Tracción & Hipertrofia
+         Día 3: Torso B • Tracción & Hipertrofia
          ========================================== -->
     <section id="torsoB" class="day-content">
       <div class="day-banner">
-        <div>
-          <div class="day-banner-title">Torso B • Tracción & Hipertrofia</div>
+        <div class="day-banner-main">
+          <div class="day-banner-title">Día 3: Torso B • Tracción & Hipertrofia</div>
           <div class="day-banner-meta">
-            <span>7 Ejercicios • 23 Series Efectivas • ~80 min</span>
+            <span class="progress-chip" id="progressChip-torsoB">0/23 series (0%)</span>
+            <span class="session-timer-chip" id="sessionTimer-torsoB">⏱️ 00:00</span>
           </div>
         </div>
         <div class="day-banner-actions">
-          <div class="session-timer-chip" id="sessionTimer-torsoB">⏱️ 00:00</div>
+          <button class="btn-guide-modal" onclick="openGuideModal()" title="Ver protocolo de calentamiento y aproximación">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Calentamiento</span>
+          </button>
           <button class="btn-finish-day" onclick="finishDaySession('torsoB')" title="Guardar marcas en 'Anterior', registrar duración e historial">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             <span>Guardar día</span>
@@ -1576,10 +1570,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoB_1">Rodilla y mano apoyadas; traccionar hacia la cresta ilíaca (cadera) con el codo pegado al torso.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoB_1">Remo Unilateral en Máquina de Palanca • Remo con Mancuernas en Banco Inclinado (Pecho Apoyado) • Kroc Rows Pesados con Mancuerna</div>
-            </details>
           </div>
         </div>
       </article>
@@ -1672,10 +1662,6 @@
             <details>
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoB_2">Inclinación a 30° (no a 45° para que no robe el trabajo el deltoides anterior). Codos a 45-60°.</div>
-            </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoB_2">Press Inclinado con Barra (30°) • Press Inclinado en Máquina Convergente • Press Inclinado en Multipower (Smith)</div>
             </details>
           </div>
         </div>
@@ -1770,10 +1756,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoB_3">Foco en acercar los codos a las costillas en el punto de contracción. Estirar dorsal arriba 2 s.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoB_3">Pullover en Polea Alta con Cuerda / Barra • Dominadas con Agarre Neutro • Jalón al Pecho con Agarre Supino (Bajo)</div>
-            </details>
           </div>
         </div>
       </article>
@@ -1867,10 +1849,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoB_4">Polea ajustada a la altura de la rodilla o muñeca. Tensión desde el milímetro cero del recorrido.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoB_4">Elevaciones Laterales con Mancuernas (Pausa Arriba) • Elevaciones Laterales en Máquina • Elevaciones Laterales Cruzadas en Polea Doble</div>
-            </details>
           </div>
         </div>
       </article>
@@ -1957,10 +1935,6 @@
             <details>
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoB_5">Tirar hacia el puente de la nariz con rotación externa (pulgares hacia atrás), aguantar 1 s apretando escápulas.</div>
-            </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoB_5">Pájaros con Mancuerna en Banco Inclinado • Pájaros en Máquina Pec-Deck Invertida • Cruces Inversos en Poleas Altas</div>
             </details>
           </div>
         </div>
@@ -2049,10 +2023,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoB_6">Bajar la barra hacia detrás de la coronilla (no hacia la frente) para mantener tensión en la cabeza larga del tríceps.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoB_6">Extensión de Tríceps Tras Nuca en Polea • Katana Extensions en Doble Polea • Press de Banca con Agarre Estrecho</div>
-            </details>
           </div>
         </div>
       </article>
@@ -2140,28 +2110,28 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-torsoB_7">Palmas enfrentadas en todo el recorrido. Empuja el bíceps hacia arriba ensanchando el brazo de perfil.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-torsoB_7">Curl Martillo en Polea Baja con Cuerda • Curl Inverso con Barra Z • Curl Martillo en Banco Predicador</div>
-            </details>
           </div>
         </div>
       </article>
     </section>
 
     <!-- ==========================================
-         Pierna B • Cadena Posterior & Búlgaras
+         Día 4: Pierna B • Cadena Posterior & Búlgaras
          ========================================== -->
     <section id="piernaB" class="day-content">
       <div class="day-banner">
-        <div>
-          <div class="day-banner-title">Pierna B • Cadena Posterior & Búlgaras</div>
+        <div class="day-banner-main">
+          <div class="day-banner-title">Día 4: Pierna B • Cadena Posterior & Búlgaras</div>
           <div class="day-banner-meta">
-            <span>6 Ejercicios • 20 Series Efectivas • ~75 min</span>
+            <span class="progress-chip" id="progressChip-piernaB">0/20 series (0%)</span>
+            <span class="session-timer-chip" id="sessionTimer-piernaB">⏱️ 00:00</span>
           </div>
         </div>
         <div class="day-banner-actions">
-          <div class="session-timer-chip" id="sessionTimer-piernaB">⏱️ 00:00</div>
+          <button class="btn-guide-modal" onclick="openGuideModal()" title="Ver protocolo de calentamiento y aproximación">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Calentamiento</span>
+          </button>
           <button class="btn-finish-day" onclick="finishDaySession('piernaB')" title="Guardar marcas en 'Anterior', registrar duración e historial">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             <span>Guardar día</span>
@@ -2259,10 +2229,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-piernaB_1">Rodillas semirrígidas (15-20° de flexión fija), empujar el glúteo hacia la pared trasera, barra rozando los muslos. Cero flexión lumbar.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-piernaB_1">RDL en Multipower (Smith) • RDL con Mancuernas Pesadas • Hip Thrust con Barra en Banco</div>
-            </details>
           </div>
         </div>
       </article>
@@ -2349,10 +2315,6 @@
             <details>
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-piernaB_2">Empeine trasero apoyado en banco; inclinación leve del torso (15°) para mayor reclutamiento de glúteo.</div>
-            </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-piernaB_2">Sentadilla Búlgara en Multipower • Prensa de Piernas Unilateral (1 Pierna) • Zancadas Estáticas con Mancuernas (Split Squat)</div>
             </details>
           </div>
         </div>
@@ -2447,10 +2409,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-piernaB_3">Ajustar el rodillo superior firmemente contra los muslos para evitar que las caderas se levanten. Aguantar 1 s abajo.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-piernaB_3">Curl Femoral Tumbado • Curl Nórdico Asistido con Elástica • Curl Femoral de Pie en Polea con Tobillera</div>
-            </details>
           </div>
         </div>
       </article>
@@ -2537,10 +2495,6 @@
             <details>
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-piernaB_4">Rango completo con pausa arriba de 1 s; en la última serie aplicar dropset o pausa isométrica final de 10 s.</div>
-            </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-piernaB_4">Sentadilla Goblet Profunda con Talones Elevados • Prensa de Piernas con Pies Bajos y Juntos • Sentadilla Sissy</div>
             </details>
           </div>
         </div>
@@ -2629,10 +2583,6 @@
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-piernaB_5">Con la rodilla flexionada a 90° el gastrocnemio queda inhibido por insuficiencia activa, focalizando el sóleo.</div>
             </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-piernaB_5">Gemelo Sentado con Barra / Mancuerna sobre Muslos • Gemelo Sentado en Multipower • Gemelos en Prensa con Rodillas Semiflexionadas</div>
-            </details>
           </div>
         </div>
       </article>
@@ -2719,10 +2669,6 @@
             <details>
               <summary>Técnica clave</summary>
               <div class="drawer-body" id="cues-piernaB_6">Fijar la cadera en el espacio; no flexionar caderas, sino doblar la columna dorsal enrollando la caja torácica hacia la pelvis.</div>
-            </details>
-            <details>
-              <summary>Alternativas si está ocupado</summary>
-              <div class="drawer-body alt-badge" id="alts-piernaB_6">Elevación de Piernas o Rodillas Colgado • Crunch en Suelo o Banco Declinado con Disco • Crunch Abdominal en Máquina</div>
             </details>
           </div>
         </div>
@@ -2900,17 +2846,28 @@
       </div>
     </section>
 
-    <!-- ==========================================
-         GUÍA & PROTOCOLO DE CALENTAMIENTO
-         ========================================== -->
-    <section id="guia" class="day-content">
+  </main>
+
+  <!-- ==========================================
+       MODAL DE GUÍA & CALENTAMIENTO (Bottom Sheet)
+       ========================================== -->
+  <div class="modal-overlay" id="guideModal" onclick="closeGuideModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">📖 Protocolo de Calentamiento y Sobrecarga</div>
+          <div class="modal-subtitle">Series de aproximación y técnica progresiva</div>
+        </div>
+        <button class="modal-close-btn" onclick="closeGuideModal()">✕</button>
+      </div>
+      
       <div class="guide-card">
         <div class="guide-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-          Protocolo de Calentamiento y Series de Aproximación
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          <span>Series de Aproximación</span>
         </div>
         <p style="font-size:0.75rem; color:var(--text-muted); line-height:1.5;">
-          Nunca empieces con tu peso de trabajo. El calentamiento específico prepara el sistema nervioso, lubrica las articulaciones y previene roturas musculares sin acumular fatiga metabólica.
+          Nunca empieces con tu peso de trabajo. Prepara el sistema nervioso, lubrica articulaciones y previene roturas sin fatigar:
         </p>
         <table class="guide-table">
           <thead><tr><th>Serie</th><th>Carga (% Trabajo)</th><th>Reps</th><th>Descanso</th></tr></thead>
@@ -2926,21 +2883,17 @@
 
       <div class="guide-card">
         <div class="guide-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          Sobrecarga Progresiva: La Regla de la Doble Progresión
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <span>La Regla de la Doble Progresión</span>
         </div>
-        <p style="font-size:0.75rem; color:var(--text-muted); line-height:1.5;">
-          Para hipertrofia real, no cambies de peso en cada serie al azar. Sigue esta regla sistemática:
-        </p>
-        <ul style="font-size:0.74rem; color:var(--text-muted); line-height:1.6; margin-left:18px; margin-top:8px;">
+        <ul style="font-size:0.74rem; color:var(--text-muted); line-height:1.6; margin-left:18px;">
           <li>Fija un peso con el que llegues a la parte baja del rango (ej: 80 kg × 6 reps).</li>
-          <li>En las siguientes semanas, mantén esos 80 kg hasta que logres 4 series de 8 reps con técnica impecable.</li>
-          <li>Una vez consigas 8 reps en todas las series, sube el peso (+2.5 kg o +5 kg) y vuelve a empezar en 6 reps.</li>
+          <li>Mantén el peso hasta completar todas las series en el tope del rango (ej: 4 series de 8 reps).</li>
+          <li>Una vez conseguido, sube el peso (+2.5 kg o +5 kg) y reinicia en la base del rango (6 reps).</li>
         </ul>
       </div>
-    </section>
-
-  </main>
+    </div>
+  </div>
 
   <!-- ==========================================
        MODAL DE ALTERNATIVAS (Bottom Sheet)
@@ -2979,31 +2932,11 @@
   </div>
 
   <!-- ==========================================
-       SMART REST TIMER DOCK (Floating Bottom App Bar)
-       ========================================== -->
-  <aside class="timer-dock">
-    <div class="timer-info">
-      <div class="timer-circle">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-      </div>
-      <div>
-        <div class="timer-label" id="timerLabel">DESCANSO</div>
-        <div class="timer-digits" id="timerDisplay">00:00</div>
-      </div>
-    </div>
-    <div class="timer-controls">
-      <button class="t-btn" onclick="adjustTimer(30)">+30s</button>
-      <button class="t-btn play" id="timerPlayBtn" onclick="togglePlayTimer()">Iniciar</button>
-      <button class="t-btn skip" onclick="resetTimerDock()">✕</button>
-    </div>
-  </aside>
-
-  <!-- ==========================================
        APP SCRIPTS & STATE ENGINE
        ========================================== -->
   <script>
     const EXERCISE_CATALOG = {"banca": {"id": "banca", "name": "Press de Banca Plano con Barra", "muscle": "Pectoral Mayor • Fuerza", "equipment": "Barra Olímpica + Banco Plano", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bench-Press.gif", "youtubeQuery": "tecnica+press+banca+plano+barra", "muscleWikiQuery": "barbell+bench+press", "cues": "Retracción escapular activa, pies firmes en el suelo, bajada en 2 s controlados rozando el esternón inferior. Cero rebote.", "dose": "4 × 6-8 reps", "rir": "RIR 1-2", "rest": 150, "alternatives": ["press_manc_plano", "press_maq_convergente", "press_multipower_plano"]}, "press_manc_plano": {"id": "press_manc_plano", "name": "Press Plano con Mancuernas", "muscle": "Pectoral Mayor • Mayor Rango", "equipment": "Mancuernas + Banco Plano", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Press.gif", "youtubeQuery": "tecnica+press+banca+mancuernas", "muscleWikiQuery": "dumbbell+bench+press", "cues": "Permite mayor rango de estiramiento y convergencia al subir sin forzar los hombros.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["banca", "press_maq_convergente", "press_multipower_plano"]}, "press_maq_convergente": {"id": "press_maq_convergente", "name": "Press de Pecho en Máquina Convergente", "muscle": "Pectoral Mayor • Máxima Estabilidad", "equipment": "Máquina de Placas o Discos", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Lever-Chest-Press.gif", "youtubeQuery": "press+pecho+maquina+convergente", "muscleWikiQuery": "chest+press+machine", "cues": "Estabilidad guiada total. Ideal para empujar con máxima intensidad y seguridad cerca del fallo.", "dose": "4 × 8-10 reps", "rir": "RIR 1", "rest": 120, "alternatives": ["banca", "press_manc_plano", "press_multipower_plano"]}, "press_multipower_plano": {"id": "press_multipower_plano", "name": "Press Plano en Multipower (Smith)", "muscle": "Pectoral Mayor • Tensión Continua", "equipment": "Máquina Multipower (Smith Machine)", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Smith-Machine-Bench-Press.gif", "youtubeQuery": "press+banca+multipower+smith", "muscleWikiQuery": "smith+machine+bench+press", "cues": "Recorrido fijo que elimina la fatiga de estabilizadores, permitiendo focalizar el 100% en el pectoral.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["banca", "press_manc_plano", "press_maq_convergente"]}, "jalon": {"id": "jalon", "name": "Jalón al Pecho (Prono Ancho)", "muscle": "Dorsal Ancho • Tracción Vertical", "equipment": "Polea Alta + Barra Larga", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lat-Pulldown.gif", "youtubeQuery": "tecnica+jalon+pecho+polea", "muscleWikiQuery": "lat+pulldown", "cues": "Torso ligeramente inclinado (10-15°), tirar llevando los codos hacia los bolsillos traseros, estirar dorsal 2s arriba.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["dominadas_libres", "jalon_unilateral_polea", "jalon_neutro_cerrado"]}, "dominadas_libres": {"id": "dominadas_libres", "name": "Dominadas Libres o Asistidas", "muscle": "Dorsal Ancho & Espalda • Peso Corporal", "equipment": "Barra de Dominadas / Máquina Asistida", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Pull-up.gif", "youtubeQuery": "tecnica+dominadas+correctas", "muscleWikiQuery": "pull+up", "cues": "Rango completo: colgarse con estiramiento escapular completo y traccionar hasta pasar barbilla.", "dose": "4 × 6-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["jalon", "jalon_unilateral_polea", "jalon_neutro_cerrado"]}, "jalon_unilateral_polea": {"id": "jalon_unilateral_polea", "name": "Jalón Unilateral en Polea", "muscle": "Dorsal Ancho • Alineación de Fibras", "equipment": "Polea Alta + Estribo", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/One-arm-lat-pulldown.gif", "youtubeQuery": "jalon+unilateral+polea+dorsal", "muscleWikiQuery": "one+arm+lat+pulldown", "cues": "Tirar en plano sagital estricto alineando el cable con las fibras iliocostales del dorsal.", "dose": "4 × 10-12 reps", "rir": "RIR 1", "rest": 90, "alternatives": ["jalon", "dominadas_libres", "jalon_neutro_cerrado"]}, "jalon_neutro_cerrado": {"id": "jalon_neutro_cerrado", "name": "Jalón al Pecho con Agarre Neutro", "muscle": "Dorsal Ancho • Ergonomía Articular", "equipment": "Polea Alta + Maneral Triángulo / Neutro", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/V-bar-Lat-Pulldown.gif", "youtubeQuery": "jalon+pecho+agarre+neutro", "muscleWikiQuery": "close+grip+lat+pulldown", "cues": "Menor estrés en hombros y codos, permitiendo un gran estiramiento y contracción profunda.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["jalon", "dominadas_libres", "jalon_unilateral_polea"]}, "militar": {"id": "militar", "name": "Press Militar Sentado con Mancuernas (75°)", "muscle": "Deltoides Anterior & Lateral", "equipment": "Mancuernas + Banco a 75°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Dumbbell-Press.gif", "youtubeQuery": "press+militar+mancuernas+banco+75", "muscleWikiQuery": "seated+dumbbell+shoulder+press", "cues": "Banco a 75° (no a 90°) para proteger la cápsula articular del hombro. Codos a 45° del torso.", "dose": "3 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["press_hombro_maquina", "press_militar_barra", "press_multipower_hombro"]}, "press_hombro_maquina": {"id": "press_hombro_maquina", "name": "Press de Hombro en Máquina", "muscle": "Deltoides Anterior • Tensión Continua", "equipment": "Máquina de Hombros", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Lever-Shoulder-Press.gif", "youtubeQuery": "press+hombro+maquina+tecnica", "muscleWikiQuery": "lever+shoulder+press", "cues": "Excelente apoyo para la espalda y tensión mecánica uniforme en todo el recorrido.", "dose": "3 × 8-10 reps", "rir": "RIR 1", "rest": 120, "alternatives": ["militar", "press_militar_barra", "press_multipower_hombro"]}, "press_militar_barra": {"id": "press_militar_barra", "name": "Press Militar de Pie con Barra", "muscle": "Deltoides & Core • Básico Clásico", "equipment": "Barra Olímpica de pie", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Military-Press.gif", "youtubeQuery": "overhead+press+barra+tecnica", "muscleWikiQuery": "standing+military+press", "cues": "Glúteos apretados y abdomen tenso; empujar la barra verticalmente pasando la cabeza bajo la barra al bloquear.", "dose": "3 × 6-8 reps", "rir": "RIR 1-2", "rest": 150, "alternatives": ["militar", "press_hombro_maquina", "press_multipower_hombro"]}, "press_multipower_hombro": {"id": "press_multipower_hombro", "name": "Press Militar en Multipower Sentado", "muscle": "Deltoides Anterior • Cero Balanceo", "equipment": "Multipower + Banco a 75°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Smith-Machine-Shoulder-Press.gif", "youtubeQuery": "press+militar+multipower+smith", "muscleWikiQuery": "smith+machine+overhead+press", "cues": "Trayectoria guiada fija. Permite máxima carga sin preocuparse por la estabilización.", "dose": "3 × 8-10 reps", "rir": "RIR 1", "rest": 120, "alternatives": ["militar", "press_hombro_maquina", "press_militar_barra"]}, "remo": {"id": "remo", "name": "Remo en Polea Baja (Agarre Neutro Estrecho)", "muscle": "Espalda Media & Dorsal • Tracción Horizontal", "equipment": "Polea Baja (Gironda) + Maneral V", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Cable-Row.gif", "youtubeQuery": "tecnica+remo+polea+baja+gironda", "muscleWikiQuery": "seated+cable+row", "cues": "Columna neutra sin balancear la espalda baja. Traccionar hacia el ombligo apretando escápulas 1s.", "dose": "3 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["remo_pecho_apoyado", "remo_mancuerna_banco", "remo_barra_t"]}, "remo_pecho_apoyado": {"id": "remo_pecho_apoyado", "name": "Remo en Máquina con Pecho Apoyado", "muscle": "Espalda Media • Cero Fatiga Lumbar", "equipment": "Máquina de Remo con Almohadilla", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lever-Seated-Row.gif", "youtubeQuery": "remo+pecho+apoyado+maquina", "muscleWikiQuery": "chest+supported+row", "cues": "Elimina totalmente el estrés lumbar, permitiendo aislar la espalda alta y dorsal con máxima seguridad.", "dose": "3 × 8-10 reps", "rir": "RIR 1", "rest": 120, "alternatives": ["remo", "remo_mancuerna_banco", "remo_barra_t"]}, "remo_mancuerna_banco": {"id": "remo_mancuerna_banco", "name": "Remo Unilateral con Mancuerna en Banco", "muscle": "Dorsal Ancho • Gran Rango", "equipment": "Mancuerna + Banco Plano", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Row.gif", "youtubeQuery": "remo+unilateral+mancuerna+tecnica", "muscleWikiQuery": "one+arm+dumbbell+row", "cues": "Rodilla y mano apoyadas; traccionar llevando el codo hacia la cadera estirando bien abajo.", "dose": "3 × 8-10 reps", "rir": "RIR 1-2", "rest": 90, "alternatives": ["remo", "remo_pecho_apoyado", "remo_barra_t"]}, "remo_barra_t": {"id": "remo_barra_t", "name": "Remo en Barra T (T-Bar Row)", "muscle": "Espalda Media & Grosor", "equipment": "Barra T o Landmine", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/T-Bar-Row.gif", "youtubeQuery": "remo+barra+t+espalda", "muscleWikiQuery": "t+bar+row", "cues": "Tronco a 45 grados, columna recta, empuje con codos pegados para activar dorsal o abiertos para espalda alta.", "dose": "3 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["remo", "remo_pecho_apoyado", "remo_mancuerna_banco"]}, "laterales1": {"id": "laterales1", "name": "Elevaciones Laterales con Mancuernas", "muscle": "Deltoides Lateral • Amplitud", "equipment": "Par de Mancuernas", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lateral-Raise.gif", "youtubeQuery": "tecnica+elevaciones+laterales+mancuernas", "muscleWikiQuery": "dumbbell+lateral+raise", "cues": "Inclinación leve de 10° hacia delante, elevar en el plano escapular (30° adelantado), pausa de 1 s arriba.", "dose": "4 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["laterales_polea_baja", "laterales_maquina", "laterales_inclinado"]}, "laterales_polea_baja": {"id": "laterales_polea_baja", "name": "Elevaciones Laterales en Polea Baja", "muscle": "Deltoides Lateral • Tensión Continua", "equipment": "Polea Baja + Tobillera o Estribo", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif", "youtubeQuery": "elevaciones+laterales+polea+baja", "muscleWikiQuery": "cable+lateral+raise", "cues": "La polea mantiene resistencia constante incluso al inicio del movimiento donde la mancuerna no pesa.", "dose": "4 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["laterales1", "laterales_maquina", "laterales_inclinado"]}, "laterales_maquina": {"id": "laterales_maquina", "name": "Elevaciones Laterales en Máquina", "muscle": "Deltoides Lateral • Aislamiento Puro", "equipment": "Máquina de Elevaciones Laterales", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Lever-Lateral-Raise.gif", "youtubeQuery": "elevaciones+laterales+maquina", "muscleWikiQuery": "lever+lateral+raise", "cues": "Aísla el deltoides lateral sin fatigar antebrazos ni trapecios superiores.", "dose": "4 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["laterales1", "laterales_polea_baja", "laterales_inclinado"]}, "laterales_inclinado": {"id": "laterales_inclinado", "name": "Elevaciones Laterales en Banco Inclinado", "muscle": "Deltoides Lateral • Máximo Estiramiento", "equipment": "Mancuerna + Banco a 60°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Lateral-Raise.gif", "youtubeQuery": "elevaciones+laterales+banco+inclinado", "muscleWikiQuery": "incline+dumbbell+lateral+raise", "cues": "Tumbado de lado en banco inclinado para sobrecargar el deltoides en posición estirada.", "dose": "4 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["laterales1", "laterales_polea_baja", "laterales_maquina"]}, "triceps1": {"id": "triceps1", "name": "Extensión de Tríceps en Polea Alta", "muscle": "Tríceps • Cabeza Lateral & Medial", "equipment": "Polea Alta + Barra Recta / V", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Pushdown.gif", "youtubeQuery": "tecnica+extension+triceps+polea+alta", "muscleWikiQuery": "cable+pushdown", "cues": "Codos clavados al costado sin adelantarlos, extensión completa con bloqueo de 1 s, subida controlada hasta 90°.", "dose": "3 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["triceps_cuerda", "fondos_paralelas", "triceps_unilateral"]}, "triceps_cuerda": {"id": "triceps_cuerda", "name": "Extensión de Tríceps con Cuerda", "muscle": "Tríceps • Mayor Contracción", "equipment": "Polea Alta + Cuerda", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Rope-Pushdown.gif", "youtubeQuery": "extension+triceps+cuerda+polea", "muscleWikiQuery": "cable+rope+pushdown", "cues": "Abrir la cuerda hacia los lados al final del recorrido para contraer la cabeza lateral al máximo.", "dose": "3 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["triceps1", "fondos_paralelas", "triceps_unilateral"]}, "fondos_paralelas": {"id": "fondos_paralelas", "name": "Fondos en Paralelas para Tríceps", "muscle": "Tríceps • Fuerza & Masa", "equipment": "Barras Paralelas / Máquina Asistida", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Triceps-Dips.gif", "youtubeQuery": "fondos+paralelas+triceps+tecnica", "muscleWikiQuery": "dips", "cues": "Torso erguido para focalizar el tríceps (no inclinar el torso hacia delante).", "dose": "3 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["triceps1", "triceps_cuerda", "triceps_unilateral"]}, "triceps_unilateral": {"id": "triceps_unilateral", "name": "Extensión Unilateral de Tríceps en Polea", "muscle": "Tríceps • Asimetrías", "equipment": "Polea Alta sin Maneral", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Cable-One-Arm-Tricep-Extension.gif", "youtubeQuery": "extension+triceps+unilateral+polea", "muscleWikiQuery": "one+arm+tricep+pushdown", "cues": "Tomar el cable directamente con la mano sin maneral para alinear la línea de fuerza articular.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["triceps1", "triceps_cuerda", "fondos_paralelas"]}, "biceps1": {"id": "biceps1", "name": "Curl de Bíceps con Mancuernas (Supinación)", "muscle": "Bíceps Braquial • Supinación", "equipment": "Par de Mancuernas", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Curl.gif", "youtubeQuery": "tecnica+curl+biceps+supinacion+mancuernas", "muscleWikiQuery": "dumbbell+curl", "cues": "Iniciar neutro y supinar fuertemente la muñeca a mitad de subida para acortar ambas cabezas del bíceps.", "dose": "3 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["curl_barra_z", "curl_polea_baja", "curl_inclinado"]}, "curl_barra_z": {"id": "curl_barra_z", "name": "Curl con Barra Z de Pie", "muscle": "Bíceps Braquial • Sobrecarga", "equipment": "Barra Z con Discos", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/EZ-Bar-Curl.gif", "youtubeQuery": "curl+biceps+barra+z+tecnica", "muscleWikiQuery": "ez+bar+curl", "cues": "El agarre semiprono de la barra Z reduce la torsión en muñecas y codos permitiendo mayor carga.", "dose": "3 × 8-10 reps", "rir": "RIR 1", "rest": 90, "alternatives": ["biceps1", "curl_polea_baja", "curl_inclinado"]}, "curl_polea_baja": {"id": "curl_polea_baja", "name": "Curl de Bíceps en Polea Baja", "muscle": "Bíceps Braquial • Tensión Continua", "equipment": "Polea Baja + Barra Corta", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Curl.gif", "youtubeQuery": "curl+biceps+polea+baja", "muscleWikiQuery": "cable+curl", "cues": "Tensión constante en la parte inferior del movimiento donde las mancuernas pierden brazo de palanca.", "dose": "3 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["biceps1", "curl_barra_z", "curl_inclinado"]}, "curl_inclinado": {"id": "curl_inclinado", "name": "Curl de Bíceps en Banco Inclinado (60°)", "muscle": "Cabeza Larga del Bíceps • Estiramiento", "equipment": "Mancuernas + Banco a 60°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Incline-Dumbbell-Curl.gif", "youtubeQuery": "curl+inclinado+mancuernas+biceps", "muscleWikiQuery": "incline+dumbbell+curl", "cues": "El codo queda retrasado respecto al torso, maximizando la tensión mecánica en elongación.", "dose": "3 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["biceps1", "curl_barra_z", "curl_polea_baja"]}, "squat": {"id": "squat", "name": "Sentadilla Trasera con Barra (Back Squat)", "muscle": "Cuádriceps & Glúteo • Básico Pesado", "equipment": "Rack + Barra Olímpica", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-SQUAT.gif", "youtubeQuery": "tecnica+sentadilla+trasera+barra", "muscleWikiQuery": "barbell+squat", "cues": "Pies a anchura de hombros, brace abdominal 360°, romper en caderas y rodillas simultáneamente, profundidad mínima paralelo.", "dose": "4 × 6-8 reps", "rir": "RIR 1-2", "rest": 180, "alternatives": ["prensa_45", "sentadilla_hack", "sentadilla_multipower"]}, "prensa_45": {"id": "prensa_45", "name": "Prensa de Piernas 45°", "muscle": "Cuádriceps & Glúteo • Gran Sobrecarga", "equipment": "Máquina Prensa 45°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Leg-Press.gif", "youtubeQuery": "tecnica+prensa+45+piernas", "muscleWikiQuery": "sled+45-degree+leg+press", "cues": "Pies a mitad de plataforma; bajar profundo sin despegar el sacro ni la zona lumbar del respaldo.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 150, "alternatives": ["squat", "sentadilla_hack", "sentadilla_multipower"]}, "sentadilla_hack": {"id": "sentadilla_hack", "name": "Sentadilla Hack en Máquina", "muscle": "Cuádriceps • Máxima Profundidad", "equipment": "Máquina Hack Squat", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Sled-Hack-Squat.gif", "youtubeQuery": "sentadilla+hack+tecnica", "muscleWikiQuery": "hack+squat", "cues": "Espalda totalmente apoyada; flexión profunda de rodillas llevando las tibias hacia delante sin despegar talones.", "dose": "4 × 8-10 reps", "rir": "RIR 1", "rest": 150, "alternatives": ["squat", "prensa_45", "sentadilla_multipower"]}, "sentadilla_multipower": {"id": "sentadilla_multipower", "name": "Sentadilla en Multipower (Smith)", "muscle": "Cuádriceps • Control Total", "equipment": "Multipower (Smith Machine)", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Smith-Squat.gif", "youtubeQuery": "sentadilla+multipower+smith+tecnica", "muscleWikiQuery": "smith+squat", "cues": "Pies ligeramente adelantados para enfatizar los cuádriceps reduciendo el estrés en cadera y lumbares.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 150, "alternatives": ["squat", "prensa_45", "sentadilla_hack"]}, "legext": {"id": "legext", "name": "Extensiones de Cuádriceps en Máquina", "muscle": "Cuádriceps • Aislamiento", "equipment": "Máquina de Extensiones", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-EXTENSION.gif", "youtubeQuery": "tecnica+extensiones+cuadriceps+maquina", "muscleWikiQuery": "leg+extensions", "cues": "Almohadilla en el empeine, sujetar los agarres para no levantar el glúteo, extensión completa con 1 s de contracción.", "dose": "3 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["sentadilla_sissy", "zancadas_caminando", "step_ups"]}, "sentadilla_sissy": {"id": "sentadilla_sissy", "name": "Sentadilla Sissy con Disco / Banco", "muscle": "Recto Femoral • Estiramiento Extremo", "equipment": "Banco Sissy o Peso Corporal + Disco", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Sissy-Squat.gif", "youtubeQuery": "sentadilla+sissy+cuadriceps", "muscleWikiQuery": "sissy+squat", "cues": "Inclinación del torso hacia atrás manteniendo cadera extendida para estirar al máximo el recto femoral.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["legext", "zancadas_caminando", "step_ups"]}, "zancadas_caminando": {"id": "zancadas_caminando", "name": "Zancadas Caminando con Mancuernas", "muscle": "Cuádriceps & Glúteo • Unilateral", "equipment": "Par de Mancuernas", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lunge.gif", "youtubeQuery": "zancadas+caminando+mancuernas", "muscleWikiQuery": "dumbbell+walking+lunge", "cues": "Paso firme, torso erguido para cuádriceps o ligeramente inclinado para glúteo; rodilla trasera casi roza el suelo.", "dose": "3 × 10-12 reps/pierna", "rir": "RIR 1", "rest": 90, "alternatives": ["legext", "sentadilla_sissy", "step_ups"]}, "step_ups": {"id": "step_ups", "name": "Step-Ups en Cajón / Banco", "muscle": "Cuádriceps & Estabilidad • Unilateral", "equipment": "Cajón Pliométrico o Banco + Mancuerna", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Step-up.gif", "youtubeQuery": "step+up+cajon+mancuerna", "muscleWikiQuery": "dumbbell+step-up", "cues": "Empujar todo el peso a través del talón apoyado en el cajón sin impulsarse con el pie de abajo.", "dose": "3 × 10-12 reps/pierna", "rir": "RIR 1", "rest": 90, "alternatives": ["legext", "sentadilla_sissy", "zancadas_caminando"]}, "curltumbado": {"id": "curltumbado", "name": "Curl Femoral Tumbado", "muscle": "Isquiosurales • Cadera Neutra", "equipment": "Máquina de Curl Tumbado", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lying-Leg-Curl.gif", "youtubeQuery": "tecnica+curl+femoral+tumbado", "muscleWikiQuery": "lying+leg+curl", "cues": "Presionar la pelvis contra el banco para no arquear la zona lumbar. Flexión explosiva y bajada en 3 s.", "dose": "4 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["curl_femoral_sentado", "curl_femoral_unilateral", "curl_femoral_mancuerna"]}, "curl_femoral_sentado": {"id": "curl_femoral_sentado", "name": "Curl Femoral Sentado", "muscle": "Isquiosurales • Máxima Hipertrofia", "equipment": "Máquina de Curl Sentado", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Leg-Curl.gif", "youtubeQuery": "curl+femoral+sentado+tecnica", "muscleWikiQuery": "seated+leg+curl", "cues": "Cadera flexionada a 90° que estira previamente los isquiosurales, produciendo mayor hipertrofia que el tumbado.", "dose": "4 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["curltumbado", "curl_femoral_unilateral", "curl_femoral_mancuerna"]}, "curl_femoral_unilateral": {"id": "curl_femoral_unilateral", "name": "Curl Femoral Unilateral de Pie", "muscle": "Isquiosurales • Corrección Asimetrías", "equipment": "Máquina de Curl de Pie / Polea", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Lever-Standing-Leg-Curl.gif", "youtubeQuery": "curl+femoral+unilateral+de+pie", "muscleWikiQuery": "standing+leg+curl", "cues": "Aísla cada pierna de forma individual para equilibrar descompensaciones musculares entre lados.", "dose": "4 × 12 reps/pierna", "rir": "RIR 0-1", "rest": 75, "alternatives": ["curltumbado", "curl_femoral_sentado", "curl_femoral_mancuerna"]}, "curl_femoral_mancuerna": {"id": "curl_femoral_mancuerna", "name": "Curl Femoral Tumbado con Mancuerna", "muscle": "Isquiosurales • Libre", "equipment": "Banco Plano + Mancuerna entre pies", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lying-Leg-Curl.gif", "youtubeQuery": "curl+femoral+con+mancuerna", "muscleWikiQuery": "dumbbell+lying+leg+curl", "cues": "Sujetar la mancuerna firmemente entre las plantas de los pies; excelente si las máquinas están ocupadas.", "dose": "4 × 10-12 reps", "rir": "RIR 1", "rest": 90, "alternatives": ["curltumbado", "curl_femoral_sentado", "curl_femoral_unilateral"]}, "gemelopie": {"id": "gemelopie", "name": "Elevación de Talones de Pie en Máquina", "muscle": "Gastrocnemio (Gemelos) • Rodilla Recta", "equipment": "Máquina de Gemelos de Pie", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Standing-Calf-Raise.gif", "youtubeQuery": "tecnica+elevacion+talones+pie+gemelos", "muscleWikiQuery": "standing+calf+raises", "cues": "Rodillas bloqueadas rectas, pausa de 2 s en máximo estiramiento abajo (elimina el reflejo miotático del Aquiles).", "dose": "3 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["gemelos_prensa", "gemelos_unilateral", "gemelos_multipower"]}, "gemelos_prensa": {"id": "gemelos_prensa", "name": "Gemelos en Prensa de Piernas", "muscle": "Gastrocnemio • Gran Carga", "equipment": "Prensa 45°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Calf-Press-on-Leg-Press.gif", "youtubeQuery": "gemelos+en+prensa+45", "muscleWikiQuery": "calf+press", "cues": "Puntas de los pies en el borde inferior de la plataforma; empuje controlado sin flexionar rodillas.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["gemelopie", "gemelos_unilateral", "gemelos_multipower"]}, "gemelos_unilateral": {"id": "gemelos_unilateral", "name": "Elevación Unilateral de Gemelos en Escalón", "muscle": "Gastrocnemio • Estiramiento Profundo", "equipment": "Escalón / Step + Mancuerna", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Single-Leg-Calf-Raise.gif", "youtubeQuery": "gemelo+unilateral+en+escalon", "muscleWikiQuery": "dumbbell+single+leg+calf+raise", "cues": "Bajar el talón al máximo sintiendo cómo se abre la fascia plantar; aguantar 2s abajo antes de subir.", "dose": "3 × 12-15 reps/pierna", "rir": "RIR 0", "rest": 75, "alternatives": ["gemelopie", "gemelos_prensa", "gemelos_multipower"]}, "gemelos_multipower": {"id": "gemelos_multipower", "name": "Gemelos en Multipower sobre Step", "muscle": "Gastrocnemio • Sobrecarga Estable", "equipment": "Multipower + Step o Disco", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Smith-Machine-Calf-Raise.gif", "youtubeQuery": "gemelos+en+multipower+step", "muscleWikiQuery": "smith+machine+calf+raise", "cues": "Barra apoyada sobre trapecios; rango completo sin rebotar abajo.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["gemelopie", "gemelos_prensa", "gemelos_unilateral"]}, "plancha": {"id": "plancha", "name": "Plancha Abdominal Isométrica (o Rueda)", "muscle": "Core • Anti-Extensión", "equipment": "Esterilla / Rueda Abdominal", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Plank.gif", "youtubeQuery": "tecnica+plancha+abdominal+correcta", "muscleWikiQuery": "plank", "cues": "Retroversión pélvica activa (meter el ombligo y apretar glúteos al máximo). Cero hundimiento lumbar.", "dose": "3 × 45-60 s", "rir": "Fallo técnico", "rest": 60, "alternatives": ["rueda_abdominal", "paseo_granjero", "pallof_press"]}, "rueda_abdominal": {"id": "rueda_abdominal", "name": "Rueda Abdominal (Ab Wheel Rollout)", "muscle": "Core • Anti-Extensión Avanzada", "equipment": "Rueda Abdominal / Barra con Discos", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Ab-Wheel-Rollout.gif", "youtubeQuery": "rueda+abdominal+tecnica+correcta", "muscleWikiQuery": "ab+wheel+rollout", "cues": "Espalda redondeada (hollow body), rodar hacia delante controlando la tensión con el abdomen.", "dose": "3 × 10-12 reps", "rir": "RIR 1-2", "rest": 75, "alternatives": ["plancha", "paseo_granjero", "pallof_press"]}, "paseo_granjero": {"id": "paseo_granjero", "name": "Paseo del Granjero Pesado (Farmer's Walk)", "muscle": "Core & Estabilidad • Funcional", "equipment": "2 Mancuernas Pesadas o Kettlebells", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Farmers-Walk.gif", "youtubeQuery": "farmers+walk+paseo+granjero", "muscleWikiQuery": "farmers+walk", "cues": "Caminar erguido con pasos cortos y rápidos, hombros firmes y abdomen bloqueado como un bloque.", "dose": "3 × 30-40 metros", "rir": "RIR 1", "rest": 90, "alternatives": ["plancha", "rueda_abdominal", "pallof_press"]}, "pallof_press": {"id": "pallof_press", "name": "Press Pallof en Polea", "muscle": "Core • Anti-Rotación", "equipment": "Polea Media + Estribo", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Cable-Pallof-Press.gif", "youtubeQuery": "press+pallof+polea+core", "muscleWikiQuery": "pallof+press", "cues": "Resistir la torsión lateral del cable manteniendo el torso completamente inmóvil al estirar brazos.", "dose": "3 × 12 reps/lado", "rir": "RIR 1", "rest": 60, "alternatives": ["plancha", "rueda_abdominal", "paseo_granjero"]}, "remouni": {"id": "remouni", "name": "Remo Unilateral con Mancuerna", "muscle": "Dorsal Ancho • Corrección Asimetrías", "equipment": "Mancuerna Pesada + Banco Plano", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Row.gif", "youtubeQuery": "remo+unilateral+mancuerna+tecnica", "muscleWikiQuery": "one+arm+dumbbell+row", "cues": "Rodilla y mano apoyadas; traccionar hacia la cresta ilíaca (cadera) con el codo pegado al torso.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 90, "alternatives": ["remo_unilateral_maquina", "remo_pecho_mancuernas", "remo_kroc"]}, "remo_unilateral_maquina": {"id": "remo_unilateral_maquina", "name": "Remo Unilateral en Máquina de Palanca", "muscle": "Dorsal Ancho • Máxima Tensión", "equipment": "Máquina de Palanca Divergente", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Lever-One-Arm-Row.gif", "youtubeQuery": "remo+unilateral+maquina+dorsal", "muscleWikiQuery": "lever+one+arm+row", "cues": "La curva de resistencia de la máquina sobrecarga el dorsal justo en el punto de contracción máxima.", "dose": "4 × 10-12 reps", "rir": "RIR 1", "rest": 90, "alternatives": ["remouni", "remo_pecho_mancuernas", "remo_kroc"]}, "remo_pecho_mancuernas": {"id": "remo_pecho_mancuernas", "name": "Remo con Mancuernas en Banco Inclinado (Pecho Apoyado)", "muscle": "Espalda Alta & Dorsal • Sin Lumbar", "equipment": "Mancuernas + Banco a 30-45°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Row.gif", "youtubeQuery": "remo+con+mancuernas+pecho+apoyado", "muscleWikiQuery": "chest+supported+dumbbell+row", "cues": "Pecho firme contra el respaldo para no tirar de impulsos ni sobrecargar la espalda baja.", "dose": "4 × 10-12 reps", "rir": "RIR 1", "rest": 90, "alternatives": ["remouni", "remo_unilateral_maquina", "remo_kroc"]}, "remo_kroc": {"id": "remo_kroc", "name": "Kroc Rows Pesados con Mancuerna", "muscle": "Dorsal & Espalda • Fuerza Brutal", "equipment": "Mancuerna Muy Pesada + Banco", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Row.gif", "youtubeQuery": "kroc+rows+tecnica+espalda", "muscleWikiQuery": "kroc+row", "cues": "Remo con mancuerna pesada a altas repeticiones (12-15 reps) con un ligero impulso dinámico del torso.", "dose": "4 × 12-15 reps", "rir": "RIR 0", "rest": 90, "alternatives": ["remouni", "remo_unilateral_maquina", "remo_pecho_mancuernas"]}, "inclinado": {"id": "inclinado", "name": "Press Inclinado con Mancuernas (30°)", "muscle": "Pectoral Superior (Clavicular)", "equipment": "Mancuernas + Banco a 30°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Press.gif", "youtubeQuery": "tecnica+press+inclinado+mancuernas+30+grados", "muscleWikiQuery": "incline+dumbbell+bench+press", "cues": "Inclinación a 30° (no a 45° para que no robe el trabajo el deltoides anterior). Codos a 45-60°.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["press_inclinado_barra", "press_inclinado_maquina", "press_inclinado_multipower"]}, "press_inclinado_barra": {"id": "press_inclinado_barra", "name": "Press Inclinado con Barra (30°)", "muscle": "Pectoral Superior • Fuerza Básica", "equipment": "Barra Olímpica + Banco Inclinado", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Incline-Bench-Press.gif", "youtubeQuery": "press+inclinado+barra+tecnica", "muscleWikiQuery": "incline+barbell+bench+press", "cues": "Bajar la barra tocando la clavícula o parte alta del esternón con control sin rebotar.", "dose": "4 × 6-8 reps", "rir": "RIR 1-2", "rest": 150, "alternatives": ["inclinado", "press_inclinado_maquina", "press_inclinado_multipower"]}, "press_inclinado_maquina": {"id": "press_inclinado_maquina", "name": "Press Inclinado en Máquina Convergente", "muscle": "Pectoral Superior • Tensión Pura", "equipment": "Máquina Inclinada de Placas/Discos", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Lever-Incline-Chest-Press.gif", "youtubeQuery": "press+inclinado+maquina+tecnica", "muscleWikiQuery": "lever+incline+chest+press", "cues": "Trayectoria guiada convergente que exprime el pectoral superior en la parte alta sin fatigar los hombros.", "dose": "4 × 8-10 reps", "rir": "RIR 1", "rest": 120, "alternatives": ["inclinado", "press_inclinado_barra", "press_inclinado_multipower"]}, "press_inclinado_multipower": {"id": "press_inclinado_multipower", "name": "Press Inclinado en Multipower (Smith)", "muscle": "Pectoral Superior • Seguridad al Fallo", "equipment": "Multipower + Banco a 30°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Smith-Machine-Incline-Bench-Press.gif", "youtubeQuery": "press+inclinado+multipower+smith", "muscleWikiQuery": "smith+machine+incline+bench+press", "cues": "Excelente para trabajar al fallo muscular absoluto sin peligro de quedar atrapado bajo el peso.", "dose": "4 × 8-10 reps", "rir": "RIR 0-1", "rest": 120, "alternatives": ["inclinado", "press_inclinado_barra", "press_inclinado_maquina"]}, "jalonneutro": {"id": "jalonneutro", "name": "Jalón al Pecho con Agarre Neutro Cerrado", "muscle": "Dorsal Ancho • Estiramiento", "equipment": "Polea Alta + Maneral V / Triángulo", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/V-bar-Lat-Pulldown.gif", "youtubeQuery": "jalon+pecho+agarre+neutro+triangulo", "muscleWikiQuery": "close+grip+lat+pulldown", "cues": "Foco en acercar los codos a las costillas en el punto de contracción. Estirar dorsal arriba 2 s.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["pullover_polea", "dominadas_neutras", "jalon_supino"]}, "pullover_polea": {"id": "pullover_polea", "name": "Pullover en Polea Alta con Cuerda / Barra", "muscle": "Dorsal Ancho • Aislamiento Sin Bíceps", "equipment": "Polea Alta + Cuerda o Barra Recta", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Straight-Arm-Pulldown.gif", "youtubeQuery": "pullover+polea+alta+dorsal", "muscleWikiQuery": "cable+pulldown", "cues": "Brazos semirrectos con ligera flexión de codos; empujar la barra hacia los muslos comprimiendo el dorsal.", "dose": "4 × 10-12 reps", "rir": "RIR 1", "rest": 90, "alternatives": ["jalonneutro", "dominadas_neutras", "jalon_supino"]}, "dominadas_neutras": {"id": "dominadas_neutras", "name": "Dominadas con Agarre Neutro", "muscle": "Dorsal Ancho • Salud Articular", "equipment": "Barra de Dominadas con Agarre Paralelo", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Parallel-Grip-Pull-up.gif", "youtubeQuery": "dominadas+agarre+neutro", "muscleWikiQuery": "neutral+grip+pull+up", "cues": "El agarre neutro es la posición más anatómica y fuerte para las muñecas y los codos.", "dose": "4 × 6-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["jalonneutro", "pullover_polea", "jalon_supino"]}, "jalon_supino": {"id": "jalon_supino", "name": "Jalón al Pecho con Agarre Supino (Bajo)", "muscle": "Dorsal Inferior & Bíceps", "equipment": "Polea Alta + Barra Recta Agarre Supino", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Underhand-Lat-Pulldown.gif", "youtubeQuery": "jalon+pecho+agarre+supino", "muscleWikiQuery": "reverse+grip+lat+pulldown", "cues": "Palmas mirando hacia ti a la anchura de hombros; gran palanca para llevar los codos muy abajo.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["jalonneutro", "pullover_polea", "dominadas_neutras"]}, "laterales2": {"id": "laterales2", "name": "Elevaciones Laterales en Polea (o Mancuernas)", "muscle": "Deltoides Lateral • Tensión Continua", "equipment": "Polea Baja + Tobillera o Estribo", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif", "youtubeQuery": "elevaciones+laterales+polea+baja", "muscleWikiQuery": "cable+lateral+raise", "cues": "Polea ajustada a la altura de la rodilla o muñeca. Tensión desde el milímetro cero del recorrido.", "dose": "4 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["laterales_mancuernas_estrictas", "laterales_maquina_laterales", "laterales_cruzadas_polea"]}, "laterales_mancuernas_estrictas": {"id": "laterales_mancuernas_estrictas", "name": "Elevaciones Laterales con Mancuernas (Pausa Arriba)", "muscle": "Deltoides Lateral • Estricto", "equipment": "Par de Mancuernas", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lateral-Raise.gif", "youtubeQuery": "elevaciones+laterales+mancuerna+pausa", "muscleWikiQuery": "dumbbell+lateral+raise", "cues": "Pausa deliberada de 1 s en la parte superior sin balancear el torso.", "dose": "4 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["laterales2", "laterales_maquina_laterales", "laterales_cruzadas_polea"]}, "laterales_maquina_laterales": {"id": "laterales_maquina_laterales", "name": "Elevaciones Laterales en Máquina", "muscle": "Deltoides Lateral • Aislamiento Guiado", "equipment": "Máquina de Deltoides Lateral", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Lever-Lateral-Raise.gif", "youtubeQuery": "elevaciones+laterales+en+maquina", "muscleWikiQuery": "lever+lateral+raise", "cues": "Almohadillas apoyadas en la parte externa de los codos; máxima concentración en el deltoides lateral.", "dose": "4 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["laterales2", "laterales_mancuernas_estrictas", "laterales_cruzadas_polea"]}, "laterales_cruzadas_polea": {"id": "laterales_cruzadas_polea", "name": "Elevaciones Laterales Cruzadas en Polea Doble", "muscle": "Deltoides Lateral • Y-Raises", "equipment": "Doble Polea Cruzada", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Rear-Delt-Fly.gif", "youtubeQuery": "elevaciones+laterales+cruzadas+polea", "muscleWikiQuery": "cable+cross+lateral+raise", "cues": "Cruzar los cables por delante del cuerpo para iniciar el movimiento con máximo estiramiento.", "dose": "4 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["laterales2", "laterales_mancuernas_estrictas", "laterales_maquina_laterales"]}, "facepull": {"id": "facepull", "name": "Face Pull en Polea Alta", "muscle": "Deltoides Posterior & Manguito", "equipment": "Polea Alta + Cuerda", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Face-Pull.gif", "youtubeQuery": "tecnica+face+pull+cuerda+correcta", "muscleWikiQuery": "face+pull", "cues": "Tirar hacia el puente de la nariz con rotación externa (pulgares hacia atrás), aguantar 1 s apretando escápulas.", "dose": "3 × 12-15 reps", "rir": "RIR 1", "rest": 75, "alternatives": ["pajaros_mancuerna", "pajaros_pecdeck", "cruces_polea_inversa"]}, "pajaros_mancuerna": {"id": "pajaros_mancuerna", "name": "Pájaros con Mancuerna en Banco Inclinado", "muscle": "Deltoides Posterior • Pecho Apoyado", "equipment": "Mancuernas + Banco a 30-45°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Rear-Delt-Fly.gif", "youtubeQuery": "pajaros+mancuerna+banco+inclinado", "muscleWikiQuery": "incline+dumbbell+rear+delt+raise", "cues": "Pecho apoyado para evitar tirones de espalda baja; abrir en arco amplio como abrazando un barril.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["facepull", "pajaros_pecdeck", "cruces_polea_inversa"]}, "pajaros_pecdeck": {"id": "pajaros_pecdeck", "name": "Pájaros en Máquina Pec-Deck Invertida", "muscle": "Deltoides Posterior • Aislamiento Puro", "equipment": "Máquina Pec-Deck Inversa", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Rear-Delt-Machine-Flys.gif", "youtubeQuery": "pajaros+en+maquina+pec+deck+inversa", "muscleWikiQuery": "rear+delt+machine+flys", "cues": "Asiento ajustado para que los brazos queden paralelos al suelo; abrir empujando con el dorso de la mano.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["facepull", "pajaros_mancuerna", "cruces_polea_inversa"]}, "cruces_polea_inversa": {"id": "cruces_polea_inversa", "name": "Cruces Inversos en Poleas Altas", "muscle": "Deltoides Posterior • Tensión Continua", "equipment": "Doble Polea Alta sin manerales", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Rear-Delt-Fly.gif", "youtubeQuery": "cruces+inversos+en+poleas+altas", "muscleWikiQuery": "cable+rear+delt+fly", "cues": "Tomar los cables cruzados con las manos desnudas y abrir hacia atrás a la altura de los ojos.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["facepull", "pajaros_mancuerna", "pajaros_pecdeck"]}, "frances": {"id": "frances", "name": "Press Francés con Barra Z o Mancuernas", "muscle": "Tríceps • Cabeza Larga", "equipment": "Barra Z o Mancuernas + Banco Plano", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lying-Triceps-Extension.gif", "youtubeQuery": "tecnica+press+frances+barra+z", "muscleWikiQuery": "lying+triceps+extension", "cues": "Bajar la barra hacia detrás de la coronilla (no hacia la frente) para mantener tensión en la cabeza larga del tríceps.", "dose": "3 × 10-12 reps", "rir": "RIR 1", "rest": 90, "alternatives": ["triceps_trasnuca_polea", "katana_extensions", "press_cerrado_banca"]}, "triceps_trasnuca_polea": {"id": "triceps_trasnuca_polea", "name": "Extensión de Tríceps Tras Nuca en Polea", "muscle": "Cabeza Larga • Cero Dolor de Codo", "equipment": "Polea Baja + Cuerda", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Overhead-Triceps-Extension.gif", "youtubeQuery": "extension+triceps+trasnuca+polea", "muscleWikiQuery": "cable+overhead+triceps+extension", "cues": "La polea mantiene tensión constante sin el impacto articular en los codos que a veces produce la barra libre.", "dose": "3 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["frances", "katana_extensions", "press_cerrado_banca"]}, "katana_extensions": {"id": "katana_extensions", "name": "Katana Extensions en Doble Polea", "muscle": "Cabeza Larga • Estiramiento Extremo", "equipment": "Doble Polea Alta Cruzada", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Cable-Rear-Drive.gif", "youtubeQuery": "katana+extensions+triceps+polea", "muscleWikiQuery": "katana+tricep+extension", "cues": "Cables cruzados saliendo por encima de los hombros; extensión en el plano escapular natural.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["frances", "triceps_trasnuca_polea", "press_cerrado_banca"]}, "press_cerrado_banca": {"id": "press_cerrado_banca", "name": "Press de Banca con Agarre Estrecho", "muscle": "Tríceps • Gran Sobrecarga de Masa", "equipment": "Barra Olímpica + Banco Plano", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Close-Grip-Bench-Press.gif", "youtubeQuery": "press+banca+agarre+estrecho+triceps", "muscleWikiQuery": "close-grip+bench+press", "cues": "Manos a la anchura de hombros (no más juntas para no dañar muñecas); codos pegados al cuerpo al bajar.", "dose": "3 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["frances", "triceps_trasnuca_polea", "katana_extensions"]}, "martillo": {"id": "martillo", "name": "Curl Martillo con Mancuernas", "muscle": "Braquial & Antebrazo • Grosor", "equipment": "Par de Mancuernas", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hammer-Curl.gif", "youtubeQuery": "tecnica+curl+martillo+mancuernas", "muscleWikiQuery": "hammer+curls", "cues": "Palmas enfrentadas en todo el recorrido. Empuja el bíceps hacia arriba ensanchando el brazo de perfil.", "dose": "3 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["curl_martillo_polea", "curl_inverso_barra", "curl_martillo_predicador"]}, "curl_martillo_polea": {"id": "curl_martillo_polea", "name": "Curl Martillo en Polea Baja con Cuerda", "muscle": "Braquial & Braquiorradial • Tensión", "equipment": "Polea Baja + Cuerda", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Hammer-Curl.gif", "youtubeQuery": "curl+martillo+polea+cuerda", "muscleWikiQuery": "cable+hammer+curl", "cues": "Sujetar la cuerda en agarre neutro; tensión constante incluso en el punto de estiramiento abajo.", "dose": "3 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["martillo", "curl_inverso_barra", "curl_martillo_predicador"]}, "curl_inverso_barra": {"id": "curl_inverso_barra", "name": "Curl Inverso con Barra Z", "muscle": "Braquiorradial • Antebrazo", "equipment": "Barra Z con agarre prono", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Reverse-Barbell-Curl.gif", "youtubeQuery": "curl+inverso+barra+z+antebrazo", "muscleWikiQuery": "reverse+barbell+curl", "cues": "Agarre en pronación (palmas hacia abajo); desarrollo brutal del antebrazo y del braquial anterior.", "dose": "3 × 10-12 reps", "rir": "RIR 1", "rest": 90, "alternatives": ["martillo", "curl_martillo_polea", "curl_martillo_predicador"]}, "curl_martillo_predicador": {"id": "curl_martillo_predicador", "name": "Curl Martillo en Banco Predicador", "muscle": "Braquial • Cero Trampa", "equipment": "Banco Scott + Mancuernas", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Dumbbell-Preacher-Hammer-Curl.gif", "youtubeQuery": "curl+martillo+predicador+scott", "muscleWikiQuery": "preacher+hammer+curl", "cues": "Brazos apoyados en la almohadilla inclinada; bloquea totalmente el balanceo corporal.", "dose": "3 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["martillo", "curl_martillo_polea", "curl_inverso_barra"]}, "rdl": {"id": "rdl", "name": "Peso Muerto Rumano (RDL) con Barra", "muscle": "Isquiosurales & Glúteo Mayor • Bisagra", "equipment": "Barra Olímpica con Discos", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Romanian-Deadlift.gif", "youtubeQuery": "tecnica+rdl+peso+muerto+rumano+barra", "muscleWikiQuery": "barbell+romanian+deadlift", "cues": "Rodillas semirrígidas (15-20° de flexión fija), empujar el glúteo hacia la pared trasera, barra rozando los muslos. Cero flexión lumbar.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 150, "alternatives": ["rdl_multipower", "rdl_mancuernas", "hip_thrust"]}, "rdl_multipower": {"id": "rdl_multipower", "name": "RDL en Multipower (Smith)", "muscle": "Isquiosurales & Glúteo • Guiado Estable", "equipment": "Máquina Multipower (Smith Machine)", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Smith-Machine-Romanian-Deadlift.gif", "youtubeQuery": "rdl+multipower+smith+tecnica", "muscleWikiQuery": "smith+machine+romanian+deadlift", "cues": "Trayectoria vertical pura. Permite centrarse exclusivamente en empujar la cadera atrás sin preocuparse del equilibrio.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["rdl", "rdl_mancuernas", "hip_thrust"]}, "rdl_mancuernas": {"id": "rdl_mancuernas", "name": "RDL con Mancuernas Pesadas", "muscle": "Isquiosurales • Trayectoria Natural", "equipment": "Par de Mancuernas Pesadas", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Romanian-Deadlift.gif", "youtubeQuery": "peso+muerto+rumano+mancuernas", "muscleWikiQuery": "dumbbell+romanian+deadlift", "cues": "Las mancuernas pueden ir por los laterales de las piernas, permitiendo una trayectoria más anatómica y menos tensión lumbar.", "dose": "4 × 8-10 reps", "rir": "RIR 1-2", "rest": 120, "alternatives": ["rdl", "rdl_multipower", "hip_thrust"]}, "hip_thrust": {"id": "hip_thrust", "name": "Hip Thrust con Barra en Banco", "muscle": "Glúteo Mayor • Máximo Acortamiento", "equipment": "Barra Acolchada + Banco", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Hip-Thrust.gif", "youtubeQuery": "tecnica+hip+thrust+gluteo", "muscleWikiQuery": "barbell+hip+thrust", "cues": "Mirada al frente (mentón pegado al pecho), empujar con los talones y apretar glúteos arriba 1 s bloqueando la pelvis.", "dose": "4 × 8-10 reps", "rir": "RIR 1", "rest": 120, "alternatives": ["rdl", "rdl_multipower", "rdl_mancuernas"]}, "bulgarian": {"id": "bulgarian", "name": "Sentadilla Búlgara con Mancuernas", "muscle": "Glúteos & Cuádriceps • Cero Fatiga Lumbar", "equipment": "Mancuernas + Banco Detrás", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Bulgarian-Split-Squat.gif", "youtubeQuery": "tecnica+sentadilla+bulgara+mancuernas", "muscleWikiQuery": "dumbbell+bulgarian+split+squat", "cues": "Empeine trasero apoyado en banco; inclinación leve del torso (15°) para mayor reclutamiento de glúteo.", "dose": "3 × 8-10 reps/pierna", "rir": "RIR 1-2", "rest": 90, "alternatives": ["bulgarian_multipower", "prensa_unilateral", "zancadas_estaticas"]}, "bulgarian_multipower": {"id": "bulgarian_multipower", "name": "Sentadilla Búlgara en Multipower", "muscle": "Glúteos & Cuádriceps • Estabilidad Total", "equipment": "Multipower + Banco", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Smith-Machine-Bulgarian-Split-Squat.gif", "youtubeQuery": "sentadilla+bulgara+multipower+smith", "muscleWikiQuery": "smith+machine+bulgarian+split+squat", "cues": "Elimina el factor equilibrio para poder empujar con cargas mucho más altas y máxima tensión en la pierna delantera.", "dose": "3 × 8-10 reps/pierna", "rir": "RIR 1", "rest": 90, "alternatives": ["bulgarian", "prensa_unilateral", "zancadas_estaticas"]}, "prensa_unilateral": {"id": "prensa_unilateral", "name": "Prensa de Piernas Unilateral (1 Pierna)", "muscle": "Cuádriceps & Glúteo • Aislamiento", "equipment": "Prensa 45°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Leg-Press.gif", "youtubeQuery": "prensa+unilateral+una+pierna", "muscleWikiQuery": "single+leg+press", "cues": "Trabajar una sola pierna permite concentrar el empuje y eliminar asimetrías de fuerza entre piernas.", "dose": "3 × 10-12 reps/pierna", "rir": "RIR 1", "rest": 90, "alternatives": ["bulgarian", "bulgarian_multipower", "zancadas_estaticas"]}, "zancadas_estaticas": {"id": "zancadas_estaticas", "name": "Zancadas Estáticas con Mancuernas (Split Squat)", "muscle": "Cuádriceps & Glúteo", "equipment": "Par de Mancuernas en el suelo", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lunge.gif", "youtubeQuery": "split+squat+zancada+estatica", "muscleWikiQuery": "dumbbell+split+squat", "cues": "Pies en el suelo sin elevar el pie trasero en banco; excelente alternativa si cuesta mantener el equilibrio en la búlgara.", "dose": "3 × 10-12 reps/pierna", "rir": "RIR 1", "rest": 90, "alternatives": ["bulgarian", "bulgarian_multipower", "prensa_unilateral"]}, "curlsentado": {"id": "curlsentado", "name": "Curl Femoral Sentado", "muscle": "Isquiosurales • Cadera Flexionada", "equipment": "Máquina de Curl Sentado", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Leg-Curl.gif", "youtubeQuery": "tecnica+curl+femoral+sentado", "muscleWikiQuery": "seated+leg+curl", "cues": "Ajustar el rodillo superior firmemente contra los muslos para evitar que las caderas se levanten. Aguantar 1 s abajo.", "dose": "4 × 10-12 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["curltumbado", "curl_nordico", "curl_pie_polea"]}, "curl_nordico": {"id": "curl_nordico", "name": "Curl Nórdico Asistido con Elástica", "muscle": "Isquiosurales • Fuerza Excéntrica", "equipment": "Tobillos fijados + Banda Elástica", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Nordic-Hamstring-Curl.gif", "youtubeQuery": "curl+nordico+asistido+isquios", "muscleWikiQuery": "nordic+hamstring+curl", "cues": "Bajar resistiendo la gravedad durante 4-5 s; el mejor ejercicio para prevenir lesiones y ganar fuerza excéntrica en isquios.", "dose": "4 × 6-8 reps", "rir": "RIR 1", "rest": 120, "alternatives": ["curlsentado", "curltumbado", "curl_pie_polea"]}, "curl_pie_polea": {"id": "curl_pie_polea", "name": "Curl Femoral de Pie en Polea con Tobillera", "muscle": "Isquiosurales • Unilateral", "equipment": "Polea Baja + Tobillera", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Cable-Standing-Leg-Curl.gif", "youtubeQuery": "curl+femoral+pie+polea+tobillera", "muscleWikiQuery": "standing+cable+leg+curl", "cues": "Fijar el muslo y flexionar la rodilla llevando el talón al glúteo; gran tensión en acortamiento.", "dose": "4 × 12 reps/pierna", "rir": "RIR 0-1", "rest": 75, "alternatives": ["curlsentado", "curltumbado", "curl_nordico"]}, "legextb": {"id": "legextb", "name": "Extensiones de Cuádriceps en Máquina", "muscle": "Cuádriceps • Bombeo Final", "equipment": "Máquina de Extensiones", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-EXTENSION.gif", "youtubeQuery": "extensiones+cuadriceps+bombeo", "muscleWikiQuery": "leg+extensions", "cues": "Rango completo con pausa arriba de 1 s; en la última serie aplicar dropset o pausa isométrica final de 10 s.", "dose": "3 × 12-15 reps", "rir": "RIR 0", "rest": 75, "alternatives": ["sentadilla_goblet", "prensa_pies_bajos", "sissy_squat"]}, "sentadilla_goblet": {"id": "sentadilla_goblet", "name": "Sentadilla Goblet Profunda con Talones Elevados", "muscle": "Cuádriceps • Máxima Flexión de Rodilla", "equipment": "Mancuerna al pecho + Talones en disco", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Goblet-Squat.gif", "youtubeQuery": "sentadilla+goblet+talones+elevados", "muscleWikiQuery": "dumbbell+goblet+squat", "cues": "Talones elevados en cuña o disco para permitir desplazamiento de rodillas hacia delante y aislar los cuádriceps.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["legextb", "prensa_pies_bajos", "sissy_squat"]}, "prensa_pies_bajos": {"id": "prensa_pies_bajos", "name": "Prensa de Piernas con Pies Bajos y Juntos", "muscle": "Vasto Externo & Cuádriceps", "equipment": "Prensa 45°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Leg-Press.gif", "youtubeQuery": "prensa+pies+bajos+cuadriceps", "muscleWikiQuery": "leg+press", "cues": "Colocar los pies juntos y en la zona inferior de la plataforma para maximizar la flexión de rodilla.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 90, "alternatives": ["legextb", "sentadilla_goblet", "sissy_squat"]}, "sissy_squat": {"id": "sissy_squat", "name": "Sentadilla Sissy", "muscle": "Recto Femoral", "equipment": "Banco Sissy o Suelo", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Sissy-Squat.gif", "youtubeQuery": "sissy+squat+tecnica", "muscleWikiQuery": "sissy+squat", "cues": "Bajar llevando las rodillas adelante y el torso atrás en una línea recta desde hombros a rodillas.", "dose": "3 × 12-15 reps", "rir": "RIR 0", "rest": 75, "alternatives": ["legextb", "sentadilla_goblet", "prensa_pies_bajos"]}, "gemelosentado": {"id": "gemelosentado", "name": "Elevación de Talones Sentado en Máquina", "muscle": "Sóleo • Rodilla a 90°", "equipment": "Máquina de Gemelo Sentado", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Calf-Raise.gif", "youtubeQuery": "tecnica+gemelo+sentado+soleo", "muscleWikiQuery": "seated+calf+raise", "cues": "Con la rodilla flexionada a 90° el gastrocnemio queda inhibido por insuficiencia activa, focalizando el sóleo.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["gemelo_sentado_barra", "gemelo_sentado_multipower", "gemelo_prensa_flex"]}, "gemelo_sentado_barra": {"id": "gemelo_sentado_barra", "name": "Gemelo Sentado con Barra / Mancuerna sobre Muslos", "muscle": "Sóleo • Libre", "equipment": "Banco + Barra Acolchada sobre muslos", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Seated-Calf-Raise.gif", "youtubeQuery": "gemelo+sentado+con+barra", "muscleWikiQuery": "barbell+seated+calf+raise", "cues": "Sentado en banco con un disco bajo las puntas de los pies y una barra o mancuerna pesada sobre las rodillas.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["gemelosentado", "gemelo_sentado_multipower", "gemelo_prensa_flex"]}, "gemelo_sentado_multipower": {"id": "gemelo_sentado_multipower", "name": "Gemelo Sentado en Multipower", "muscle": "Sóleo • Carga Estable", "equipment": "Multipower + Banco + Step", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Smith-Machine-Calf-Raise.gif", "youtubeQuery": "gemelo+sentado+en+multipower", "muscleWikiQuery": "smith+machine+seated+calf+raise", "cues": "Sentado con la barra del multipower acolchada sobre los muslos; permite meter alta carga con estabilidad.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["gemelosentado", "gemelo_sentado_barra", "gemelo_prensa_flex"]}, "gemelo_prensa_flex": {"id": "gemelo_prensa_flex", "name": "Gemelos en Prensa con Rodillas Semiflexionadas", "muscle": "Sóleo & Gastrocnemio", "equipment": "Prensa 45°", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Calf-Press-on-Leg-Press.gif", "youtubeQuery": "gemelos+en+prensa+rodillas+flexionadas", "muscleWikiQuery": "calf+press", "cues": "Mantener 30 grados de flexión constante de rodilla durante todo el empuje de tobillo para activar el sóleo.", "dose": "3 × 15 reps", "rir": "RIR 0-1", "rest": 75, "alternatives": ["gemelosentado", "gemelo_sentado_barra", "gemelo_sentado_multipower"]}, "crunch": {"id": "crunch", "name": "Crunch en Polea Alta Arrodillado", "muscle": "Recto Abdominal • Flexión Espinal", "equipment": "Polea Alta + Cuerda", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Kneeling-Cable-Crunch.gif", "youtubeQuery": "tecnica+crunch+polea+alta+arrodillado", "muscleWikiQuery": "cable+kneeling+crunch", "cues": "Fijar la cadera en el espacio; no flexionar caderas, sino doblar la columna dorsal enrollando la caja torácica hacia la pelvis.", "dose": "3 × 12-15 reps", "rir": "RIR 1", "rest": 75, "alternatives": ["elevacion_piernas", "crunch_suelo_lastrado", "crunch_maquina"]}, "elevacion_piernas": {"id": "elevacion_piernas", "name": "Elevación de Piernas o Rodillas Colgado", "muscle": "Abdomen Inferior & Core", "equipment": "Barra de Dominadas o Torre de Paralelas", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hanging-Leg-Raise.gif", "youtubeQuery": "elevacion+piernas+colgado+abdomen", "muscleWikiQuery": "hanging+leg+raise", "cues": "Rodar la pelvis hacia el pecho al subir (no solo subir las piernas con los flexores de cadera).", "dose": "3 × 10-15 reps", "rir": "RIR 1", "rest": 75, "alternatives": ["crunch", "crunch_suelo_lastrado", "crunch_maquina"]}, "crunch_suelo_lastrado": {"id": "crunch_suelo_lastrado", "name": "Crunch en Suelo o Banco Declinado con Disco", "muscle": "Recto Abdominal • Sobrecarga", "equipment": "Disco al pecho o tras la cabeza + Esterilla", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Weighted-Crunch.gif", "youtubeQuery": "crunch+abdominal+con+disco", "muscleWikiQuery": "weighted+crunch", "cues": "Sostener un disco sobre el pecho; flexión controlada de la parte superior del tronco exhalando todo el aire.", "dose": "3 × 12-15 reps", "rir": "RIR 0-1", "rest": 60, "alternatives": ["crunch", "elevacion_piernas", "crunch_maquina"]}, "crunch_maquina": {"id": "crunch_maquina", "name": "Crunch Abdominal en Máquina", "muscle": "Recto Abdominal • Resistencia Guiada", "equipment": "Máquina de Crunch Abdominal", "demoGif": "https://fitnessprogramer.com/wp-content/uploads/2021/04/Lever-Seated-Crunch.gif", "youtubeQuery": "crunch+abdominal+en+maquina", "muscleWikiQuery": "lever+seated+crunch", "cues": "Permite sobrecarga progresiva milimétrica mediante placas ajustables sin fatigar el cuello.", "dose": "3 × 12-15 reps", "rir": "RIR 1", "rest": 75, "alternatives": ["crunch", "elevacion_piernas", "crunch_suelo_lastrado"]}};
-    const ROUTINE_SLOTS = {"torsoA": {"title": "Torso A • Fuerza & Empuje", "meta": "7 Ejercicios • 23 Series Efectivas • ~75 min", "slots": [{"slotId": "torsoA_1", "defaultExId": "banca", "num": 1, "sets": [["80", "8"], ["80", "8"], ["80", "7"], ["80", "6"]]}, {"slotId": "torsoA_2", "defaultExId": "jalon", "num": 2, "sets": [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]]}, {"slotId": "torsoA_3", "defaultExId": "militar", "num": 3, "sets": [["24", "10"], ["24", "10"], ["24", "8"]]}, {"slotId": "torsoA_4", "defaultExId": "remo", "num": 4, "sets": [["65", "10"], ["65", "10"], ["65", "9"]]}, {"slotId": "torsoA_5", "defaultExId": "laterales1", "num": 5, "sets": [["12", "15"], ["12", "14"], ["12", "12"], ["12", "12"]]}, {"slotId": "torsoA_6", "defaultExId": "triceps1", "num": 6, "sets": [["30", "12"], ["30", "11"], ["30", "10"]]}, {"slotId": "torsoA_7", "defaultExId": "biceps1", "num": 7, "sets": [["16", "12"], ["16", "10"], ["16", "10"]]}]}, "piernaA": {"title": "Pierna A • Sentadilla & Cuádriceps", "meta": "5 Ejercicios • 17 Series Efectivas • ~70 min", "slots": [{"slotId": "piernaA_1", "defaultExId": "squat", "num": 1, "sets": [["100", "8"], ["100", "8"], ["100", "7"], ["100", "6"]]}, {"slotId": "piernaA_2", "defaultExId": "legext", "num": 2, "sets": [["60", "12"], ["60", "11"], ["60", "10"]]}, {"slotId": "piernaA_3", "defaultExId": "curltumbado", "num": 3, "sets": [["45", "12"], ["45", "11"], ["45", "10"], ["45", "10"]]}, {"slotId": "piernaA_4", "defaultExId": "gemelopie", "num": 4, "sets": [["70", "12"], ["70", "12"], ["70", "10"]]}, {"slotId": "piernaA_5", "defaultExId": "plancha", "num": 5, "sets": [["0", "60"], ["0", "50"], ["0", "45"]]}]}, "torsoB": {"title": "Torso B • Tracción & Hipertrofia", "meta": "7 Ejercicios • 23 Series Efectivas • ~80 min", "slots": [{"slotId": "torsoB_1", "defaultExId": "remouni", "num": 1, "sets": [["34", "10"], ["34", "10"], ["34", "9"], ["34", "8"]]}, {"slotId": "torsoB_2", "defaultExId": "inclinado", "num": 2, "sets": [["30", "10"], ["30", "10"], ["30", "8"], ["30", "8"]]}, {"slotId": "torsoB_3", "defaultExId": "jalonneutro", "num": 3, "sets": [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]]}, {"slotId": "torsoB_4", "defaultExId": "laterales2", "num": 4, "sets": [["10", "15"], ["10", "14"], ["10", "13"], ["10", "12"]]}, {"slotId": "torsoB_5", "defaultExId": "facepull", "num": 5, "sets": [["25", "15"], ["25", "14"], ["25", "12"]]}, {"slotId": "torsoB_6", "defaultExId": "frances", "num": 6, "sets": [["32", "12"], ["32", "10"], ["32", "10"]]}, {"slotId": "torsoB_7", "defaultExId": "martillo", "num": 7, "sets": [["16", "12"], ["16", "11"], ["16", "10"]]}]}, "piernaB": {"title": "Pierna B • Cadena Posterior & Búlgaras", "meta": "6 Ejercicios • 20 Series Efectivas • ~75 min", "slots": [{"slotId": "piernaB_1", "defaultExId": "rdl", "num": 1, "sets": [["90", "10"], ["90", "10"], ["90", "9"], ["90", "8"]]}, {"slotId": "piernaB_2", "defaultExId": "bulgarian", "num": 2, "sets": [["20", "10"], ["20", "10"], ["20", "8"]]}, {"slotId": "piernaB_3", "defaultExId": "curlsentado", "num": 3, "sets": [["55", "12"], ["55", "11"], ["55", "10"], ["55", "10"]]}, {"slotId": "piernaB_4", "defaultExId": "legextb", "num": 4, "sets": [["55", "15"], ["55", "14"], ["55", "12"]]}, {"slotId": "piernaB_5", "defaultExId": "gemelosentado", "num": 5, "sets": [["45", "15"], ["45", "14"], ["45", "12"]]}, {"slotId": "piernaB_6", "defaultExId": "crunch", "num": 6, "sets": [["40", "15"], ["40", "14"], ["40", "12"]]}]}};
+    const ROUTINE_SLOTS = {"torsoA": {"title": "Día 1: Torso A • Fuerza & Empuje", "dayNum": "Día 1", "shortName": "Día 1: Torso A • Empuje", "totalSets": 23, "slots": [{"slotId": "torsoA_1", "defaultExId": "banca", "num": 1, "sets": [["80", "8"], ["80", "8"], ["80", "7"], ["80", "6"]]}, {"slotId": "torsoA_2", "defaultExId": "jalon", "num": 2, "sets": [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]]}, {"slotId": "torsoA_3", "defaultExId": "militar", "num": 3, "sets": [["24", "10"], ["24", "10"], ["24", "8"]]}, {"slotId": "torsoA_4", "defaultExId": "remo", "num": 4, "sets": [["65", "10"], ["65", "10"], ["65", "9"]]}, {"slotId": "torsoA_5", "defaultExId": "laterales1", "num": 5, "sets": [["12", "15"], ["12", "14"], ["12", "12"], ["12", "12"]]}, {"slotId": "torsoA_6", "defaultExId": "triceps1", "num": 6, "sets": [["30", "12"], ["30", "11"], ["30", "10"]]}, {"slotId": "torsoA_7", "defaultExId": "biceps1", "num": 7, "sets": [["16", "12"], ["16", "10"], ["16", "10"]]}]}, "piernaA": {"title": "Día 2: Pierna A • Sentadilla & Cuádriceps", "dayNum": "Día 2", "shortName": "Día 2: Pierna A • Cuádriceps", "totalSets": 17, "slots": [{"slotId": "piernaA_1", "defaultExId": "squat", "num": 1, "sets": [["100", "8"], ["100", "8"], ["100", "7"], ["100", "6"]]}, {"slotId": "piernaA_2", "defaultExId": "legext", "num": 2, "sets": [["60", "12"], ["60", "11"], ["60", "10"]]}, {"slotId": "piernaA_3", "defaultExId": "curltumbado", "num": 3, "sets": [["45", "12"], ["45", "11"], ["45", "10"], ["45", "10"]]}, {"slotId": "piernaA_4", "defaultExId": "gemelopie", "num": 4, "sets": [["70", "12"], ["70", "12"], ["70", "10"]]}, {"slotId": "piernaA_5", "defaultExId": "plancha", "num": 5, "sets": [["0", "60"], ["0", "50"], ["0", "45"]]}]}, "torsoB": {"title": "Día 3: Torso B • Tracción & Hipertrofia", "dayNum": "Día 3", "shortName": "Día 3: Torso B • Tracción", "totalSets": 23, "slots": [{"slotId": "torsoB_1", "defaultExId": "remouni", "num": 1, "sets": [["34", "10"], ["34", "10"], ["34", "9"], ["34", "8"]]}, {"slotId": "torsoB_2", "defaultExId": "inclinado", "num": 2, "sets": [["30", "10"], ["30", "10"], ["30", "8"], ["30", "8"]]}, {"slotId": "torsoB_3", "defaultExId": "jalonneutro", "num": 3, "sets": [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]]}, {"slotId": "torsoB_4", "defaultExId": "laterales2", "num": 4, "sets": [["10", "15"], ["10", "14"], ["10", "13"], ["10", "12"]]}, {"slotId": "torsoB_5", "defaultExId": "facepull", "num": 5, "sets": [["25", "15"], ["25", "14"], ["25", "12"]]}, {"slotId": "torsoB_6", "defaultExId": "frances", "num": 6, "sets": [["32", "12"], ["32", "10"], ["32", "10"]]}, {"slotId": "torsoB_7", "defaultExId": "martillo", "num": 7, "sets": [["16", "12"], ["16", "11"], ["16", "10"]]}]}, "piernaB": {"title": "Día 4: Pierna B • Cadena Posterior & Búlgaras", "dayNum": "Día 4", "shortName": "Día 4: Pierna B • Isquios", "totalSets": 20, "slots": [{"slotId": "piernaB_1", "defaultExId": "rdl", "num": 1, "sets": [["90", "10"], ["90", "10"], ["90", "9"], ["90", "8"]]}, {"slotId": "piernaB_2", "defaultExId": "bulgarian", "num": 2, "sets": [["20", "10"], ["20", "10"], ["20", "8"]]}, {"slotId": "piernaB_3", "defaultExId": "curlsentado", "num": 3, "sets": [["55", "12"], ["55", "11"], ["55", "10"], ["55", "10"]]}, {"slotId": "piernaB_4", "defaultExId": "legextb", "num": 4, "sets": [["55", "15"], ["55", "14"], ["55", "12"]]}, {"slotId": "piernaB_5", "defaultExId": "gemelosentado", "num": 5, "sets": [["45", "15"], ["45", "14"], ["45", "12"]]}, {"slotId": "piernaB_6", "defaultExId": "crunch", "num": 6, "sets": [["40", "15"], ["40", "14"], ["40", "12"]]}]}};
 
     let workoutState = {
       inputs: {},
@@ -3019,11 +2952,12 @@
     // Active session live ticker interval
     let sessionTickerInterval = null;
 
-    // Navigation
+    // Navigation via dropdown selector
     function selectDay(dayId) {
-      document.querySelectorAll('.nav-pill').forEach(btn => btn.classList.remove('active'));
+      const sel = document.getElementById('daySelector');
+      if (sel && sel.value !== dayId) sel.value = dayId;
+
       document.querySelectorAll('.day-content').forEach(content => content.classList.remove('active'));
-      if (event && event.currentTarget) event.currentTarget.classList.add('active');
       const target = document.getElementById(dayId);
       if (target) target.classList.add('active');
       
@@ -3033,6 +2967,15 @@
         updateProgress();
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Guide Modal
+    function openGuideModal() {
+      document.getElementById('guideModal').classList.add('open');
+    }
+    function closeGuideModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn')) return;
+      document.getElementById('guideModal').classList.remove('open');
     }
 
     // Toggle 3D Player
@@ -3071,7 +3014,7 @@
 
     // Start Session Timer automatically when user starts logging
     function startSessionTimerIfNeeded(dayId) {
-      if (!dayId || dayId === 'guia' || dayId === 'historialView') return;
+      if (!dayId || dayId === 'historialView') return;
       if (!workoutState.sessionStartTime) workoutState.sessionStartTime = {};
       if (!workoutState.sessionStartTime[dayId]) {
         workoutState.sessionStartTime[dayId] = Date.now();
@@ -3168,17 +3111,20 @@
     // Workout Progress Calculator
     function updateProgress() {
       const activeContent = document.querySelector('.day-content.active');
-      if (!activeContent || activeContent.id === 'guia' || activeContent.id === 'historialView') return;
+      if (!activeContent || activeContent.id === 'historialView') return;
 
       const totalSets = activeContent.querySelectorAll('.set-row').length;
       const doneSets = activeContent.querySelectorAll('.set-row.done').length;
       const percentage = totalSets > 0 ? (doneSets / totalSets) * 100 : 0;
 
       const bar = document.getElementById('workoutProgressBar');
-      const chip = document.getElementById('progressChip');
-      
       if (bar) bar.style.width = percentage + '%';
-      if (chip) chip.innerText = `${doneSets}/${totalSets} series (${Math.round(percentage)}%)`;
+
+      // Update the progress chip inside the active day banner
+      const bannerChip = document.getElementById('progressChip-' + activeContent.id);
+      if (bannerChip) {
+        bannerChip.innerText = `${doneSets}/${totalSets} series (${Math.round(percentage)}%)`;
+      }
     }
 
     // Finish & Archive Day Session
@@ -3498,13 +3444,6 @@
       const cuesEl = document.getElementById('cues-' + slotId);
       if (cuesEl) cuesEl.innerText = ex.cues;
 
-      // Update alternatives list text in drawer
-      const altsEl = document.getElementById('alts-' + slotId);
-      if (altsEl && ex.alternatives) {
-        const names = ex.alternatives.map(id => EXERCISE_CATALOG[id] ? EXERCISE_CATALOG[id].name : id);
-        altsEl.innerText = names.join(' • ');
-      }
-
       // Update Anterior column for this specific exercise
       const exPrev = workoutState.previous[exId] || {};
       const rows = card.querySelectorAll('.set-row');
@@ -3760,7 +3699,7 @@
       const downloadAnchor = document.createElement('a');
       const dateSlug = new Date().toISOString().slice(0, 10);
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `aesthetic_gym_backup_${dateSlug}.json`);
+      downloadAnchor.setAttribute("download", `gym_poderoso_backup_${dateSlug}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -3769,7 +3708,7 @@
 
     async function shareBackup() {
       const dateSlug = new Date().toISOString().slice(0, 10);
-      const filename = `aesthetic_gym_backup_${dateSlug}.json`;
+      const filename = `gym_poderoso_backup_${dateSlug}.json`;
       const jsonContent = JSON.stringify(workoutState, null, 2);
 
       if (navigator.share && navigator.canShare) {
@@ -3777,7 +3716,7 @@
           const file = new File([jsonContent], filename, { type: "application/json" });
           if (navigator.canShare({ files: [file] })) {
             await navigator.share({
-              title: "Aesthetic Pro Backup",
+              title: "GYM Poderoso Backup",
               text: `Copia de seguridad de mis entrenamientos (${dateSlug})`,
               files: [file]
             });
@@ -3864,7 +3803,7 @@
     }
 
     // ==========================================
-    // REST TIMER ENGINE (Date.now() background fix)
+    // TOP REST TIMER ENGINE (Date.now() background fix)
     // ==========================================
     let timerDuration = 90;
     let timerRemaining = 90;
@@ -3881,6 +3820,12 @@
     function updateTimerUI() {
       const display = document.getElementById('timerDisplay');
       if (display) display.innerText = formatClock(timerRemaining);
+
+      const widget = document.getElementById('topTimerWidget');
+      if (widget) {
+        if (isTimerActive) widget.classList.add('timer-active');
+        else widget.classList.remove('timer-active');
+      }
     }
 
     function triggerRest(seconds) {
@@ -3919,6 +3864,7 @@
         btn.innerText = "Pausa";
         btn.classList.add('paused');
       }
+      updateTimerUI();
       
       timerInterval = setInterval(() => {
         const now = Date.now();
@@ -3939,6 +3885,7 @@
         btn.innerText = "Reanudar";
         btn.classList.remove('paused');
       }
+      updateTimerUI();
     }
 
     function resetTimerDock() {
@@ -3963,6 +3910,7 @@
         btn.innerText = "Listo";
         btn.classList.remove('paused');
       }
+      updateTimerUI();
       playAlertTone();
       if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 300]);
     }

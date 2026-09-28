@@ -1,7 +1,7 @@
 {
-  "name": "Aesthetic Pro - Rutina Torso Pierna",
-  "short_name": "Aesthetic Pro",
-  "description": "Tu app de entrenamiento inteligente con registro de series, temporizador y animaciones 3D.",
+  "name": "GYM Poderoso - Rutina Elite Torso/Pierna",
+  "short_name": "GYM Poderoso",
+  "description": "Tu app de entrenamiento inteligente con registro de series, temporizador superior, alternativas 3D y backup.",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
