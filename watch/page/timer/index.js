@@ -20,7 +20,11 @@ Page({
     this.state.app = getApp()
     const timerData = this.state.app.globalData.restTimer
     this.state.totalSeconds = (timerData && timerData.totalSeconds) || 90
-    this.state.remainingSeconds = (timerData && timerData.remainingSeconds) || 90
+    if (timerData && timerData.endTime && timerData.endTime > Date.now()) {
+      this.state.remainingSeconds = Math.max(0, Math.round((timerData.endTime - Date.now()) / 1000))
+    } else {
+      this.state.remainingSeconds = (timerData && timerData.remainingSeconds) || 90
+    }
   },
 
   build() {
@@ -153,6 +157,11 @@ Page({
   addTime(seconds) {
     this.state.remainingSeconds += seconds
     this.state.totalSeconds = Math.max(this.state.totalSeconds, this.state.remainingSeconds)
+    if (this.state.app && this.state.app.globalData.restTimer) {
+      this.state.app.globalData.restTimer.remainingSeconds = this.state.remainingSeconds
+      this.state.app.globalData.restTimer.endTime = Date.now() + this.state.remainingSeconds * 1000
+      this.state.app.globalData.restTimer.totalSeconds = this.state.totalSeconds
+    }
     this.updateUI()
   },
 
@@ -170,13 +179,16 @@ Page({
 
   startCountdown() {
     this.state.timerInterval = setInterval(() => {
-      if (this.state.remainingSeconds > 0) {
+      const timerData = this.state.app ? this.state.app.globalData.restTimer : null
+      if (timerData && timerData.endTime) {
+        this.state.remainingSeconds = Math.max(0, Math.round((timerData.endTime - Date.now()) / 1000))
+      } else if (this.state.remainingSeconds > 0) {
         this.state.remainingSeconds -= 1
-        this.updateUI()
+      }
+      this.updateUI()
 
-        if (this.state.remainingSeconds === 0) {
-          this.onTimerExpired()
-        }
+      if (this.state.remainingSeconds === 0) {
+        this.onTimerExpired()
       }
     }, 1000)
   },

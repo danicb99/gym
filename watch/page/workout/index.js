@@ -94,18 +94,27 @@ Page(BasePage({
       text: '❤️ --'
     })
 
-    // Ticker duración entreno
+    // Ticker duración entreno / descanso activo
     const elapsedMinutes = Math.floor((Date.now() - (app.globalData.sessionStartTime || Date.now())) / 60000)
-    this.state.timerWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 160,
-      y: 35,
-      w: 146,
-      h: 24,
-      color: 0x94a3b8,
+    const isResting = app.globalData.restTimer && app.globalData.restTimer.active
+    this.state.timerWidget = hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 148,
+      y: 28,
+      w: 170,
+      h: 36,
+      radius: 18,
+      normal_color: isResting ? 0x1e293b : 0x0f172a,
+      press_color: 0x334155,
+      color: isResting ? 0xfbbf24 : 0x94a3b8,
       text_size: 15,
-      align_h: hmUI.align.CENTER_H,
-      align_v: hmUI.align.CENTER_V,
-      text: `⏱️ ${elapsedMinutes}m`
+      text: isResting ? '⏳ Descanso' : `⏱️ ${elapsedMinutes}m`,
+      click_func: () => {
+        vibrateShort()
+        const rt = app.globalData.restTimer
+        if (rt && rt.active) {
+          push({ url: 'page/timer/index' })
+        }
+      }
     })
 
     hmUI.createWidget(hmUI.widget.TEXT, {
@@ -300,8 +309,9 @@ Page(BasePage({
       }
     })
 
-    // Iniciar sensor de frecuencia cardíaca
+    // Iniciar sensor de frecuencia cardíaca y ticker de descanso/entreno
     this.startHeartRateMonitor()
+    this.startWorkoutTicker()
   },
 
   adjustKg(delta) {
@@ -316,6 +326,98 @@ Page(BasePage({
     if (this.state.repsWidget) {
       this.state.repsWidget.setProperty(hmUI.prop.TEXT, `${this.state.currentReps} reps`)
     }
+  },
+
+  startWorkoutTicker() {
+    this.stopWorkoutTicker()
+    this.updateTimerDisplay()
+    let tickCount = 0
+    this.state.tickerTimer = setInterval(() => {
+      this.updateTimerDisplay()
+      tickCount++
+      if (tickCount % 5 === 0) {
+        this.syncWithPhoneInBackground()
+      }
+    }, 1000)
+  },
+
+  stopWorkoutTicker() {
+    if (this.state.tickerTimer) {
+      clearInterval(this.state.tickerTimer)
+      this.state.tickerTimer = null
+    }
+  },
+
+  updateTimerDisplay() {
+    if (!this.state.timerWidget) return
+    const app = this.state.app
+    const rt = app.globalData.restTimer
+
+    if (rt && rt.active) {
+      const now = Date.now()
+      let rem = 0
+      if (rt.endTime) {
+        rem = Math.max(0, Math.round((rt.endTime - now) / 1000))
+      } else if (rt.remainingSeconds > 0) {
+        rt.remainingSeconds -= 1
+        rem = rt.remainingSeconds
+      }
+
+      if (rem > 0) {
+        const m = Math.floor(rem / 60)
+        const s = rem % 60
+        const str = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`
+        this.state.timerWidget.setProperty(hmUI.prop.TEXT, `⏳ ${str}`)
+        this.state.timerWidget.setProperty(hmUI.prop.COLOR, 0xfbbf24) // Gold / Amber
+        this.state.timerWidget.setProperty(hmUI.prop.NORMAL_COLOR, 0x1e293b)
+        return
+      } else {
+        rt.active = false
+        vibrateRestFinished()
+      }
+    }
+
+    const elapsedMinutes = Math.floor((Date.now() - (app.globalData.sessionStartTime || Date.now())) / 60000)
+    const syncDot = app.globalData.isPhoneSynced ? ' 🟢' : ''
+    this.state.timerWidget.setProperty(hmUI.prop.TEXT, `⏱️ ${elapsedMinutes}m${syncDot}`)
+    this.state.timerWidget.setProperty(hmUI.prop.COLOR, 0x94a3b8)
+    this.state.timerWidget.setProperty(hmUI.prop.NORMAL_COLOR, 0x0f172a)
+  },
+
+  async syncWithPhoneInBackground() {
+    const app = this.state.app
+    try {
+      await app.checkPhoneLiveSession()
+      const phoneSession = app.globalData.phoneLiveSession
+      if (!phoneSession || !phoneSession.activeDayId) return
+
+      if (phoneSession.activeDayId === app.globalData.activeDayId) {
+        const phoneSlot = phoneSession.currentSlotIndex || 0
+        const phoneSet = phoneSession.currentSetIndex || 0
+        if (phoneSlot !== app.globalData.currentSlotIndex || phoneSet !== app.globalData.currentSetIndex) {
+          app.adoptPhoneSession(phoneSession)
+          replace({ url: 'page/workout/index' })
+          return
+        }
+
+        if (phoneSession.restTimer && phoneSession.restTimer.active) {
+          const rt = phoneSession.restTimer
+          const now = Date.now()
+          if (rt.endTime && rt.endTime > now) {
+            const rem = Math.max(0, Math.round((rt.endTime - now) / 1000))
+            const ex = app.getActiveExercise()
+            app.globalData.restTimer = {
+              active: true,
+              endTime: rt.endTime,
+              remainingSeconds: rem,
+              totalSeconds: rt.duration || 90,
+              nextExerciseName: ex ? ex.name : '',
+              nextSetNum: (app.globalData.currentSetIndex || 0) + 1
+            }
+          }
+        }
+      }
+    } catch (e) {}
   },
 
   completeCurrentSet() {
@@ -336,6 +438,7 @@ Page(BasePage({
       app.globalData.currentSetIndex += 1
       app.globalData.restTimer = {
         active: true,
+        endTime: Date.now() + restDuration * 1000,
         remainingSeconds: restDuration,
         totalSeconds: restDuration,
         nextExerciseName: ex ? ex.name : '',
@@ -350,6 +453,7 @@ Page(BasePage({
         const nextEx = app.getActiveExercise()
         app.globalData.restTimer = {
           active: true,
+          endTime: Date.now() + restDuration * 1000,
           remainingSeconds: restDuration,
           totalSeconds: restDuration,
           nextExerciseName: nextEx ? nextEx.name : '',
@@ -399,6 +503,7 @@ Page(BasePage({
   },
 
   onDestroy() {
+    this.stopWorkoutTicker()
     if (this.state.heartRateSensor) {
       try {
         this.state.heartRateSensor.offCurrentChange()

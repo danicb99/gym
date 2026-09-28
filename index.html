@@ -4843,6 +4843,9 @@
       } else {
         localStorage.removeItem('vigorexiapp_rest_timer');
       }
+      if (window.VigorexiWatchSync && typeof window.VigorexiWatchSync.broadcast === 'function') {
+        window.VigorexiWatchSync.broadcast();
+      }
     }
 
     function restoreRestTimerState() {

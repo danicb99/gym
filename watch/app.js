@@ -83,6 +83,32 @@ App(
       this.globalData.slotExOverrides = phoneSession.slotExOverrides || {}
       this.globalData.isPhoneSynced = true
 
+      // Adoptar descanso si está activo en el móvil
+      if (phoneSession.restTimer && phoneSession.restTimer.active) {
+        const rt = phoneSession.restTimer
+        const now = Date.now()
+        let remaining = 0
+        if (rt.endTime && rt.endTime > now) {
+          remaining = Math.max(0, Math.round((rt.endTime - now) / 1000))
+        } else if (rt.remaining > 0) {
+          remaining = rt.remaining
+        }
+
+        if (remaining > 0) {
+          const ex = this.getActiveExercise()
+          this.globalData.restTimer = {
+            active: true,
+            endTime: rt.endTime || (now + remaining * 1000),
+            remainingSeconds: remaining,
+            totalSeconds: rt.duration || 90,
+            nextExerciseName: ex ? ex.name : '',
+            nextSetNum: (this.globalData.currentSetIndex || 0) + 1
+          }
+        } else if (this.globalData.restTimer) {
+          this.globalData.restTimer.active = false
+        }
+      }
+
       saveActiveSession({
         activeDayId: this.globalData.activeDayId,
         currentSlotIndex: this.globalData.currentSlotIndex,

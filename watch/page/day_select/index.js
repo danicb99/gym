@@ -132,7 +132,11 @@ Page(
           vibrateShort()
           if (app.globalData.phoneLiveSession) {
             app.adoptPhoneSession(app.globalData.phoneLiveSession)
-            push({ url: 'page/workout/index' })
+            if (app.globalData.restTimer && app.globalData.restTimer.active && app.globalData.restTimer.remainingSeconds > 2) {
+              push({ url: 'page/timer/index' })
+            } else {
+              push({ url: 'page/workout/index' })
+            }
           } else {
             this.checkSync(true)
           }

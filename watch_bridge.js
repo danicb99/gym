@@ -78,13 +78,40 @@
         });
       });
 
+      // Extraer temporizador de descanso si está activo
+      let restTimerPayload = null;
+      try {
+        const savedRest = localStorage.getItem('vigorexiapp_rest_timer');
+        if (savedRest) {
+          const parsed = JSON.parse(savedRest);
+          if (parsed && parsed.endTime && parsed.endTime > Date.now()) {
+            restTimerPayload = {
+              active: true,
+              endTime: parsed.endTime,
+              duration: parsed.duration || 90,
+              remaining: Math.max(0, Math.round((parsed.endTime - Date.now()) / 1000))
+            };
+          }
+        }
+      } catch (e) {}
+
+      if (!restTimerPayload && typeof isTimerActive !== 'undefined' && isTimerActive && typeof timerEndTime !== 'undefined' && timerEndTime > Date.now()) {
+        restTimerPayload = {
+          active: true,
+          endTime: timerEndTime,
+          duration: typeof timerDuration !== 'undefined' ? timerDuration : 90,
+          remaining: typeof timerRemaining !== 'undefined' ? timerRemaining : 0
+        };
+      }
+
       const payload = {
         activeDayId: activeDay,
         currentSlotIndex: firstUnfinishedSlot,
         currentSetIndex: firstUnfinishedSet,
-        sessionStartTime: workoutState.sessionStartTime[activeDay] || Date.now(),
+        sessionStartTime: (workoutState.sessionStartTime && workoutState.sessionStartTime[activeDay]) || Date.now(),
         sessionLoggedSets: sessionLoggedSets,
         slotExOverrides: Object.assign({}, workoutState.customSlots, workoutState.tempSlots),
+        restTimer: restTimerPayload,
         timestamp: Date.now()
       };
 
@@ -92,7 +119,8 @@
         d: activeDay,
         c: (workoutState.completed || []).length,
         s: firstUnfinishedSlot,
-        set: firstUnfinishedSet
+        set: firstUnfinishedSet,
+        r: restTimerPayload ? Math.round(restTimerPayload.remaining / 5) : 0
       });
 
       if (hash === lastBroadcastHash) return;
@@ -261,17 +289,27 @@
     };
   }
 
+  // Hooking en saveRestTimerState para emitir inicio y cambio de descanso al reloj
+  const origSaveRestTimer = window.saveRestTimerState;
+  if (typeof origSaveRestTimer === 'function') {
+    window.saveRestTimerState = function(...args) {
+      const res = origSaveRestTimer.apply(this, args);
+      setTimeout(broadcastActiveWorkoutToWatch, 50);
+      return res;
+    };
+  }
+
   // Iniciar al cargar la página
   window.addEventListener('DOMContentLoaded', () => {
     startListeningToWatchEvents();
     setTimeout(broadcastActiveWorkoutToWatch, 1200);
 
-    // Sincronizar periódicamente cada 15 segundos si la app está en pantalla
+    // Sincronizar periódicamente (cada 5s si hay descanso activo, cada 15s en reposo)
     setInterval(() => {
       if (document.visibilityState === 'visible') {
         broadcastActiveWorkoutToWatch();
       }
-    }, 15000);
+    }, 5000);
   });
 
   // Exponer API global
