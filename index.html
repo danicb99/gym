@@ -72,10 +72,21 @@
     @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Day Header Banner */
-    .day-banner { background: linear-gradient(135deg, rgba(22, 32, 53, 0.8), rgba(15, 23, 40, 0.9)); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .day-banner { background: linear-gradient(135deg, rgba(22, 32, 53, 0.8), rgba(15, 23, 40, 0.9)); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .day-banner-title { font-size: 1.05rem; font-weight: 800; color: #fff; }
     .day-banner-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; display: flex; gap: 8px; }
-    .btn-reset-session { background: rgba(244, 63, 94, 0.12); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 8px; padding: 6px 10px; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
+    .day-banner-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .btn-finish-day { background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 182, 212, 0.2)); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 8px; padding: 7px 11px; font-size: 0.74rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.15); transition: all 0.15s ease; }
+    .btn-finish-day:active { transform: scale(0.96); background: rgba(16, 185, 129, 0.35); }
+    .btn-reset-session { background: rgba(255, 255, 255, 0.05); color: var(--text-dim); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .btn-reset-session:hover, .btn-reset-session:active { background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.3); }
+
+    .set-prev { font-size: 0.76rem; font-weight: 700; color: var(--cyan); cursor: pointer; transition: all 0.15s; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .set-prev.empty { color: var(--text-dim); font-weight: 500; }
+    .set-prev:active { transform: scale(0.92); opacity: 0.8; }
+
+    .toast-msg { position: fixed; top: 72px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(15, 23, 40, 0.95); border: 1px solid var(--primary); box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 16px var(--primary-glow); color: #fff; padding: 10px 18px; border-radius: 30px; font-size: 0.82rem; font-weight: 700; z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 8px; max-width: 90vw; text-align: center; }
+    .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* Exercise Card */
     .exercise-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: border-color 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); }
@@ -210,7 +221,13 @@
           <div class="day-banner-title">Torso A • Fuerza & Empuje</div>
           <div class="day-banner-meta"><span>7 Ejercicios</span> • <span>23 Series Efectivas</span> • <span>~75 min</span></div>
         </div>
-        <button class="btn-reset-session" onclick="resetDayChecks('torsoA')">Reiniciar</button>
+        <div class="day-banner-actions">
+          <button class="btn-finish-day" onclick="finishDaySession('torsoA')" title="Guardar marcas en 'Anterior' y preparar próxima semana">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Guardar día</span>
+          </button>
+          <button class="btn-reset-session" onclick="resetDayChecks('torsoA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
+        </div>
       </div>
 
       <!-- Exercise 1 -->
@@ -247,10 +264,10 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="6" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="80" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="6" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -300,10 +317,10 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -353,9 +370,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="22" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="22" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="22" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="22" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="22" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="22" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -405,9 +422,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -457,9 +474,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -509,9 +526,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -561,9 +578,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -590,7 +607,13 @@
           <div class="day-banner-title">Pierna A • Sentadilla & Cuádriceps</div>
           <div class="day-banner-meta"><span>5 Ejercicios</span> • <span>17 Series Efectivas</span> • <span>~70 min</span></div>
         </div>
-        <button class="btn-reset-session" onclick="resetDayChecks('piernaA')">Reiniciar</button>
+        <div class="day-banner-actions">
+          <button class="btn-finish-day" onclick="finishDaySession('piernaA')" title="Guardar marcas en 'Anterior' y preparar próxima semana">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Guardar día</span>
+          </button>
+          <button class="btn-reset-session" onclick="resetDayChecks('piernaA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
+        </div>
       </div>
 
       <!-- Squat -->
@@ -627,10 +650,10 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="6" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="90" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="6" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 180)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -680,9 +703,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -732,9 +755,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -784,10 +807,10 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="60" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -837,9 +860,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>Segundos</th><th>Completado</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell" style="color:var(--text-dim)">Seg</td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell" style="color:var(--text-dim)">Seg</td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell" style="color:var(--text-dim)">Seg</td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell" style="color:var(--text-dim)">Seg</td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell" style="color:var(--text-dim)">Seg</td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="50" oninput="saveInput(this)"></td><td class="set-cell" style="color:var(--text-dim)">Seg</td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -866,7 +889,13 @@
           <div class="day-banner-title">Torso B • Tracción & Hipertrofia</div>
           <div class="day-banner-meta"><span>7 Ejercicios</span> • <span>23 Series Efectivas</span> • <span>~80 min</span></div>
         </div>
-        <button class="btn-reset-session" onclick="resetDayChecks('torsoB')">Reiniciar</button>
+        <div class="day-banner-actions">
+          <button class="btn-finish-day" onclick="finishDaySession('torsoB')" title="Guardar marcas en 'Anterior' y preparar próxima semana">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Guardar día</span>
+          </button>
+          <button class="btn-reset-session" onclick="resetDayChecks('torsoB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
+        </div>
       </div>
 
       <!-- Exercise 1 -->
@@ -903,10 +932,10 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="28" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -956,10 +985,10 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="26" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 120)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1009,9 +1038,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="55" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1061,9 +1090,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="7" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1113,9 +1142,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="20" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="20" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="20" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="20" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="20" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="20" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1165,9 +1194,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="25" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1217,9 +1246,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="16" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="16" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="16" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="16" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="16" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="16" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1246,7 +1275,13 @@
           <div class="day-banner-title">Pierna B • Cadena Posterior & Búlgaras</div>
           <div class="day-banner-meta"><span>6 Ejercicios</span> • <span>20 Series Efectivas</span> • <span>~75 min</span></div>
         </div>
-        <button class="btn-reset-session" onclick="resetDayChecks('piernaB')">Reiniciar</button>
+        <div class="day-banner-actions">
+          <button class="btn-finish-day" onclick="finishDaySession('piernaB')" title="Guardar marcas en 'Anterior' y preparar próxima semana">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Guardar día</span>
+          </button>
+          <button class="btn-reset-session" onclick="resetDayChecks('piernaB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
+        </div>
       </div>
 
       <!-- RDL -->
@@ -1283,10 +1318,10 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="85" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 150)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1336,9 +1371,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps/p</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="18" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="18" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="18" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="18" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="18" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="9" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="18" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="8" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 105)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1388,9 +1423,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="11" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="10" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 90)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1440,9 +1475,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="45" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 75)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1492,10 +1527,10 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="13" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">4</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="40" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1545,9 +1580,9 @@
         <table class="sets-table">
           <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
           <tbody>
-            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="30" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="30" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
-            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell" style="color:var(--text-dim)">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="30" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">1</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="30" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="15" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">2</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="30" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="14" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
+            <tr class="set-row"><td class="set-cell">3</td><td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca previa">—</td><td class="set-cell"><input type="number" class="set-input" placeholder="30" oninput="saveInput(this)"></td><td class="set-cell"><input type="number" class="set-input" placeholder="12" oninput="saveInput(this)"></td><td class="set-cell"><button class="check-btn" onclick="completeSet(this, 60)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td></tr>
           </tbody>
         </table>
 
@@ -1680,15 +1715,122 @@
       if (chip) chip.innerText = `${doneSets}/${totalSets} series (${Math.round(percentage)}%)`;
     }
 
-    // Reset Day Checks
-    function resetDayChecks(dayId) {
-      if (!confirm('¿Quieres reiniciar las series de este entrenamiento?')) return;
-      const container = document.getElementById(dayId);
-      if (container) {
-        container.querySelectorAll('.set-row').forEach(row => row.classList.remove('done'));
+    // Toast Notification System
+    function showToast(msg) {
+      let toast = document.getElementById('appToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'appToast';
+        toast.className = 'toast-msg';
+        document.body.appendChild(toast);
       }
-      updateProgress();
+      toast.innerText = msg;
+      toast.classList.add('show');
+      clearTimeout(window._toastTimeout);
+      window._toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3200);
+    }
+
+    // Finish & Archive Day Session
+    function finishDaySession(dayId) {
+      const daySection = document.getElementById(dayId);
+      if (!daySection) return;
+
+      const dayRows = Array.from(daySection.querySelectorAll('.set-row'));
+      const allRows = Array.from(document.querySelectorAll('.set-row'));
+      
+      let hasData = false;
+      dayRows.forEach(row => {
+        const inputs = row.querySelectorAll('.set-input');
+        if ((inputs[0] && inputs[0].value) || (inputs[1] && inputs[1].value) || row.classList.contains('done')) {
+          hasData = true;
+        }
+      });
+
+      if (!hasData) {
+        showToast('ℹ️ Primero anota algún peso o marca series con ✓');
+        return;
+      }
+
+      if (!confirm('¿Finalizar este entrenamiento y pasar marcas a "Anterior"?\n\nTus pesos y repeticiones se guardarán en la columna "Anterior" como objetivo para la próxima semana, y las casillas quedarán listas para el siguiente entreno.')) {
+        return;
+      }
+
+      let countArchived = 0;
+      dayRows.forEach(row => {
+        const globalRowIdx = allRows.indexOf(row);
+        const inputs = row.querySelectorAll('.set-input');
+        const kg = inputs[0] ? inputs[0].value.trim() : '';
+        const reps = inputs[1] ? inputs[1].value.trim() : '';
+
+        if (kg || reps) {
+          let record = '';
+          if (kg && reps) record = `${kg}k × ${reps}`;
+          else if (kg) record = `${kg} kg`;
+          else if (reps) record = `${reps} reps`;
+
+          workoutState.previous[globalRowIdx] = record;
+          
+          const prevCell = row.querySelector('.set-prev');
+          if (prevCell) {
+            prevCell.innerText = record;
+            prevCell.classList.remove('empty');
+          }
+          countArchived++;
+        }
+
+        if (inputs[0]) inputs[0].value = '';
+        if (inputs[1]) inputs[1].value = '';
+        row.classList.remove('done');
+      });
+
       saveWorkoutState();
+      updateProgress();
+
+      showToast(`🎉 ¡Sesión guardada! ${countArchived} marcas archivadas en "Anterior" 💪`);
+      if (navigator.vibrate) navigator.vibrate([70, 50, 70]);
+    }
+
+    // Reset Day Checks (without touching Anterior)
+    function resetDayChecks(dayId) {
+      if (!confirm('¿Quieres reiniciar las casillas de hoy?\n(La columna "Anterior" no se borrará)')) return;
+      const daySection = document.getElementById(dayId);
+      if (daySection) {
+        daySection.querySelectorAll('.set-row').forEach(row => {
+          row.classList.remove('done');
+          const inputs = row.querySelectorAll('.set-input');
+          if (inputs[0]) inputs[0].value = '';
+          if (inputs[1]) inputs[1].value = '';
+        });
+      }
+      saveWorkoutState();
+      updateProgress();
+      showToast('Casillas de hoy reiniciadas');
+    }
+
+    // Manual Quick Edit for Anterior Cell
+    function editPrevious(cell) {
+      const row = cell.closest('.set-row');
+      const allRows = Array.from(document.querySelectorAll('.set-row'));
+      const globalRowIdx = allRows.indexOf(row);
+      const current = (cell.innerText && cell.innerText !== '—') ? cell.innerText : '';
+      
+      const val = prompt('Editar marca Anterior de referencia para esta serie (ej: 80k × 8 o 25 kg):', current);
+      if (val === null) return;
+      
+      const trimmed = val.trim();
+      if (trimmed) {
+        workoutState.previous[globalRowIdx] = trimmed;
+        cell.innerText = trimmed;
+        cell.classList.remove('empty');
+      } else {
+        delete workoutState.previous[globalRowIdx];
+        cell.innerText = '—';
+        cell.classList.add('empty');
+      }
+      localStorage.setItem('aesthetic_routine_data', JSON.stringify(workoutState));
+      showToast('Marca de referencia actualizada');
     }
 
     // Rest Timer Engine
@@ -1801,38 +1943,67 @@
     }
 
     // LocalStorage Persistent State
+    let workoutState = {
+      inputs: {},
+      completed: [],
+      previous: {}
+    };
+
     function saveInput(input) {
       saveWorkoutState();
     }
 
     function saveWorkoutState() {
-      const state = { inputs: {}, completed: [] };
+      workoutState.inputs = {};
+      workoutState.completed = [];
       document.querySelectorAll('.set-input').forEach((input, idx) => {
-        if (input.value) state.inputs[idx] = input.value;
+        if (input.value) workoutState.inputs[idx] = input.value;
       });
       document.querySelectorAll('.set-row').forEach((row, idx) => {
-        if (row.classList.contains('done')) state.completed.push(idx);
+        if (row.classList.contains('done')) workoutState.completed.push(idx);
       });
-      localStorage.setItem('aesthetic_routine_data', JSON.stringify(state));
+      localStorage.setItem('aesthetic_routine_data', JSON.stringify(workoutState));
     }
 
     function loadWorkoutState() {
       const saved = localStorage.getItem('aesthetic_routine_data');
       if (!saved) return;
       try {
-        const state = JSON.parse(saved);
-        if (state.inputs) {
-          document.querySelectorAll('.set-input').forEach((input, idx) => {
-            if (state.inputs[idx]) input.value = state.inputs[idx];
-          });
-        }
-        if (state.completed) {
-          const rows = document.querySelectorAll('.set-row');
-          state.completed.forEach(idx => {
+        const loaded = JSON.parse(saved);
+        workoutState = {
+          inputs: loaded.inputs || {},
+          completed: loaded.completed || [],
+          previous: loaded.previous || {}
+        };
+
+        const rows = document.querySelectorAll('.set-row');
+        rows.forEach((row, idx) => {
+          const prevCell = row.querySelector('.set-prev');
+          if (prevCell) {
+            if (workoutState.previous && workoutState.previous[idx]) {
+              prevCell.innerText = workoutState.previous[idx];
+              prevCell.classList.remove('empty');
+            } else {
+              prevCell.innerText = '—';
+              prevCell.classList.add('empty');
+            }
+          }
+        });
+
+        document.querySelectorAll('.set-input').forEach((input, idx) => {
+          if (workoutState.inputs && workoutState.inputs[idx] !== undefined) {
+            input.value = workoutState.inputs[idx];
+          }
+        });
+
+        if (workoutState.completed) {
+          workoutState.completed.forEach(idx => {
             if (rows[idx]) rows[idx].classList.add('done');
           });
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error(e);
+      }
       updateProgress();
     }
 
