@@ -4988,6 +4988,9 @@
       });
 
       localStorage.setItem('aesthetic_routine_data', JSON.stringify(workoutState));
+      if (window.VigorexiWatchSync && typeof window.VigorexiWatchSync.broadcast === 'function') {
+        window.VigorexiWatchSync.broadcast();
+      }
     }
 
     function applyCustomSlotsToDOM() {

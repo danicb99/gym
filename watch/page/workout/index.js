@@ -42,10 +42,26 @@ Page(BasePage({
       this.state.currentKg = logged[app.globalData.currentSetIndex].kg
       this.state.currentReps = logged[app.globalData.currentSetIndex].reps
     } else {
-      // Cargar peso y reps por defecto de la rutina
-      const defaultSet = (slot.sets && slot.sets[app.globalData.currentSetIndex]) || ["60", "10"]
-      this.state.currentKg = parseFloat(defaultSet[0]) || 60
-      this.state.currentReps = parseInt(defaultSet[1], 10) || 10
+      // Cargar peso del último set realizado en este slot si existe
+      let lastLoggedSet = null
+      if (logged && logged.length > 0) {
+        for (let i = logged.length - 1; i >= 0; i--) {
+          if (logged[i] && logged[i].completed) {
+            lastLoggedSet = logged[i]
+            break
+          }
+        }
+      }
+
+      if (lastLoggedSet) {
+        this.state.currentKg = lastLoggedSet.kg
+        this.state.currentReps = lastLoggedSet.reps
+      } else {
+        // Cargar peso y reps por defecto de la rutina
+        const defaultSet = (slot.sets && slot.sets[app.globalData.currentSetIndex]) || ["60", "10"]
+        this.state.currentKg = parseFloat(defaultSet[0]) || 60
+        this.state.currentReps = parseInt(defaultSet[1], 10) || 10
+      }
     }
   },
 

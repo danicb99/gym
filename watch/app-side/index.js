@@ -28,30 +28,50 @@ AppSideService(
       if (req.method === 'GET_PHONE_SESSION') {
         // Consultar el último estado del entrenamiento que el móvil haya publicado
         try {
-          const response = await fetch({
-            url: `${RELAY_PHONE_TO_WATCH}/json?poll=1`,
-            method: 'GET'
-          })
-
-          const bodyText = typeof response.body === 'string' ? response.body : JSON.stringify(response.body)
-          if (!bodyText || bodyText.trim() === '') {
+          const fetchFn = (typeof this.fetch === 'function') ? this.fetch.bind(this) : (typeof fetch === 'function' ? fetch : null)
+          if (!fetchFn) {
+            console.log('[VigorexiApp Side] Fetch no disponible en entorno')
             res(null, { session: null })
             return
           }
 
-          // ntfy devuelve líneas ndjson; tomamos la última línea con evento 'message'
-          const lines = bodyText.trim().split('\n')
+          const response = await fetchFn({
+            url: `${RELAY_PHONE_TO_WATCH}/json?poll=1`,
+            method: 'GET',
+            timeout: 6000
+          })
+
+          if (!response || !response.body) {
+            res(null, { session: null })
+            return
+          }
+
+          let lines = []
+          if (typeof response.body === 'string') {
+            lines = response.body.trim().split('\n')
+          } else if (Array.isArray(response.body)) {
+            lines = response.body
+          } else if (typeof response.body === 'object') {
+            lines = [response.body]
+          }
+
           let latestSession = null
 
           for (let i = lines.length - 1; i >= 0; i--) {
             try {
-              const parsed = JSON.parse(lines[i])
-              if (parsed.event === 'message' && parsed.message) {
-                const sessionPayload = typeof parsed.message === 'string' ? JSON.parse(parsed.message) : parsed.message
+              let item = lines[i]
+              if (typeof item === 'string') {
+                item = JSON.parse(item)
+              }
+              if (item && item.event === 'message' && item.message) {
+                let sessionPayload = item.message
+                if (typeof sessionPayload === 'string') {
+                  sessionPayload = JSON.parse(sessionPayload)
+                }
                 if (sessionPayload && sessionPayload.activeDayId) {
-                  // Verificar que no sea un entreno de hace más de 6 horas
+                  // Verificar que no sea un entreno de hace más de 8 horas
                   const ageMinutes = (Date.now() - (sessionPayload.timestamp || 0)) / 60000
-                  if (ageMinutes < 360) {
+                  if (ageMinutes < 480) {
                     latestSession = sessionPayload
                     break
                   }
@@ -62,7 +82,7 @@ AppSideService(
             }
           }
 
-          console.log('[VigorexiApp Side] Sesión activa encontrada para el reloj:', latestSession ? latestSession.activeDayId : 'ninguna')
+          console.log('[VigorexiApp Side] Sesión activa para el reloj:', latestSession ? `${latestSession.activeDayId} slot ${latestSession.currentSlotIndex} set ${latestSession.currentSetIndex}` : 'ninguna')
           res(null, { session: latestSession })
         } catch (err) {
           console.log('[VigorexiApp Side] Error consultando sesión móvil:', err)

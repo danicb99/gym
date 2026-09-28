@@ -14,30 +14,59 @@ Page(
   BasePage({
     state: {
       titleWidget: null,
-      buttons: [],
-      syncButton: null
+      subWidget: null,
+      syncButton: null,
+      buttons: []
     },
 
     async onInit() {
+      // Iniciar búsqueda automática de sesión en móvil
+      this.checkSync(false)
+    },
+
+    async checkSync(manualTrigger = false) {
       const app = getApp()
-      // Si no tenemos todavía la sesión del móvil, consultarla
-      if (!app.globalData.phoneLiveSession) {
-        try {
-          const phoneSession = await requestPhoneLiveWorkout(this)
-          if (phoneSession && phoneSession.activeDayId) {
-            app.globalData.phoneLiveSession = phoneSession
-            // Si hay botón de sincronización, actualizar su texto y hacerlo visible
-            if (this.state.syncButton) {
-              const dayData = ROUTINE_SLOTS[phoneSession.activeDayId]
-              const title = dayData ? dayData.shortName : phoneSession.activeDayId
-              this.state.syncButton.setProperty(hmUI.prop.MORE, {
-                text: `🟢 Unirse a ${title}`,
-                visible: true
-              })
-            }
+      if (this.state.syncButton && !app.globalData.phoneLiveSession) {
+        this.state.syncButton.setProperty(hmUI.prop.TEXT, '🔄 Buscando móvil...')
+        this.state.syncButton.setProperty(hmUI.prop.NORMAL_COLOR, 0x1e293b)
+      }
+      if (this.state.subWidget && !app.globalData.phoneLiveSession) {
+        this.state.subWidget.setProperty(hmUI.prop.TEXT, 'Conectando con tu móvil...')
+      }
+
+      try {
+        const phoneSession = await requestPhoneLiveWorkout(this)
+        if (phoneSession && phoneSession.activeDayId) {
+          app.globalData.phoneLiveSession = phoneSession
+          const dayData = ROUTINE_SLOTS[phoneSession.activeDayId]
+          const title = dayData ? dayData.shortName : phoneSession.activeDayId
+
+          if (this.state.syncButton) {
+            this.state.syncButton.setProperty(hmUI.prop.TEXT, `🟢 Unirse a ${title}`)
+            this.state.syncButton.setProperty(hmUI.prop.NORMAL_COLOR, 0x0284c7)
           }
-        } catch (e) {
-          console.log('[DaySelect] Error consultando móvil:', e)
+          if (this.state.subWidget) {
+            this.state.subWidget.setProperty(hmUI.prop.TEXT, '¡Entreno activo detectado!')
+            this.state.subWidget.setProperty(hmUI.prop.COLOR, 0x38bdf8)
+          }
+          vibrateShort()
+        } else {
+          if (this.state.syncButton) {
+            this.state.syncButton.setProperty(hmUI.prop.TEXT, '🔄 Sincronizar Móvil')
+            this.state.syncButton.setProperty(hmUI.prop.NORMAL_COLOR, 0x1e293b)
+          }
+          if (this.state.subWidget) {
+            this.state.subWidget.setProperty(hmUI.prop.TEXT, 'Selecciona rutina o sincroniza')
+            this.state.subWidget.setProperty(hmUI.prop.COLOR, 0x94a3b8)
+          }
+          if (manualTrigger) {
+            vibrateShort()
+          }
+        }
+      } catch (e) {
+        console.log('[DaySelect] Error consultando móvil:', e)
+        if (this.state.syncButton) {
+          this.state.syncButton.setProperty(hmUI.prop.TEXT, '🔄 Reintentar conexión')
         }
       }
     },
@@ -50,82 +79,83 @@ Page(
       // Título Principal
       this.state.titleWidget = hmUI.createWidget(hmUI.widget.TEXT, {
         x: 33,
-        y: 40,
+        y: 28,
         w: 400,
-        h: 38,
+        h: 32,
         color: 0xfbbf24, // Gold / Amber
-        text_size: 24,
+        text_size: 22,
         align_h: hmUI.align.CENTER_H,
         align_v: hmUI.align.CENTER_V,
         text: 'VIGOREXIAPP'
       })
 
       // Subtítulo de estado
-      let subText = 'Selecciona tu rutina'
+      let subText = 'Buscando entreno en móvil...'
+      let subColor = 0x94a3b8
       if (phoneSession && phoneSession.activeDayId) {
-        subText = '¡Entrenamiento detectado en móvil!'
+        subText = '¡Entreno activo detectado!'
+        subColor = 0x38bdf8
       } else if (activeLocal) {
         subText = 'Sesión en curso disponible'
       }
 
-      hmUI.createWidget(hmUI.widget.TEXT, {
+      this.state.subWidget = hmUI.createWidget(hmUI.widget.TEXT, {
         x: 33,
-        y: 78,
+        y: 62,
         w: 400,
-        h: 26,
-        color: phoneSession ? 0x38bdf8 : 0x94a3b8, // Cyan si hay móvil, slate si no
-        text_size: 15,
+        h: 24,
+        color: subColor,
+        text_size: 14,
         align_h: hmUI.align.CENTER_H,
         align_v: hmUI.align.CENTER_V,
         text: subText
       })
 
-      let startY = 112
-      const btnHeight = 52
-      const btnGap = 10
-
       // 1. BOTÓN PRIORITARIO: Unirse al entrenamiento del móvil (Live Sync)
       const phoneDayData = phoneSession ? ROUTINE_SLOTS[phoneSession.activeDayId] : null
       const phoneDayTitle = phoneDayData ? phoneDayData.shortName : (phoneSession ? phoneSession.activeDayId : '')
+      const initialBtnText = phoneSession ? `🟢 Unirse a ${phoneDayTitle}` : '🔄 Conectar con Móvil'
+      const initialBtnColor = phoneSession ? 0x0284c7 : 0x1e293b
 
       this.state.syncButton = hmUI.createWidget(hmUI.widget.BUTTON, {
-        x: 53,
-        y: startY,
-        w: 360,
-        h: btnHeight,
-        radius: 26,
-        normal_color: 0x0284c7, // Sky Blue
+        x: 58,
+        y: 92,
+        w: 350,
+        h: 50,
+        radius: 25,
+        normal_color: initialBtnColor,
         press_color: 0x0369a1,
         color: 0xffffff,
-        text_size: 17,
-        text: phoneSession ? `🟢 Unirse a ${phoneDayTitle}` : 'Buscando móvil...',
-        visible: phoneSession ? true : false,
+        text_size: 16,
+        text: initialBtnText,
         click_func: () => {
           vibrateShort()
           if (app.globalData.phoneLiveSession) {
             app.adoptPhoneSession(app.globalData.phoneLiveSession)
             push({ url: 'page/workout/index' })
+          } else {
+            this.checkSync(true)
           }
         }
       })
 
-      if (phoneSession) {
-        startY += btnHeight + btnGap
-      }
+      let startY = 150
+      const btnHeight = 46
+      const btnGap = 8
 
-      // 2. BOTÓN: Continuar sesión local (si no se está usando el móvil)
+      // 2. BOTÓN: Continuar sesión local (si hay sesión previa en el reloj diferente a la del móvil)
       if (activeLocal && (!phoneSession || activeLocal !== phoneSession.activeDayId)) {
         const activeDay = ROUTINE_SLOTS[activeLocal]
         hmUI.createWidget(hmUI.widget.BUTTON, {
-          x: 53,
+          x: 58,
           y: startY,
-          w: 360,
+          w: 350,
           h: btnHeight,
-          radius: 26,
+          radius: 23,
           normal_color: 0x10b981, // Emerald green
           press_color: 0x059669,
           color: 0xffffff,
-          text_size: 17,
+          text_size: 16,
           text: `▶ Continuar ${activeDay ? activeDay.shortName : 'Sesión'}`,
           click_func: () => {
             vibrateShort()
@@ -143,21 +173,21 @@ Page(
         { id: 'piernaB', label: 'D4: Pierna B (Isquios)' }
       ]
 
-      const maxButtonsToShow = phoneSession || activeLocal ? 3 : 4
+      const maxButtonsToShow = (startY > 160) ? 3 : 4
 
       days.forEach((day, idx) => {
         if (idx >= maxButtonsToShow) return
 
         hmUI.createWidget(hmUI.widget.BUTTON, {
-          x: 53,
+          x: 58,
           y: startY + idx * (btnHeight + btnGap),
-          w: 360,
+          w: 350,
           h: btnHeight,
-          radius: 26,
+          radius: 23,
           normal_color: 0x1e293b,
           press_color: 0x334155,
           color: 0xf8fafc,
-          text_size: 16,
+          text_size: 15,
           text: day.label,
           click_func: () => {
             vibrateShort()

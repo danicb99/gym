@@ -15,15 +15,29 @@
   function broadcastActiveWorkoutToWatch() {
     if (isBroadcasting) return;
     try {
-      if (typeof workoutState === 'undefined' || !workoutState || !workoutState.sessionStartTime) return;
+      if (typeof workoutState === 'undefined' || !workoutState) return;
       if (typeof ROUTINE_SLOTS === 'undefined' || !ROUTINE_SLOTS) return;
       
       let activeDay = null;
-      let latestTime = 0;
-      for (const [dayId, sTime] of Object.entries(workoutState.sessionStartTime)) {
-        if (sTime && sTime > latestTime) {
-          const hoursAgo = (Date.now() - sTime) / 3600000;
-          if (hoursAgo < 6) {
+      // 1. Selector DOM de sección activa
+      const activeSection = document.querySelector('.day-content.active');
+      if (activeSection && ROUTINE_SLOTS[activeSection.id]) {
+        activeDay = activeSection.id;
+      }
+
+      // 2. Dropdown selector de día
+      if (!activeDay) {
+        const sel = document.getElementById('daySelector');
+        if (sel && ROUTINE_SLOTS[sel.value]) {
+          activeDay = sel.value;
+        }
+      }
+
+      // 3. sessionStartTime
+      if (!activeDay && workoutState.sessionStartTime) {
+        let latestTime = 0;
+        for (const [dayId, sTime] of Object.entries(workoutState.sessionStartTime)) {
+          if (sTime && sTime > latestTime) {
             latestTime = sTime;
             activeDay = dayId;
           }
@@ -33,7 +47,7 @@
       if (!activeDay && typeof lastActiveWorkoutDay !== 'undefined') {
         activeDay = lastActiveWorkoutDay;
       }
-      if (!activeDay || !ROUTINE_SLOTS[activeDay]) return;
+      if (!activeDay || !ROUTINE_SLOTS[activeDay]) activeDay = 'torsoA';
 
       const dayData = ROUTINE_SLOTS[activeDay];
       const sessionLoggedSets = {};
@@ -212,11 +226,11 @@
   function updateSyncPill(connected) {
     let pill = document.getElementById('watchSyncPill');
     if (!pill) {
-      const headerContainer = document.querySelector('.header-top, header, nav, .header-card, .top-bar');
+      const headerContainer = document.querySelector('.header-content, .app-header');
       if (headerContainer) {
         pill = document.createElement('div');
         pill.id = 'watchSyncPill';
-        pill.style.cssText = 'display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:12px;background:rgba(15,23,42,0.8);border:1px solid rgba(56,189,248,0.3);color:#94a3b8;cursor:pointer;margin-left:auto;';
+        pill.style.cssText = 'display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 8px;border-radius:12px;background:rgba(15,23,42,0.9);border:1px solid rgba(56,189,248,0.4);color:#94a3b8;cursor:pointer;white-space:nowrap;user-select:none;margin-left:auto;';
         pill.title = 'Sincronización en vivo con Amazfit Active 2';
         pill.onclick = () => {
           broadcastActiveWorkoutToWatch();
