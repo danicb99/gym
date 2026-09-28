@@ -6,6 +6,7 @@
 import * as hmUI from '@zos/ui'
 import { push, replace } from '@zos/router'
 import { HeartRate } from '@zos/sensor'
+import { pauseDropWristScreenOff, resetDropWristScreenOff, pausePalmScreenOff, resetPalmScreenOff, setPageBrightTime, resetPageBrightTime } from '@zos/display'
 import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
 import { vibrateShort } from '../../utils/haptics'
@@ -26,6 +27,7 @@ Page(BasePage({
 
   onInit() {
     this.state.app = getApp()
+    this.keepScreenAwake()
     this.initCurrentValues()
   },
 
@@ -502,8 +504,27 @@ Page(BasePage({
     }
   },
 
+  keepScreenAwake() {
+    try {
+      pauseDropWristScreenOff({ duration: 0 })
+      pausePalmScreenOff({ duration: 0 })
+      setPageBrightTime({ brightTime: 1800000 })
+    } catch (e) {
+      console.log('[Workout] Display keep screen awake no disponible:', e)
+    }
+  },
+
+  releaseScreenAwake() {
+    try {
+      resetDropWristScreenOff()
+      resetPalmScreenOff()
+      resetPageBrightTime()
+    } catch (e) {}
+  },
+
   onDestroy() {
     this.stopWorkoutTicker()
+    this.releaseScreenAwake()
     if (this.state.heartRateSensor) {
       try {
         this.state.heartRateSensor.offCurrentChange()

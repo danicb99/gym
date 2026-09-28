@@ -4,6 +4,7 @@
 
 import * as hmUI from '@zos/ui'
 import { replace } from '@zos/router'
+import { pauseDropWristScreenOff, resetDropWristScreenOff, pausePalmScreenOff, resetPalmScreenOff, setPageBrightTime, resetPageBrightTime } from '@zos/display'
 import { vibrateShort, vibrateRestFinished } from '../../utils/haptics'
 
 Page({
@@ -18,6 +19,7 @@ Page({
 
   onInit() {
     this.state.app = getApp()
+    this.keepScreenAwake()
     const timerData = this.state.app.globalData.restTimer
     this.state.totalSeconds = (timerData && timerData.totalSeconds) || 90
     if (timerData && timerData.endTime && timerData.endTime > Date.now()) {
@@ -220,7 +222,26 @@ Page({
     }
   },
 
+  keepScreenAwake() {
+    try {
+      pauseDropWristScreenOff({ duration: 0 })
+      pausePalmScreenOff({ duration: 0 })
+      setPageBrightTime({ brightTime: 1800000 })
+    } catch (e) {
+      console.log('[Timer] Display keep screen awake no disponible:', e)
+    }
+  },
+
+  releaseScreenAwake() {
+    try {
+      resetDropWristScreenOff()
+      resetPalmScreenOff()
+      resetPageBrightTime()
+    } catch (e) {}
+  },
+
   onDestroy() {
     this.clearCountdown()
+    this.releaseScreenAwake()
   }
 })
