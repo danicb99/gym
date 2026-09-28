@@ -3,6 +3,7 @@ const ASSETS = [
   './',
   './index.html',
   './rutina_movil.html',
+  './reloj.html',
   './watch_bridge.js',
   './icon-round-192.png',
   './icon-round-512.png',

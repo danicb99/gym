@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Instalar VigorexiApp en Amazfit</title>
+  <link rel="icon" type="image/png" href="./icon-round-192.png">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background: #090d16;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+      text-align: center;
+    }
+    .card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 24px;
+      padding: 24px 20px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      margin-top: 10px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fbbf24;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .btn-install {
+      display: block;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 20px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+      transition: transform 0.1s, opacity 0.2s;
+    }
+    .btn-install:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 600;
+      margin: 20px 0;
+    }
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #334155;
+    }
+    .divider span {
+      padding: 0 12px;
+    }
+    .qr-container {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 16px;
+      display: inline-block;
+      margin: 10px 0 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+    .qr-image {
+      width: 220px;
+      height: 220px;
+      display: block;
+    }
+    .steps {
+      text-align: left;
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 14px;
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin-top: 20px;
+    }
+    .steps ol {
+      padding-left: 20px;
+    }
+    .steps li {
+      margin-bottom: 8px;
+    }
+    .steps strong {
+      color: #f8fafc;
+    }
+    .footer-links {
+      margin-top: 24px;
+      font-size: 14px;
+    }
+    .footer-links a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>⌚ VigorexiApp Watch</h1>
+    <div class="badge">Amazfit Active 2 • Zepp OS 3.0</div>
+
+    <p style="color: #94a3b8; font-size: 14px; margin-bottom: 18px;">
+      Sincronización en vivo, descanso háptico en muñeca y pantalla activa.
+    </p>
+
+    <!-- Método 1: Enlace directo con 1 toque -->
+    <a href="zpkd1://raw.githubusercontent.com/danicb99/gym/main/watch/dist/vigorexiapp_active2.zpk" class="btn-install" id="installBtn">
+      📲 Instalar con 1 Toque en Zepp
+    </a>
+
+    <div class="divider">
+      <span>O DESDE EL MODO DESARROLLADOR</span>
+    </div>
+
+    <div class="qr-container">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=zpkd1%3A%2F%2Fraw.githubusercontent.com%2Fdanicb99%2Fgym%2Fmain%2Fwatch%2Fdist%2Fvigorexiapp_active2.zpk" alt="Código QR Zepp" class="qr-image" id="qrImg">
+    </div>
+
+    <p style="font-size: 13px; color: #94a3b8;">
+      Mantén pulsada la imagen para <strong>Guardar imagen</strong> y selecciónala directamente en el Modo Desarrollador de Zepp.
+    </p>
+
+    <div class="steps">
+      <div style="font-weight:700; color:#fbbf24; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+        💡 Para que la app no se cierre al apagar la pantalla:
+      </div>
+      <ol>
+        <li>En tu reloj, entra en <strong>Ajustes</strong> (rueda).</li>
+        <li>Entra en <strong>Preferencias</strong> (o <em>Pantalla</em>).</li>
+        <li>Busca <strong>"Volver a la esfera"</strong>.</li>
+        <li>Cámbialo a <strong>"Tras 15 minutos"</strong> (o "No volver").</li>
+      </ol>
+    </div>
+
+    <div class="footer-links">
+      <a href="./">← Volver a la rutina del móvil</a>
+    </div>
+  </div>
+
+</body>
+</html>
