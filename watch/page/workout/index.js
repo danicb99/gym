@@ -60,10 +60,34 @@ Page(BasePage({
         this.state.currentKg = lastLoggedSet.kg
         this.state.currentReps = lastLoggedSet.reps
       } else {
-        // Cargar peso y reps por defecto de la rutina
+        // Cargar peso y reps por defecto de la rutina o de la marca anterior
+        let loadedKg = null
+        let loadedReps = null
+        if (app.globalData.previousSets && ex) {
+          const exPrev = app.globalData.previousSets[ex.id]
+          if (exPrev) {
+            let prevStr = exPrev[app.globalData.currentSetIndex]
+            if (!prevStr && app.globalData.currentSetIndex > 0) {
+              for (let s = app.globalData.currentSetIndex - 1; s >= 0; s--) {
+                if (exPrev[s]) {
+                  prevStr = exPrev[s]
+                  break
+                }
+              }
+            }
+            if (prevStr) {
+              const m = String(prevStr).match(/^([\d\.]+)\s*(?:kg)?\s*[×xX]\s*(\d+)/i)
+              if (m) {
+                loadedKg = parseFloat(m[1])
+                loadedReps = parseInt(m[2], 10)
+              }
+            }
+          }
+        }
+
         const defaultSet = (slot.sets && slot.sets[app.globalData.currentSetIndex]) || ["60", "10"]
-        this.state.currentKg = parseFloat(defaultSet[0]) || 60
-        this.state.currentReps = parseInt(defaultSet[1], 10) || 10
+        this.state.currentKg = loadedKg !== null ? loadedKg : (parseFloat(defaultSet[0]) || 60)
+        this.state.currentReps = loadedReps !== null ? loadedReps : (parseInt(defaultSet[1], 10) || 10)
       }
     }
   },
@@ -145,16 +169,35 @@ Page(BasePage({
       text: ex ? ex.name : 'Ejercicio'
     })
 
+    let prevText = ''
+    if (app.globalData.previousSets && ex) {
+      const exPrev = app.globalData.previousSets[ex.id]
+      if (exPrev) {
+        let prevVal = exPrev[app.globalData.currentSetIndex]
+        if (!prevVal && app.globalData.currentSetIndex > 0) {
+          for (let s = app.globalData.currentSetIndex - 1; s >= 0; s--) {
+            if (exPrev[s]) {
+              prevVal = exPrev[s]
+              break
+            }
+          }
+        }
+        if (prevVal) {
+          prevText = ` • Ant: ${prevVal}`
+        }
+      }
+    }
+
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 38,
       y: 100,
       w: 390,
       h: 26,
       color: 0x38bdf8, // Cyan
-      text_size: 17,
+      text_size: 16,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: `SERIE ${currentSetNum} DE ${totalSets}`
+      text: `SERIE ${currentSetNum} DE ${totalSets}${prevText}`
     })
 
     // 3. CONTROL DE KILOS ( [-]  80.0 kg  [+] ) - TAMAÑO XL
@@ -499,6 +542,14 @@ Page(BasePage({
         const bpm = this.state.heartRateSensor.getCurrent()
         if (this.state.hrWidget && bpm > 0) {
           this.state.hrWidget.setProperty(hmUI.prop.TEXT, `❤️ ${bpm}`)
+          const app = this.state.app
+          if (app && app.globalData) {
+            if (!app.globalData.hrHistory) app.globalData.hrHistory = []
+            app.globalData.hrHistory.push(bpm)
+            if (!app.globalData.hrMax || bpm > app.globalData.hrMax) {
+              app.globalData.hrMax = bpm
+            }
+          }
         }
       })
     } catch (e) {

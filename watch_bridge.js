@@ -111,6 +111,7 @@
         sessionStartTime: (workoutState.sessionStartTime && workoutState.sessionStartTime[activeDay]) || Date.now(),
         sessionLoggedSets: sessionLoggedSets,
         slotExOverrides: Object.assign({}, workoutState.customSlots, workoutState.tempSlots),
+        previousSets: workoutState.previous || {},
         restTimer: restTimerPayload,
         timestamp: Date.now()
       };

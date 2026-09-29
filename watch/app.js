@@ -27,6 +27,7 @@ App(
         nextExerciseName: '',
         nextSetNum: 1
       },
+      previousSets: {},
       heartRate: 0
     },
 
@@ -84,6 +85,9 @@ App(
       this.globalData.sessionStartTime = phoneSession.sessionStartTime || Date.now()
       this.globalData.sessionLoggedSets = phoneSession.sessionLoggedSets || {}
       this.globalData.slotExOverrides = phoneSession.slotExOverrides || {}
+      if (phoneSession.previousSets) {
+        this.globalData.previousSets = phoneSession.previousSets
+      }
       this.globalData.isPhoneSynced = true
 
       // Adoptar descanso si está activo en el móvil
@@ -241,6 +245,15 @@ App(
           }
         })
       }
+
+      // Calcular promedio de FC si se registraron pulsaciones
+      let hrAvg = 0
+      if (this.globalData.hrHistory && this.globalData.hrHistory.length > 0) {
+        const sum = this.globalData.hrHistory.reduce((a, b) => a + b, 0)
+        hrAvg = Math.round(sum / this.globalData.hrHistory.length)
+      }
+      sessionSummary.hrAvg = hrAvg
+      sessionSummary.hrMax = this.globalData.hrMax || 0
 
       // Guardar en el historial local del reloj
       recordCompletedSession(sessionSummary)

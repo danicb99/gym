@@ -40,6 +40,8 @@ Page({
     let totalSeries = 0
     let totalExCount = 0
     let durationMin = (lastSession && lastSession.durationMinutes) || 0
+    let hrAvg = (lastSession && lastSession.hrAvg) || 0
+    let hrMax = (lastSession && lastSession.hrMax) || 0
 
     if (lastSession && lastSession.exercises) {
       totalExCount = lastSession.exercises.length
@@ -49,12 +51,12 @@ Page({
     }
 
     // 2. TARJETAS DE MÉTRICAS (Fondo oscuro elegante)
-    const cardY = 135
+    const cardY = 124
     hmUI.createWidget(hmUI.widget.BUTTON, {
       x: 63,
       y: cardY,
       w: 340,
-      h: 155,
+      h: 186,
       radius: 20,
       normal_color: 0x1e293b,
       press_color: 0x1e293b,
@@ -64,11 +66,11 @@ Page({
 
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 80,
-      y: cardY + 20,
+      y: cardY + 16,
       w: 306,
       h: 32,
       color: 0xffffff,
-      text_size: 18,
+      text_size: 17,
       align_h: hmUI.align.LEFT,
       align_v: hmUI.align.CENTER_V,
       text: `⏱️ Duración: ${durationMin} min`
@@ -76,11 +78,11 @@ Page({
 
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 80,
-      y: cardY + 62,
+      y: cardY + 54,
       w: 306,
       h: 32,
       color: 0x38bdf8,
-      text_size: 18,
+      text_size: 17,
       align_h: hmUI.align.LEFT,
       align_v: hmUI.align.CENTER_V,
       text: `🏋️ Ejercicios: ${totalExCount} realizados`
@@ -88,14 +90,26 @@ Page({
 
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 80,
-      y: cardY + 104,
+      y: cardY + 92,
       w: 306,
       h: 32,
       color: 0x10b981,
-      text_size: 18,
+      text_size: 17,
       align_h: hmUI.align.LEFT,
       align_v: hmUI.align.CENTER_V,
       text: `💪 Total Series: ${totalSeries} efectivas`
+    })
+
+    hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 80,
+      y: cardY + 130,
+      w: 306,
+      h: 32,
+      color: 0xf43f5e, // Rose red
+      text_size: 17,
+      align_h: hmUI.align.LEFT,
+      align_v: hmUI.align.CENTER_V,
+      text: `❤️ FC: Med ${hrAvg > 0 ? hrAvg : '--'} • Máx ${hrMax > 0 ? hrMax : '--'} bpm`
     })
 
     // 3. BOTÓN VOLVER

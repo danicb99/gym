@@ -230,6 +230,149 @@
     .set-row.done .check-btn { background: var(--primary); border-color: var(--primary); color: #042f2e; box-shadow: 0 0 10px var(--primary-glow); }
     .set-row.done .check-btn svg { transform: scale(1.1); stroke: #042f2e; }
 
+    /* Active Row & Quick Stepper Bar */
+    .set-row.active-row {
+      background: rgba(56, 189, 248, 0.12) !important;
+      outline: 1.5px solid rgba(56, 189, 248, 0.45);
+      border-radius: 8px;
+    }
+    .quick-stepper-bar {
+      position: fixed;
+      bottom: max(14px, env(safe-area-inset-bottom, 14px));
+      left: 50%;
+      transform: translateX(-50%) translateY(140%);
+      width: calc(100% - 24px);
+      max-width: 480px;
+      background: rgba(12, 21, 39, 0.96);
+      border: 1.5px solid var(--border-focus);
+      border-radius: 18px;
+      padding: 8px 12px 10px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 20px var(--primary-glow);
+      z-index: 999;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .quick-stepper-bar.open {
+      transform: translateX(-50%) translateY(0);
+    }
+    .stepper-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--cyan);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 4px;
+    }
+    .stepper-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+    .stepper-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .stepper-section {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+    }
+    .stepper-sec-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .stepper-btn-row {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+    }
+    .btn-step {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: #fff;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
+      min-width: 38px;
+      transition: all 0.12s ease;
+    }
+    .btn-step:active {
+      transform: scale(0.92);
+      background: var(--primary);
+      color: #042f2e;
+    }
+    .btn-step-check {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: 1px solid #34d399;
+      color: #fff;
+      border-radius: 12px;
+      width: 46px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 900;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+      flex-shrink: 0;
+      transition: transform 0.12s;
+    }
+    .btn-step-check:active {
+      transform: scale(0.92);
+    }
+    .overload-badge {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(16, 185, 129, 0.15));
+      border: 1.5px solid rgba(245, 158, 11, 0.45);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: #fef08a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .overload-badge strong { color: #fff; font-weight: 800; }
+    .t-btn-top.audio-btn {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: #fff;
+      border-radius: 8px;
+      padding: 5px 7px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .t-btn-top.audio-btn.active {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+
     /* Collapsible Details */
     .collapsible-drawer { margin-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 8px; }
     details { margin-bottom: 6px; }
@@ -585,6 +728,7 @@
           <span class="timer-digits" id="timerDisplay">00:00</span>
         </div>
         <div class="top-timer-controls">
+          <button class="t-btn-top audio-btn" id="audioModeBtn" onclick="toggleAudioMode()" title="Audio de descansos: Toca para activar en auriculares Bluetooth">🔕</button>
           <button class="t-btn-top play" id="timerPlayBtn" onclick="togglePlayTimer()">Iniciar</button>
           <button class="t-btn-top skip" onclick="resetTimerDock()" title="Reiniciar / Cancelar">✕</button>
         </div>
@@ -3453,6 +3597,35 @@
   </main>
 
   <!-- ==========================================
+       BARRA RÁPIDA DE STEPPERS (Ajuste sin teclado nativo)
+       ========================================== -->
+  <div class="quick-stepper-bar" id="quickStepperBar">
+    <div class="stepper-header">
+      <span id="stepperTitle">⚡ Serie activa: —</span>
+      <button type="button" class="stepper-close-btn" onclick="closeQuickStepper()">✕</button>
+    </div>
+    <div class="stepper-actions">
+      <div class="stepper-section">
+        <span class="stepper-sec-label">Kilos (KG)</span>
+        <div class="stepper-btn-row">
+          <button type="button" class="btn-step" onclick="adjustActiveRowKg(-5)">-5</button>
+          <button type="button" class="btn-step" onclick="adjustActiveRowKg(-2.5)">-2.5</button>
+          <button type="button" class="btn-step" onclick="adjustActiveRowKg(+2.5)">+2.5</button>
+          <button type="button" class="btn-step" onclick="adjustActiveRowKg(+5)">+5</button>
+        </div>
+      </div>
+      <div class="stepper-section">
+        <span class="stepper-sec-label">Reps</span>
+        <div class="stepper-btn-row">
+          <button type="button" class="btn-step" onclick="adjustActiveRowReps(-1)">-1</button>
+          <button type="button" class="btn-step" onclick="adjustActiveRowReps(+1)">+1</button>
+        </div>
+      </div>
+      <button type="button" class="btn-step-check" onclick="completeActiveRow()" title="Marcar serie completada">✓</button>
+    </div>
+  </div>
+
+  <!-- ==========================================
        MODAL DE GUÍA & CALENTAMIENTO (Bottom Sheet)
        ========================================== -->
   <div class="modal-overlay" id="guideModal" onclick="closeGuideModal(event)">
@@ -3553,6 +3726,150 @@
 
     // Navigation via dropdown selector
     let lastActiveWorkoutDay = 'torsoA';
+
+    // Audio mode for rest timer alerts: 'silent' (🔕 Mute/Only Vibration) or 'headphones' (🎧 Bluetooth Voice/Beeps)
+    let audioMode = localStorage.getItem('vigorexiapp_audio_mode') || 'silent';
+
+    // Active Row & Quick Steppers State
+    let activeRowEl = null;
+    let activeSlotId = null;
+    let activeSetIdx = null;
+
+    // Helper: Parse previous record string (e.g. "80kg × 8" -> { kg: 80, reps: 8 })
+    function parsePreviousString(val) {
+      if (!val || val === '—' || val === '-') return { kg: null, reps: null };
+      const str = String(val).trim();
+      const m = str.match(/^([\d\.]+)\s*(?:kg)?\s*[×xX]\s*(\d+)/i);
+      if (m) return { kg: parseFloat(m[1]), reps: parseInt(m[2], 10) };
+      const mSingle = str.match(/^([\d\.]+)\s*(?:kg)?$/i);
+      if (mSingle) return { kg: parseFloat(mSingle[1]), reps: null };
+      return { kg: null, reps: null };
+    }
+
+    // Helper: Parse target rep range (e.g. "4 × 6-8 reps" -> { min: 6, max: 8 })
+    function getExerciseTargetReps(doseStr) {
+      if (!doseStr) return { min: 8, max: 8 };
+      const m = doseStr.match(/(\d+)\s*[-–]\s*(\d+)\s*reps?/i);
+      if (m) return { min: parseInt(m[1], 10), max: parseInt(m[2], 10) };
+      const single = doseStr.match(/(\d+)\s*reps?/i);
+      if (single) return { min: parseInt(single[1], 10), max: parseInt(single[1], 10) };
+      return { min: 8, max: 10 };
+    }
+
+    // Helper: 1RM formula (Epley)
+    function calculate1RM(kg, reps) {
+      if (!kg || kg <= 0) return 0;
+      if (!reps || reps <= 1) return kg;
+      return Math.round(kg * (1 + reps / 30) * 10) / 10;
+    }
+
+    // Audio & Speech cues
+    function toggleAudioMode() {
+      audioMode = audioMode === 'headphones' ? 'silent' : 'headphones';
+      localStorage.setItem('vigorexiapp_audio_mode', audioMode);
+      updateAudioModeUI();
+      if (audioMode === 'headphones') {
+        showToast('🎧 Modo Auriculares ACTIVO: Avisos por voz y sonido');
+        speakAudioCue('Modo auriculares activado');
+      } else {
+        showToast('🔕 Modo Silencioso ACTIVO: Cero sonido en altavoz (solo vibración)');
+      }
+    }
+
+    function updateAudioModeUI() {
+      const btn = document.getElementById('audioModeBtn');
+      if (!btn) return;
+      if (audioMode === 'headphones') {
+        btn.innerText = '🎧';
+        btn.classList.add('active');
+        btn.title = 'Audio activo para Auriculares Bluetooth (Toca para silenciar)';
+      } else {
+        btn.innerText = '🔕';
+        btn.classList.remove('active');
+        btn.title = 'Modo Silencioso (Cero sonido por altavoz. Toca para activar auriculares)';
+      }
+    }
+
+    function speakAudioCue(text) {
+      if (audioMode !== 'headphones') return; // NUNCA emitir sonido si no está en modo auriculares
+      try {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'es-ES';
+          utterance.rate = 1.05;
+          utterance.volume = 0.95;
+          window.speechSynthesis.speak(utterance);
+        }
+      } catch (e) {}
+    }
+
+    // Quick Stepper Dock handlers
+    function selectActiveSetRow(row) {
+      if (!row) return;
+      if (activeRowEl && activeRowEl !== row) {
+        activeRowEl.classList.remove('active-row');
+      }
+      activeRowEl = row;
+      row.classList.add('active-row');
+
+      const card = row.closest('.exercise-card');
+      activeSlotId = card ? card.getAttribute('data-slot') : '';
+      activeSetIdx = parseInt(row.getAttribute('data-set-num')) - 1;
+      const exId = card ? card.getAttribute('data-current-ex') : '';
+      const ex = EXERCISE_CATALOG[exId];
+
+      const bar = document.getElementById('quickStepperBar');
+      const title = document.getElementById('stepperTitle');
+      if (title && ex) {
+        const parts = ex.name.split(' ');
+        const shortName = `${parts[0]} ${parts[1] || ''}`;
+        title.innerText = `⚡ Serie ${activeSetIdx + 1} • ${shortName}`;
+      }
+      if (bar) bar.classList.add('open');
+    }
+
+    function closeQuickStepper() {
+      if (activeRowEl) {
+        activeRowEl.classList.remove('active-row');
+        activeRowEl = null;
+      }
+      const bar = document.getElementById('quickStepperBar');
+      if (bar) bar.classList.remove('open');
+    }
+
+    function adjustActiveRowKg(delta) {
+      if (!activeRowEl) return;
+      const kgInp = activeRowEl.querySelector('.input-kg');
+      if (!kgInp) return;
+      let val = parseFloat(kgInp.value);
+      if (isNaN(val)) val = parseFloat(kgInp.placeholder) || 0;
+      val = Math.max(0, Math.round((val + delta) * 10) / 10);
+      kgInp.value = val;
+      handleSetInput(kgInp);
+      if (navigator.vibrate) navigator.vibrate(15);
+    }
+
+    function adjustActiveRowReps(delta) {
+      if (!activeRowEl) return;
+      const repsInp = activeRowEl.querySelector('.input-reps');
+      if (!repsInp) return;
+      let val = parseInt(repsInp.value, 10);
+      if (isNaN(val)) val = parseInt(repsInp.placeholder, 10) || 0;
+      val = Math.max(0, val + delta);
+      repsInp.value = val;
+      handleSetInput(repsInp);
+      if (navigator.vibrate) navigator.vibrate(15);
+    }
+
+    function completeActiveRow() {
+      if (!activeRowEl) return;
+      const checkBtn = activeRowEl.querySelector('.check-btn');
+      if (checkBtn) {
+        checkBtn.click();
+      }
+      closeQuickStepper();
+    }
 
     function selectDay(dayId) {
       if (dayId !== 'historialView') {
@@ -3883,11 +4200,56 @@
       saveWorkoutState();
     }
 
-    // Set Completion Logic + Auto-collapse finished exercise
+    function handleSetChange(input) {
+      const row = input.closest('.set-row');
+      const card = input.closest('.exercise-card');
+      if (!row || !card) return;
+      const sIdx = parseInt(row.getAttribute('data-set-num'), 10) - 1;
+      cascadeForwardValues(card, sIdx);
+      saveWorkoutState();
+    }
+
+    // Cascada inteligente de valores hacia las series posteriores no completadas
+    function cascadeForwardValues(card, triggerSetIdx) {
+      if (!card) return;
+      const slotId = card.getAttribute('data-slot');
+      const rows = Array.from(card.querySelectorAll('.set-row'));
+      const triggerRow = rows[triggerSetIdx];
+      if (!triggerRow) return;
+
+      const triggerKgInp = triggerRow.querySelector('.input-kg');
+      const triggerRepsInp = triggerRow.querySelector('.input-reps');
+      const currentKg = triggerKgInp ? triggerKgInp.value : '';
+      const currentReps = triggerRepsInp ? triggerRepsInp.value : '';
+
+      if (!currentKg && !currentReps) return;
+
+      for (let i = triggerSetIdx + 1; i < rows.length; i++) {
+        const nextRow = rows[i];
+        if (nextRow.classList.contains('done')) continue; // Blindaje: no sobreescribir series ya terminadas
+
+        const nextKgInp = nextRow.querySelector('.input-kg');
+        const nextRepsInp = nextRow.querySelector('.input-reps');
+
+        if (nextKgInp && currentKg) {
+          nextKgInp.value = currentKg;
+          workoutState.inputs[`${slotId}_${i}_kg`] = currentKg;
+        }
+        if (nextRepsInp && currentReps) {
+          nextRepsInp.value = currentReps;
+          workoutState.inputs[`${slotId}_${i}_reps`] = currentReps;
+        }
+      }
+    }
+
+    // Set Completion Logic + Auto-collapse finished exercise + Overload & PR Engine
     function completeSet(btn, restSeconds) {
       const row = btn.closest('.set-row');
       const card = btn.closest('.exercise-card');
       const section = btn.closest('.day-content');
+      const slotId = card ? card.getAttribute('data-slot') : '';
+      const exId = card ? card.getAttribute('data-current-ex') : '';
+      const sIdx = parseInt(row.getAttribute('data-set-num')) - 1;
 
       if (section) startSessionTimerIfNeeded(section.id);
 
@@ -3896,6 +4258,38 @@
       // Haptic feedback
       if (navigator.vibrate) {
         navigator.vibrate(isDone ? [35] : [15]);
+      }
+
+      const kgInp = row.querySelector('.input-kg');
+      const repsInp = row.querySelector('.input-reps');
+
+      if (isDone) {
+        // Asegurar que si el input tiene valor pre-cargado (o placeholder), quede guardado formalmente
+        if (kgInp) {
+          if (!kgInp.value && kgInp.placeholder) kgInp.value = kgInp.placeholder;
+          workoutState.inputs[`${slotId}_${sIdx}_kg`] = kgInp.value.trim();
+        }
+        if (repsInp) {
+          if (!repsInp.value && repsInp.placeholder) repsInp.value = repsInp.placeholder;
+          workoutState.inputs[`${slotId}_${sIdx}_reps`] = repsInp.value.trim();
+        }
+
+        // Cascada inteligente: propaga carga y reps a series posteriores que aún no estén completadas
+        cascadeForwardValues(card, sIdx);
+
+        // 1RM Estimado y detección de nuevo Récord Personal (PR)
+        const curKg = parseFloat(kgInp?.value) || 0;
+        const curReps = parseInt(repsInp?.value, 10) || 0;
+        if (curKg > 0 && curReps > 0 && exId) {
+          const est1RM = calculate1RM(curKg, curReps);
+          const historyLogs = (workoutState.exerciseHistory && workoutState.exerciseHistory[exId]) ? workoutState.exerciseHistory[exId] : [];
+          let prevBest1RM = 0;
+          historyLogs.forEach(h => { if (h.best1RM && h.best1RM > prevBest1RM) prevBest1RM = h.best1RM; });
+          
+          if (est1RM > prevBest1RM && prevBest1RM > 0) {
+            showToast(`🏆 ¡Nuevo Récord Estimado! 1RM: ${est1RM} kg (+${(est1RM - prevBest1RM).toFixed(1)}kg)`);
+          }
+        }
       }
 
       // Auto start timer if set completed
@@ -3921,19 +4315,55 @@
     }
 
     function checkExerciseCardCompletion(card) {
+      if (!card) return;
       const slotId = card.getAttribute('data-slot');
+      const exId = card.getAttribute('data-current-ex');
+      const ex = EXERCISE_CATALOG[exId];
       const rows = card.querySelectorAll('.set-row');
       const totalSets = rows.length;
-      const doneSets = card.querySelectorAll('.set-row.done').length;
+      const doneRows = card.querySelectorAll('.set-row.done');
+      const doneSets = doneRows.length;
 
       const subLabel = document.getElementById('summary-sub-' + slotId);
       if (subLabel) subLabel.innerText = `${doneSets}/${totalSets} series completadas`;
 
+      const existingBadge = card.querySelector('.overload-badge');
+
       if (totalSets > 0 && doneSets === totalSets) {
         card.classList.add('exercise-completed');
+
+        // Detector de Sobrecarga Progresiva Dinámica
+        if (ex && ex.dose) {
+          const target = getExerciseTargetReps(ex.dose);
+          let allHitCeiling = true;
+          let maxKgUsed = 0;
+
+          doneRows.forEach(r => {
+            const rVal = parseInt(r.querySelector('.input-reps')?.value, 10) || 0;
+            const kVal = parseFloat(r.querySelector('.input-kg')?.value) || 0;
+            if (kVal > maxKgUsed) maxKgUsed = kVal;
+            if (rVal < target.max) allHitCeiling = false;
+          });
+
+          if (allHitCeiling && maxKgUsed > 0 && target.max > 0) {
+            const step = ex.stepKg || 2.5;
+            const nextKg = Math.round((maxKgUsed + step) * 10) / 10;
+            if (!existingBadge) {
+              const badge = document.createElement('div');
+              badge.className = 'overload-badge';
+              badge.innerHTML = `<span>🎯</span><div><strong>¡Sobrecarga Superada!</strong> Techo de ${target.max} reps alcanzado en todas las series. Próxima sesión: sube a <strong>${nextKg} kg</strong> (base de ${target.min} reps).</div>`;
+              card.appendChild(badge);
+            }
+            if (!workoutState.overloadSuggestions) workoutState.overloadSuggestions = {};
+            workoutState.overloadSuggestions[exId] = { nextKg: nextKg, baseReps: target.min, date: Date.now() };
+          } else if (existingBadge) {
+            existingBadge.remove();
+          }
+        }
       } else {
         card.classList.remove('exercise-completed');
         card.classList.remove('manually-expanded');
+        if (existingBadge) existingBadge.remove();
       }
     }
 
@@ -4041,13 +4471,13 @@
         rows.forEach((row, sIdx) => {
           const kgInp = row.querySelector('.input-kg');
           const repsInp = row.querySelector('.input-reps');
-          const kg = kgInp ? kgInp.value.trim() : '';
-          const reps = repsInp ? repsInp.value.trim() : '';
+          const kg = kgInp ? (kgInp.value.trim() || kgInp.placeholder || '') : '';
+          const reps = repsInp ? (repsInp.value.trim() || repsInp.placeholder || '') : '';
 
           if (kg || reps) {
             const kgNum = parseFloat(kg) || 0;
             const repsNum = parseInt(reps) || 0;
-            const est1RM = repsNum > 0 ? Math.round(kgNum * (1 + repsNum / 30)) : kgNum;
+            const est1RM = repsNum > 0 ? calculate1RM(kgNum, repsNum) : kgNum;
 
             let recordStr = '';
             if (kg && reps) recordStr = `${kg}kg × ${reps}`;
@@ -4072,15 +4502,17 @@
             countArchived++;
           }
 
-          // Clear inputs and checks for next session
-          if (kgInp) kgInp.value = '';
-          if (repsInp) repsInp.value = '';
+          // Reiniciar para la próxima sesión: mantener pre-rellenado con la última marca
+          if (kgInp) kgInp.value = kg;
+          if (repsInp) repsInp.value = reps;
           row.classList.remove('done');
         });
 
-        // Uncollapse card
+        // Uncollapse card & clean overload badge
         card.classList.remove('exercise-completed');
         card.classList.remove('manually-expanded');
+        const badge = card.querySelector('.overload-badge');
+        if (badge) badge.remove();
 
         if (exSessionLog.sets.length > 0) {
           sessionRecord.exercises.push(exSessionLog);
@@ -4336,7 +4768,7 @@
         sumBadgeEl.innerHTML = `<svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-${ex.svgSlug}"></use></svg>`;
       }
 
-      // Update Anterior column for this specific exercise
+      // Update Anterior column & pre-fill inputs for this specific exercise
       const exPrev = workoutState.previous[exId] || {};
       const rows = card.querySelectorAll('.set-row');
       rows.forEach((row, sIdx) => {
@@ -4348,6 +4780,24 @@
           } else {
             prevCell.innerText = '—';
             prevCell.classList.add('empty');
+          }
+        }
+
+        if (!row.classList.contains('done')) {
+          const kgInp = row.querySelector('.input-kg');
+          const repsInp = row.querySelector('.input-reps');
+          const parsed = parsePreviousString(exPrev[sIdx]);
+
+          if (parsed.kg !== null) {
+            if (kgInp) kgInp.value = parsed.kg;
+          } else if (sIdx > 0 && rows[sIdx - 1]?.querySelector('.input-kg')?.value) {
+            if (kgInp) kgInp.value = rows[sIdx - 1].querySelector('.input-kg').value;
+          }
+
+          if (parsed.reps !== null) {
+            if (repsInp) repsInp.value = parsed.reps;
+          } else if (sIdx > 0 && rows[sIdx - 1]?.querySelector('.input-reps')?.value) {
+            if (repsInp) repsInp.value = rows[sIdx - 1].querySelector('.input-reps').value;
           }
         }
       });
@@ -4818,6 +5268,8 @@
     }
 
     function playAlertTone() {
+      // Si no está en modo auriculares, NUNCA reproducir sonido por el altavoz del móvil
+      if (audioMode !== 'headphones') return;
       try {
         if (!window._vigorexiappAudioCtx) window._vigorexiappAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const audioCtx = window._vigorexiappAudioCtx;
@@ -4984,11 +5436,19 @@
       updateTimerUI();
       saveRestTimerState();
       
+      let voicedWarning = false;
       timerInterval = setInterval(() => {
         const now = Date.now();
         const diff = Math.max(0, Math.round((timerEndTime - now) / 1000));
         timerRemaining = diff;
         updateTimerUI();
+
+        // Audio cue solo a través de auriculares si el modo está activado
+        if (diff === 5 && !voicedWarning && audioMode === 'headphones') {
+          voicedWarning = true;
+          speakAudioCue("Cinco segundos");
+        }
+
         if (diff <= 0) {
           finishTimer();
         }
@@ -5051,6 +5511,11 @@
       updateTimerUI();
       saveRestTimerState();
       sendRestFinishedNotification();
+
+      // Aviso por voz en auriculares al finalizar
+      if (audioMode === 'headphones') {
+        speakAudioCue("¡Tiempo cumplido!");
+      }
     }
 
     // When screen wakes up or app is focused, re-evaluate timer instantly
@@ -5156,11 +5621,50 @@
 
           const kgInp = row.querySelector('.input-kg');
           const repsInp = row.querySelector('.input-reps');
-          if (kgInp && workoutState.inputs[`${slotId}_${sIdx}_kg`]) {
-            kgInp.value = workoutState.inputs[`${slotId}_${sIdx}_kg`];
+
+          const savedKg = workoutState.inputs[`${slotId}_${sIdx}_kg`];
+          const savedReps = workoutState.inputs[`${slotId}_${sIdx}_reps`];
+          const parsed = parsePreviousString(exPrev[sIdx]);
+          const overload = (workoutState.overloadSuggestions && workoutState.overloadSuggestions[exId]) ? workoutState.overloadSuggestions[exId] : null;
+
+          if (savedKg !== undefined && savedKg !== '') {
+            if (kgInp) kgInp.value = savedKg;
+          } else if (overload && overload.nextKg) {
+            if (kgInp) kgInp.value = overload.nextKg;
+          } else if (parsed.kg !== null) {
+            if (kgInp) kgInp.value = parsed.kg;
+          } else if (sIdx > 0 && rows[sIdx - 1]?.querySelector('.input-kg')?.value) {
+            // Auto-rellenar desde la serie anterior N-1 si no hay histórico
+            if (kgInp) kgInp.value = rows[sIdx - 1].querySelector('.input-kg').value;
+          } else if (kgInp && kgInp.placeholder) {
+            kgInp.value = kgInp.placeholder;
           }
-          if (repsInp && workoutState.inputs[`${slotId}_${sIdx}_reps`]) {
-            repsInp.value = workoutState.inputs[`${slotId}_${sIdx}_reps`];
+
+          if (savedReps !== undefined && savedReps !== '') {
+            if (repsInp) repsInp.value = savedReps;
+          } else if (overload && overload.baseReps) {
+            if (repsInp) repsInp.value = overload.baseReps;
+          } else if (parsed.reps !== null) {
+            if (repsInp) repsInp.value = parsed.reps;
+          } else if (sIdx > 0 && rows[sIdx - 1]?.querySelector('.input-reps')?.value) {
+            // Auto-rellenar desde la serie anterior N-1 si no hay histórico
+            if (repsInp) repsInp.value = rows[sIdx - 1].querySelector('.input-reps').value;
+          } else if (repsInp && repsInp.placeholder) {
+            repsInp.value = repsInp.placeholder;
+          }
+
+          // Conectar selección táctil para la barra rápida de steppers y cascada al editar
+          row.onclick = function(e) {
+            if (e.target.closest('.check-btn') || e.target.closest('.set-prev')) return;
+            selectActiveSetRow(row);
+          };
+          if (kgInp) {
+            kgInp.onfocus = function() { selectActiveSetRow(row); };
+            kgInp.onchange = function() { handleSetChange(this); };
+          }
+          if (repsInp) {
+            repsInp.onfocus = function() { selectActiveSetRow(row); };
+            repsInp.onchange = function() { handleSetChange(this); };
           }
 
           if (workoutState.completed.includes(`${slotId}_${sIdx}`)) {
@@ -5172,6 +5676,9 @@
 
         checkExerciseCardCompletion(card);
       });
+
+      // Update Audio Mode UI
+      updateAudioModeUI();
 
       // Auto select next day based on last finished workout session
       checkAutoSave();
