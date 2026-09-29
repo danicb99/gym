@@ -4294,7 +4294,10 @@
 
       // Auto start timer if set completed
       if (isDone && restSeconds) {
-        triggerRest(restSeconds);
+        const titleEl = card ? card.querySelector('.ex-title') : null;
+        const exName = titleEl ? titleEl.innerText.replace(/^\d+\.\s*/, '').trim() : '';
+        const setInfo = `Serie ${sIdx + 1}`;
+        triggerRest(restSeconds, exName, setInfo);
         const curSlotId = card ? card.getAttribute('data-slot') : '';
         if (curSlotId === 'torsoA_6') {
           showToast('⚡ Biserie: 45s de descanso ➔ Toca Bíceps');
@@ -5231,6 +5234,19 @@
       }
     }
 
+    // Escucha de acciones disparadas desde la pantalla de bloqueo o reloj
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'REST_TIMER_ADJUSTED') {
+          adjustTimer(event.data.delta || 30);
+          showToast(`⏱️ Descanso +${event.data.delta || 30}s desde pantalla de bloqueo`);
+        } else if (event.data && event.data.type === 'REST_TIMER_SKIPPED') {
+          finishTimer();
+          showToast('💪 Descanso completado desde pantalla de bloqueo');
+        }
+      });
+    }
+
     function sendRestFinishedNotification() {
       // 1. Android Notification API
       if ('Notification' in window && Notification.permission === 'granted') {
@@ -5330,8 +5346,13 @@
       }
     }
 
-    function triggerRest(seconds) {
+    let currentRestExerciseInfo = { name: '', setInfo: '' };
+
+    function triggerRest(seconds, exerciseName = '', setInfo = '') {
       initNotifications();
+      if (exerciseName) {
+        currentRestExerciseInfo = { name: exerciseName, setInfo: setInfo || '' };
+      }
       timerDuration = seconds;
       timerRemaining = seconds;
       timerEndTime = Date.now() + seconds * 1000;
@@ -5344,6 +5365,14 @@
       timerEndTime = Date.now() + timerRemaining * 1000;
       updateTimerUI();
       saveRestTimerState();
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'UPDATE_REST_TIMER',
+          endTime: timerEndTime,
+          exerciseName: currentRestExerciseInfo.name || '',
+          setInfo: currentRestExerciseInfo.setInfo || ''
+        });
+      }
     }
 
     function togglePlayTimer() {
@@ -5382,7 +5411,9 @@
         localStorage.setItem('vigorexiapp_rest_timer', JSON.stringify({
           endTime: timerEndTime,
           duration: timerDuration,
-          isActive: isTimerActive
+          isActive: isTimerActive,
+          exerciseName: currentRestExerciseInfo.name || '',
+          setInfo: currentRestExerciseInfo.setInfo || ''
         }));
       } else {
         localStorage.removeItem('vigorexiapp_rest_timer');
@@ -5404,6 +5435,9 @@
             timerDuration = data.duration || 90;
             timerEndTime = data.endTime;
             timerRemaining = remaining;
+            if (data.exerciseName) {
+              currentRestExerciseInfo = { name: data.exerciseName, setInfo: data.setInfo || '' };
+            }
             if (data.isActive) {
               startTimerLoop();
             } else {
@@ -5424,7 +5458,10 @@
       if (navigator.serviceWorker && navigator.serviceWorker.controller) {
         navigator.serviceWorker.controller.postMessage({
           type: 'START_REST_TIMER',
-          endTime: timerEndTime
+          endTime: timerEndTime,
+          duration: timerDuration,
+          exerciseName: currentRestExerciseInfo.name || '',
+          setInfo: currentRestExerciseInfo.setInfo || ''
         });
       }
 
@@ -5524,7 +5561,16 @@
         const diff = Math.max(0, Math.round((timerEndTime - Date.now()) / 1000));
         timerRemaining = diff;
         updateTimerUI();
-        if (diff <= 0) finishTimer();
+        if (diff <= 0) {
+          finishTimer();
+        } else if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({
+            type: 'UPDATE_REST_TIMER',
+            endTime: timerEndTime,
+            exerciseName: currentRestExerciseInfo.name || '',
+            setInfo: currentRestExerciseInfo.setInfo || ''
+          });
+        }
       }
     });
 

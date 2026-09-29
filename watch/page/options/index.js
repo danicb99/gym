@@ -5,7 +5,7 @@
 
 import * as hmUI from '@zos/ui'
 import { back, push, replace } from '@zos/router'
-import { setWakeUpRelaunch, resetWakeUpRelaunch } from '@zos/display'
+import { keepScreenActive, restoreScreenBehavior } from '../../utils/display'
 import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
 
@@ -262,25 +262,11 @@ Page(
     },
 
     enableWakeUpRelaunch() {
-      try {
-        if (typeof setWakeUpRelaunch === 'function') {
-          setWakeUpRelaunch({ relaunch: true })
-        }
-      } catch (e) {
-        try {
-          setWakeUpRelaunch(true)
-        } catch (e2) {}
-      }
+      keepScreenActive(30000)
     },
 
     disableWakeUpRelaunch() {
-      try {
-        if (typeof resetWakeUpRelaunch === 'function') {
-          resetWakeUpRelaunch()
-        } else if (typeof setWakeUpRelaunch === 'function') {
-          setWakeUpRelaunch({ relaunch: false })
-        }
-      } catch (e) {}
+      restoreScreenBehavior()
     },
 
     onDestroy() {

@@ -6,7 +6,7 @@
 import * as hmUI from '@zos/ui'
 import { push, replace } from '@zos/router'
 import { HeartRate } from '@zos/sensor'
-import { setWakeUpRelaunch, resetWakeUpRelaunch } from '@zos/display'
+import { keepScreenActive, restoreScreenBehavior } from '../../utils/display'
 import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
 import { vibrateShort } from '../../utils/haptics'
@@ -558,40 +558,17 @@ Page(BasePage({
   },
 
   onResume() {
+    this.enableWakeUpRelaunch()
     this.updateClockDisplay()
     this.updateTimerDisplay()
   },
 
   enableWakeUpRelaunch() {
-    try {
-      if (typeof setWakeUpRelaunch === 'function') {
-        setWakeUpRelaunch({ relaunch: true })
-      }
-    } catch (e) {
-      try {
-        setWakeUpRelaunch(true)
-      } catch (e2) {}
-    }
-    try {
-      if (typeof hmApp !== 'undefined' && hmApp.setScreenKeep) {
-        hmApp.setScreenKeep(true)
-      }
-    } catch (e3) {}
+    keepScreenActive(45000)
   },
 
   disableWakeUpRelaunch() {
-    try {
-      if (typeof resetWakeUpRelaunch === 'function') {
-        resetWakeUpRelaunch()
-      } else if (typeof setWakeUpRelaunch === 'function') {
-        setWakeUpRelaunch({ relaunch: false })
-      }
-    } catch (e) {}
-    try {
-      if (typeof hmApp !== 'undefined' && hmApp.setScreenKeep) {
-        hmApp.setScreenKeep(false)
-      }
-    } catch (e2) {}
+    restoreScreenBehavior()
   },
 
   onDestroy() {

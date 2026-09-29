@@ -5,6 +5,7 @@
 import * as hmUI from '@zos/ui'
 import { replace } from '@zos/router'
 import { vibrateRestFinished } from '../../utils/haptics'
+import { keepScreenActive, restoreScreenBehavior } from '../../utils/display'
 
 Page({
   state: {
@@ -251,40 +252,17 @@ Page({
   },
 
   onResume() {
+    this.enableWakeUpRelaunch()
     this.updateUI()
     this.updateClockDisplay()
   },
 
   enableWakeUpRelaunch() {
-    try {
-      if (typeof setWakeUpRelaunch === 'function') {
-        setWakeUpRelaunch({ relaunch: true })
-      }
-    } catch (e) {
-      try {
-        setWakeUpRelaunch(true)
-      } catch (e2) {}
-    }
-    try {
-      if (typeof hmApp !== 'undefined' && hmApp.setScreenKeep) {
-        hmApp.setScreenKeep(true)
-      }
-    } catch (e3) {}
+    keepScreenActive(45000)
   },
 
   disableWakeUpRelaunch() {
-    try {
-      if (typeof resetWakeUpRelaunch === 'function') {
-        resetWakeUpRelaunch()
-      } else if (typeof setWakeUpRelaunch === 'function') {
-        setWakeUpRelaunch({ relaunch: false })
-      }
-    } catch (e) {}
-    try {
-      if (typeof hmApp !== 'undefined' && hmApp.setScreenKeep) {
-        hmApp.setScreenKeep(false)
-      }
-    } catch (e2) {}
+    restoreScreenBehavior()
   },
 
   onDestroy() {

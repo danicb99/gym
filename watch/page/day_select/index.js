@@ -4,8 +4,8 @@
  */
 
 import * as hmUI from '@zos/ui'
-import { push } from '@zos/router'
-import { setWakeUpRelaunch, resetWakeUpRelaunch } from '@zos/display'
+import { push, replace } from '@zos/router'
+import { keepScreenActive, restoreScreenBehavior } from '../../utils/display'
 import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
 import { requestPhoneLiveWorkout } from '../../utils/sync_bridge'
@@ -21,6 +21,14 @@ Page(
     },
 
     async onInit() {
+      const app = getApp()
+      // Si ya hay un entrenamiento activo guardado en memoria flash, reanudar inmediatamente
+      if (app && app.globalData && app.globalData.activeDayId) {
+        console.log('[DaySelect] Sesión activa detectada en flash, auto-resumiendo entreno:', app.globalData.activeDayId)
+        replace({ url: 'page/workout/index' })
+        return
+      }
+
       this.enableWakeUpRelaunch()
       // Iniciar búsqueda automática de sesión en móvil
       this.checkSync(false)
@@ -245,25 +253,11 @@ Page(
     },
 
     enableWakeUpRelaunch() {
-      try {
-        if (typeof setWakeUpRelaunch === 'function') {
-          setWakeUpRelaunch({ relaunch: true })
-        }
-      } catch (e) {
-        try {
-          setWakeUpRelaunch(true)
-        } catch (e2) {}
-      }
+      keepScreenActive(30000)
     },
 
     disableWakeUpRelaunch() {
-      try {
-        if (typeof resetWakeUpRelaunch === 'function') {
-          resetWakeUpRelaunch()
-        } else if (typeof setWakeUpRelaunch === 'function') {
-          setWakeUpRelaunch({ relaunch: false })
-        }
-      } catch (e) {}
+      restoreScreenBehavior()
     },
 
     onDestroy() {
