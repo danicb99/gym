@@ -195,8 +195,8 @@
     // Actualizar inputs si vienen valores
     const kgInp = targetRow.querySelector('.input-kg');
     const repsInp = targetRow.querySelector('.input-reps');
-    if (kgInp && kg) kgInp.value = kg;
-    if (repsInp && reps) repsInp.value = reps;
+    if (kgInp && kg !== undefined && kg !== null && kg !== '') kgInp.value = kg;
+    if (repsInp && reps !== undefined && reps !== null && reps !== '') repsInp.value = reps;
 
     // Marcar como completada si no lo estaba
     if (!targetRow.classList.contains('done')) {

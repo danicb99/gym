@@ -1,3 +1,4 @@
 *.xlsm
 *.zip
 .system_generated/
+scratch/

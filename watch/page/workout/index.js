@@ -23,7 +23,10 @@ Page(BasePage({
     currentKg: 80,
     currentReps: 8,
     stepKg: 2.5,
-    tickerTimer: null
+    tickerTimer: null,
+    plankTimer: null,
+    isPlankRunning: false,
+    cronoBtnWidget: null
   },
 
   onInit() {
@@ -76,17 +79,26 @@ Page(BasePage({
               }
             }
             if (prevStr) {
-              const m = String(prevStr).match(/^([\d\.]+)\s*(?:kg)?\s*[×xX]\s*(\d+)/i)
-              if (m) {
-                loadedKg = parseFloat(m[1])
-                loadedReps = parseInt(m[2], 10)
+              const str = String(prevStr).trim()
+              const mSec = str.match(/^(\d+)\s*(?:s|seg)$/i)
+              if (mSec) {
+                loadedKg = 0
+                loadedReps = parseInt(mSec[1], 10)
+              } else {
+                const m = str.match(/^(?:\+?([\d\.]+)\s*(?:kg)?\s*[×xX]\s*)?(\d+)\s*(?:s|seg|reps?)?$/i)
+                if (m) {
+                  if (m[1] !== undefined) loadedKg = parseFloat(m[1])
+                  if (m[2] !== undefined) loadedReps = parseInt(m[2], 10)
+                }
               }
             }
           }
         }
 
+        const isBodyweightOrIso = ex && (ex.metricType === 'peso_corporal' || ex.metricType === 'isometria')
         const defaultSet = (slot.sets && slot.sets[app.globalData.currentSetIndex]) || ["60", "10"]
-        this.state.currentKg = loadedKg !== null ? loadedKg : (parseFloat(defaultSet[0]) || 60)
+        const fallbackKg = isBodyweightOrIso ? 0 : (parseFloat(defaultSet[0]) || 60)
+        this.state.currentKg = loadedKg !== null ? loadedKg : fallbackKg
         this.state.currentReps = loadedReps !== null ? loadedReps : (parseInt(defaultSet[1], 10) || 10)
       }
     }
@@ -227,7 +239,7 @@ Page(BasePage({
       text_size: 36,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: `${this.state.currentKg.toFixed(1)} kg`
+      text: this.getKgDisplayStr()
     })
 
     hmUI.createWidget(hmUI.widget.BUTTON, {
@@ -246,7 +258,7 @@ Page(BasePage({
       }
     })
 
-    // 4. CONTROL DE REPETICIONES ( [-]  8 reps  [+] ) - TAMAÑO XL
+    // 4. CONTROL DE REPETICIONES / SEGUNDOS ( [-]  8 reps / 60 seg  [+] ) - TAMAÑO XL
     const rowRepsY = 206
     hmUI.createWidget(hmUI.widget.BUTTON, {
       x: 60,
@@ -273,7 +285,7 @@ Page(BasePage({
       text_size: 36,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: `${this.state.currentReps} reps`
+      text: this.getRepsDisplayStr()
     })
 
     hmUI.createWidget(hmUI.widget.BUTTON, {
@@ -292,22 +304,58 @@ Page(BasePage({
       }
     })
 
-    // 5. BOTÓN PRINCIPAL: COMPLETAR SERIE (Grande y accesible)
-    hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 60,
-      y: 276,
-      w: 346,
-      h: 60,
-      radius: 30,
-      normal_color: 0x10b981, // Emerald green
-      press_color: 0x059669,
-      color: 0xffffff,
-      text_size: 22,
-      text: '✓ COMPLETAR SERIE',
-      click_func: () => {
-        this.completeCurrentSet()
-      }
-    })
+    // 5. BOTÓN PRINCIPAL: COMPLETAR SERIE (o DUAL CRONO/GUARDAR para Isometría)
+    const isIso = ex && ex.metricType === 'isometria'
+    if (isIso) {
+      this.state.cronoBtnWidget = hmUI.createWidget(hmUI.widget.BUTTON, {
+        x: 60,
+        y: 276,
+        w: 168,
+        h: 60,
+        radius: 30,
+        normal_color: 0x6366f1, // Indigo vibrante
+        press_color: 0x4f46e5,
+        color: 0xffffff,
+        text_size: 20,
+        text: '⏱️ CRONO',
+        click_func: () => {
+          this.togglePlankTimer()
+        }
+      })
+
+      hmUI.createWidget(hmUI.widget.BUTTON, {
+        x: 238,
+        y: 276,
+        w: 168,
+        h: 60,
+        radius: 30,
+        normal_color: 0x10b981, // Emerald green
+        press_color: 0x059669,
+        color: 0xffffff,
+        text_size: 20,
+        text: '✓ GUARDAR',
+        click_func: () => {
+          this.stopPlankTimer()
+          this.completeCurrentSet()
+        }
+      })
+    } else {
+      hmUI.createWidget(hmUI.widget.BUTTON, {
+        x: 60,
+        y: 276,
+        w: 346,
+        h: 60,
+        radius: 30,
+        normal_color: 0x10b981, // Emerald green
+        press_color: 0x059669,
+        color: 0xffffff,
+        text_size: 22,
+        text: '✓ COMPLETAR SERIE',
+        click_func: () => {
+          this.completeCurrentSet()
+        }
+      })
+    }
 
     // 6. HORA ACTUAL INFERIOR (Grande, nítida, sin emoji)
     this.state.clockWidget = hmUI.createWidget(hmUI.widget.TEXT, {
@@ -359,17 +407,78 @@ Page(BasePage({
     }
   },
 
+  getKgDisplayStr() {
+    const ex = this.state.app.getActiveExercise()
+    const isBodyweight = ex && (ex.metricType === 'peso_corporal' || ex.metricType === 'isometria')
+    if (isBodyweight) {
+      return this.state.currentKg > 0 ? `+${this.state.currentKg.toFixed(1)} kg` : '+0.0 kg'
+    }
+    return `${this.state.currentKg.toFixed(1)} kg`
+  },
+
+  getRepsDisplayStr() {
+    const ex = this.state.app.getActiveExercise()
+    if (ex && ex.metricType === 'isometria') {
+      return `${this.state.currentReps} seg`
+    }
+    if (ex && ex.metricType === 'unilateral') {
+      return `${this.state.currentReps} /lado`
+    }
+    return `${this.state.currentReps} reps`
+  },
+
   adjustKg(delta) {
     this.state.currentKg = Math.max(0, Math.round((this.state.currentKg + delta) * 10) / 10)
     if (this.state.kgWidget) {
-      this.state.kgWidget.setProperty(hmUI.prop.TEXT, `${this.state.currentKg.toFixed(1)} kg`)
+      this.state.kgWidget.setProperty(hmUI.prop.TEXT, this.getKgDisplayStr())
     }
   },
 
   adjustReps(delta) {
-    this.state.currentReps = Math.max(1, this.state.currentReps + delta)
+    const ex = this.state.app.getActiveExercise()
+    const isIso = ex && ex.metricType === 'isometria'
+    const step = isIso ? 5 : 1
+    const minVal = isIso ? 5 : 1
+    this.state.currentReps = Math.max(minVal, this.state.currentReps + (delta * step))
     if (this.state.repsWidget) {
-      this.state.repsWidget.setProperty(hmUI.prop.TEXT, `${this.state.currentReps} reps`)
+      this.state.repsWidget.setProperty(hmUI.prop.TEXT, this.getRepsDisplayStr())
+    }
+  },
+
+  togglePlankTimer() {
+    if (this.state.isPlankRunning) {
+      this.stopPlankTimer()
+      vibrateShort()
+    } else {
+      vibrateShort()
+      this.state.isPlankRunning = true
+      keepScreenActive(180000)
+      if (this.state.cronoBtnWidget) {
+        this.state.cronoBtnWidget.setProperty(hmUI.prop.TEXT, '⏹ PARAR')
+        this.state.cronoBtnWidget.setProperty(hmUI.prop.NORMAL_COLOR, 0xef4444)
+      }
+      this.state.currentReps = 0
+      if (this.state.repsWidget) {
+        this.state.repsWidget.setProperty(hmUI.prop.TEXT, this.getRepsDisplayStr())
+      }
+      this.state.plankTimer = setInterval(() => {
+        this.state.currentReps++
+        if (this.state.repsWidget) {
+          this.state.repsWidget.setProperty(hmUI.prop.TEXT, this.getRepsDisplayStr())
+        }
+      }, 1000)
+    }
+  },
+
+  stopPlankTimer() {
+    if (this.state.plankTimer) {
+      clearInterval(this.state.plankTimer)
+      this.state.plankTimer = null
+    }
+    this.state.isPlankRunning = false
+    if (this.state.cronoBtnWidget) {
+      this.state.cronoBtnWidget.setProperty(hmUI.prop.TEXT, '⏱️ CRONO')
+      this.state.cronoBtnWidget.setProperty(hmUI.prop.NORMAL_COLOR, 0x6366f1)
     }
   },
 
@@ -468,6 +577,7 @@ Page(BasePage({
   },
 
   completeCurrentSet() {
+    this.stopPlankTimer()
     vibrateShort()
     const app = this.state.app
     const slot = app.getActiveSlot()
@@ -572,6 +682,7 @@ Page(BasePage({
   },
 
   onDestroy() {
+    this.stopPlankTimer()
     this.stopWorkoutTicker()
     this.disableWakeUpRelaunch()
     if (this.state.heartRateSensor) {
