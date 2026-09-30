@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigorexiapp-v24';
+const CACHE_NAME = 'vigorexiapp-v25';
 const NOTIF_BADGE = './badge-dumbbell.png?v=3';
 const NOTIF_ICON = './icon-192.png?v=3';
 
@@ -85,6 +85,7 @@ self.addEventListener('fetch', (e) => {
 
 let currentRestState = null;
 let liveTickerInterval = null;
+let bgTimerId = null;
 
 function formatRestClock(totalSeconds) {
   const m = Math.floor(Math.max(0, totalSeconds) / 60);
@@ -92,15 +93,23 @@ function formatRestClock(totalSeconds) {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+function formatEndTime(timestamp) {
+  const d = new Date(timestamp);
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  return `${h}:${m}`;
+}
+
 function showLiveRestNotification(state) {
   if (!state || !state.endTime) return Promise.resolve();
   const remaining = Math.max(0, Math.round((state.endTime - Date.now()) / 1000));
   const timeText = formatRestClock(remaining);
+  const finishTime = formatEndTime(state.endTime);
   const exercise = state.exerciseName || 'Siguiente serie';
   const subtitle = state.setInfo ? `${exercise} (${state.setInfo})` : exercise;
 
-  return self.registration.showNotification(`⏱️ ${timeText} — Descanso`, {
-    body: `⏱️ ${timeText} • Siguiente: ${subtitle}`,
+  return self.registration.showNotification(`⏱️ ${timeText} (Hasta ${finishTime})`, {
+    body: `⏱️ ${timeText} • Termina a las ${finishTime} • ${subtitle}`,
     icon: NOTIF_ICON,
     badge: NOTIF_BADGE,
     tag: 'vigorexiapp-rest-live',
@@ -140,6 +149,10 @@ function stopLiveTicker() {
     clearInterval(liveTickerInterval);
     liveTickerInterval = null;
   }
+  if (bgTimerId) {
+    clearTimeout(bgTimerId);
+    bgTimerId = null;
+  }
 }
 
 function startLiveTicker(state) {
@@ -150,7 +163,19 @@ function startLiveTicker(state) {
   // Actualizar inmediatamente
   showLiveRestNotification(currentRestState);
 
-  // Bucle de refresco en vivo segundo a segundo
+  // 1. Programar el despertar nativo para cuando expire el tiempo
+  // Esto garantiza que aunque Android congele el setInterval durante el bloqueo,
+  // el sistema operativo despierte la CPU y lance la alarma final con sonido y vibración.
+  const delay = Math.max(0, currentRestState.endTime - Date.now());
+  bgTimerId = setTimeout(() => {
+    const finished = currentRestState;
+    stopLiveTicker();
+    currentRestState = null;
+    showRestFinishedNotification(finished);
+    notifyClients({ type: 'REST_TIMER_FINISHED' });
+  }, delay);
+
+  // 2. Ticker de refresco en vivo mientras la pantalla o CPU estén activas
   liveTickerInterval = setInterval(() => {
     if (!currentRestState || !currentRestState.endTime) {
       stopLiveTicker();
@@ -181,7 +206,7 @@ self.addEventListener('notificationclick', (event) => {
   if (action === 'add30') {
     if (currentRestState && currentRestState.endTime) {
       currentRestState.endTime += 30000;
-      showLiveRestNotification(currentRestState);
+      startLiveTicker(currentRestState);
       notifyClients({ type: 'REST_TIMER_ADJUSTED', delta: 30 });
     }
     return;
