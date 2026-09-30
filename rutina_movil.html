@@ -3572,17 +3572,23 @@
           <button class="btn-backup primary" onclick="downloadBackupJSON()">
             <span>💾 Descargar JSON</span>
           </button>
+          <button class="btn-backup" onclick="copyBackupToClipboard()">
+            <span>📋 Copiar JSON</span>
+          </button>
           <button class="btn-backup share" onclick="shareBackup()">
             <span>📤 Compartir Drive / WA</span>
           </button>
-          <button class="btn-backup" onclick="exportCSV()">
-            <span>📊 Exportar a Excel</span>
-          </button>
           <button class="btn-backup" onclick="document.getElementById('restoreFileInput').click()">
-            <span>📥 Restaurar Copia</span>
+            <span>📁 Seleccionar Archivo</span>
+          </button>
+          <button class="btn-backup primary" onclick="pasteBackupFromClipboard()" style="grid-column: span 2; background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(16, 185, 129, 0.2)); border-color: rgba(56, 189, 248, 0.4); color: var(--cyan);">
+            <span>📥 Restaurar desde Portapapeles o Texto</span>
+          </button>
+          <button class="btn-backup" onclick="exportCSV()" style="grid-column: span 2;">
+            <span>📊 Exportar Historial a Excel</span>
           </button>
         </div>
-        <input type="file" id="restoreFileInput" accept=".json" style="display:none" onchange="restoreBackupFromFile(this)">
+        <input type="file" id="restoreFileInput" accept=".json,application/json,text/plain,*/*" style="display:none" onchange="restoreBackupFromFile(this)">
       </div>
 
       <!-- Past Sessions Timeline -->
@@ -5238,30 +5244,23 @@
       showToast('📊 CSV exportado con éxito');
     }
 
-    function restoreBackupFromFile(fileInput) {
-      const file = fileInput.files[0];
-      if (!file) return;
+    function applyRestoredState(parsed) {
+      if (!parsed || typeof parsed !== 'object') throw new Error('Formato inválido');
+      
+      workoutState = {
+        inputs: parsed.inputs || {},
+        completed: parsed.completed || [],
+        previous: parsed.previous || {},
+        exerciseHistory: parsed.exerciseHistory || {},
+        sessions: parsed.sessions || [],
+        customSlots: parsed.customSlots || {},
+        tempSlots: parsed.tempSlots || {},
+        sessionStartTime: parsed.sessionStartTime || {},
+        lastActivityTime: parsed.lastActivityTime || {}
+      };
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          if (!parsed || typeof parsed !== 'object') throw new Error('Formato inválido');
-          
-          workoutState = {
-            inputs: parsed.inputs || {},
-            completed: parsed.completed || [],
-            previous: parsed.previous || {},
-            exerciseHistory: parsed.exerciseHistory || {},
-            sessions: parsed.sessions || [],
-            customSlots: parsed.customSlots || {},
-            tempSlots: parsed.tempSlots || {},
-            sessionStartTime: parsed.sessionStartTime || {},
-            lastActivityTime: parsed.lastActivityTime || {}
-          };
-
-          localStorage.setItem('aesthetic_routine_data', JSON.stringify(workoutState));
-          applyCustomSlotsToDOM();
+      localStorage.setItem('aesthetic_routine_data', JSON.stringify(workoutState));
+      applyCustomSlotsToDOM();
 
       // Auto-migración preventiva de marcas históricas con formato 'k' -> 'kg'
       if (workoutState.previous) {
@@ -5279,7 +5278,21 @@
         if (dirty) saveWorkoutState();
       }
 
-          loadWorkoutState();
+      loadWorkoutState();
+      if (window.VigorexiWatchSync && typeof window.VigorexiWatchSync.broadcast === 'function') {
+        window.VigorexiWatchSync.broadcast();
+      }
+    }
+
+    function restoreBackupFromFile(fileInput) {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          applyRestoredState(parsed);
           showToast('🎉 ¡Copia de seguridad restaurada con éxito!');
         } catch (err) {
           alert('Error al leer el archivo de copia de seguridad: ' + err.message);
@@ -5287,6 +5300,41 @@
       };
       reader.readAsText(file);
       fileInput.value = '';
+    }
+
+    async function copyBackupToClipboard() {
+      const jsonContent = JSON.stringify(workoutState, null, 2);
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(jsonContent);
+          showToast('📋 ¡Copia copiada al portapapeles!');
+          return;
+        }
+      } catch (e) {}
+      prompt('Copia este texto para pegarlo en tu otra app:', jsonContent);
+    }
+
+    async function pasteBackupFromClipboard() {
+      let text = '';
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          text = await navigator.clipboard.readText();
+        }
+      } catch (e) {}
+
+      if (!text || !text.trim().startsWith('{')) {
+        text = prompt('Pega aquí el contenido de tu copia de seguridad (JSON):');
+      }
+
+      if (!text || !text.trim()) return;
+
+      try {
+        const parsed = JSON.parse(text);
+        applyRestoredState(parsed);
+        showToast('🎉 ¡Copia de seguridad restaurada con éxito!');
+      } catch (err) {
+        alert('Error al procesar los datos pegados: ' + err.message);
+      }
     }
 
     // ==========================================
