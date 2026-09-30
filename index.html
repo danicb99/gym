@@ -5371,7 +5371,7 @@
           finishTimer();
           showToast('💪 Descanso completado desde pantalla de bloqueo');
         } else if (event.data && event.data.type === 'REST_TIMER_FINISHED') {
-          finishTimer();
+          finishTimer(true);
         }
       });
     }
@@ -5647,7 +5647,7 @@
       }
     }
 
-    function finishTimer() {
+    function finishTimer(fromSW = false) {
       clearInterval(timerInterval);
       isTimerActive = false;
       timerEndTime = null;
@@ -5660,7 +5660,9 @@
       }
       updateTimerUI();
       saveRestTimerState();
-      sendRestFinishedNotification();
+      if (!fromSW) {
+        sendRestFinishedNotification();
+      }
 
       // Aviso por voz en auriculares al finalizar
       if (audioMode === 'headphones') {

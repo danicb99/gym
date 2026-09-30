@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigorexiapp-v25';
+const CACHE_NAME = 'vigorexiapp-v26';
 const NOTIF_BADGE = './badge-dumbbell.png?v=3';
 const NOTIF_ICON = './icon-192.png?v=3';
 
@@ -108,8 +108,8 @@ function showLiveRestNotification(state) {
   const exercise = state.exerciseName || 'Siguiente serie';
   const subtitle = state.setInfo ? `${exercise} (${state.setInfo})` : exercise;
 
-  return self.registration.showNotification(`⏱️ ${timeText} (Hasta ${finishTime})`, {
-    body: `⏱️ ${timeText} • Termina a las ${finishTime} • ${subtitle}`,
+  return self.registration.showNotification(`⏱️ ${timeText} — Descanso`, {
+    body: `Termina ${finishTime} • ${subtitle}`,
     icon: NOTIF_ICON,
     badge: NOTIF_BADGE,
     tag: 'vigorexiapp-rest-live',
