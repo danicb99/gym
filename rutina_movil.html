@@ -5625,11 +5625,11 @@
         timerRemaining = diff;
         updateTimerUI();
 
-        // Audio cue con rango de seguridad (<= 5s y >= 2s) para no saltárselo por throttling en segundo plano
-        if (diff <= 5 && diff >= 2 && !voicedWarning && audioMode === 'headphones') {
+        // Audio cue con rango de seguridad (<= 10s y >= 5s) para avisar 10 segundos antes
+        if (diff <= 10 && diff >= 5 && !voicedWarning && audioMode === 'headphones') {
           voicedWarning = true;
           playPreWarningTone();
-          speakAudioCue("Cinco segundos");
+          speakAudioCue("Diez segundos");
         }
 
         if (diff <= 0) {
