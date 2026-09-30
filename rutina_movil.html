@@ -5346,6 +5346,21 @@
       }
     }
 
+    function sendSWMessage(msg) {
+      try {
+        if ('serviceWorker' in navigator) {
+          if (navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage(msg);
+          }
+          navigator.serviceWorker.ready.then(reg => {
+            if (reg && reg.active && reg.active !== navigator.serviceWorker.controller) {
+              reg.active.postMessage(msg);
+            }
+          }).catch(() => {});
+        }
+      } catch(e) {}
+    }
+
     // Escucha de acciones disparadas desde la pantalla de bloqueo o reloj
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', (event) => {
@@ -5355,6 +5370,8 @@
         } else if (event.data && event.data.type === 'REST_TIMER_SKIPPED') {
           finishTimer();
           showToast('💪 Descanso completado desde pantalla de bloqueo');
+        } else if (event.data && event.data.type === 'REST_TIMER_FINISHED') {
+          finishTimer();
         }
       });
     }
@@ -5365,8 +5382,8 @@
         const title = '¡Descanso Terminado! ⏱️';
         const options = {
           body: 'Hora de la siguiente serie en Vigorexiapp 💪',
-          icon: './icon-192.png',
-          badge: './badge-round.png',
+          icon: './icon-192.png?v=3',
+          badge: './badge-dumbbell.png?v=3',
           vibrate: [200, 100, 200, 100, 300],
           tag: 'rest-finish',
           renotify: true,
@@ -5477,14 +5494,12 @@
       timerEndTime = Date.now() + timerRemaining * 1000;
       updateTimerUI();
       saveRestTimerState();
-      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          type: 'UPDATE_REST_TIMER',
-          endTime: timerEndTime,
-          exerciseName: currentRestExerciseInfo.name || '',
-          setInfo: currentRestExerciseInfo.setInfo || ''
-        });
-      }
+      sendSWMessage({
+        type: 'UPDATE_REST_TIMER',
+        endTime: timerEndTime,
+        exerciseName: currentRestExerciseInfo.name || '',
+        setInfo: currentRestExerciseInfo.setInfo || ''
+      });
     }
 
     function togglePlayTimer() {
@@ -5567,15 +5582,13 @@
       isTimerActive = true;
       if (!timerEndTime) timerEndTime = Date.now() + timerRemaining * 1000;
       acquireWakeLock();
-      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          type: 'START_REST_TIMER',
-          endTime: timerEndTime,
-          duration: timerDuration,
-          exerciseName: currentRestExerciseInfo.name || '',
-          setInfo: currentRestExerciseInfo.setInfo || ''
-        });
-      }
+      sendSWMessage({
+        type: 'START_REST_TIMER',
+        endTime: timerEndTime,
+        duration: timerDuration,
+        exerciseName: currentRestExerciseInfo.name || '',
+        setInfo: currentRestExerciseInfo.setInfo || ''
+      });
 
       const btn = document.getElementById('timerPlayBtn');
       if (btn) {
@@ -5608,11 +5621,7 @@
       clearInterval(timerInterval);
       isTimerActive = false;
       releaseWakeLock();
-      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          type: 'CANCEL_REST_TIMER'
-        });
-      }
+      sendSWMessage({ type: 'CANCEL_REST_TIMER' });
       const btn = document.getElementById('timerPlayBtn');
       if (btn) {
         btn.innerText = "Reanudar";
@@ -5628,11 +5637,7 @@
       timerEndTime = null;
       timerRemaining = timerDuration;
       releaseWakeLock();
-      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          type: 'CANCEL_REST_TIMER'
-        });
-      }
+      sendSWMessage({ type: 'CANCEL_REST_TIMER' });
       updateTimerUI();
       saveRestTimerState();
       const btn = document.getElementById('timerPlayBtn');
@@ -5647,11 +5652,7 @@
       isTimerActive = false;
       timerEndTime = null;
       releaseWakeLock();
-      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          type: 'CANCEL_REST_TIMER'
-        });
-      }
+      sendSWMessage({ type: 'CANCEL_REST_TIMER' });
       const btn = document.getElementById('timerPlayBtn');
       if (btn) {
         btn.innerText = "Listo";
@@ -5675,8 +5676,8 @@
         updateTimerUI();
         if (diff <= 0) {
           finishTimer();
-        } else if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-          navigator.serviceWorker.controller.postMessage({
+        } else {
+          sendSWMessage({
             type: 'UPDATE_REST_TIMER',
             endTime: timerEndTime,
             exerciseName: currentRestExerciseInfo.name || '',

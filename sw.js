@@ -1,4 +1,7 @@
-const CACHE_NAME = 'vigorexiapp-v22';
+const CACHE_NAME = 'vigorexiapp-v23';
+const NOTIF_BADGE = './badge-dumbbell.png?v=3';
+const NOTIF_ICON = './icon-192.png?v=3';
+
 const ASSETS = [
   './',
   './index.html',
@@ -10,6 +13,7 @@ const ASSETS = [
   './icon-round-512.png',
   './badge-round.png',
   './badge.png',
+  './badge-dumbbell.png',
   './manifest.json',
   './manifest.json?v=2',
   './icon-192.png',
@@ -79,8 +83,8 @@ self.addEventListener('fetch', (e) => {
   );
 });
 
-let bgTimerId = null;
 let currentRestState = null;
+let liveTickerInterval = null;
 
 function formatRestClock(totalSeconds) {
   const m = Math.floor(Math.max(0, totalSeconds) / 60);
@@ -97,8 +101,8 @@ function showLiveRestNotification(state) {
 
   return self.registration.showNotification(`⏳ Descanso: ${timeText}`, {
     body: `Siguiente: ${subtitle} • Vigorexiapp 💪`,
-    icon: './icon-192.png',
-    badge: './badge-round.png',
+    icon: NOTIF_ICON,
+    badge: NOTIF_BADGE,
     tag: 'vigorexiapp-rest-live',
     ongoing: true,
     silent: true,
@@ -110,10 +114,59 @@ function showLiveRestNotification(state) {
   }).catch(() => {});
 }
 
+function showRestFinishedNotification(state) {
+  clearLiveRestNotification();
+  const exName = state && state.exerciseName ? state.exerciseName : '';
+  return self.registration.showNotification('¡Descanso Terminado! 🔔', {
+    body: exName 
+      ? `¡A por ello! Siguiente: ${exName} 💪` 
+      : 'Hora de la siguiente serie en Vigorexiapp 💪',
+    icon: NOTIF_ICON,
+    badge: NOTIF_BADGE,
+    vibrate: [200, 100, 200, 100, 300],
+    tag: 'rest-finish',
+    renotify: true
+  }).catch(() => {});
+}
+
 function clearLiveRestNotification() {
   return self.registration.getNotifications({ tag: 'vigorexiapp-rest-live' }).then((notifications) => {
     notifications.forEach((n) => n.close());
   }).catch(() => {});
+}
+
+function stopLiveTicker() {
+  if (liveTickerInterval) {
+    clearInterval(liveTickerInterval);
+    liveTickerInterval = null;
+  }
+}
+
+function startLiveTicker(state) {
+  stopLiveTicker();
+  currentRestState = state;
+  if (!currentRestState || !currentRestState.endTime) return;
+
+  // Actualizar inmediatamente
+  showLiveRestNotification(currentRestState);
+
+  // Bucle de refresco en vivo segundo a segundo
+  liveTickerInterval = setInterval(() => {
+    if (!currentRestState || !currentRestState.endTime) {
+      stopLiveTicker();
+      return;
+    }
+    const remaining = Math.max(0, Math.round((currentRestState.endTime - Date.now()) / 1000));
+    if (remaining <= 0) {
+      const finished = currentRestState;
+      stopLiveTicker();
+      currentRestState = null;
+      showRestFinishedNotification(finished);
+      notifyClients({ type: 'REST_TIMER_FINISHED' });
+    } else {
+      showLiveRestNotification(currentRestState);
+    }
+  }, 1000);
 }
 
 function notifyClients(msg) {
@@ -128,24 +181,6 @@ self.addEventListener('notificationclick', (event) => {
   if (action === 'add30') {
     if (currentRestState && currentRestState.endTime) {
       currentRestState.endTime += 30000;
-      if (bgTimerId) clearTimeout(bgTimerId);
-      const delay = Math.max(0, currentRestState.endTime - Date.now());
-      bgTimerId = setTimeout(() => {
-        clearLiveRestNotification();
-        self.registration.showNotification('¡Descanso Terminado! 🔔', {
-          body: currentRestState.exerciseName 
-            ? `¡A por ello! Siguiente: ${currentRestState.exerciseName} 💪` 
-            : 'Hora de la siguiente serie en Vigorexiapp 💪',
-          icon: './icon-192.png',
-          badge: './badge-round.png',
-          vibrate: [200, 100, 200, 100, 300],
-          tag: 'rest-finish',
-          renotify: true
-        });
-        bgTimerId = null;
-        currentRestState = null;
-      }, delay);
-
       showLiveRestNotification(currentRestState);
       notifyClients({ type: 'REST_TIMER_ADJUSTED', delta: 30 });
     }
@@ -153,20 +188,19 @@ self.addEventListener('notificationclick', (event) => {
   }
 
   if (action === 'skip') {
-    if (bgTimerId) clearTimeout(bgTimerId);
-    bgTimerId = null;
+    stopLiveTicker();
     clearLiveRestNotification();
 
     self.registration.showNotification('¡Listo para la serie! 💪', {
       body: currentRestState && currentRestState.exerciseName
         ? `A darlo todo en: ${currentRestState.exerciseName}`
         : 'Hora de la siguiente serie en Vigorexiapp 💪',
-      icon: './icon-192.png',
-      badge: './badge-round.png',
+      icon: NOTIF_ICON,
+      badge: NOTIF_BADGE,
       vibrate: [150, 80, 150],
       tag: 'rest-finish',
       renotify: true
-    });
+    }).catch(() => {});
 
     notifyClients({ type: 'REST_TIMER_SKIPPED' });
     currentRestState = null;
@@ -187,64 +221,29 @@ self.addEventListener('notificationclick', (event) => {
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'START_REST_TIMER') {
-    if (bgTimerId) clearTimeout(bgTimerId);
     currentRestState = {
       endTime: event.data.endTime,
       duration: event.data.duration || 90,
       exerciseName: event.data.exerciseName || '',
       setInfo: event.data.setInfo || ''
     };
-
-    // Publicar inmediatamente notificación persistente para la pantalla de bloqueo
-    showLiveRestNotification(currentRestState);
-
-    const delay = Math.max(0, currentRestState.endTime - Date.now());
-    bgTimerId = setTimeout(() => {
-      clearLiveRestNotification();
-      self.registration.showNotification('¡Descanso Terminado! 🔔', {
-        body: currentRestState.exerciseName 
-          ? `¡A por ello! Siguiente: ${currentRestState.exerciseName} 💪` 
-          : 'Hora de la siguiente serie en Vigorexiapp 💪',
-        icon: './icon-192.png',
-        badge: './badge-round.png',
-        vibrate: [200, 100, 200, 100, 300],
-        tag: 'rest-finish',
-        renotify: true
-      });
-      bgTimerId = null;
-      currentRestState = null;
-    }, delay);
+    startLiveTicker(currentRestState);
   } else if (event.data && event.data.type === 'UPDATE_REST_TIMER') {
     if (currentRestState) {
       currentRestState.endTime = event.data.endTime;
       if (event.data.exerciseName) currentRestState.exerciseName = event.data.exerciseName;
       if (event.data.setInfo) currentRestState.setInfo = event.data.setInfo;
-
-      if (bgTimerId) clearTimeout(bgTimerId);
-      const delay = Math.max(0, currentRestState.endTime - Date.now());
-      bgTimerId = setTimeout(() => {
-        clearLiveRestNotification();
-        self.registration.showNotification('¡Descanso Terminado! 🔔', {
-          body: currentRestState.exerciseName 
-            ? `¡A por ello! Siguiente: ${currentRestState.exerciseName} 💪` 
-            : 'Hora de la siguiente serie en Vigorexiapp 💪',
-          icon: './icon-192.png',
-          badge: './badge-round.png',
-          vibrate: [200, 100, 200, 100, 300],
-          tag: 'rest-finish',
-          renotify: true
-        });
-        bgTimerId = null;
-        currentRestState = null;
-      }, delay);
-
-      showLiveRestNotification(currentRestState);
+    } else {
+      currentRestState = {
+        endTime: event.data.endTime,
+        duration: event.data.duration || 90,
+        exerciseName: event.data.exerciseName || '',
+        setInfo: event.data.setInfo || ''
+      };
     }
+    startLiveTicker(currentRestState);
   } else if (event.data && event.data.type === 'CANCEL_REST_TIMER') {
-    if (bgTimerId) {
-      clearTimeout(bgTimerId);
-      bgTimerId = null;
-    }
+    stopLiveTicker();
     currentRestState = null;
     clearLiveRestNotification();
   } else if (event.data && event.data.type === 'SKIP_WAITING') {

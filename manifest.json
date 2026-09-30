@@ -33,6 +33,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "./badge-dumbbell.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "monochrome"
     }
   ]
 }
