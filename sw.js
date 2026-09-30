@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigorexiapp-v26';
+const CACHE_NAME = 'vigorexiapp-v27';
 const NOTIF_BADGE = './badge-dumbbell.png?v=3';
 const NOTIF_ICON = './icon-192.png?v=3';
 
@@ -144,6 +144,8 @@ function clearLiveRestNotification() {
   }).catch(() => {});
 }
 
+let activeTimerResolve = null;
+
 function stopLiveTicker() {
   if (liveTickerInterval) {
     clearInterval(liveTickerInterval);
@@ -153,45 +155,54 @@ function stopLiveTicker() {
     clearTimeout(bgTimerId);
     bgTimerId = null;
   }
+  if (activeTimerResolve) {
+    activeTimerResolve();
+    activeTimerResolve = null;
+  }
 }
 
 function startLiveTicker(state) {
   stopLiveTicker();
   currentRestState = state;
-  if (!currentRestState || !currentRestState.endTime) return;
+  if (!currentRestState || !currentRestState.endTime) return Promise.resolve();
 
   // Actualizar inmediatamente
   showLiveRestNotification(currentRestState);
 
-  // 1. Programar el despertar nativo para cuando expire el tiempo
-  // Esto garantiza que aunque Android congele el setInterval durante el bloqueo,
-  // el sistema operativo despierte la CPU y lance la alarma final con sonido y vibración.
-  const delay = Math.max(0, currentRestState.endTime - Date.now());
-  bgTimerId = setTimeout(() => {
-    const finished = currentRestState;
-    stopLiveTicker();
-    currentRestState = null;
-    showRestFinishedNotification(finished);
-    notifyClients({ type: 'REST_TIMER_FINISHED' });
-  }, delay);
+  return new Promise((resolve) => {
+    activeTimerResolve = resolve;
 
-  // 2. Ticker de refresco en vivo mientras la pantalla o CPU estén activas
-  liveTickerInterval = setInterval(() => {
-    if (!currentRestState || !currentRestState.endTime) {
-      stopLiveTicker();
-      return;
-    }
-    const remaining = Math.max(0, Math.round((currentRestState.endTime - Date.now()) / 1000));
-    if (remaining <= 0) {
+    // 1. Programar el despertar nativo para cuando expire el tiempo
+    const delay = Math.max(0, currentRestState.endTime - Date.now());
+    bgTimerId = setTimeout(() => {
       const finished = currentRestState;
       stopLiveTicker();
       currentRestState = null;
       showRestFinishedNotification(finished);
       notifyClients({ type: 'REST_TIMER_FINISHED' });
-    } else {
-      showLiveRestNotification(currentRestState);
-    }
-  }, 1000);
+      resolve();
+    }, delay);
+
+    // 2. Ticker de refresco en vivo mientras la pantalla o CPU estén activas
+    liveTickerInterval = setInterval(() => {
+      if (!currentRestState || !currentRestState.endTime) {
+        stopLiveTicker();
+        resolve();
+        return;
+      }
+      const remaining = Math.max(0, Math.round((currentRestState.endTime - Date.now()) / 1000));
+      if (remaining <= 0) {
+        const finished = currentRestState;
+        stopLiveTicker();
+        currentRestState = null;
+        showRestFinishedNotification(finished);
+        notifyClients({ type: 'REST_TIMER_FINISHED' });
+        resolve();
+      } else {
+        showLiveRestNotification(currentRestState);
+      }
+    }, 1000);
+  });
 }
 
 function notifyClients(msg) {
@@ -206,7 +217,8 @@ self.addEventListener('notificationclick', (event) => {
   if (action === 'add30') {
     if (currentRestState && currentRestState.endTime) {
       currentRestState.endTime += 30000;
-      startLiveTicker(currentRestState);
+      const p = startLiveTicker(currentRestState);
+      if (event.waitUntil) event.waitUntil(p);
       notifyClients({ type: 'REST_TIMER_ADJUSTED', delta: 30 });
     }
     return;
@@ -216,7 +228,7 @@ self.addEventListener('notificationclick', (event) => {
     stopLiveTicker();
     clearLiveRestNotification();
 
-    self.registration.showNotification('¡Listo para la serie! 💪', {
+    const p = self.registration.showNotification('¡Listo para la serie! 💪', {
       body: currentRestState && currentRestState.exerciseName
         ? `A darlo todo en: ${currentRestState.exerciseName}`
         : 'Hora de la siguiente serie en Vigorexiapp 💪',
@@ -227,6 +239,7 @@ self.addEventListener('notificationclick', (event) => {
       renotify: true
     }).catch(() => {});
 
+    if (event.waitUntil) event.waitUntil(p);
     notifyClients({ type: 'REST_TIMER_SKIPPED' });
     currentRestState = null;
     return;
@@ -252,7 +265,8 @@ self.addEventListener('message', (event) => {
       exerciseName: event.data.exerciseName || '',
       setInfo: event.data.setInfo || ''
     };
-    startLiveTicker(currentRestState);
+    const p = startLiveTicker(currentRestState);
+    if (event.waitUntil) event.waitUntil(p);
   } else if (event.data && event.data.type === 'UPDATE_REST_TIMER') {
     if (currentRestState) {
       currentRestState.endTime = event.data.endTime;
@@ -266,7 +280,8 @@ self.addEventListener('message', (event) => {
         setInfo: event.data.setInfo || ''
       };
     }
-    startLiveTicker(currentRestState);
+    const p = startLiveTicker(currentRestState);
+    if (event.waitUntil) event.waitUntil(p);
   } else if (event.data && event.data.type === 'CANCEL_REST_TIMER') {
     stopLiveTicker();
     currentRestState = null;

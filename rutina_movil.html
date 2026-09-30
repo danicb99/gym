@@ -5577,6 +5577,26 @@
       } catch (e) {}
     }
 
+    function playPreWarningTone() {
+      if (audioMode !== 'headphones') return;
+      try {
+        if (!window._vigorexiappAudioCtx) window._vigorexiappAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = window._vigorexiappAudioCtx;
+        if (ctx.state === 'suspended') ctx.resume();
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(659.25, t); // E5 soft tone
+        gain.gain.setValueAtTime(0.12, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.15);
+      } catch(e) {}
+    }
+
     function startTimerLoop() {
       clearInterval(timerInterval);
       isTimerActive = true;
@@ -5605,9 +5625,10 @@
         timerRemaining = diff;
         updateTimerUI();
 
-        // Audio cue solo a través de auriculares si el modo está activado
-        if (diff === 5 && !voicedWarning && audioMode === 'headphones') {
+        // Audio cue con rango de seguridad (<= 5s y >= 2s) para no saltárselo por throttling en segundo plano
+        if (diff <= 5 && diff >= 2 && !voicedWarning && audioMode === 'headphones') {
           voicedWarning = true;
+          playPreWarningTone();
           speakAudioCue("Cinco segundos");
         }
 
