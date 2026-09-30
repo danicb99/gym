@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigorexiapp-v21';
+const CACHE_NAME = 'vigorexiapp-v22';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   './icon-round-192.png',
   './icon-round-512.png',
   './badge-round.png',
+  './badge.png',
   './manifest.json',
   './manifest.json?v=2',
   './icon-192.png',
@@ -96,7 +97,7 @@ function showLiveRestNotification(state) {
 
   return self.registration.showNotification(`⏳ Descanso: ${timeText}`, {
     body: `Siguiente: ${subtitle} • Vigorexiapp 💪`,
-    icon: './icon-round-192.png',
+    icon: './icon-192.png',
     badge: './badge-round.png',
     tag: 'vigorexiapp-rest-live',
     ongoing: true,
@@ -135,7 +136,7 @@ self.addEventListener('notificationclick', (event) => {
           body: currentRestState.exerciseName 
             ? `¡A por ello! Siguiente: ${currentRestState.exerciseName} 💪` 
             : 'Hora de la siguiente serie en Vigorexiapp 💪',
-          icon: './icon-round-192.png',
+          icon: './icon-192.png',
           badge: './badge-round.png',
           vibrate: [200, 100, 200, 100, 300],
           tag: 'rest-finish',
@@ -160,7 +161,7 @@ self.addEventListener('notificationclick', (event) => {
       body: currentRestState && currentRestState.exerciseName
         ? `A darlo todo en: ${currentRestState.exerciseName}`
         : 'Hora de la siguiente serie en Vigorexiapp 💪',
-      icon: './icon-round-192.png',
+      icon: './icon-192.png',
       badge: './badge-round.png',
       vibrate: [150, 80, 150],
       tag: 'rest-finish',
@@ -204,7 +205,7 @@ self.addEventListener('message', (event) => {
         body: currentRestState.exerciseName 
           ? `¡A por ello! Siguiente: ${currentRestState.exerciseName} 💪` 
           : 'Hora de la siguiente serie en Vigorexiapp 💪',
-        icon: './icon-round-192.png',
+        icon: './icon-192.png',
         badge: './badge-round.png',
         vibrate: [200, 100, 200, 100, 300],
         tag: 'rest-finish',
@@ -227,7 +228,7 @@ self.addEventListener('message', (event) => {
           body: currentRestState.exerciseName 
             ? `¡A por ello! Siguiente: ${currentRestState.exerciseName} 💪` 
             : 'Hora de la siguiente serie en Vigorexiapp 💪',
-          icon: './icon-round-192.png',
+          icon: './icon-192.png',
           badge: './badge-round.png',
           vibrate: [200, 100, 200, 100, 300],
           tag: 'rest-finish',
