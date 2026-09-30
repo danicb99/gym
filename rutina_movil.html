@@ -5584,16 +5584,30 @@
         const ctx = window._vigorexiappAudioCtx;
         if (ctx.state === 'suspended') ctx.resume();
         const t = ctx.currentTime;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(659.25, t); // E5 soft tone
-        gain.gain.setValueAtTime(0.12, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(t);
-        osc.stop(t + 0.15);
+
+        // Chime 1 (E5 - 659Hz)
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(659.25, t);
+        gain1.gain.setValueAtTime(0.12, t);
+        gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(t);
+        osc1.stop(t + 0.12);
+
+        // Chime 2 (G#5 - 830.6Hz)
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(830.6, t + 0.14);
+        gain2.gain.setValueAtTime(0.12, t + 0.14);
+        gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(t + 0.14);
+        osc2.stop(t + 0.28);
       } catch(e) {}
     }
 
@@ -5626,10 +5640,15 @@
         updateTimerUI();
 
         // Audio cue con rango de seguridad (<= 10s y >= 5s) para avisar 10 segundos antes
-        if (diff <= 10 && diff >= 5 && !voicedWarning && audioMode === 'headphones') {
+        if (diff <= 10 && diff >= 5 && !voicedWarning) {
           voicedWarning = true;
-          playPreWarningTone();
-          speakAudioCue("Diez segundos");
+          if (navigator.vibrate) {
+            try { navigator.vibrate([150, 100, 150]); } catch(e) {}
+          }
+          if (audioMode === 'headphones') {
+            playPreWarningTone();
+            speakAudioCue("Diez segundos");
+          }
         }
 
         if (diff <= 0) {

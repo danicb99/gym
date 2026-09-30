@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigorexiapp-v28';
+const CACHE_NAME = 'vigorexiapp-v29';
 const NOTIF_BADGE = './badge-dumbbell.png?v=3';
 const NOTIF_ICON = './icon-192.png?v=3';
 
