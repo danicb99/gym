@@ -4,6 +4,61 @@
  */
 
 export const ROUTINE_SLOTS = {
+  // === PROGRAMA 1: FULL BODY CÍCLICO ROTATIVO (3 DÍAS) ===
+  fullbodyA: {
+    id: "fullbodyA",
+    title: "Día A: Full Body A",
+    subtitle: "Squat Pesado & Torso",
+    dayNum: "Día A",
+    shortName: "Día A (Squat + Torso)",
+    program: "fullbody",
+    totalSets: 20,
+    slots: [
+      { slotId: "fullbodyA_1", defaultExId: "squat", num: 1, sets: [["100", "8"], ["100", "8"], ["100", "7"]] },
+      { slotId: "fullbodyA_2", defaultExId: "banca", num: 2, sets: [["80", "8"], ["80", "8"], ["80", "7"], ["80", "6"]] },
+      { slotId: "fullbodyA_3", defaultExId: "jalon", num: 3, sets: [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]] },
+      { slotId: "fullbodyA_4", defaultExId: "laterales1", num: 4, sets: [["12", "15"], ["12", "14"], ["12", "12"]] },
+      { slotId: "fullbodyA_5", defaultExId: "triceps1", num: 5, sets: [["30", "12"], ["30", "11"], ["30", "10"]] },
+      { slotId: "fullbodyA_6", defaultExId: "biceps1", num: 6, sets: [["16", "12"], ["16", "10"], ["16", "10"]] }
+    ]
+  },
+  fullbodyB: {
+    id: "fullbodyB",
+    title: "Día B: Full Body B",
+    subtitle: "RDL & Torso Hipertrofia",
+    dayNum: "Día B",
+    shortName: "Día B (RDL + Torso)",
+    program: "fullbody",
+    totalSets: 20,
+    slots: [
+      { slotId: "fullbodyB_1", defaultExId: "rdl", num: 1, sets: [["90", "10"], ["90", "10"], ["90", "8"]] },
+      { slotId: "fullbodyB_2", defaultExId: "inclinado", num: 2, sets: [["30", "10"], ["30", "10"], ["30", "8"], ["30", "8"]] },
+      { slotId: "fullbodyB_3", defaultExId: "remouni", num: 3, sets: [["34", "10"], ["34", "10"], ["34", "9"], ["34", "8"]] },
+      { slotId: "fullbodyB_4", defaultExId: "militar", num: 4, sets: [["24", "10"], ["24", "10"], ["24", "8"]] },
+      { slotId: "fullbodyB_5", defaultExId: "facepull", num: 5, sets: [["25", "15"], ["25", "14"], ["25", "12"]] },
+      { slotId: "fullbodyB_6", defaultExId: "plancha", num: 6, sets: [["0", "60"], ["0", "50"], ["0", "45"]] }
+    ]
+  },
+  fullbodyC: {
+    id: "fullbodyC",
+    title: "Día C: Full Body C",
+    subtitle: "Pierna & Brazos/Core",
+    dayNum: "Día C",
+    shortName: "Día C (Pierna + Hipertrofia)",
+    program: "fullbody",
+    totalSets: 22,
+    slots: [
+      { slotId: "fullbodyC_1", defaultExId: "prensa_45", num: 1, sets: [["140", "10"], ["140", "10"], ["140", "8"]] },
+      { slotId: "fullbodyC_2", defaultExId: "curltumbado", num: 2, sets: [["50", "12"], ["50", "11"], ["50", "10"]] },
+      { slotId: "fullbodyC_3", defaultExId: "jalonneutro", num: 3, sets: [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]] },
+      { slotId: "fullbodyC_4", defaultExId: "laterales2", num: 4, sets: [["10", "15"], ["10", "14"], ["10", "12"]] },
+      { slotId: "fullbodyC_5", defaultExId: "frances", num: 5, sets: [["32", "12"], ["32", "10"], ["32", "10"]] },
+      { slotId: "fullbodyC_6", defaultExId: "martillo", num: 6, sets: [["16", "12"], ["16", "11"], ["16", "10"]] },
+      { slotId: "fullbodyC_7", defaultExId: "crunch", num: 7, sets: [["40", "15"], ["40", "14"], ["40", "12"]] }
+    ]
+  },
+
+  // === PROGRAMA 2: TORSO / PIERNA (4 DÍAS) ===
   torsoA: {
     id: "torsoA",
     title: "Día 1: Torso A",

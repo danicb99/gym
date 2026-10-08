@@ -185,20 +185,30 @@ Page(
       }
 
       // 3. BOTONES DE RUTINA CON RECOMENDACIÓN POR ROTACIÓN
-      const ROTATION = ['torsoA', 'piernaA', 'torsoB', 'piernaB']
-      let recommendedDayId = 'torsoA'
+      const ROTATION_FULLBODY = ['fullbodyA', 'fullbodyB', 'fullbodyC']
+      const ROTATION_TP = ['torsoA', 'piernaA', 'torsoB', 'piernaB']
+      let recommendedDayId = 'fullbodyA'
+
       try {
         const localData = loadWorkoutData()
         if (localData && localData.history && localData.history.length > 0) {
           const lastDay = localData.history[0].dayId
-          const idx = ROTATION.indexOf(lastDay)
-          if (idx !== -1) {
-            recommendedDayId = ROTATION[(idx + 1) % ROTATION.length]
+          if (ROTATION_FULLBODY.indexOf(lastDay) !== -1) {
+            const idx = ROTATION_FULLBODY.indexOf(lastDay)
+            recommendedDayId = ROTATION_FULLBODY[(idx + 1) % ROTATION_FULLBODY.length]
+          } else if (ROTATION_TP.indexOf(lastDay) !== -1) {
+            const idx = ROTATION_TP.indexOf(lastDay)
+            recommendedDayId = ROTATION_TP[(idx + 1) % ROTATION_TP.length]
           }
         }
       } catch (e) {}
 
       const days = [
+        // --- FULL BODY 3 DÍAS (PRINCIPAL) ---
+        { id: 'fullbodyA', label: '🏋️ Día A: Squat + Torso' },
+        { id: 'fullbodyB', label: '🔥 Día B: RDL + Torso' },
+        { id: 'fullbodyC', label: '⚡ Día C: Pierna + Brazos' },
+        // --- TORSO / PIERNA 4 DÍAS (ALTERNO) ---
         { id: 'torsoA', label: '💪 D1: Torso A (Empuje)' },
         { id: 'piernaA', label: '🦵 D2: Pierna A (Cuádriceps)' },
         { id: 'torsoB', label: '🔙 D3: Torso B (Tracción)' },
