@@ -46,6 +46,22 @@ App(
         this.globalData.slotExtraSets = saved.activeSession.slotExtraSets || {}
       }
 
+      // 1b. Cargar marcas anteriores (previousSets) desde el historial local si no hay sesión del móvil
+      if (saved && saved.history && saved.history.length > 0) {
+        const localPrev = {}
+        for (let i = saved.history.length - 1; i >= 0; i--) {
+          const s = saved.history[i]
+          if (s && s.exercises) {
+            s.exercises.forEach(ex => {
+              if (ex.exId && Array.isArray(ex.sets)) {
+                localPrev[ex.exId] = ex.sets.map(item => `${item.kg}kg × ${item.reps}`)
+              }
+            })
+          }
+        }
+        this.globalData.previousSets = Object.assign({}, localPrev, this.globalData.previousSets)
+      }
+
       // 2. Comprobar en segundo plano si el móvil tiene un entreno en curso
       this.checkPhoneLiveSession()
     },

@@ -104,6 +104,32 @@
         };
       }
 
+      // Filtrar previousSets solo para los ejercicios del día activo (reduce el JSON a <1KB)
+      const filteredPrevious = {};
+      try {
+        const activeExIds = new Set();
+        dayData.slots.forEach(slot => {
+          const chosenEx = (workoutState.customSlots && workoutState.customSlots[slot.slotId]) ||
+                           (workoutState.tempSlots && workoutState.tempSlots[slot.slotId]) ||
+                           slot.defaultExId || slot.slotId;
+          if (chosenEx) activeExIds.add(chosenEx);
+          if (slot.defaultExId) activeExIds.add(slot.defaultExId);
+          if (slot.slotId) activeExIds.add(slot.slotId);
+          if (Array.isArray(slot.options)) {
+            slot.options.forEach(opt => {
+              if (opt && opt.id) activeExIds.add(opt.id);
+            });
+          }
+        });
+        if (workoutState.previous) {
+          for (const exId of activeExIds) {
+            if (workoutState.previous[exId]) {
+              filteredPrevious[exId] = workoutState.previous[exId];
+            }
+          }
+        }
+      } catch (e) {}
+
       const payload = {
         activeDayId: activeDay,
         currentSlotIndex: firstUnfinishedSlot,
@@ -111,7 +137,7 @@
         sessionStartTime: (workoutState.sessionStartTime && workoutState.sessionStartTime[activeDay]) || Date.now(),
         sessionLoggedSets: sessionLoggedSets,
         slotExOverrides: Object.assign({}, workoutState.customSlots, workoutState.tempSlots),
-        previousSets: workoutState.previous || {},
+        previousSets: filteredPrevious,
         restTimer: restTimerPayload,
         timestamp: Date.now()
       };
@@ -144,9 +170,46 @@
     }
   }
 
+  let reconnectTimeout = null;
+  let lastCatchUpTimestamp = 0;
+
+  async function catchUpFromWatch() {
+    try {
+      const resp = await fetch(`${RELAY_WATCH_TO_PHONE}/json?poll=1&since=10m`);
+      if (!resp.ok) return;
+      const text = await resp.text();
+      if (!text) return;
+      const lines = text.trim().split('\n');
+      for (const line of lines) {
+        try {
+          const raw = JSON.parse(line);
+          if (raw && raw.event === 'message' && raw.message) {
+            const data = typeof raw.message === 'string' ? JSON.parse(raw.message) : raw.message;
+            if (data && data.timestamp && data.timestamp > lastCatchUpTimestamp) {
+              lastCatchUpTimestamp = data.timestamp;
+              if (data.type === 'SET_COMPLETED') {
+                handleSetCompletedFromWatch(data);
+              } else if (data.type === 'WORKOUT_FINISHED') {
+                handleWorkoutFinishedFromWatch(data);
+              }
+            }
+          }
+        } catch (e) {}
+      }
+    } catch (e) {
+      console.log('[WatchBridge] Error en catch-up del reloj:', e);
+    }
+  }
+
   // 2. Escuchar eventos entrantes desde el reloj vía SSE
   function startListeningToWatchEvents() {
-    if (syncEventSource) return;
+    if (syncEventSource) {
+      if (syncEventSource.readyState === EventSource.OPEN || syncEventSource.readyState === EventSource.CONNECTING) {
+        return;
+      }
+      try { syncEventSource.close(); } catch (e) {}
+      syncEventSource = null;
+    }
 
     try {
       syncEventSource = new EventSource(`${RELAY_WATCH_TO_PHONE}/sse`);
@@ -162,6 +225,8 @@
           if (!raw.message) return;
           const data = typeof raw.message === 'string' ? JSON.parse(raw.message) : raw.message;
 
+          if (data.timestamp) lastCatchUpTimestamp = Math.max(lastCatchUpTimestamp, data.timestamp);
+
           if (data.type === 'SET_COMPLETED') {
             handleSetCompletedFromWatch(data);
           } else if (data.type === 'WORKOUT_FINISHED') {
@@ -174,9 +239,17 @@
 
       syncEventSource.onerror = () => {
         updateSyncPill(false);
+        try {
+          if (syncEventSource) syncEventSource.close();
+        } catch (e) {}
+        syncEventSource = null;
+        clearTimeout(reconnectTimeout);
+        reconnectTimeout = setTimeout(startListeningToWatchEvents, 3500);
       };
     } catch (e) {
       console.warn('[WatchBridge] Error inicializando SSE:', e);
+      clearTimeout(reconnectTimeout);
+      reconnectTimeout = setTimeout(startListeningToWatchEvents, 5000);
     }
   }
 
@@ -338,22 +411,38 @@
     };
   }
 
-  // Iniciar al cargar la página
+  // Iniciar al cargar la página y cuando la app vuelve a primer plano
+  function onAppForeground() {
+    startListeningToWatchEvents();
+    catchUpFromWatch();
+    broadcastActiveWorkoutToWatch();
+  }
+
   window.addEventListener('DOMContentLoaded', () => {
     startListeningToWatchEvents();
+    catchUpFromWatch();
     setTimeout(broadcastActiveWorkoutToWatch, 1200);
 
-    // Sincronizar periódicamente (cada 5s si hay descanso activo, cada 15s en reposo)
+    // Sincronizar periódicamente (cada 5s si hay descanso activo o ventana visible)
     setInterval(() => {
       if (document.visibilityState === 'visible') {
         broadcastActiveWorkoutToWatch();
       }
     }, 5000);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        onAppForeground();
+      }
+    });
+
+    window.addEventListener('focus', onAppForeground);
   });
 
   // Exponer API global
   window.VigorexiWatchSync = {
     broadcast: broadcastActiveWorkoutToWatch,
-    reconnect: startListeningToWatchEvents
+    reconnect: onAppForeground,
+    catchUp: catchUpFromWatch
   };
 })();

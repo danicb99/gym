@@ -4,7 +4,7 @@
 
 import * as hmUI from '@zos/ui'
 import { replace } from '@zos/router'
-import { vibrateRestFinished } from '../../utils/haptics'
+import { vibrateRestFinished, vibratePreWarning } from '../../utils/haptics'
 import { keepScreenActive, restoreScreenBehavior } from '../../utils/display'
 
 Page({
@@ -15,7 +15,8 @@ Page({
     digitsWidget: null,
     arcWidget: null,
     clockWidget: null,
-    timerInterval: null
+    timerInterval: null,
+    preWarned: false
   },
 
   onInit() {
@@ -33,36 +34,36 @@ Page({
   build() {
     const timerData = this.state.app.globalData.restTimer
 
-    // 1. TÍTULO SUPERIOR
+    // 1. TÍTULO SUPERIOR (Centrado en zona visible)
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 33,
-      y: 45,
-      w: 400,
-      h: 30,
+      x: 65,
+      y: 38,
+      w: 336,
+      h: 28,
       color: 0x38bdf8, // Cyan
-      text_size: 18,
+      text_size: 17,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: '⏱️ DESCANSO'
     })
 
-    // 2. PRÓXIMO EJERCICIO Y SERIE
+    // 2. PRÓXIMO EJERCICIO Y SERIE (Gold y Slate de alto contraste)
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 40,
-      y: 80,
-      w: 386,
+      x: 65,
+      y: 70,
+      w: 336,
       h: 28,
       color: 0xfbbf24, // Gold / Amber
-      text_size: 17,
+      text_size: 18,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: timerData ? timerData.nextExerciseName : 'Siguiente serie'
     })
 
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 40,
-      y: 110,
-      w: 386,
+      x: 65,
+      y: 100,
+      w: 336,
       h: 24,
       color: 0x94a3b8, // Slate
       text_size: 15,
@@ -85,29 +86,29 @@ Page({
 
     // 4. DÍGITOS GIGANTES DEL CRONÓMETRO
     this.state.digitsWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 33,
-      y: 160,
-      w: 400,
-      h: 80,
+      x: 65,
+      y: 162,
+      w: 336,
+      h: 76,
       color: 0xffffff,
-      text_size: 52,
+      text_size: 54,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.formatTime(this.state.remainingSeconds)
     })
 
     // 5. CONTROLES DE DESCANSO (+30s y Saltar / Listo)
-    const btnY = 270
+    const btnY = 268
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 75,
+      x: 80,
       y: btnY,
-      w: 145,
+      w: 142,
       h: 52,
       radius: 26,
       normal_color: 0x1e293b,
       press_color: 0x334155,
       color: 0x38bdf8,
-      text_size: 17,
+      text_size: 18,
       text: '+30s',
       click_func: () => {
         this.addTime(30)
@@ -115,15 +116,15 @@ Page({
     })
 
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 246,
+      x: 244,
       y: btnY,
-      w: 145,
+      w: 142,
       h: 52,
       radius: 26,
       normal_color: 0x10b981,
       press_color: 0x059669,
       color: 0xffffff,
-      text_size: 17,
+      text_size: 18,
       text: '¡Listo! ➔',
       click_func: () => {
         this.finishRest()
@@ -132,25 +133,25 @@ Page({
 
     // Subtexto motivacional inferior
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 33,
-      y: 338,
-      w: 400,
-      h: 24,
+      x: 65,
+      y: 334,
+      w: 336,
+      h: 22,
       color: 0x64748b,
-      text_size: 14,
+      text_size: 13,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: 'Vibrará en la muñeca al terminar'
+      text: 'Aviso háptico a los 10s y al terminar'
     })
 
     // Reloj inferior (Hora actual - Grande y limpio)
     this.state.clockWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 108,
-      y: 368,
-      w: 250,
-      h: 46,
+      x: 133,
+      y: 364,
+      w: 200,
+      h: 38,
       color: 0xf1f5f9,
-      text_size: 30,
+      text_size: 28,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.getClockStr()
@@ -186,6 +187,9 @@ Page({
   addTime(seconds) {
     this.state.remainingSeconds += seconds
     this.state.totalSeconds = Math.max(this.state.totalSeconds, this.state.remainingSeconds)
+    if (this.state.remainingSeconds > 10) {
+      this.state.preWarned = false
+    }
     if (this.state.app && this.state.app.globalData.restTimer) {
       this.state.app.globalData.restTimer.remainingSeconds = this.state.remainingSeconds
       this.state.app.globalData.restTimer.endTime = Date.now() + this.state.remainingSeconds * 1000
@@ -218,6 +222,11 @@ Page({
       this.updateUI()
       this.updateClockDisplay()
 
+      if (this.state.remainingSeconds === 10 && !this.state.preWarned) {
+        this.state.preWarned = true
+        vibratePreWarning()
+      }
+
       if (this.state.remainingSeconds === 0) {
         this.onTimerExpired()
       }
@@ -226,6 +235,7 @@ Page({
 
   onTimerExpired() {
     this.clearCountdown()
+    this.state.preWarned = false
     vibrateRestFinished()
 
     if (this.state.digitsWidget) {

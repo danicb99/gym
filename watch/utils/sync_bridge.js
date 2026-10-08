@@ -23,7 +23,7 @@ export async function requestPhoneLiveWorkout(context) {
     const result = await context.request({
       method: SYNC_EVENTS.GET_PHONE_SESSION,
       params: { timestamp: Date.now() }
-    }, { timeout: 8000 })
+    }, { timeout: 12000 })
     return result && result.session ? result.session : null
   } catch (err) {
     console.log('[SyncBridge] No se pudo conectar con el móvil:', err)

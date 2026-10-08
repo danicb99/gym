@@ -9,7 +9,21 @@ import { HeartRate } from '@zos/sensor'
 import { keepScreenActive, restoreScreenBehavior } from '../../utils/display'
 import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
-import { vibrateShort } from '../../utils/haptics'
+import { vibrateShort, vibrateRestFinished, vibratePreWarning } from '../../utils/haptics'
+
+function countCompletedSets(sessionLoggedSets) {
+  if (!sessionLoggedSets) return 0
+  let count = 0
+  for (const slotId in sessionLoggedSets) {
+    const list = sessionLoggedSets[slotId]
+    if (Array.isArray(list)) {
+      for (let i = 0; i < list.length; i++) {
+        if (list[i] && list[i].completed) count++
+      }
+    }
+  }
+  return count
+}
 
 Page(BasePage({
   state: {
@@ -26,7 +40,8 @@ Page(BasePage({
     tickerTimer: null,
     plankTimer: null,
     isPlankRunning: false,
-    cronoBtnWidget: null
+    cronoBtnWidget: null,
+    restPreWarned: false
   },
 
   onInit() {
@@ -126,32 +141,32 @@ Page(BasePage({
     const currentSetNum = app.globalData.currentSetIndex + 1
     const totalSets = app.getTotalSetsForSlot ? app.getTotalSetsForSlot(slot) : ((slot.sets && slot.sets.length) || 4)
 
-    // 1. BARRA SUPERIOR (Pulsaciones, Duración, Slot #)
+    // 1. BARRA SUPERIOR (Pulsaciones, Duración, Slot #) - Centrado seguro dentro de [95, 371]
     this.state.hrWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 46,
-      y: 28,
-      w: 96,
+      x: 95,
+      y: 24,
+      w: 72,
       h: 34,
       color: 0xf43f5e, // Rose red
-      text_size: 16,
+      text_size: 15,
       align_h: hmUI.align.LEFT,
       align_v: hmUI.align.CENTER_V,
       text: '❤️ --'
     })
 
-    // Ticker duración entreno / descanso activo
+    // Ticker duración entreno / descanso activo (Píldora central interactiva)
     const elapsedMinutes = Math.floor((Date.now() - (app.globalData.sessionStartTime || Date.now())) / 60000)
     const isResting = app.globalData.restTimer && app.globalData.restTimer.active
     this.state.timerWidget = hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 148,
-      y: 24,
-      w: 168,
-      h: 38,
-      radius: 19,
+      x: 172,
+      y: 22,
+      w: 122,
+      h: 36,
+      radius: 18,
       normal_color: isResting ? 0x1e293b : 0x0f172a,
       press_color: 0x334155,
       color: isResting ? 0xfbbf24 : 0x94a3b8,
-      text_size: 15,
+      text_size: 14,
       text: isResting ? '⏳ Descanso' : `⏱️ ${elapsedMinutes}m`,
       click_func: () => {
         const rt = app.globalData.restTimer
@@ -161,27 +176,27 @@ Page(BasePage({
       }
     })
 
-    // Indicador Ejercicio X/Y (arriba a la derecha, limpio y visible)
+    // Indicador Ejercicio X/Y (arriba a la derecha, dentro del radio visible)
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 322,
-      y: 28,
-      w: 98,
+      x: 299,
+      y: 24,
+      w: 72,
       h: 34,
       color: 0x38bdf8, // Cyan
-      text_size: 16,
+      text_size: 15,
       align_h: hmUI.align.RIGHT,
       align_v: hmUI.align.CENTER_V,
       text: `Ej ${currentSlotNum}/${totalSlots}`
     })
 
-    // 2. NOMBRE DEL EJERCICIO Y SERIE (Texto grande y claro)
+    // 2. NOMBRE DEL EJERCICIO (Gold / Amber, centrado nítido)
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 38,
-      y: 66,
-      w: 390,
+      x: 65,
+      y: 64,
+      w: 336,
       h: 34,
-      color: 0xfbbf24, // Gold / Amber
-      text_size: 23,
+      color: 0xfbbf24,
+      text_size: 22,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: ex ? ex.name : 'Ejercicio'
@@ -201,77 +216,118 @@ Page(BasePage({
           }
         }
         if (prevVal) {
-          prevText = ` • Ant: ${prevVal}`
+          prevText = ` • 🎯 Ant: ${prevVal}`
         }
       }
     }
 
+    // Serie y marca objetivo anterior (Cyan brillante)
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 38,
+      x: 50,
       y: 100,
-      w: 390,
-      h: 26,
-      color: 0x38bdf8, // Cyan
+      w: 366,
+      h: 28,
+      color: 0x38bdf8,
       text_size: 16,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: `SERIE ${currentSetNum} DE ${totalSets}${prevText}`
     })
 
-    // 3. CONTROL DE KILOS ( [-]  80.0 kg  [+] ) - TAMAÑO XL
-    const rowKgY = 136
+    // 3. CONTROL DE KILOS CON STEPPERS DUALES ( [-5] [-2.5]  80.0 kg  [+2.5] [+5] )
+    const rowKgY = 138
+    const step = this.state.stepKg || 2.5
+    const bigStep = step >= 2 ? step * 2 : 2
+
+    // Botón outer -bigStep
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 60,
+      x: 34,
       y: rowKgY,
-      w: 60,
-      h: 58,
-      radius: 29,
+      w: 48,
+      h: 54,
+      radius: 16,
       normal_color: 0x1e293b,
       press_color: 0x334155,
-      color: 0xffffff,
-      text_size: 32,
-      text: '-',
+      color: 0x94a3b8,
+      text_size: 17,
+      text: `-${bigStep}`,
       click_func: () => {
-        this.adjustKg(-this.state.stepKg)
+        this.adjustKg(-bigStep)
       }
     })
 
-    this.state.kgWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 125,
+    // Botón inner -step
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 88,
       y: rowKgY,
-      w: 216,
-      h: 58,
+      w: 56,
+      h: 54,
+      radius: 18,
+      normal_color: 0x1e293b,
+      press_color: 0x334155,
       color: 0xffffff,
-      text_size: 36,
+      text_size: 24,
+      text: `-${step}`,
+      click_func: () => {
+        this.adjustKg(-step)
+      }
+    })
+
+    // Valor central de peso
+    this.state.kgWidget = hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 148,
+      y: rowKgY,
+      w: 170,
+      h: 54,
+      color: 0xffffff,
+      text_size: 33,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.getKgDisplayStr()
     })
 
+    // Botón inner +step
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 346,
+      x: 322,
       y: rowKgY,
-      w: 60,
-      h: 58,
-      radius: 29,
+      w: 56,
+      h: 54,
+      radius: 18,
       normal_color: 0x1e293b,
       press_color: 0x334155,
       color: 0xffffff,
-      text_size: 32,
-      text: '+',
+      text_size: 24,
+      text: `+${step}`,
       click_func: () => {
-        this.adjustKg(this.state.stepKg)
+        this.adjustKg(step)
       }
     })
 
-    // 4. CONTROL DE REPETICIONES / SEGUNDOS ( [-]  8 reps / 60 seg  [+] ) - TAMAÑO XL
+    // Botón outer +bigStep
+    hmUI.createWidget(hmUI.widget.BUTTON, {
+      x: 384,
+      y: rowKgY,
+      w: 48,
+      h: 54,
+      radius: 16,
+      normal_color: 0x1e293b,
+      press_color: 0x334155,
+      color: 0x94a3b8,
+      text_size: 17,
+      text: `+${bigStep}`,
+      click_func: () => {
+        this.adjustKg(bigStep)
+      }
+    })
+
+    // 4. CONTROL DE REPETICIONES / SEGUNDOS ( [-]  8 reps / 60 seg  [+] )
     const rowRepsY = 206
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 60,
+      x: 65,
       y: rowRepsY,
-      w: 60,
-      h: 58,
-      radius: 29,
+      w: 68,
+      h: 56,
+      radius: 24,
       normal_color: 0x1e293b,
       press_color: 0x334155,
       color: 0xffffff,
@@ -283,23 +339,23 @@ Page(BasePage({
     })
 
     this.state.repsWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 125,
+      x: 143,
       y: rowRepsY,
-      w: 216,
-      h: 58,
+      w: 180,
+      h: 56,
       color: 0xffffff,
-      text_size: 36,
+      text_size: 34,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.getRepsDisplayStr()
     })
 
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 346,
+      x: 333,
       y: rowRepsY,
-      w: 60,
-      h: 58,
-      radius: 29,
+      w: 68,
+      h: 56,
+      radius: 24,
       normal_color: 0x1e293b,
       press_color: 0x334155,
       color: 0xffffff,
@@ -314,15 +370,15 @@ Page(BasePage({
     const isIso = ex && ex.metricType === 'isometria'
     if (isIso) {
       this.state.cronoBtnWidget = hmUI.createWidget(hmUI.widget.BUTTON, {
-        x: 60,
-        y: 276,
-        w: 168,
+        x: 48,
+        y: 282,
+        w: 175,
         h: 60,
         radius: 30,
         normal_color: 0x6366f1, // Indigo vibrante
         press_color: 0x4f46e5,
         color: 0xffffff,
-        text_size: 20,
+        text_size: 19,
         text: '⏱️ CRONO',
         click_func: () => {
           this.togglePlankTimer()
@@ -330,15 +386,15 @@ Page(BasePage({
       })
 
       hmUI.createWidget(hmUI.widget.BUTTON, {
-        x: 238,
-        y: 276,
-        w: 168,
+        x: 243,
+        y: 282,
+        w: 175,
         h: 60,
         radius: 30,
         normal_color: 0x10b981, // Emerald green
         press_color: 0x059669,
         color: 0xffffff,
-        text_size: 20,
+        text_size: 19,
         text: '✓ GUARDAR',
         click_func: () => {
           this.stopPlankTimer()
@@ -347,15 +403,15 @@ Page(BasePage({
       })
     } else {
       hmUI.createWidget(hmUI.widget.BUTTON, {
-        x: 60,
-        y: 276,
-        w: 346,
+        x: 48,
+        y: 282,
+        w: 370,
         h: 60,
         radius: 30,
         normal_color: 0x10b981, // Emerald green
         press_color: 0x059669,
         color: 0xffffff,
-        text_size: 22,
+        text_size: 21,
         text: '✓ COMPLETAR SERIE',
         click_func: () => {
           this.completeCurrentSet()
@@ -363,30 +419,30 @@ Page(BasePage({
       })
     }
 
-    // 6. HORA ACTUAL INFERIOR (Grande, nítida, sin emoji)
+    // 6. HORA ACTUAL INFERIOR (25px, blanco suave)
     this.state.clockWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 108,
-      y: 346,
-      w: 250,
-      h: 36,
-      color: 0xf1f5f9, // Blanco suave de alto contraste
-      text_size: 28,
+      x: 133,
+      y: 352,
+      w: 200,
+      h: 32,
+      color: 0xf1f5f9,
+      text_size: 25,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.getClockStr()
     })
 
-    // 7. BOTÓN INFERIOR DESPLEGABLE: FLECHA HACIA ARRIBA (▲ Menú / Opciones)
+    // 7. BOTÓN INFERIOR: FLECHA HACIA ARRIBA (▲ Menú / Opciones)
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 148,
-      y: 390,
-      w: 170,
+      x: 153,
+      y: 392,
+      w: 160,
       h: 42,
       radius: 21,
       normal_color: 0x1e293b,
       press_color: 0x334155,
-      color: 0x38bdf8, // Cyan vibrante
-      text_size: 17,
+      color: 0x38bdf8,
+      text_size: 16,
       text: '▲ Menú',
       click_func: () => {
         push({ url: 'page/options/index' })
@@ -532,9 +588,15 @@ Page(BasePage({
         this.state.timerWidget.setProperty(hmUI.prop.TEXT, `⏳ ${str}`)
         this.state.timerWidget.setProperty(hmUI.prop.COLOR, 0xfbbf24) // Gold / Amber
         this.state.timerWidget.setProperty(hmUI.prop.NORMAL_COLOR, 0x1e293b)
+
+        if (rem === 10 && !this.state.restPreWarned) {
+          this.state.restPreWarned = true
+          vibratePreWarning()
+        }
         return
       } else {
         rt.active = false
+        this.state.restPreWarned = false
         vibrateRestFinished()
       }
     }
@@ -554,12 +616,24 @@ Page(BasePage({
       if (!phoneSession || !phoneSession.activeDayId) return
 
       if (phoneSession.activeDayId === app.globalData.activeDayId) {
-        const phoneSlot = phoneSession.currentSlotIndex || 0
-        const phoneSet = phoneSession.currentSetIndex || 0
-        if (phoneSlot !== app.globalData.currentSlotIndex || phoneSet !== app.globalData.currentSetIndex) {
+        const watchCompleted = countCompletedSets(app.globalData.sessionLoggedSets)
+        const phoneCompleted = countCompletedSets(phoneSession.sessionLoggedSets)
+
+        // Prevenir regresión: Si el reloj lleva MÁS o IGUAL series completadas, no retroceder
+        if (phoneCompleted > watchCompleted) {
           app.adoptPhoneSession(phoneSession)
           replace({ url: 'page/workout/index' })
           return
+        } else if (phoneCompleted === watchCompleted) {
+          const phoneSlot = phoneSession.currentSlotIndex || 0
+          const phoneSet = phoneSession.currentSetIndex || 0
+          const phoneScore = phoneSlot * 100 + phoneSet
+          const watchScore = app.globalData.currentSlotIndex * 100 + app.globalData.currentSetIndex
+          if (phoneScore > watchScore) {
+            app.adoptPhoneSession(phoneSession)
+            replace({ url: 'page/workout/index' })
+            return
+          }
         }
 
         if (phoneSession.restTimer && phoneSession.restTimer.active) {

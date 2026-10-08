@@ -8,6 +8,16 @@ import { BaseSideService } from '@zeppos/zml/base-side'
 const RELAY_WATCH_TO_PHONE = 'https://ntfy.sh/vigorexiapp_sync_danicb99'
 const RELAY_PHONE_TO_WATCH = 'https://ntfy.sh/vigorexiapp_watch_danicb99'
 
+async function safeFetch(ctx, options) {
+  const fn = (ctx && typeof ctx.fetch === 'function')
+    ? ctx.fetch.bind(ctx)
+    : (typeof fetch === 'function' ? fetch : null)
+  if (!fn) {
+    throw new Error('No fetch implementation available in AppSideService')
+  }
+  return await fn(options)
+}
+
 AppSideService(
   BaseSideService({
     onInit() {
@@ -26,19 +36,12 @@ AppSideService(
       console.log('[VigorexiApp Side] Solicitud onRequest recibida:', req.method)
 
       if (req.method === 'GET_PHONE_SESSION') {
-        // Consultar el último estado del entrenamiento que el móvil haya publicado
+        // Consultar el último estado del entrenamiento que el móvil haya publicado (since=latest para evitar sobrecarga)
         try {
-          const fetchFn = (typeof this.fetch === 'function') ? this.fetch.bind(this) : (typeof fetch === 'function' ? fetch : null)
-          if (!fetchFn) {
-            console.log('[VigorexiApp Side] Fetch no disponible en entorno')
-            res(null, { session: null })
-            return
-          }
-
-          const response = await fetchFn({
-            url: `${RELAY_PHONE_TO_WATCH}/json?poll=1`,
+          const response = await safeFetch(this, {
+            url: `${RELAY_PHONE_TO_WATCH}/json?poll=1&since=latest`,
             method: 'GET',
-            timeout: 6000
+            timeout: 10000
           })
 
           if (!response || !response.body) {
@@ -96,11 +99,12 @@ AppSideService(
             summary: req.params,
             timestamp: Date.now()
           }
-          await fetch({
+          await safeFetch(this, {
             url: RELAY_WATCH_TO_PHONE,
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            timeout: 10000
           })
           console.log('[VigorexiApp Side] Fin de entreno retransmitido a la PWA')
           res(null, { status: 'OK' })
@@ -124,11 +128,12 @@ AppSideService(
             ...req.params,
             timestamp: Date.now()
           }
-          await fetch({
+          await safeFetch(this, {
             url: RELAY_WATCH_TO_PHONE,
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            timeout: 10000
           })
           console.log('[VigorexiApp Side] Serie retransmitida a la PWA:', req.params)
         } catch (err) {

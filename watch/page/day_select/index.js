@@ -9,6 +9,7 @@ import { keepScreenActive, restoreScreenBehavior } from '../../utils/display'
 import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
 import { requestPhoneLiveWorkout } from '../../utils/sync_bridge'
+import { loadWorkoutData } from '../../utils/storage'
 
 Page(
   BasePage({
@@ -183,7 +184,20 @@ Page(
         curY += btnH + btnGap
       }
 
-      // 3. BOTONES NORMALES DE RUTINA (TODOS VISIBLES CON SCROLL)
+      // 3. BOTONES DE RUTINA CON RECOMENDACIÓN POR ROTACIÓN
+      const ROTATION = ['torsoA', 'piernaA', 'torsoB', 'piernaB']
+      let recommendedDayId = 'torsoA'
+      try {
+        const localData = loadWorkoutData()
+        if (localData && localData.history && localData.history.length > 0) {
+          const lastDay = localData.history[0].dayId
+          const idx = ROTATION.indexOf(lastDay)
+          if (idx !== -1) {
+            recommendedDayId = ROTATION[(idx + 1) % ROTATION.length]
+          }
+        }
+      } catch (e) {}
+
       const days = [
         { id: 'torsoA', label: '💪 D1: Torso A (Empuje)' },
         { id: 'piernaA', label: '🦵 D2: Pierna A (Cuádriceps)' },
@@ -192,17 +206,22 @@ Page(
       ]
 
       days.forEach(day => {
+        const isRec = (day.id === recommendedDayId)
+        const btnText = isRec ? `${day.label} ⭐` : day.label
+        const btnBg = isRec ? 0x0f2942 : 0x1e293b
+        const btnTextColor = isRec ? 0x38bdf8 : 0xf8fafc
+
         hmUI.createWidget(hmUI.widget.BUTTON, {
           x: btnX,
           y: curY,
           w: btnW,
           h: btnH,
           radius: btnRadius,
-          normal_color: 0x1e293b,
+          normal_color: btnBg,
           press_color: 0x334155,
-          color: 0xf8fafc,
+          color: btnTextColor,
           text_size: 19,
-          text: day.label,
+          text: btnText,
           click_func: () => {
             app.startNewWorkout(day.id)
             push({ url: 'page/workout/index' })

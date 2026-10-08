@@ -73,3 +73,30 @@ export function vibrateRestFinished() {
     }
   }
 }
+
+/**
+ * Pre-aviso háptico a falta de 10 segundos para terminar el descanso
+ * Doble pulso breve (80ms - 80ms - 80ms)
+ */
+export function vibratePreWarning() {
+  const vib = getVibrator()
+  if (vib) {
+    try {
+      vib.start()
+      setTimeout(() => {
+        try { vib.stop() } catch (err) {}
+        setTimeout(() => {
+          try {
+            vib.start()
+            setTimeout(() => {
+              try { vib.stop() } catch (err) {}
+            }, 80)
+          } catch (err) {}
+        }, 80)
+      }, 80)
+    } catch (e) {
+      console.log('[Haptics] Error vibratePreWarning:', e)
+    }
+  }
+}
+
