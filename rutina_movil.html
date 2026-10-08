@@ -109,41 +109,6 @@
     .t-btn-top.skip { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); padding: 5px 7px; }
 
     
-    /* Program Switcher Segmented Bar */
-    .program-switcher-wrap {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0 14px 8px;
-      background: transparent;
-    }
-    .program-tab {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 7px 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(18, 30, 56, 0.7);
-      color: var(--text-muted);
-      font-size: 0.76rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .program-tab:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-    }
-    .program-tab.active {
-      background: linear-gradient(135deg, rgba(251, 191, 36, 0.22), rgba(217, 119, 6, 0.15));
-      border-color: rgba(251, 191, 36, 0.5);
-      color: var(--primary);
-      box-shadow: 0 0 12px rgba(251, 191, 36, 0.2);
-    }
-
     /* Workout Progress Bar */
     .workout-progress { width: 100%; height: 3px; background: rgba(255,255,255,0.06); }
     .workout-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #10b981, #06b6d4); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -779,15 +744,6 @@
     </div>
     
     <!-- Progress Indicator directly underneath -->
-    <!-- Program Switcher Segmented Bar (Full Body 3 Días vs Torso / Pierna 4 Días) -->
-    <div class="program-switcher-wrap">
-      <button type="button" class="program-tab active" id="tabFullbody" onclick="setWorkoutProgram('fullbody')">
-        <span>⚡ Full Body (3 Días)</span>
-      </button>
-      <button type="button" class="program-tab" id="tabTorsoPierna" onclick="setWorkoutProgram('torso_pierna')">
-        <span>📋 Torso / Pierna (4 Días)</span>
-      </button>
-    </div>
 
     <div class="workout-progress">
       <div class="workout-progress-fill" id="workoutProgressBar"></div>
@@ -910,15 +866,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyA_1">Rack + Barra Olímpica</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyA_1">Pies a anchura de hombros, brace abdominal 360°, romper en caderas y rodillas simultáneamente, profundidad mínima paralelo.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyA_1" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyA_1', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyA_1">Pies a anchura de hombros, brace abdominal 360°, romper en caderas y rodillas simultáneamente, profundidad mínima paralelo.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1013,15 +974,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyA_2">Barra Olímpica + Banco Plano</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyA_2">Retracción escapular activa, pies firmes en el suelo, bajada en 2 s controlados rozando el esternón inferior. Cero rebote.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyA_2" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyA_2', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyA_2">Retracción escapular activa, pies firmes en el suelo, bajada en 2 s controlados rozando el esternón inferior. Cero rebote.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1116,15 +1082,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyA_3">Polea Alta + Barra Larga</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyA_3">Torso ligeramente inclinado (10-15°), tirar llevando los codos hacia los bolsillos traseros, estirar dorsal 2s arriba.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyA_3" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyA_3', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyA_3">Torso ligeramente inclinado (10-15°), tirar llevando los codos hacia los bolsillos traseros, estirar dorsal 2s arriba.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1212,15 +1183,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyA_4">Par de Mancuernas</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyA_4">Inclinación leve de 10° hacia delante, elevar en el plano escapular (30° adelantado), pausa de 1 s arriba.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyA_4" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyA_4', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyA_4">Inclinación leve de 10° hacia delante, elevar en el plano escapular (30° adelantado), pausa de 1 s arriba.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1308,15 +1284,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyA_5">Polea Alta + Barra Recta / V</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyA_5">Codos clavados al costado sin adelantarlos, extensión completa con bloqueo de 1 s, subida controlada hasta 90°.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyA_5" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyA_5', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyA_5">Codos clavados al costado sin adelantarlos, extensión completa con bloqueo de 1 s, subida controlada hasta 90°.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1404,15 +1385,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyA_6">Par de Mancuernas</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyA_6">Iniciar neutro y supinar fuertemente la muñeca a mitad de subida para acortar ambas cabezas del bíceps.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyA_6" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyA_6', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyA_6">Iniciar neutro y supinar fuertemente la muñeca a mitad de subida para acortar ambas cabezas del bíceps.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1529,15 +1515,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyB_1">Barra Olímpica con Discos</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyB_1">Rodillas semirrígidas (15-20° de flexión fija), empujar el glúteo hacia la pared trasera, barra rozando los muslos. Cero flexión lumbar.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyB_1" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyB_1', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyB_1">Rodillas semirrígidas (15-20° de flexión fija), empujar el glúteo hacia la pared trasera, barra rozando los muslos. Cero flexión lumbar.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1632,15 +1623,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyB_2">Mancuernas + Banco a 30°</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyB_2">Inclinación a 30° (no a 45° para que no robe el trabajo el deltoides anterior). Codos a 45-60°.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyB_2" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyB_2', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyB_2">Inclinación a 30° (no a 45° para que no robe el trabajo el deltoides anterior). Codos a 45-60°.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1735,15 +1731,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyB_3">Mancuerna Pesada + Banco Plano</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyB_3">Rodilla y mano apoyadas; traccionar hacia la cresta ilíaca (cadera) con el codo pegado al torso.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyB_3" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyB_3', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyB_3">Rodilla y mano apoyadas; traccionar hacia la cresta ilíaca (cadera) con el codo pegado al torso.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1831,15 +1832,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyB_4">Mancuernas + Banco a 75°</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyB_4">Banco a 75° (no a 90°) para proteger la cápsula articular del hombro. Codos a 45° del torso.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyB_4" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyB_4', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyB_4">Banco a 75° (no a 90°) para proteger la cápsula articular del hombro. Codos a 45° del torso.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -1927,15 +1933,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyB_5">Polea Alta + Cuerda</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyB_5">Tirar hacia el puente de la nariz con rotación externa (pulgares hacia atrás), aguantar 1 s apretando escápulas.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyB_5" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyB_5', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyB_5">Tirar hacia el puente de la nariz con rotación externa (pulgares hacia atrás), aguantar 1 s apretando escápulas.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2023,15 +2034,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyB_6">Esterilla / Rueda Abdominal</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyB_6">Retroversión pélvica activa (meter el ombligo y apretar glúteos al máximo). Cero hundimiento lumbar.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyB_6" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyB_6', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyB_6">Retroversión pélvica activa (meter el ombligo y apretar glúteos al máximo). Cero hundimiento lumbar.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2148,15 +2164,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyC_1">Máquina Prensa 45°</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyC_1">Pies a mitad de plataforma; bajar profundo sin despegar el sacro ni la zona lumbar del respaldo.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyC_1" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyC_1', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyC_1">Pies a mitad de plataforma; bajar profundo sin despegar el sacro ni la zona lumbar del respaldo.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2244,15 +2265,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyC_2">Máquina de Curl Tumbado</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyC_2">Presionar la pelvis contra el banco para no arquear la zona lumbar. Flexión explosiva y bajada en 3 s.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyC_2" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyC_2', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyC_2">Presionar la pelvis contra el banco para no arquear la zona lumbar. Flexión explosiva y bajada en 3 s.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2347,15 +2373,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyC_3">Polea Alta + Maneral V / Triángulo</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyC_3">Foco en acercar los codos a las costillas en el punto de contracción. Estirar dorsal arriba 2 s.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyC_3" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyC_3', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyC_3">Foco en acercar los codos a las costillas en el punto de contracción. Estirar dorsal arriba 2 s.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2443,15 +2474,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyC_4">Polea Baja + Tobillera o Estribo</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyC_4">Polea ajustada a la altura de la rodilla o muñeca. Tensión desde el milímetro cero del recorrido.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyC_4" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyC_4', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyC_4">Polea ajustada a la altura de la rodilla o muñeca. Tensión desde el milímetro cero del recorrido.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2539,15 +2575,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyC_5">Barra Z o Mancuernas + Banco Plano</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyC_5">Bajar la barra hacia detrás de la coronilla (no hacia la frente) para mantener tensión en la cabeza larga del tríceps.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyC_5" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyC_5', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyC_5">Bajar la barra hacia detrás de la coronilla (no hacia la frente) para mantener tensión en la cabeza larga del tríceps.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2635,15 +2676,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyC_6">Par de Mancuernas</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyC_6">Palmas enfrentadas en todo el recorrido. Empuja el bíceps hacia arriba ensanchando el brazo de perfil.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyC_6" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyC_6', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyC_6">Palmas enfrentadas en todo el recorrido. Empuja el bíceps hacia arriba ensanchando el brazo de perfil.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -2731,15 +2777,20 @@
             </tbody>
           </table>
 
-          <div class="exercise-cues">
-            <div class="cue-item">
-              <span class="cue-label">Equipamiento:</span>
-              <span class="cue-text" id="equip-fullbodyC_7">Polea Alta + Cuerda</span>
-            </div>
-            <div class="cue-item">
-              <span class="cue-label">Técnica y Enfoque:</span>
-              <span class="cue-text" id="cues-fullbodyC_7">Fijar la cadera en el espacio; no flexionar caderas, sino doblar la columna dorsal enrollando la caja torácica hacia la pelvis.</span>
-            </div>
+          <!-- Sleek Notes Capsule -->
+          <div class="notes-capsule">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <input type="text" class="notes-input" id="notes-fullbodyC_7" placeholder="Añadir sensaciones, agarre o notas..." onchange="handleNoteChange('fullbodyC_7', this.value)">
+          </div>
+
+          <div class="collapsible-drawer">
+            <details>
+              <summary>Técnica clave</summary>
+              <div class="drawer-body" id="cues-fullbodyC_7">Fijar la cadera en el espacio; no flexionar caderas, sino doblar la columna dorsal enrollando la caja torácica hacia la pelvis.</div>
+            </details>
           </div>
         </div>
       </article>
@@ -5922,19 +5973,6 @@
     function setWorkoutProgram(prog, targetDayId = null) {
       currentProgram = prog;
       localStorage.setItem('vigorexiapp_program', prog);
-
-      const tabFB = document.getElementById('tabFullbody');
-      const tabTP = document.getElementById('tabTorsoPierna');
-      if (tabFB && tabTP) {
-        if (prog === 'fullbody') {
-          tabFB.classList.add('active');
-          tabTP.classList.remove('active');
-        } else {
-          tabTP.classList.add('active');
-          tabFB.classList.remove('active');
-        }
-      }
-
       const defaultDay = (prog === 'fullbody') ? 'fullbodyA' : 'torsoA';
       selectDay(targetDayId || defaultDay);
     }
@@ -5946,17 +5984,7 @@
         currentProgram = isFB ? 'fullbody' : 'torso_pierna';
         localStorage.setItem('vigorexiapp_program', currentProgram);
 
-        const tabFB = document.getElementById('tabFullbody');
-        const tabTP = document.getElementById('tabTorsoPierna');
-        if (tabFB && tabTP) {
-          if (isFB) {
-            tabFB.classList.add('active');
-            tabTP.classList.remove('active');
-          } else {
-            tabTP.classList.add('active');
-            tabFB.classList.remove('active');
-          }
-        }
+        
       }
       const sel = document.getElementById('daySelector');
       if (sel) {
