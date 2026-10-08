@@ -48,58 +48,64 @@ Page(BasePage({
       this.state.currentKg = logged[app.globalData.currentSetIndex].kg
       this.state.currentReps = logged[app.globalData.currentSetIndex].reps
     } else {
-      // Cargar peso del último set realizado en este slot si existe
-      let lastLoggedSet = null
-      if (logged && logged.length > 0) {
-        for (let i = logged.length - 1; i >= 0; i--) {
-          if (logged[i] && logged[i].completed) {
-            lastLoggedSet = logged[i]
-            break
+      // Prioridad: Cargar peso y reps de la marca anterior (previousSets) para esta serie específica
+      let loadedKg = null
+      let loadedReps = null
+      if (app.globalData.previousSets && ex) {
+        const exPrev = app.globalData.previousSets[ex.id]
+        if (exPrev) {
+          let prevStr = exPrev[app.globalData.currentSetIndex]
+          if (!prevStr && app.globalData.currentSetIndex > 0) {
+            for (let s = app.globalData.currentSetIndex - 1; s >= 0; s--) {
+              if (exPrev[s]) {
+                prevStr = exPrev[s]
+                break
+              }
+            }
+          }
+          if (prevStr) {
+            const str = String(prevStr).trim()
+            const mSec = str.match(/^(\d+)\s*(?:s|seg)$/i)
+            if (mSec) {
+              loadedKg = 0
+              loadedReps = parseInt(mSec[1], 10)
+            } else {
+              const m = str.match(/^(?:\+?([\d\.]+)\s*(?:kg)?\s*[×xX]\s*)?(\d+)\s*(?:s|seg|reps?)?$/i)
+              if (m) {
+                if (m[1] !== undefined) loadedKg = parseFloat(m[1])
+                if (m[2] !== undefined) loadedReps = parseInt(m[2], 10)
+              }
+            }
           }
         }
       }
 
-      if (lastLoggedSet) {
-        this.state.currentKg = lastLoggedSet.kg
-        this.state.currentReps = lastLoggedSet.reps
+      if (loadedKg !== null && loadedReps !== null) {
+        this.state.currentKg = loadedKg
+        this.state.currentReps = loadedReps
       } else {
-        // Cargar peso y reps por defecto de la rutina o de la marca anterior
-        let loadedKg = null
-        let loadedReps = null
-        if (app.globalData.previousSets && ex) {
-          const exPrev = app.globalData.previousSets[ex.id]
-          if (exPrev) {
-            let prevStr = exPrev[app.globalData.currentSetIndex]
-            if (!prevStr && app.globalData.currentSetIndex > 0) {
-              for (let s = app.globalData.currentSetIndex - 1; s >= 0; s--) {
-                if (exPrev[s]) {
-                  prevStr = exPrev[s]
-                  break
-                }
-              }
-            }
-            if (prevStr) {
-              const str = String(prevStr).trim()
-              const mSec = str.match(/^(\d+)\s*(?:s|seg)$/i)
-              if (mSec) {
-                loadedKg = 0
-                loadedReps = parseInt(mSec[1], 10)
-              } else {
-                const m = str.match(/^(?:\+?([\d\.]+)\s*(?:kg)?\s*[×xX]\s*)?(\d+)\s*(?:s|seg|reps?)?$/i)
-                if (m) {
-                  if (m[1] !== undefined) loadedKg = parseFloat(m[1])
-                  if (m[2] !== undefined) loadedReps = parseInt(m[2], 10)
-                }
-              }
+        // Si no hay marca de la sesión anterior, recurrir al último set realizado en este slot
+        let lastLoggedSet = null
+        if (logged && logged.length > 0) {
+          for (let i = logged.length - 1; i >= 0; i--) {
+            if (logged[i] && logged[i].completed) {
+              lastLoggedSet = logged[i]
+              break
             }
           }
         }
 
-        const isBodyweightOrIso = ex && (ex.metricType === 'peso_corporal' || ex.metricType === 'isometria')
-        const defaultSet = (slot.sets && slot.sets[app.globalData.currentSetIndex]) || ["60", "10"]
-        const fallbackKg = isBodyweightOrIso ? 0 : (parseFloat(defaultSet[0]) || 60)
-        this.state.currentKg = loadedKg !== null ? loadedKg : fallbackKg
-        this.state.currentReps = loadedReps !== null ? loadedReps : (parseInt(defaultSet[1], 10) || 10)
+        if (lastLoggedSet) {
+          this.state.currentKg = lastLoggedSet.kg
+          this.state.currentReps = lastLoggedSet.reps
+        } else {
+          // Si no hay set previo ni marca anterior, cargar por defecto de la rutina
+          const isBodyweightOrIso = ex && (ex.metricType === 'peso_corporal' || ex.metricType === 'isometria')
+          const defaultSet = (slot.sets && slot.sets[app.globalData.currentSetIndex]) || ["60", "10"]
+          const fallbackKg = isBodyweightOrIso ? 0 : (parseFloat(defaultSet[0]) || 60)
+          this.state.currentKg = loadedKg !== null ? loadedKg : fallbackKg
+          this.state.currentReps = loadedReps !== null ? loadedReps : (parseInt(defaultSet[1], 10) || 10)
+        }
       }
     }
   },

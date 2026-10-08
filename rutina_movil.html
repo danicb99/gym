@@ -4234,42 +4234,12 @@
       const row = input.closest('.set-row');
       const card = input.closest('.exercise-card');
       if (!row || !card) return;
-      const sIdx = parseInt(row.getAttribute('data-set-num'), 10) - 1;
-      cascadeForwardValues(card, sIdx);
       saveWorkoutState();
     }
 
-    // Cascada inteligente de valores hacia las series posteriores no completadas
+    // Cascada desactivada: cada serie mantiene de forma independiente los datos de la sesión anterior
     function cascadeForwardValues(card, triggerSetIdx) {
-      if (!card) return;
-      const slotId = card.getAttribute('data-slot');
-      const rows = Array.from(card.querySelectorAll('.set-row'));
-      const triggerRow = rows[triggerSetIdx];
-      if (!triggerRow) return;
-
-      const triggerKgInp = triggerRow.querySelector('.input-kg');
-      const triggerRepsInp = triggerRow.querySelector('.input-reps');
-      const currentKg = triggerKgInp ? triggerKgInp.value : '';
-      const currentReps = triggerRepsInp ? triggerRepsInp.value : '';
-
-      if (!currentKg && !currentReps) return;
-
-      for (let i = triggerSetIdx + 1; i < rows.length; i++) {
-        const nextRow = rows[i];
-        if (nextRow.classList.contains('done')) continue; // Blindaje: no sobreescribir series ya terminadas
-
-        const nextKgInp = nextRow.querySelector('.input-kg');
-        const nextRepsInp = nextRow.querySelector('.input-reps');
-
-        if (nextKgInp && currentKg) {
-          nextKgInp.value = currentKg;
-          workoutState.inputs[`${slotId}_${i}_kg`] = currentKg;
-        }
-        if (nextRepsInp && currentReps) {
-          nextRepsInp.value = currentReps;
-          workoutState.inputs[`${slotId}_${i}_reps`] = currentReps;
-        }
-      }
+      // Intencionalmente no propaga valores hacia series posteriores
     }
 
     // Set Completion Logic + Auto-collapse finished exercise + Overload & PR Engine
@@ -4303,9 +4273,6 @@
           if (!repsInp.value && repsInp.placeholder) repsInp.value = repsInp.placeholder;
           workoutState.inputs[`${slotId}_${sIdx}_reps`] = repsInp.value.trim();
         }
-
-        // Cascada inteligente: propaga carga y reps a series posteriores que aún no estén completadas
-        cascadeForwardValues(card, sIdx);
 
         // 1RM Estimado y detección de nuevo Récord Personal (PR)
         const curKg = parseFloat(kgInp?.value) || 0;
