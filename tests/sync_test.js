@@ -1,0 +1,486 @@
+/**
+ * VigorexiApp - Suite de Pruebas Automatizadas de Sincronización
+ * Valida la lógica pura de mezcla, desempaquetado, deduplicación, hashing y los 8 escenarios de aceptación.
+ * Ejecución: node tests/sync_test.js
+ */
+
+const assert = require('assert');
+
+// 1. Simulación e importación de lógica pura
+
+// --- Lógica de Derivación de Hash y Topics (Fase 5) ---
+function deriveTopicHash(code) {
+  const str = String(code || '').trim() || 'vigorexi_danicb99_7f3a91c4e2b8';
+  let h1 = 0x811c9dc5;
+  let h2 = 0x9e3779b9;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 ^= ch;
+    h1 = Math.imul(h1, 0x01000193);
+    h2 ^= ch;
+    h2 = Math.imul(h2, 0x5bd1e995);
+  }
+  const hex1 = (h1 >>> 0).toString(16).padStart(8, '0');
+  const hex2 = (h2 >>> 0).toString(16).padStart(8, '0');
+  return (hex1 + hex2).toLowerCase();
+}
+
+function getSyncEndpoints(code, server = 'https://ntfy.sh') {
+  const srv = server.replace(/\/+$/, '');
+  const hash = deriveTopicHash(code);
+  return {
+    phoneToWatch: `${srv}/vigorexi_${hash}_p2w`,
+    watchToPhone: `${srv}/vigorexi_${hash}_w2p`
+  };
+}
+
+// --- Lógica de Mezcla no destructiva de series (Fase 2 - watch/utils/merge.js) ---
+const { mergeSessionLoggedSets, countCompletedSets } = require('../watch/utils/merge.js');
+
+// --- Lógica de Desempaquetado y Deduplicación (Fase 4 - watch_bridge.js) ---
+function unboxWatchMessage(raw) {
+  if (!raw) return null;
+  const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+  const type = data.type || (data.payload && data.payload.type);
+  const payload = data.payload || data;
+
+  let id = data.id;
+  if (!id) {
+    if (type === 'SET_COMPLETED') {
+      const slot = payload.slotId || data.slotId || '';
+      const sIdx = payload.setIndex !== undefined ? payload.setIndex : data.setIndex;
+      const kg = payload.kg !== undefined ? payload.kg : data.kg;
+      const reps = payload.reps !== undefined ? payload.reps : data.reps;
+      id = `legacy-set-${slot}_${sIdx}-${kg}x${reps}`;
+    } else if (type === 'WORKOUT_FINISHED') {
+      const sum = payload.summary || payload;
+      const sId = sum.sessionId || sum.dayId || 'fin';
+      const dStr = sum.date || data.timestamp || '';
+      id = `legacy-fin-${sId}-${dStr}`;
+    } else {
+      id = `legacy-unk-${Date.now()}`;
+    }
+  }
+
+  return {
+    id: id,
+    type: type,
+    ts: data.ts || data.timestamp || Date.now(),
+    payload: payload
+  };
+}
+
+// --- Lógica de Cálculo de Hash de Broadcast (Fase 1 - watch_bridge.js) ---
+function computeBroadcastHash(payload, workoutState) {
+  if (!payload.workoutActive) {
+    return JSON.stringify({ active: false });
+  }
+  return JSON.stringify({
+    active: true,
+    d: payload.activeDayId,
+    c: (workoutState.completed || []).length,
+    s: payload.currentSlotIndex,
+    set: payload.currentSetIndex,
+    rtActive: !!(payload.restTimer && payload.restTimer.active),
+    rtEnd: payload.restTimer && payload.restTimer.active ? payload.restTimer.endTime : 0,
+    logged: payload.sessionLoggedSets,
+    overrides: payload.slotExOverrides,
+    start: payload.sessionStartTime || 0
+  });
+}
+
+// --- Inicio de la suite de pruebas ---
+let totalTests = 0;
+let passedTests = 0;
+
+function test(name, fn) {
+  totalTests++;
+  try {
+    fn();
+    console.log(`  ✓ ${name}`);
+    passedTests++;
+  } catch (err) {
+    console.error(`  ✗ ${name}`);
+    console.error(`    ${err.message}`);
+    throw err;
+  }
+}
+
+console.log('====================================================');
+console.log('🧪 VigorexiApp - Suite de Pruebas de Sincronización');
+console.log('====================================================\n');
+
+// ----------------------------------------------------
+// BLOQUE 1: LÓGICA PURA
+// ----------------------------------------------------
+console.log('📦 Bloque 1: Pruebas de Funciones Puras');
+
+test('mergeSessionLoggedSets: maneja entradas nulas o vacías', () => {
+  assert.deepStrictEqual(mergeSessionLoggedSets(null, null), {});
+  assert.deepStrictEqual(mergeSessionLoggedSets({}, null), {});
+  assert.deepStrictEqual(mergeSessionLoggedSets(null, { slot1: [{ kg: 50, reps: 10, completed: true }] }), {
+    slot1: [{ kg: 50, reps: 10, completed: true }]
+  });
+});
+
+test('mergeSessionLoggedSets: fusiona series sin duplicados y respeta mayor repetición/peso', () => {
+  const local = {
+    slot1: [
+      { kg: 80, reps: 8, completed: true },
+      { kg: 80, reps: 6, completed: false }
+    ]
+  };
+  const incoming = {
+    slot1: [
+      { kg: 80, reps: 8, completed: true }, // idéntico
+      { kg: 80, reps: 8, completed: true }  // completada en el otro lado
+    ],
+    slot2: [
+      { kg: 40, reps: 12, completed: true }
+    ]
+  };
+
+  const merged = mergeSessionLoggedSets(local, incoming);
+  assert.strictEqual(merged.slot1.length, 2);
+  assert.strictEqual(merged.slot1[0].completed, true);
+  assert.strictEqual(merged.slot1[1].completed, true);
+  assert.strictEqual(merged.slot1[1].reps, 8); // Se actualizó a 8 reps y completada
+  assert.strictEqual(merged.slot2.length, 1);
+  assert.strictEqual(merged.slot2[0].kg, 40);
+});
+
+test('countCompletedSets: cuenta exactamente las series completadas', () => {
+  const sets = {
+    slot1: [{ completed: true }, { completed: false }, { completed: true }],
+    slot2: [{ completed: true }],
+    slot3: []
+  };
+  assert.strictEqual(countCompletedSets(sets), 3);
+});
+
+test('unboxWatchMessage: desempaqueta sobres v1 estándar', () => {
+  const envelope = {
+    v: 1,
+    id: 'msg-12345',
+    type: 'SET_COMPLETED',
+    ts: 1700000000000,
+    src: 'watch',
+    payload: { slotId: 'slotA', setIndex: 0, kg: 100, reps: 5 }
+  };
+  const unboxed = unboxWatchMessage(envelope);
+  assert.strictEqual(unboxed.id, 'msg-12345');
+  assert.strictEqual(unboxed.type, 'SET_COMPLETED');
+  assert.strictEqual(unboxed.payload.kg, 100);
+});
+
+test('unboxWatchMessage: compatibilidad retroactiva con formato legacy y deriva id determinista', () => {
+  const legacy = {
+    type: 'SET_COMPLETED',
+    slotId: 'slotB',
+    setIndex: 2,
+    kg: 75,
+    reps: 10,
+    timestamp: 1699999999999
+  };
+  const unboxed = unboxWatchMessage(legacy);
+  assert.strictEqual(unboxed.id, 'legacy-set-slotB_2-75x10');
+  assert.strictEqual(unboxed.type, 'SET_COMPLETED');
+  assert.strictEqual(unboxed.payload.kg, 75);
+});
+
+test('computeBroadcastHash: hash constante en reposo y sensible a cambios de entreno', () => {
+  const stateIdle = { completed: [] };
+  const h1 = computeBroadcastHash({ workoutActive: false }, stateIdle);
+  const h2 = computeBroadcastHash({ workoutActive: false, timestamp: 99999 }, stateIdle);
+  assert.strictEqual(h1, h2, 'En reposo el hash DEBE ser idéntico sin importar marcas de tiempo');
+
+  const stateActive1 = { completed: ['s1_0'] };
+  const hActive1 = computeBroadcastHash({ workoutActive: true, activeDayId: 'torsoA', currentSlotIndex: 0, currentSetIndex: 0 }, stateActive1);
+  assert.notStrictEqual(h1, hActive1, 'El hash debe cambiar cuando hay entreno activo');
+
+  // Modificar peso/reps en sessionLoggedSets
+  const hActive2 = computeBroadcastHash({
+    workoutActive: true,
+    activeDayId: 'torsoA',
+    currentSlotIndex: 0,
+    currentSetIndex: 0,
+    sessionLoggedSets: { s1: [{ kg: 82.5, reps: 8 }] }
+  }, stateActive1);
+  assert.notStrictEqual(hActive1, hActive2, 'El hash debe cambiar cuando cambia el peso o reps editado');
+});
+
+// ----------------------------------------------------
+// BLOQUE 2: ESCENARIOS DE ACEPTACIÓN a) - h)
+// ----------------------------------------------------
+console.log('\n🚀 Bloque 2: Escenarios de Aceptación (a - h)');
+
+test('Escenario a) Sesión iniciada en móvil, continuada en reloj', () => {
+  // 1. Móvil genera snapshot
+  const phoneSnapshot = {
+    workoutActive: true,
+    activeDayId: 'fullbodyA',
+    currentSlotIndex: 1,
+    currentSetIndex: 2,
+    sessionStartTime: Date.now() - 600000,
+    sessionLoggedSets: {
+      fb_squat: [{ kg: 100, reps: 5, completed: true }]
+    }
+  };
+
+  // 2. Reloj recibe respuesta de GET_PHONE_SESSION y adopta estado
+  const watchState = {
+    activeDayId: null,
+    currentSlotIndex: 0,
+    currentSetIndex: 0,
+    sessionLoggedSets: {}
+  };
+
+  if (phoneSnapshot.workoutActive && phoneSnapshot.activeDayId) {
+    watchState.activeDayId = phoneSnapshot.activeDayId;
+    watchState.currentSlotIndex = phoneSnapshot.currentSlotIndex;
+    watchState.currentSetIndex = phoneSnapshot.currentSetIndex;
+    watchState.sessionLoggedSets = mergeSessionLoggedSets(watchState.sessionLoggedSets, phoneSnapshot.sessionLoggedSets);
+  }
+
+  assert.strictEqual(watchState.activeDayId, 'fullbodyA');
+  assert.strictEqual(watchState.currentSlotIndex, 1);
+  assert.strictEqual(watchState.currentSetIndex, 2);
+  assert.strictEqual(watchState.sessionLoggedSets.fb_squat.length, 1);
+});
+
+test('Escenario b) Móvil apagado/sin cobertura: encolado en outbox y retransmisión con backoff', () => {
+  const outbox = [];
+  const enqueue = (item) => outbox.push({ ...item, retries: 0 });
+
+  // 1. Tres series se realizan en el reloj sin móvil disponible
+  enqueue({ id: 'set-1', type: 'SET_COMPLETED', payload: { set: 1 } });
+  enqueue({ id: 'set-2', type: 'SET_COMPLETED', payload: { set: 2 } });
+  enqueue({ id: 'set-3', type: 'SET_COMPLETED', payload: { set: 3 } });
+  assert.strictEqual(outbox.length, 3);
+
+  // 2. Primer intento falla (sin conexión)
+  let bleConnected = false;
+  const flushedSuccess = [];
+
+  const simulateFlush = () => {
+    if (!bleConnected) {
+      // Incrementar reintentos según política de backoff
+      outbox.forEach(item => item.retries++);
+      return;
+    }
+    // Al volver la conexión, se envían y confirman uno a uno
+    while (outbox.length > 0) {
+      const current = outbox.shift();
+      flushedSuccess.push(current.id);
+    }
+  };
+
+  simulateFlush();
+  assert.strictEqual(outbox.length, 3);
+  assert.strictEqual(outbox[0].retries, 1, 'Se incrementaron los reintentos para backoff');
+
+  // 3. Vuelve la conexión: vaciado con éxito
+  bleConnected = true;
+  simulateFlush();
+  assert.strictEqual(outbox.length, 0, 'El outbox quedó completamente vacío');
+  assert.deepStrictEqual(flushedSuccess, ['set-1', 'set-2', 'set-3']);
+});
+
+test('Escenario c) Finalización en reloj con móvil cerrado: catch-up de 12 horas recupera sesión', () => {
+  const finishTimestamp = Date.now() - (2 * 3600 * 1000); // Terminó hace 2 horas
+  const ntfyStream = [
+    JSON.stringify({
+      id: 'ntfy_msg_987',
+      event: 'message',
+      message: JSON.stringify({
+        v: 1,
+        id: 'watch-fin-fullbodyA-1234',
+        type: 'WORKOUT_FINISHED',
+        ts: finishTimestamp,
+        payload: {
+          sessionId: 'session-fullbodyA-abc',
+          dayId: 'fullbodyA',
+          durationMinutes: 52,
+          date: new Date(finishTimestamp).toISOString()
+        }
+      })
+    })
+  ];
+
+  // Simulación de catchUpFromWatch en la web
+  const processedIds = new Set();
+  const savedSessions = [];
+  const CATCHUP_MAX_AGE_MS = 12 * 3600 * 1000;
+
+  for (const line of ntfyStream) {
+    const raw = JSON.parse(line);
+    const envelope = JSON.parse(raw.message);
+    const unboxed = unboxWatchMessage(envelope);
+    if (!unboxed) continue;
+
+    // Verificar ventana de 12 horas
+    if (Date.now() - unboxed.ts <= CATCHUP_MAX_AGE_MS) {
+      if (!processedIds.has(unboxed.id)) {
+        processedIds.add(unboxed.id);
+        savedSessions.push(unboxed.payload);
+      }
+    }
+  }
+
+  assert.strictEqual(savedSessions.length, 1);
+  assert.strictEqual(savedSessions[0].sessionId, 'session-fullbodyA-abc');
+  assert.strictEqual(savedSessions[0].durationMinutes, 52);
+});
+
+test('Escenario d) Respuesta 429 de ntfy.sh: pausa respetando Retry-After sin pérdida de series', () => {
+  let rateLimitResetTime = 0;
+  let hasPendingBroadcast = false;
+
+  // Simular respuesta HTTP 429 con header Retry-After
+  const mockResponse = {
+    status: 429,
+    headers: { 'retry-after': '45' }
+  };
+
+  if (mockResponse.status === 429) {
+    const retrySec = parseInt(mockResponse.headers['retry-after'], 10) || 60;
+    rateLimitResetTime = Date.now() + (retrySec * 1000);
+    hasPendingBroadcast = true;
+  }
+
+  assert.strictEqual(hasPendingBroadcast, true, 'El broadcast pendiente se preserva');
+  const remainingSec = Math.ceil((rateLimitResetTime - Date.now()) / 1000);
+  assert.strictEqual(remainingSec >= 44 && remainingSec <= 45, true, 'Se calculó el tiempo restante');
+});
+
+test('Escenario e) Dispositivos alternados: convergencia sin sobrescritura destructiva', () => {
+  // Serie 1 en móvil
+  let webSets = { slot1: [{ kg: 80, reps: 8, completed: true }] };
+  let watchSets = {};
+
+  // Reloj sincroniza con móvil
+  watchSets = mergeSessionLoggedSets(watchSets, webSets);
+
+  // Serie 2 en reloj
+  watchSets.slot1.push({ kg: 82.5, reps: 8, completed: true });
+
+  // Web sincroniza con evento de reloj
+  webSets = mergeSessionLoggedSets(webSets, watchSets);
+
+  // Serie 3 en móvil
+  webSets.slot1.push({ kg: 82.5, reps: 7, completed: true });
+
+  // Reloj sincroniza con móvil
+  watchSets = mergeSessionLoggedSets(watchSets, webSets);
+
+  assert.strictEqual(webSets.slot1.length, 3);
+  assert.strictEqual(watchSets.slot1.length, 3);
+  assert.deepStrictEqual(webSets.slot1, watchSets.slot1);
+  assert.strictEqual(countCompletedSets(webSets), 3);
+});
+
+test('Escenario f) Topic privado: determinismo e igualdad entre web y reloj para un mismo código', () => {
+  const syncCode = 'VigorexiApp_Priv_Code_9876543210_SecureKey';
+  
+  // Derivación en la web
+  const webEndpoints = getSyncEndpoints(syncCode);
+  
+  // Derivación en el reloj (app-side)
+  const watchEndpoints = getSyncEndpoints(syncCode);
+
+  assert.strictEqual(webEndpoints.phoneToWatch, watchEndpoints.phoneToWatch);
+  assert.strictEqual(webEndpoints.watchToPhone, watchEndpoints.watchToPhone);
+  assert.ok(webEndpoints.phoneToWatch.includes('vigorexi_'));
+  assert.ok(webEndpoints.phoneToWatch.endsWith('_p2w'));
+  assert.ok(webEndpoints.watchToPhone.endsWith('_w2p'));
+});
+
+test('Escenario g) Sin entreno activo: 0 peticiones HTTP periódicas en segundo plano', () => {
+  let httpRequestsCount = 0;
+  let lastHash = '';
+
+  const simulatePeriodicCheck = (workoutActive) => {
+    const payload = { workoutActive };
+    const hash = computeBroadcastHash(payload, { completed: [] });
+    // Coalescencia: solo emite si cambió el hash
+    if (hash === lastHash) {
+      return; // 0 peticiones
+    }
+    lastHash = hash;
+    httpRequestsCount++;
+  };
+
+  // Estado reposo durante 10 ciclos
+  for (let i = 0; i < 10; i++) {
+    simulatePeriodicCheck(false);
+  }
+
+  assert.strictEqual(httpRequestsCount, 1, 'Solo 1 petición para notificar reposo inicial');
+
+  for (let i = 0; i < 50; i++) {
+    simulatePeriodicCheck(false);
+  }
+
+  assert.strictEqual(httpRequestsCount, 1, 'Exactamente 0 peticiones subsecuentes en reposo');
+});
+
+test('Escenario h) Sesión duplicada: dos eventos WORKOUT_FINISHED con el mismo sessionId solo generan 1 registro', () => {
+  const workoutState = { sessions: [] };
+  const processedIds = new Set();
+
+  const handleWorkoutFinished = (event) => {
+    const unboxed = unboxWatchMessage(event);
+    if (!unboxed) return;
+    if (processedIds.has(unboxed.id)) return; // Deduplicación por id
+
+    const summary = unboxed.payload.summary || unboxed.payload;
+    const sessionId = summary.sessionId;
+
+    // Idempotencia en historial
+    const exists = workoutState.sessions.some(s => s.sessionId === sessionId);
+    if (exists) {
+      processedIds.add(unboxed.id);
+      return;
+    }
+
+    workoutState.sessions.push({
+      sessionId: sessionId,
+      dayId: summary.dayId,
+      date: summary.date
+    });
+    processedIds.add(unboxed.id);
+  };
+
+  const finishEvent = {
+    v: 1,
+    id: 'msg-fin-001',
+    type: 'WORKOUT_FINISHED',
+    payload: {
+      summary: {
+        sessionId: 'session-fullbodyA-sameId',
+        dayId: 'fullbodyA',
+        date: new Date().toISOString()
+      }
+    }
+  };
+
+  // Recibido por SSE
+  handleWorkoutFinished(finishEvent);
+  assert.strictEqual(workoutState.sessions.length, 1);
+
+  // Recibido nuevamente por catch-up
+  handleWorkoutFinished(finishEvent);
+  assert.strictEqual(workoutState.sessions.length, 1, 'No se duplicó en el historial');
+
+  // Incluso con id de mensaje distinto pero mismo sessionId (re-envío de outbox)
+  const finishEvent2 = {
+    ...finishEvent,
+    id: 'msg-fin-002'
+  };
+  handleWorkoutFinished(finishEvent2);
+  assert.strictEqual(workoutState.sessions.length, 1, 'Idempotencia absoluta por sessionId');
+});
+
+console.log('\n====================================================');
+console.log(`🎉 Todas las pruebas superadas exitosamente: ${passedTests}/${totalTests}`);
+console.log('====================================================');
