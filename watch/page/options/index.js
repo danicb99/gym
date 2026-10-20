@@ -53,7 +53,7 @@ Page(
         text_size: 24,
         align_h: hmUI.align.CENTER_H,
         align_v: hmUI.align.CENTER_V,
-        text: '▲ MENÚ DE AJUSTES'
+        text: 'MENÚ DE AJUSTES'
       })
 
       // 2. SUBTÍTULO CON CONTEXTO ACTUAL
@@ -157,7 +157,7 @@ Page(
         press_color: 0x334155,
         color: 0x10b981,
         text_size: 19,
-        text: `➕ Serie Extra (Total: ${totalSets + 1})`,
+        text: `+ Serie Extra (${totalSets + 1} series)`,
         click_func: () => {
           if (slot) {
             if (app.addExtraSet) {
@@ -183,7 +183,7 @@ Page(
         press_color: 0x334155,
         color: 0xf59e0b,
         text_size: 19,
-        text: `➖ Quitar 1 Serie (Total: ${Math.max(1, totalSets - 1)})`,
+        text: `- Quitar 1 Serie (${Math.max(1, totalSets - 1)} series)`,
         click_func: () => {
           if (slot && totalSets > 1) {
             if (app.removeSet) {
@@ -212,7 +212,7 @@ Page(
         press_color: 0x334155,
         color: 0x38bdf8,
         text_size: 19,
-        text: '🔄 Sincronizar con Móvil',
+        text: 'Sincronizar con Móvil',
         click_func: async () => {
           try {
             await app.checkPhoneLiveSession()
@@ -233,7 +233,7 @@ Page(
         press_color: 0xdc2626,
         color: 0xffffff,
         text_size: 19,
-        text: '🏁 Finalizar Entrenamiento',
+        text: 'Finalizar Entrenamiento',
         click_func: () => {
           app.finishWorkout()
           replace({ url: 'page/summary/index' })

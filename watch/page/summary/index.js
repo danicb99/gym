@@ -49,7 +49,7 @@ Page({
       text_size: 24,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: '🎉 ¡ENTRENO COMPLETADO!'
+      text: '¡ENTRENO COMPLETADO!'
     })
 
     hmUI.createWidget(hmUI.widget.TEXT, {
@@ -101,7 +101,7 @@ Page({
       text_size: 18,
       align_h: hmUI.align.LEFT,
       align_v: hmUI.align.CENTER_V,
-      text: `💪 Series: ${totalSeries} efectivas`
+      text: `Series: ${totalSeries} efectivas`
     })
 
     hmUI.createWidget(hmUI.widget.TEXT, {
@@ -137,14 +137,14 @@ Page({
       text_size: 16,
       align_h: hmUI.align.LEFT,
       align_v: hmUI.align.CENTER_V,
-      text: `🏋️ Ejercicios: ${totalExCount} realizados`
+      text: `Ejercicios: ${totalExCount} realizados`
     })
 
     // 3. ESTADO DE SINCRONIZACIÓN
     const pendCount = getPendingOutboxCount()
     const syncStatusText = pendCount > 0 
       ? `⏳ En cola (${pendCount}), se enviará al conectar` 
-      : '✅ Enviado y sincronizado con el móvil'
+      : 'Enviado y sincronizado con el móvil'
 
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 43,
@@ -169,7 +169,7 @@ Page({
       press_color: THEME_COLORS.stepperPress,
       color: THEME_COLORS.textMain,
       text_size: 20,
-      text: 'Listo ➔',
+      text: 'Listo',
       click_func: () => {
         replace({ url: 'page/day_select/index' })
       }

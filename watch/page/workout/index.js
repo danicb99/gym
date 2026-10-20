@@ -198,7 +198,7 @@ Page(BasePage({
       press_color: THEME_COLORS.stepperBg,
       color: isResting ? THEME_COLORS.timerAmber : (initialSync.color || THEME_COLORS.textMuted),
       text_size: 13,
-      text: isResting ? `⏳ Descanso${syncText}` : `⏱️ ${elapsedMinutes}m${syncText}`,
+      text: isResting ? `Descanso${syncText}` : `${elapsedMinutes}m${syncText}`,
       click_func: () => {
         const rt = app.globalData.restTimer
         if (rt && rt.active) {
@@ -444,7 +444,7 @@ Page(BasePage({
       press_color: THEME_COLORS.stepperPress,
       color: THEME_COLORS.cyan,
       text_size: 14,
-      text: '▲ Menú',
+      text: 'Menú',
       click_func: () => {
         push({ url: 'page/options/index' })
       }

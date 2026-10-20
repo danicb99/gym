@@ -73,7 +73,7 @@ Page({
       text_size: 16,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: '⏱️ DESCANSO'
+      text: 'DESCANSO'
     })
 
     // 2. PRÓXIMO EJERCICIO Y SERIE (Gold)

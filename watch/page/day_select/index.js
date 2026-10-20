@@ -42,7 +42,7 @@ Page(
     async checkSync(manualTrigger = false) {
       const app = getApp()
       if (this.state.syncButton && !app.globalData.phoneLiveSession) {
-        this.state.syncButton.setProperty(hmUI.prop.TEXT, '🔄 Buscando móvil...')
+        this.state.syncButton.setProperty(hmUI.prop.TEXT, 'Buscando móvil...')
         this.state.syncButton.setProperty(hmUI.prop.NORMAL_COLOR, 0x1e293b)
       }
       if (this.state.subWidget && !app.globalData.phoneLiveSession) {
@@ -57,7 +57,7 @@ Page(
           const title = dayData ? dayData.shortName : phoneSession.activeDayId
 
           if (this.state.syncButton) {
-            this.state.syncButton.setProperty(hmUI.prop.TEXT, `🟢 Unirse a ${title}`)
+            this.state.syncButton.setProperty(hmUI.prop.TEXT, `Unirse a ${title}`)
             this.state.syncButton.setProperty(hmUI.prop.NORMAL_COLOR, 0x0284c7)
           }
           if (this.state.subWidget) {
@@ -67,7 +67,7 @@ Page(
         } else {
           app.globalData.phoneLiveSession = null
           if (this.state.syncButton) {
-            this.state.syncButton.setProperty(hmUI.prop.TEXT, '🔄 Sincronizar Móvil')
+            this.state.syncButton.setProperty(hmUI.prop.TEXT, 'Sincronizar Móvil')
             this.state.syncButton.setProperty(hmUI.prop.NORMAL_COLOR, 0x1e293b)
           }
           if (this.state.subWidget) {
@@ -78,7 +78,7 @@ Page(
       } catch (e) {
         console.log('[DaySelect] Error consultando móvil:', e)
         if (this.state.syncButton) {
-          this.state.syncButton.setProperty(hmUI.prop.TEXT, '🔄 Reintentar conexión')
+          this.state.syncButton.setProperty(hmUI.prop.TEXT, 'Reintentar conexión')
         }
       }
     },
@@ -157,7 +157,7 @@ Page(
       const phoneDayData = phoneSession ? ROUTINE_SLOTS[phoneSession.activeDayId] : null
       const phoneDayTitle = phoneDayData ? phoneDayData.shortName : (phoneSession ? phoneSession.activeDayId : '')
       const hasLiveWorkout = phoneSession && phoneSession.activeDayId && phoneSession.workoutActive
-      const initialBtnText = hasLiveWorkout ? `🟢 Unirse a ${phoneDayTitle}` : '🔄 Sincronizar Móvil'
+      const initialBtnText = hasLiveWorkout ? `Unirse a ${phoneDayTitle}` : 'Sincronizar Móvil'
       const initialBtnColor = hasLiveWorkout ? THEME_COLORS.blueAction : THEME_COLORS.stepperBg
 
       this.state.syncButton = hmUI.createWidget(hmUI.widget.BUTTON, {
@@ -199,7 +199,7 @@ Page(
           press_color: THEME_COLORS.emeraldDark,
           color: THEME_COLORS.textDark,
           text_size: 20,
-          text: `▶ Continuar ${activeDay ? activeDay.shortName : 'Sesión'}`,
+          text: `Continuar ${activeDay ? activeDay.shortName : 'Sesión'}`,
           click_func: () => {
             push({ url: 'page/workout/index' })
           }
@@ -232,14 +232,14 @@ Page(
 
       const days = [
         // --- FULL BODY 3 DÍAS (PRINCIPAL) ---
-        { id: 'fullbodyA', label: '🏋️ Día A: Squat + Torso' },
-        { id: 'fullbodyB', label: '🔥 Día B: RDL + Torso' },
-        { id: 'fullbodyC', label: '⚡ Día C: Pierna + Brazos' },
+        { id: 'fullbodyA', label: 'Día A: Squat + Torso' },
+        { id: 'fullbodyB', label: 'Día B: RDL + Torso' },
+        { id: 'fullbodyC', label: 'Día C: Pierna + Brazos' },
         // --- TORSO / PIERNA 4 DÍAS (ALTERNO) ---
-        { id: 'torsoA', label: '💪 D1: Torso A (Empuje)' },
-        { id: 'piernaA', label: '🦵 D2: Pierna A (Cuádriceps)' },
-        { id: 'torsoB', label: '🔙 D3: Torso B (Tracción)' },
-        { id: 'piernaB', label: '🍑 D4: Pierna B (Isquios)' }
+        { id: 'torsoA', label: 'D1: Torso A (Empuje)' },
+        { id: 'piernaA', label: 'D2: Pierna A (Cuádriceps)' },
+        { id: 'torsoB', label: 'D3: Torso B (Tracción)' },
+        { id: 'piernaB', label: 'D4: Pierna B (Isquios)' }
       ]
 
       days.forEach(day => {
@@ -248,7 +248,7 @@ Page(
         const cardRadius = isRec ? 26 : 22
         const cardBg = isRec ? THEME_COLORS.gold : THEME_COLORS.stepperBg
         const cardTextColor = isRec ? 0x060a12 : THEME_COLORS.textMain
-        const cardText = isRec ? `⭐ RECOMENDADO\n${day.label}` : day.label
+        const cardText = isRec ? `RECOMENDADO\n${day.label}` : day.label
 
         hmUI.createWidget(hmUI.widget.BUTTON, {
           x: btnX,
