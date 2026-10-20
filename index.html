@@ -489,7 +489,7 @@
     .exercise-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: border-color 0.2s, box-shadow 0.2s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); }
     .exercise-card:hover { border-color: rgba(255, 255, 255, 0.14); }
     
-    /* Auto-collapse / Reorder styles (Zero scroll) */
+    /* Auto-collapse & Accordion (Focused Exercise Mode) */
     .completed-summary-bar {
       display: none;
       align-items: center;
@@ -497,27 +497,33 @@
       cursor: pointer;
       padding: 6px 4px;
       gap: 10px;
+      border-radius: 10px;
+      transition: background 0.15s ease;
+      user-select: none;
+    }
+    .completed-summary-bar:hover {
+      background: rgba(255, 255, 255, 0.03);
     }
     .summary-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex: 1;
       min-width: 0;
     }
     .summary-check-icon {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #fff;
-      font-weight: 900;
-      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.75rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
       flex-shrink: 0;
+      transition: all 0.2s ease;
     }
     .summary-text-wrap {
       display: flex;
@@ -527,7 +533,7 @@
       min-width: 0;
     }
     .summary-title {
-      font-size: 0.92rem;
+      font-size: 0.90rem;
       font-weight: 750;
       color: #fff;
       white-space: nowrap;
@@ -535,18 +541,18 @@
       text-overflow: ellipsis;
     }
     .summary-sub {
-      font-size: 0.70rem;
+      font-size: 0.68rem;
       color: var(--text-muted);
       font-weight: 600;
     }
     .summary-best-pill {
-      font-size: 0.72rem;
+      font-size: 0.70rem;
       font-weight: 800;
       color: var(--amber);
       background: var(--gold-subtle);
       border: 1px solid var(--border-gold);
       border-radius: 8px;
-      padding: 3px 8px;
+      padding: 2px 7px;
       display: none;
       align-items: center;
       gap: 4px;
@@ -554,36 +560,46 @@
       flex-shrink: 0;
     }
     .summary-toggle-btn {
-      font-size: 0.72rem;
+      font-size: 0.70rem;
       font-weight: 700;
       color: var(--cyan);
       background: var(--cyan-subtle);
       border: 1px solid rgba(56, 189, 248, 0.25);
       border-radius: 8px;
-      padding: 5px 9px;
-      transition: transform 0.2s;
+      padding: 4px 8px;
+      transition: transform 0.2s, background 0.15s;
       flex-shrink: 0;
     }
 
-    .exercise-card.exercise-completed {
-      order: 100 !important;
+    /* Accordion collapsed card */
+    .exercise-card.collapsed {
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      background: rgba(15, 23, 42, 0.45);
+      border-color: rgba(255, 255, 255, 0.07);
+    }
+    .exercise-card.collapsed .card-body-collapsible {
+      display: none !important;
+    }
+    .exercise-card.collapsed .completed-summary-bar {
+      display: flex !important;
+    }
+
+    /* Accordion collapsed & completed (green success accent) */
+    .exercise-card.exercise-completed .summary-check-icon {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+      font-size: 0.88rem;
+    }
+    .exercise-card.collapsed.exercise-completed {
       background: rgba(16, 185, 129, 0.04);
       border-color: rgba(16, 185, 129, 0.25);
-      padding: 12px 14px;
-      margin-bottom: 10px;
     }
-    .exercise-card.exercise-completed .card-body-collapsible { display: none; }
-    .exercise-card.exercise-completed .completed-summary-bar { display: flex; }
-    .exercise-card.exercise-completed.manually-expanded .card-body-collapsible {
-      display: block;
-      margin-top: 14px;
-      border-top: 1px solid var(--border);
-      padding-top: 12px;
-    }
-    .exercise-card.exercise-completed.manually-expanded .summary-toggle-btn {
-      background: rgba(255, 255, 255, 0.08);
+    .exercise-card.collapsed:not(.exercise-completed) .summary-toggle-btn {
       color: var(--text-muted);
-      transform: rotate(180deg);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.08);
     }
 
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
@@ -641,26 +657,26 @@
     .demo-links { display: flex; gap: 8px; }
     .ext-link { color: var(--cyan); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 3px; }
 
-    /* Interactive Sets Table */
+    /* Interactive Sets Table - Compacted & Sleek */
     .sets-table {
       width: 100%;
       border-collapse: separate;
-      border-spacing: 0 7px;
-      margin-top: 6px;
-      font-size: 0.85rem;
+      border-spacing: 0 4px;
+      margin-top: 4px;
+      font-size: 0.82rem;
     }
     .sets-table th {
       text-align: center;
       color: var(--text-dim);
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.6px;
-      padding-bottom: 5px;
+      letter-spacing: 0.5px;
+      padding-bottom: 3px;
     }
     .set-row {
       background: rgba(255, 255, 255, 0.025);
-      border-radius: 12px;
+      border-radius: 10px;
       transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .set-row:hover {
@@ -672,10 +688,10 @@
     .set-row.active-row {
       background: rgba(56, 189, 248, 0.12) !important;
       outline: 1.5px solid rgba(56, 189, 248, 0.5);
-      border-radius: 12px;
+      border-radius: 10px;
     }
     .set-cell {
-      padding: 7px 6px;
+      padding: 4px 4px;
       text-align: center;
       border-top: 1px solid var(--border-subtle);
       border-bottom: 1px solid var(--border-subtle);
@@ -683,27 +699,27 @@
     }
     .set-cell:first-child {
       border-left: 1px solid var(--border-subtle);
-      border-radius: 12px 0 0 12px;
-      width: 38px;
+      border-radius: 10px 0 0 10px;
+      width: 34px;
       font-weight: 850;
       color: var(--text-muted);
       font-variant-numeric: tabular-nums;
     }
     .set-cell:last-child {
       border-right: 1px solid var(--border-subtle);
-      border-radius: 0 12px 12px 0;
-      width: 52px;
+      border-radius: 0 10px 10px 0;
+      width: 48px;
     }
     .set-prev {
-      font-size: 0.80rem;
-      font-weight: 750;
+      font-size: 0.78rem;
+      font-weight: 700;
       color: var(--cyan);
       cursor: pointer;
       transition: all 0.15s;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
-      padding: 4px;
-      border-radius: 6px;
+      padding: 2px 4px;
+      border-radius: 5px;
     }
     .set-prev.empty {
       color: var(--text-dim);
@@ -714,15 +730,15 @@
       background: var(--cyan-subtle);
     }
 
-    /* Sets Inputs: 16px to prevent iOS auto-zoom, 42px touch height */
+    /* Sets Inputs: 16px to prevent iOS auto-zoom, compact 38px touch height */
     .set-input {
-      width: 68px;
-      height: 42px;
+      width: 64px;
+      height: 38px;
       background: rgba(0, 0, 0, 0.45);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 9px;
       color: #ffffff;
-      font-size: 16px; /* Prevents auto-zoom on mobile Safari */
+      font-size: 16px;
       font-weight: 800;
       text-align: center;
       padding: 0 4px;
@@ -737,11 +753,11 @@
       box-shadow: 0 0 10px rgba(251, 191, 36, 0.25);
     }
 
-    /* Set Check Button: Generous 42x42px touch target with haptic feedback animation */
+    /* Set Check Button: Compact 38x38px */
     .check-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
       border: 1.5px solid var(--border);
       background: var(--surface-elevated);
       color: var(--text-dim);
@@ -754,8 +770,8 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
     .check-btn svg {
-      width: 19px;
-      height: 19px;
+      width: 17px;
+      height: 17px;
       stroke-width: 2.8;
       stroke: currentColor;
       fill: none;
@@ -1204,23 +1220,9 @@
       display: none !important;
     }
 
-    /* Live 1RM pill in set row */
+    /* Live 1RM pill in set row - Removed per user request */
     .live-1rm-pill {
-      display: block;
-      font-size: 0.62rem;
-      font-weight: 700;
-      color: var(--amber);
-      margin-top: 2px;
-      line-height: 1.1;
-      letter-spacing: -0.2px;
-      opacity: 0.9;
-      white-space: nowrap;
-    }
-    .live-1rm-pill.empty {
-      visibility: hidden;
-      height: 0;
-      margin: 0;
-      overflow: hidden;
+      display: none !important;
     }
 
     /* Last done chip in day banners */
@@ -2016,7 +2018,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyA_1">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyA_1" onclick="togglePlayer('player-fullbodyA_1')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-squat"></use></svg>
             </div>
@@ -2117,7 +2119,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyA_2">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyA_2" onclick="togglePlayer('player-fullbodyA_2')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bench-press"></use></svg>
             </div>
@@ -2225,7 +2227,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyA_3">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyA_3" onclick="togglePlayer('player-fullbodyA_3')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lat-pulldown"></use></svg>
             </div>
@@ -2333,7 +2335,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyA_4">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyA_4" onclick="togglePlayer('player-fullbodyA_4')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lateral-raise"></use></svg>
             </div>
@@ -2434,7 +2436,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyA_5">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyA_5" onclick="togglePlayer('player-fullbodyA_5')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-tricep-pushdown"></use></svg>
             </div>
@@ -2535,7 +2537,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyA_6">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyA_6" onclick="togglePlayer('player-fullbodyA_6')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bicep-curl"></use></svg>
             </div>
@@ -2680,7 +2682,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyB_1">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyB_1" onclick="togglePlayer('player-fullbodyB_1')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-romanian-deadlift"></use></svg>
             </div>
@@ -2781,7 +2783,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyB_2">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyB_2" onclick="togglePlayer('player-fullbodyB_2')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-incline-dumbbell-press"></use></svg>
             </div>
@@ -2889,7 +2891,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyB_3">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyB_3" onclick="togglePlayer('player-fullbodyB_3')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-dumbbell-bent-over-row"></use></svg>
             </div>
@@ -2997,7 +2999,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyB_4">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyB_4" onclick="togglePlayer('player-fullbodyB_4')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-overhead-press"></use></svg>
             </div>
@@ -3098,7 +3100,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyB_5">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyB_5" onclick="togglePlayer('player-fullbodyB_5')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-face-pull"></use></svg>
             </div>
@@ -3199,7 +3201,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyB_6">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyB_6" onclick="togglePlayer('player-fullbodyB_6')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-plank"></use></svg>
             </div>
@@ -3344,7 +3346,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyC_1">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyC_1" onclick="togglePlayer('player-fullbodyC_1')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-press"></use></svg>
             </div>
@@ -3445,7 +3447,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyC_2">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyC_2" onclick="togglePlayer('player-fullbodyC_2')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-curl"></use></svg>
             </div>
@@ -3546,7 +3548,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyC_3">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyC_3" onclick="togglePlayer('player-fullbodyC_3')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-close-grip-lat-pulldown"></use></svg>
             </div>
@@ -3654,7 +3656,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyC_4">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyC_4" onclick="togglePlayer('player-fullbodyC_4')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-lateral-raise"></use></svg>
             </div>
@@ -3755,7 +3757,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyC_5">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyC_5" onclick="togglePlayer('player-fullbodyC_5')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-skull-crusher"></use></svg>
             </div>
@@ -3856,7 +3858,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyC_6">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyC_6" onclick="togglePlayer('player-fullbodyC_6')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-hammer-curl"></use></svg>
             </div>
@@ -3957,7 +3959,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyC_7">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyC_7" onclick="togglePlayer('player-fullbodyC_7')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-crunch"></use></svg>
             </div>
@@ -4100,7 +4102,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_1">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoA_1" onclick="togglePlayer('player-torsoA_1')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bench-press"></use></svg>
             </div>
@@ -4205,7 +4207,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_2">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoA_2" onclick="togglePlayer('player-torsoA_2')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lat-pulldown"></use></svg>
             </div>
@@ -4310,7 +4312,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_3">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoA_3" onclick="togglePlayer('player-torsoA_3')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-overhead-press"></use></svg>
             </div>
@@ -4409,7 +4411,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_4">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoA_4" onclick="togglePlayer('player-torsoA_4')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-row"></use></svg>
             </div>
@@ -4508,7 +4510,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_5">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoA_5" onclick="togglePlayer('player-torsoA_5')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lateral-raise"></use></svg>
             </div>
@@ -4607,7 +4609,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_6">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoA_6" onclick="togglePlayer('player-torsoA_6')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-tricep-pushdown"></use></svg>
             </div>
@@ -4707,7 +4709,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoA_7">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoA_7" onclick="togglePlayer('player-torsoA_7')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bicep-curl"></use></svg>
             </div>
@@ -4851,7 +4853,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaA_1">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-piernaA_1" onclick="togglePlayer('player-piernaA_1')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-squat"></use></svg>
             </div>
@@ -4950,7 +4952,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaA_2">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-piernaA_2" onclick="togglePlayer('player-piernaA_2')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-extension"></use></svg>
             </div>
@@ -5049,7 +5051,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaA_3">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-piernaA_3" onclick="togglePlayer('player-piernaA_3')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-curl"></use></svg>
             </div>
@@ -5148,7 +5150,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaA_4">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-piernaA_4" onclick="togglePlayer('player-piernaA_4')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-standing-calf-raise"></use></svg>
             </div>
@@ -5247,7 +5249,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaA_5">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-piernaA_5" onclick="togglePlayer('player-piernaA_5')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-plank"></use></svg>
             </div>
@@ -5390,7 +5392,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_1">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoB_1" onclick="togglePlayer('player-torsoB_1')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-dumbbell-bent-over-row"></use></svg>
             </div>
@@ -5495,7 +5497,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_2">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoB_2" onclick="togglePlayer('player-torsoB_2')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-incline-dumbbell-press"></use></svg>
             </div>
@@ -5600,7 +5602,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_3">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoB_3" onclick="togglePlayer('player-torsoB_3')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-close-grip-lat-pulldown"></use></svg>
             </div>
@@ -5705,7 +5707,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_4">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoB_4" onclick="togglePlayer('player-torsoB_4')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-lateral-raise"></use></svg>
             </div>
@@ -5804,7 +5806,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_5">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoB_5" onclick="togglePlayer('player-torsoB_5')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-face-pull"></use></svg>
             </div>
@@ -5903,7 +5905,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_6">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoB_6" onclick="togglePlayer('player-torsoB_6')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-skull-crusher"></use></svg>
             </div>
@@ -6003,7 +6005,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-torsoB_7">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-torsoB_7" onclick="togglePlayer('player-torsoB_7')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-hammer-curl"></use></svg>
             </div>
@@ -6147,7 +6149,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_1">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-piernaB_1" onclick="togglePlayer('player-piernaB_1')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-romanian-deadlift"></use></svg>
             </div>
@@ -6246,7 +6248,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_2">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-piernaB_2" onclick="togglePlayer('player-piernaB_2')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bulgarian-split-squat"></use></svg>
             </div>
@@ -6345,7 +6347,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_3">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-piernaB_3" onclick="togglePlayer('player-piernaB_3')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-leg-curl"></use></svg>
             </div>
@@ -6444,7 +6446,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_4">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-piernaB_4" onclick="togglePlayer('player-piernaB_4')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-extension"></use></svg>
             </div>
@@ -6543,7 +6545,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_5">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-piernaB_5" onclick="togglePlayer('player-piernaB_5')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-calf-raise"></use></svg>
             </div>
@@ -6642,7 +6644,7 @@
 
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-piernaB_6">
-          <div class="card-top">
+          <div class="card-top" style="cursor:pointer;" onclick="toggleCardAccordion(this.closest('.exercise-card').getAttribute('data-slot'))" title="Toca para compactar">
             <div class="ex-icon-avatar" id="icon-badge-piernaB_6" onclick="togglePlayer('player-piernaB_6')" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-crunch"></use></svg>
             </div>
@@ -7553,6 +7555,7 @@
       } else {
         updateDayBannerLastDone(dayId);
         updateProgress();
+        updateDayExerciseAccordion(dayId);
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -7950,9 +7953,7 @@
           let prevBest1RM = 0;
           historyLogs.forEach(h => { if (h.best1RM && h.best1RM > prevBest1RM) prevBest1RM = h.best1RM; });
           
-          if (est1RM > prevBest1RM && prevBest1RM > 0) {
-            showToast(`🏆 ¡Nuevo Récord Estimado! 1RM: ${est1RM} kg (+${(est1RM - prevBest1RM).toFixed(1)}kg)`);
-          }
+          // 1RM record toast omitted per user request
         } else if (isCurIso && curReps > 0 && exId) {
           const historyLogs = (workoutState.exerciseHistory && workoutState.exerciseHistory[exId]) ? workoutState.exerciseHistory[exId] : [];
           let prevBestSecs = 0;
@@ -7969,6 +7970,31 @@
 
       // Check if all sets of this card are completed
       checkExerciseCardCompletion(card);
+      updateCardSummaryStatus(card);
+
+      // Auto-accordion: if this card is now complete, collapse it and auto-expand next!
+      const cardRows = card.querySelectorAll('.set-row');
+      const cardDone = card.querySelectorAll('.set-row.done');
+      if (cardRows.length > 0 && cardDone.length >= cardRows.length) {
+        card.classList.add('collapsed');
+        card.classList.remove('manually-expanded');
+
+        const allCards = Array.from(section.querySelectorAll('.exercise-card'));
+        const nextPending = allCards.find(c => {
+          const cDone = c.querySelectorAll('.set-row.done').length;
+          const cTot = c.querySelectorAll('.set-row').length;
+          return cTot > 0 && cDone < cTot;
+        });
+
+        if (nextPending) {
+          nextPending.classList.remove('collapsed');
+          nextPending.classList.add('manually-expanded');
+          setTimeout(() => {
+            nextPending.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 200);
+        }
+      }
+
       updateProgress();
       saveWorkoutState();
 
@@ -8098,11 +8124,107 @@
       }
     }
 
-    function toggleManualExpand(slotId) {
+    // Accordion Manager: Single active exercise mode
+    function toggleCardAccordion(slotId) {
       const card = document.getElementById('card-' + slotId);
-      if (card && card.classList.contains('exercise-completed')) {
-        card.classList.toggle('manually-expanded');
+      if (!card) return;
+      const daySection = card.closest('.day-content');
+      if (!daySection) return;
+
+      const isCollapsed = card.classList.contains('collapsed');
+      if (isCollapsed) {
+        // Collapse all other cards in this day
+        daySection.querySelectorAll('.exercise-card').forEach(c => {
+          c.classList.add('collapsed');
+          c.classList.remove('manually-expanded');
+        });
+        // Expand this card
+        card.classList.remove('collapsed');
+        card.classList.add('manually-expanded');
+      } else {
+        // Toggle collapse
+        card.classList.add('collapsed');
+        card.classList.remove('manually-expanded');
       }
+    }
+
+    // Keep toggleManualExpand backward compatible with existing onclick handlers
+    function toggleManualExpand(slotId) {
+      toggleCardAccordion(slotId);
+    }
+
+    // Update summary bar texts (done count, exercise number / check icon)
+    function updateCardSummaryStatus(card) {
+      if (!card) return;
+      const slotId = card.getAttribute('data-slot');
+      const rows = card.querySelectorAll('.set-row');
+      const doneRows = card.querySelectorAll('.set-row.done');
+      const totalSets = rows.length;
+      const doneSets = doneRows.length;
+      const isComplete = (totalSets > 0 && doneSets >= totalSets);
+
+      card.classList.toggle('exercise-completed', isComplete);
+
+      const checkIcon = card.querySelector('.summary-check-icon');
+      if (checkIcon) {
+        if (isComplete) {
+          checkIcon.innerText = '✓';
+        } else {
+          const slotNum = slotId ? slotId.split('_')[1] : '';
+          checkIcon.innerText = slotNum || '•';
+        }
+      }
+
+      const subLabel = document.getElementById('summary-sub-' + slotId);
+      if (subLabel) {
+        if (isComplete) {
+          subLabel.innerText = `${doneSets}/${totalSets} series completadas`;
+        } else if (doneSets > 0) {
+          subLabel.innerText = `${doneSets}/${totalSets} series en curso`;
+        } else {
+          subLabel.innerText = `${totalSets} series por realizar`;
+        }
+      }
+
+      const toggleBtn = card.querySelector('.summary-toggle-btn');
+      if (toggleBtn) {
+        toggleBtn.innerText = isComplete ? 'Ver ▾' : 'Abrir ▾';
+      }
+    }
+
+    // Synchronize day accordion state: expands ONLY the active / up next exercise
+    function updateDayExerciseAccordion(dayId) {
+      const daySection = document.getElementById(dayId);
+      if (!daySection) return;
+
+      const cards = Array.from(daySection.querySelectorAll('.exercise-card'));
+      if (cards.length === 0) return;
+
+      let firstPendingCard = null;
+
+      cards.forEach(card => {
+        updateCardSummaryStatus(card);
+        const rows = card.querySelectorAll('.set-row');
+        const doneRows = card.querySelectorAll('.set-row.done');
+        const isComplete = (rows.length > 0 && doneRows.length >= rows.length);
+
+        if (!isComplete && !firstPendingCard) {
+          firstPendingCard = card;
+        }
+      });
+
+      // Target card to keep expanded: first pending, or Card 1 if all complete
+      const targetCard = firstPendingCard || cards[0];
+
+      cards.forEach(card => {
+        if (card === targetCard) {
+          card.classList.remove('collapsed');
+          card.classList.add('manually-expanded');
+        } else {
+          card.classList.add('collapsed');
+          card.classList.remove('manually-expanded');
+        }
+      });
     }
 
     function renderProgressChipHtml(doneSets, totalSets, percentage) {
@@ -8371,6 +8493,7 @@
       updateSessionTimerDisplay(dayId);
       saveWorkoutState();
       updateProgress();
+      updateDayExerciseAccordion(dayId);
       showToast('Casillas de hoy reiniciadas');
     }
 
@@ -9777,6 +9900,10 @@
       initAll1RMBadges();
       renderDaySelectorOptions();
       updateProgress();
+      const activeSec = document.querySelector('.day-content.active');
+      if (activeSec && activeSec.id !== 'historialView' && activeSec.id !== 'routinePlanView') {
+        updateDayExerciseAccordion(activeSec.id);
+      }
     }
 
     function clearAppCacheAndReload() {
@@ -9809,7 +9936,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=design11').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=design12').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -9841,48 +9968,15 @@
     // CALENDARIO DE CONSTANCIA & TARJETA FLEX CARD
     // ==========================================
 
-    // 1. Live 1RM Badges
+    // 1. Live 1RM Badges (Removed from workout screen per user request)
     function updateRow1RMBadge(row) {
       if (!row) return;
-      const kgInp = row.querySelector('.input-kg');
-      const repsInp = row.querySelector('.input-reps');
-      if (!kgInp || !repsInp) return;
-
-      const card = row.closest('.exercise-card');
-      const exId = card ? card.getAttribute('data-current-ex') : '';
-      const ex = EXERCISE_CATALOG[exId];
-      const isIso = ex && ex.metricType === 'isometria';
-
-      let pill = row.querySelector('.live-1rm-pill');
-      if (!pill) {
-        pill = document.createElement('span');
-        pill.className = 'live-1rm-pill';
-        const repsCell = repsInp.closest('.set-cell') || repsInp.parentElement;
-        repsCell.appendChild(pill);
-      }
-
-      const kgVal = kgInp.value.trim() || kgInp.placeholder || '';
-      const repsVal = repsInp.value.trim() || repsInp.placeholder || '';
-      const kg = parseFloat(kgVal) || 0;
-      const reps = parseInt(repsVal, 10) || 0;
-
-      if (!isIso && kg > 0 && reps > 0) {
-        const est1RM = calculate1RM(kg, reps);
-        pill.innerText = `1RM ~${est1RM}kg`;
-        pill.title = `1RM estimado: ${est1RM} kg`;
-        pill.classList.remove('empty');
-      } else if (isIso && reps > 0) {
-        pill.innerText = `${reps}s`;
-        pill.title = `Tiempo objetivo: ${reps} s`;
-        pill.classList.remove('empty');
-      } else {
-        pill.innerText = '';
-        pill.classList.add('empty');
-      }
+      const pill = row.querySelector('.live-1rm-pill');
+      if (pill) pill.remove();
     }
 
     function initAll1RMBadges() {
-      document.querySelectorAll('.set-row').forEach(row => updateRow1RMBadge(row));
+      document.querySelectorAll('.live-1rm-pill').forEach(p => p.remove());
     }
 
     // 2. Dynamic Day Selector & Routine Switching
