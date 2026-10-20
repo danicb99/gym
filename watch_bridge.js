@@ -339,20 +339,74 @@
   }
 
   let reconnectTimeout = null;
-  const CATCHUP_WINDOW_MS = 10 * 60 * 1000;
-  const WATCH_TS_KEY = 'vigorexiapp_watch_last_ts';
+  const CATCHUP_MAX_AGE_MS = 12 * 60 * 60 * 1000; // Ventana máxima de 12 horas en ntfy.sh
+  const PROCESSED_IDS_KEY = 'vigorexiapp_processed_msg_ids';
+  const LAST_NTFY_ID_KEY = 'vigorexiapp_last_ntfy_id';
 
-  function getLastWatchTs() {
-    const stored = Number(localStorage.getItem(WATCH_TS_KEY));
-    return Number.isFinite(stored) ? stored : 0;
+  function getProcessedMsgIds() {
+    try {
+      const raw = localStorage.getItem(PROCESSED_IDS_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return [];
   }
 
-  let lastCatchUpTimestamp = getLastWatchTs();
+  function isMsgProcessed(id) {
+    if (!id) return false;
+    const list = getProcessedMsgIds();
+    return list.includes(id);
+  }
 
-  function setLastWatchTs(ts) {
-    if (!ts || ts <= lastCatchUpTimestamp) return;
-    lastCatchUpTimestamp = ts;
-    try { localStorage.setItem(WATCH_TS_KEY, String(ts)); } catch (e) {}
+  function markMsgProcessed(id) {
+    if (!id) return;
+    let list = getProcessedMsgIds();
+    if (!list.includes(id)) {
+      list.push(id);
+      if (list.length > 500) list = list.slice(list.length - 500); // Mantener los últimos 500
+      try { localStorage.setItem(PROCESSED_IDS_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+  }
+
+  function getLastNtfyId() {
+    return localStorage.getItem(LAST_NTFY_ID_KEY) || null;
+  }
+
+  function setLastNtfyId(ntfyId) {
+    if (!ntfyId) return;
+    try { localStorage.setItem(LAST_NTFY_ID_KEY, String(ntfyId)); } catch (e) {}
+  }
+
+  function unboxWatchMessage(raw) {
+    if (!raw) return null;
+    const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    const type = data.type || (data.payload && data.payload.type);
+    const payload = data.payload || data;
+
+    // Obtener id estable o derivar clave para compatibilidad hacia atrás
+    let id = data.id;
+    if (!id) {
+      if (type === 'SET_COMPLETED') {
+        const slot = payload.slotId || data.slotId || '';
+        const sIdx = payload.setIndex !== undefined ? payload.setIndex : data.setIndex;
+        const kg = payload.kg !== undefined ? payload.kg : data.kg;
+        const reps = payload.reps !== undefined ? payload.reps : data.reps;
+        id = `legacy-set-${slot}_${sIdx}-${kg}x${reps}`;
+      } else if (type === 'WORKOUT_FINISHED') {
+        const sum = payload.summary || payload;
+        const sId = sum.sessionId || sum.dayId || 'fin';
+        const dStr = sum.date || data.timestamp || '';
+        id = `legacy-fin-${sId}-${dStr}`;
+      } else {
+        id = `legacy-unk-${Date.now()}`;
+      }
+    }
+
+    return {
+      id: id,
+      type: type,
+      ts: data.ts || data.timestamp || Date.now(),
+      payload: payload
+    };
   }
 
   function insertSessionSorted(record) {
@@ -365,9 +419,10 @@
 
   async function catchUpFromWatch() {
     try {
-      const minTs = Date.now() - CATCHUP_WINDOW_MS;
-      const sinceSec = Math.max(0, Math.floor(Math.max(lastCatchUpTimestamp, minTs) / 1000));
-      const resp = await fetch(`${RELAY_WATCH_TO_PHONE}/json?poll=1&since=${sinceSec}`, { cache: 'no-store' });
+      const lastNtfyId = getLastNtfyId();
+      // Si tenemos id previo de ntfy, pedir since=<id>; si no, pedir since=12h
+      const sinceParam = lastNtfyId ? encodeURIComponent(lastNtfyId) : '12h';
+      const resp = await fetch(`${RELAY_WATCH_TO_PHONE}/json?poll=1&since=${sinceParam}`, { cache: 'no-store' });
       if (!resp.ok) return;
       const text = await resp.text();
       if (!text) return;
@@ -375,17 +430,23 @@
       for (const line of lines) {
         try {
           const raw = JSON.parse(line);
+          if (raw && raw.id) {
+            setLastNtfyId(raw.id);
+          }
           if (raw && raw.event === 'message' && raw.message) {
             const data = typeof raw.message === 'string' ? JSON.parse(raw.message) : raw.message;
-            if (!data || !data.timestamp) continue;
-            if (data.timestamp <= lastCatchUpTimestamp) continue;
-            if (Date.now() - data.timestamp > CATCHUP_WINDOW_MS) continue;
+            if (!data) continue;
 
-            setLastWatchTs(data.timestamp);
-            const isFresh = Date.now() - data.timestamp < 120000;
-            if (data.type === 'SET_COMPLETED') {
+            const ts = data.ts || data.timestamp || 0;
+            // Descartar mensajes más viejos que 12 horas
+            if (ts > 0 && Date.now() - ts > CATCHUP_MAX_AGE_MS) continue;
+
+            const isFresh = ts > 0 && (Date.now() - ts < 120000);
+            const type = data.type || (data.payload && data.payload.type);
+
+            if (type === 'SET_COMPLETED') {
               handleSetCompletedFromWatch(data, { silent: !isFresh });
-            } else if (data.type === 'WORKOUT_FINISHED') {
+            } else if (type === 'WORKOUT_FINISHED') {
               handleWorkoutFinishedFromWatch(data, { silent: !isFresh });
             }
           }
@@ -417,14 +478,16 @@
       syncEventSource.onmessage = (event) => {
         try {
           const raw = JSON.parse(event.data);
+          if (raw && raw.id) {
+            setLastNtfyId(raw.id);
+          }
           if (!raw.message) return;
           const data = typeof raw.message === 'string' ? JSON.parse(raw.message) : raw.message;
 
-          if (data.timestamp) setLastWatchTs(data.timestamp);
-
-          if (data.type === 'SET_COMPLETED') {
+          const type = data.type || (data.payload && data.payload.type);
+          if (type === 'SET_COMPLETED') {
             handleSetCompletedFromWatch(data);
-          } else if (data.type === 'WORKOUT_FINISHED') {
+          } else if (type === 'WORKOUT_FINISHED') {
             handleWorkoutFinishedFromWatch(data);
           }
         } catch (err) {
@@ -448,149 +511,225 @@
     }
   }
 
-  // 3. Manejar serie completada en el reloj
-  function handleSetCompletedFromWatch(data, opts = {}) {
-    const { slotId, setIndex, kg, reps } = data;
-    console.log('[WatchBridge] Serie recibida desde el reloj:', slotId, setIndex, kg, reps);
+  // 3. Manejar serie completada en el reloj con persistencia directa en workoutState
+  function handleSetCompletedFromWatch(eventData, opts = {}) {
+    const unboxed = unboxWatchMessage(eventData);
+    if (!unboxed) return false;
+    const { id, payload, ts } = unboxed;
 
+    // 1. Deduplicación por id de mensaje
+    if (isMsgProcessed(id)) {
+      console.log('[WatchBridge] Serie ya procesada previamente, ignorando duplicado:', id);
+      return true;
+    }
+
+    const slotId = payload.slotId;
+    const setIndex = payload.setIndex;
+    const kg = payload.kg;
+    const reps = payload.reps;
+    const dayId = payload.dayId;
+    const completedAt = payload.completedAt || ts;
+
+    if (!slotId || setIndex === undefined) return false;
+
+    console.log('[WatchBridge] Procesando serie del reloj:', id, slotId, setIndex, kg, reps);
+
+    // 2. Aplicar directamente a workoutState para que NO se pierda si la tarjeta no está en el DOM
+    if (typeof workoutState !== 'undefined' && workoutState) {
+      if (!workoutState.inputs) workoutState.inputs = {};
+      if (!Array.isArray(workoutState.completed)) workoutState.completed = [];
+
+      const rowKey = `${slotId}_${setIndex}`;
+      if (kg !== undefined && kg !== null && kg !== '') {
+        workoutState.inputs[`${rowKey}_kg`] = String(kg);
+      }
+      if (reps !== undefined && reps !== null && reps !== '') {
+        workoutState.inputs[`${rowKey}_reps`] = String(reps);
+      }
+      if (!workoutState.completed.includes(rowKey)) {
+        workoutState.completed.push(rowKey);
+      }
+
+      // Marcar sessionStartTime si no existía para este día
+      if (dayId && (!workoutState.sessionStartTime || !workoutState.sessionStartTime[dayId])) {
+        if (!workoutState.sessionStartTime) workoutState.sessionStartTime = {};
+        workoutState.sessionStartTime[dayId] = completedAt || Date.now();
+      }
+
+      // Guardar inmediatamente en localStorage
+      if (typeof persistStateRaw === 'function') {
+        persistStateRaw();
+      }
+    }
+
+    // 3. Actualizar la tarjeta en el DOM si está renderizada
     const card = document.querySelector(`.exercise-card[data-slot="${slotId}"]`);
-    if (!card) return;
+    if (card) {
+      const rows = card.querySelectorAll('.set-row');
+      const targetRow = rows[setIndex];
+      if (targetRow) {
+        const kgInp = targetRow.querySelector('.input-kg');
+        const repsInp = targetRow.querySelector('.input-reps');
+        if (kgInp && kg !== undefined && kg !== null && kg !== '') kgInp.value = kg;
+        if (repsInp && reps !== undefined && reps !== null && reps !== '') repsInp.value = reps;
+        targetRow.classList.add('done');
 
-    const rows = card.querySelectorAll('.set-row');
-    const targetRow = rows[setIndex];
-    if (!targetRow) return;
+        if (typeof updateRow1RMBadge === 'function') {
+          updateRow1RMBadge(targetRow);
+        }
+      }
 
-    // Actualizar inputs si vienen valores
-    const kgInp = targetRow.querySelector('.input-kg');
-    const repsInp = targetRow.querySelector('.input-reps');
-    if (kgInp && kg !== undefined && kg !== null && kg !== '') kgInp.value = kg;
-    if (repsInp && reps !== undefined && reps !== null && reps !== '') repsInp.value = reps;
-
-    // Marcar como completada si no lo estaba
-    if (!targetRow.classList.contains('done')) {
-      targetRow.classList.add('done');
-      
-      // Actualizar tarjeta
       if (typeof checkExerciseCardCompletion === 'function') {
         checkExerciseCardCompletion(card);
       }
-      
-      // Iniciar temporizador de descanso en la web (nunca al reproducir eventos antiguos)
+
+      // Iniciar temporizador de descanso en la web (solo si es evento fresco en directo)
       if (!opts.silent && typeof startRestTimerFromCard === 'function') {
         startRestTimerFromCard(card);
       }
-
-      // Guardar estado local
-      if (typeof saveWorkoutState === 'function') {
-        saveWorkoutState();
-      }
-      if (typeof updateProgress === 'function') {
-        updateProgress();
-      }
-
-      // Notificación visual flotante en la pantalla del móvil
-      if (!opts.silent) {
-        showWatchToast(`⌚ Serie ${setIndex + 1} completada en el reloj (${kg}kg × ${reps})`);
-      }
     }
+
+    if (typeof updateProgress === 'function') {
+      updateProgress();
+    }
+
+    // 4. Marcar mensaje como procesado con éxito
+    markMsgProcessed(id);
+
+    // Notificación visual flotante en la pantalla del móvil
+    if (!opts.silent) {
+      showWatchToast(`⌚ Serie ${setIndex + 1} completada en el reloj (${kg}kg × ${reps})`);
+    }
+
+    return true;
   }
 
-  // 4. Manejar fin de entreno desde el reloj
-  function handleWorkoutFinishedFromWatch(data, opts = {}) {
-    console.log('[WatchBridge] Fin de entreno recibido desde el reloj:', data);
+  // 4. Manejar fin de entreno desde el reloj con deduplicación idempotente por sessionId
+  function handleWorkoutFinishedFromWatch(eventData, opts = {}) {
+    const unboxed = unboxWatchMessage(eventData);
+    if (!unboxed) return false;
+    const { id, payload, ts } = unboxed;
+
+    if (isMsgProcessed(id)) {
+      console.log('[WatchBridge] Fin de entreno ya procesado previamente, ignorando duplicado:', id);
+      return true;
+    }
+
+    const summary = payload.summary || payload;
+    if (!summary || !summary.dayId) return false;
+
+    const sessionId = payload.sessionId || summary.sessionId || id;
+
+    // Idempotencia: comprobar si la sesión ya existe en el historial
+    if (typeof workoutState !== 'undefined' && Array.isArray(workoutState.sessions)) {
+      const alreadyExists = workoutState.sessions.some(s => s && (s.sessionId === sessionId || s.id === sessionId));
+      if (alreadyExists) {
+        markMsgProcessed(id);
+        return true;
+      }
+    }
+
+    console.log('[WatchBridge] Fin de entreno recibido desde el reloj:', id, sessionId);
     try {
-      const summary = data.summary || data;
-      if (summary && summary.dayId && typeof workoutState !== 'undefined') {
-        const durMin = summary.durationMinutes || 45;
-        const durationFormatted = durMin >= 60 
-          ? `${Math.floor(durMin / 60)}h ${durMin % 60}m` 
-          : `${durMin} min`;
-        
-        const record = {
-          id: 'ses_' + Date.now(),
-          date: summary.date || new Date().toISOString(),
-          dayId: summary.dayId,
-          dayName: summary.dayName || summary.dayId,
-          durationMinutes: durMin,
-          durationFormatted: durationFormatted,
-          exercises: summary.exercises || []
-        };
+      const durMin = summary.durationMinutes || 45;
+      const durationFormatted = durMin >= 60 
+        ? `${Math.floor(durMin / 60)}h ${durMin % 60}m` 
+        : `${durMin} min`;
 
-        // Evitar duplicar la misma sesión (mismo día y fecha exacta o <60s)
-        const exists = Array.isArray(workoutState.sessions) && workoutState.sessions.some(s => {
-          if (!s || s.dayId !== record.dayId || !s.date) return false;
-          const a = new Date(s.date).getTime();
-          const b = new Date(record.date).getTime();
-          if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
-          return a === b || Math.abs(a - b) < 60000;
+      const record = {
+        id: sessionId,
+        sessionId: sessionId,
+        date: summary.date || new Date(ts).toISOString(),
+        dayId: summary.dayId,
+        dayName: summary.dayName || summary.dayId,
+        durationMinutes: durMin,
+        durationFormatted: durationFormatted,
+        exercises: summary.exercises || []
+      };
+
+      insertSessionSorted(record);
+
+      if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[summary.dayId];
+      if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[summary.dayId];
+      if (workoutState.sessionIds) delete workoutState.sessionIds[summary.dayId];
+
+      // Actualizar marcas "Anterior" con los ejercicios completados en el reloj
+      if (Array.isArray(summary.exercises)) {
+        if (!workoutState.previous) workoutState.previous = {};
+        summary.exercises.forEach(ex => {
+          if (!ex.exId || !Array.isArray(ex.sets)) return;
+          if (!workoutState.previous[ex.exId]) workoutState.previous[ex.exId] = {};
+          ex.sets.forEach((st, sIdx) => {
+            if (st && (st.kg !== undefined || st.reps !== undefined)) {
+              workoutState.previous[ex.exId][sIdx] = `${st.kg}kg × ${st.reps}`;
+            }
+          });
         });
-        if (!exists) {
-          insertSessionSorted(record);
-        }
+      }
 
-        if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[summary.dayId];
-        if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[summary.dayId];
-
-        // Actualizar marcas "Anterior" con los ejercicios completados en el reloj
-        if (Array.isArray(summary.exercises)) {
-          if (!workoutState.previous) workoutState.previous = {};
-          summary.exercises.forEach(ex => {
-            if (!ex.exId || !Array.isArray(ex.sets)) return;
-            if (!workoutState.previous[ex.exId]) workoutState.previous[ex.exId] = {};
-            ex.sets.forEach((st, sIdx) => {
-              if (st && (st.kg !== undefined || st.reps !== undefined)) {
-                workoutState.previous[ex.exId][sIdx] = `${st.kg}kg × ${st.reps}`;
-              }
-            });
+      // Limpiar el estado visual de las casillas del día terminado
+      const daySection = document.getElementById(summary.dayId);
+      if (daySection) {
+        daySection.querySelectorAll('.exercise-card').forEach(card => {
+          card.classList.remove('exercise-completed', 'manually-expanded');
+          card.querySelectorAll('.set-row').forEach(row => {
+            row.classList.remove('done');
+            const inputs = row.querySelectorAll('.set-input');
+            if (inputs[0]) inputs[0].value = '';
+            if (inputs[1]) inputs[1].value = '';
           });
-        }
+        });
+      }
 
-        // Limpiar el estado visual de las casillas del día terminado
-        const daySection = document.getElementById(summary.dayId);
-        if (daySection) {
-          daySection.querySelectorAll('.exercise-card').forEach(card => {
-            card.classList.remove('exercise-completed', 'manually-expanded');
-            card.querySelectorAll('.set-row').forEach(row => {
-              row.classList.remove('done');
-              const inputs = row.querySelectorAll('.set-input');
-              if (inputs[0]) inputs[0].value = '';
-              if (inputs[1]) inputs[1].value = '';
+      // Limpiar en workoutState las series completadas del día archivado
+      const dayData = typeof ROUTINE_SLOTS !== 'undefined' && ROUTINE_SLOTS[summary.dayId];
+      if (dayData && dayData.slots && Array.isArray(workoutState.completed)) {
+        dayData.slots.forEach(slot => {
+          workoutState.completed = workoutState.completed.filter(c => !c.startsWith(slot.slotId + '_'));
+          if (workoutState.inputs) {
+            Object.keys(workoutState.inputs).forEach(k => {
+              if (k.startsWith(slot.slotId + '_')) delete workoutState.inputs[k];
             });
-          });
-        }
-
-        // Cancelar temporizador de descanso si estaba activo
-        if (typeof finishTimer === 'function' && typeof isTimerActive !== 'undefined' && isTimerActive) {
-          finishTimer();
-        }
-
-        if (typeof saveWorkoutState === 'function') saveWorkoutState();
-        if (typeof updateProgress === 'function') updateProgress();
-        if (typeof renderDaySelectorOptions === 'function') renderDaySelectorOptions();
-        if (typeof updateDayBannerLastDone === 'function') updateDayBannerLastDone(summary.dayId);
-
-        // Si fue una finalización fresca en directo, sugerir siguiente día y abrir Flex Card
-        if (!opts.silent) {
-          if (typeof getNextRecommendedDay === 'function' && typeof selectDay === 'function') {
-            const nextDay = getNextRecommendedDay();
-            if (nextDay) selectDay(nextDay);
           }
-          if (typeof openWorkoutSummaryModal === 'function') {
-            openWorkoutSummaryModal(record);
-          }
+        });
+      }
+
+      // Cancelar temporizador de descanso si estaba activo
+      if (typeof finishTimer === 'function' && typeof isTimerActive !== 'undefined' && isTimerActive) {
+        finishTimer();
+      }
+
+      if (typeof persistStateRaw === 'function') persistStateRaw();
+      if (typeof updateProgress === 'function') updateProgress();
+      if (typeof renderDaySelectorOptions === 'function') renderDaySelectorOptions();
+      if (typeof updateDayBannerLastDone === 'function') updateDayBannerLastDone(summary.dayId);
+
+      // Marcar mensaje como procesado con éxito
+      markMsgProcessed(id);
+
+      // Si fue una finalización fresca en directo, sugerir siguiente día y abrir Flex Card
+      if (!opts.silent) {
+        if (typeof getNextRecommendedDay === 'function' && typeof selectDay === 'function') {
+          const nextDay = getNextRecommendedDay();
+          if (nextDay) selectDay(nextDay);
+        }
+        if (typeof openWorkoutSummaryModal === 'function') {
+          openWorkoutSummaryModal(record);
         }
       }
     } catch (e) {
       console.warn('[WatchBridge] Error archivando sesión del reloj:', e);
     }
 
-    const durText = (data.summary && data.summary.durationMinutes) ? ` (${data.summary.durationMinutes} min)` : '';
+    const durText = (summary && summary.durationMinutes) ? ` (${summary.durationMinutes} min)` : '';
     if (!opts.silent) {
       showWatchToast(`⌚ ¡Entrenamiento completado y guardado desde el reloj!${durText}`);
     }
     if (typeof loadWorkoutState === 'function') {
       loadWorkoutState();
     }
+
+    return true;
   }
 
   // 5. Toast flotante sutil
