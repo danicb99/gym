@@ -976,11 +976,7 @@
       background: rgba(245, 158, 11, 0.22);
     }
     .header-day-picker {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex: 1;
-      max-width: 290px;
+      display: none !important;
     }
 
     /* Live 1RM pill in set row */
@@ -1714,13 +1710,7 @@
         <div class="header-day-sub" id="headerDaySub">Squat Pesado & Torso</div>
       </div>
 
-      <!-- Hidden elements for test compatibility & legacy functions -->
-      <div class="header-day-picker" style="display:none !important;" aria-hidden="true">
-        <button id="btnProgramSwitch" class="btn-program-switch" type="button" style="display:none !important;">⚡ 3D ▾</button>
-        <select id="daySelector" class="header-day-select" style="display:none !important;" onchange="handleDaySelectChange(this.value)">
-          <!-- Rendered dynamically -->
-        </select>
-      </div>
+
 
       <!-- Right: Compact Top Rest Timer Dock -->
       <div class="top-timer-widget" id="topTimerWidget">
@@ -9465,13 +9455,19 @@
       updateTimerUI();
       runSessionTimerTicker();
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(reg => {
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (event.data && (event.data.type === 'FORCE_UPDATE' || event.data.type === 'SW_ACTIVATED')) {
+            console.log('[App] Nueva versión activada. Recargando interfaz...');
+            window.location.reload();
+          }
+        });
+        navigator.serviceWorker.register('./sw.js?v=design5').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                if ((newWorker.state === 'installed' || newWorker.state === 'activating') && navigator.serviceWorker.controller) {
                   newWorker.postMessage({ type: 'SKIP_WAITING' });
                 }
               });
@@ -9482,6 +9478,14 @@
           window.location.reload();
         });
       }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistration().then(reg => {
+            if (reg) reg.update();
+          });
+        }
+      });
     });
 
     // ==========================================
@@ -10232,5 +10236,14 @@
     </button>
   </nav>
 
+  <!-- Hidden elements for test compatibility & legacy functions (completely removed from header) -->
+  <div style="display:none !important; width:0; height:0; overflow:hidden;" aria-hidden="true">
+    <div class="header-day-picker" style="display:none !important;">
+      <button id="btnProgramSwitch" class="btn-program-switch" type="button" style="display:none !important;">⚡ 3D ▾</button>
+      <select id="daySelector" class="header-day-select" style="display:none !important;" onchange="handleDaySelectChange(this.value)">
+        <!-- Rendered dynamically -->
+      </select>
+    </div>
+  </div>
 </body>
 </html>

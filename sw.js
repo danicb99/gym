@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigorexiapp-v1.6.0-design4';
+const CACHE_NAME = 'vigorexiapp-v1.6.0-design5';
 const NOTIF_BADGE = './badge-dumbbell.png?v=3';
 const NOTIF_ICON = './icon-192.png?v=3';
 
@@ -25,8 +25,13 @@ const ASSETS = [
 self.addEventListener('install', (e) => {
   self.skipWaiting();
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+    caches.open(CACHE_NAME).then(async (cache) => {
+      for (const asset of ASSETS) {
+        try {
+          const res = await fetch(asset, { cache: 'reload' });
+          if (res.ok) await cache.put(asset, res);
+        } catch (err) {}
+      }
     })
   );
 });
@@ -42,7 +47,11 @@ self.addEventListener('activate', (e) => {
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => self.clients.claim()).then(() => {
+      return self.clients.matchAll({ type: 'window' }).then((clients) => {
+        clients.forEach((c) => c.postMessage({ type: 'FORCE_UPDATE', cache: CACHE_NAME }));
+      });
+    })
   );
 });
 
@@ -57,7 +66,7 @@ self.addEventListener('fetch', (e) => {
   // Network-first para páginas HTML para que cualquier actualización en GitHub se aplique de inmediato
   if (isNav) {
     e.respondWith(
-      fetch(e.request).then((networkRes) => {
+      fetch(e.request, { cache: 'reload' }).then((networkRes) => {
         if (networkRes && networkRes.status === 200) {
           const clone = networkRes.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone)).catch(() => {});
