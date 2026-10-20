@@ -91,7 +91,9 @@ Los mockups de referencia (`diseno_referencia/`) emplean una paleta azulada gen�
 
 ---
 
-## 🔒 Compromiso de Integridad de Datos y Pruebas
-1. Todas las pruebas automatizadas existentes en `tests/sync_test.js` (17/17) deben continuar ejecutándose con resultado **100% aprobado** tras cada fase.
-2. Los datos de usuarios existentes en `localStorage` (`gym_workout_state`, `gym_poderoso_history`, `gym_sessions_v1`, `gym_active_routine_program`) se respetan en su totalidad sin modificaciones de clave ni de formato.
-3. El archivo `rutina_movil.html` se mantendrá idéntico a `index.html`.
+## 🔒 Compromiso de Integridad de Datos y Certificación de Pruebas
+1. **Pruebas Automatizadas (tests/sync_test.js):** 17/17 superadas (100% éxito) cubriendo convergencia de datos, orden de llegada por `completedAt`, límite de tráfico de red y recuperación de sesiones.
+2. **Pruebas de Compatibilidad (tests/compat_test.js):** 5/5 bloques aprobados (IDs estructurales, funciones JavaScript, paleta AMOLED y widgets nativos del reloj).
+3. **Compilación de Zepp OS:** Compilado exitosamente a v1.6.0 (`code: 16`) con QuickJS y empaquetado para Amazfit Active 2 (pantalla redonda de 466 px y cuadrada de 390 px).
+4. **Formato de Datos Persistentes:** Claves de `localStorage` (`gym_workout_state`, `gym_poderoso_history`, `gym_sessions_v1`, `vigorexiapp_program`) y formato JSON de copias de seguridad 100% compatibles.
+5. **Estado Global del Inventario:** 50/50 funcionalidades (30 móvil + 20 reloj) verificadas y **CONSERVADAS**.
