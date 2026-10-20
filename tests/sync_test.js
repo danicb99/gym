@@ -123,20 +123,20 @@ test('mergeSessionLoggedSets: maneja entradas nulas o vacías', () => {
   });
 });
 
-test('mergeSessionLoggedSets: fusiona series sin duplicados y respeta mayor repetición/peso', () => {
+test('mergeSessionLoggedSets: fusiona series sin duplicados y respeta la versión más reciente', () => {
   const local = {
     slot1: [
-      { kg: 80, reps: 8, completed: true },
-      { kg: 80, reps: 6, completed: false }
+      { kg: 80, reps: 8, completed: true, completedAt: 1000 },
+      { kg: 80, reps: 6, completed: false, completedAt: 1000 }
     ]
   };
   const incoming = {
     slot1: [
-      { kg: 80, reps: 8, completed: true }, // idéntico
-      { kg: 80, reps: 8, completed: true }  // completada en el otro lado
+      { kg: 80, reps: 8, completed: true, completedAt: 1000 }, // idéntico
+      { kg: 80, reps: 8, completed: true, completedAt: 2000 }  // completada más reciente en el otro lado
     ],
     slot2: [
-      { kg: 40, reps: 12, completed: true }
+      { kg: 40, reps: 12, completed: true, completedAt: 1500 }
     ]
   };
 
@@ -147,6 +147,43 @@ test('mergeSessionLoggedSets: fusiona series sin duplicados y respeta mayor repe
   assert.strictEqual(merged.slot1[1].reps, 8); // Se actualizó a 8 reps y completada
   assert.strictEqual(merged.slot2.length, 1);
   assert.strictEqual(merged.slot2[0].kg, 40);
+});
+
+test('mergeSessionLoggedSets: corrección a la baja gana si es más reciente por completedAt', () => {
+  // Caso 1: Estaba a 82.5 kg, el usuario corrigió a 80 kg después
+  const anterior = {
+    slot1: [{ kg: 82.5, reps: 8, completed: true, completedAt: 10000 }]
+  };
+  const correccionBaja = {
+    slot1: [{ kg: 80.0, reps: 8, completed: true, completedAt: 15000 }]
+  };
+
+  const res1 = mergeSessionLoggedSets(anterior, correccionBaja);
+  assert.strictEqual(res1.slot1[0].kg, 80.0, 'Debe ganar el valor corregido a la baja porque es más reciente');
+
+  // Caso 2: Corrección en repeticiones a la baja (de 10 a 8 reps)
+  const repsAnterior = {
+    slot1: [{ kg: 80, reps: 10, completed: true, completedAt: 10000 }]
+  };
+  const repsCorregido = {
+    slot1: [{ kg: 80, reps: 8, completed: true, completedAt: 20000 }]
+  };
+
+  const res2 = mergeSessionLoggedSets(repsAnterior, repsCorregido);
+  assert.strictEqual(res2.slot1[0].reps, 8, 'Debe ganar la repetición corregida a la baja por ser más reciente');
+});
+
+test('mergeSessionLoggedSets: serie completada NUNCA es sobrescrita por una no completada', () => {
+  const completada = {
+    slot1: [{ kg: 80, reps: 8, completed: true, completedAt: 5000 }]
+  };
+  const noCompletada = {
+    slot1: [{ kg: 80, reps: 0, completed: false, completedAt: 99999 }]
+  };
+
+  const res = mergeSessionLoggedSets(completada, noCompletada);
+  assert.strictEqual(res.slot1[0].completed, true, 'La serie completada debe preservarse');
+  assert.strictEqual(res.slot1[0].reps, 8);
 });
 
 test('countCompletedSets: cuenta exactamente las series completadas', () => {
@@ -479,6 +516,85 @@ test('Escenario h) Sesión duplicada: dos eventos WORKOUT_FINISHED con el mismo 
   };
   handleWorkoutFinished(finishEvent2);
   assert.strictEqual(workoutState.sessions.length, 1, 'Idempotencia absoluta por sessionId');
+});
+
+test('Escenario i) Entreno completo de 20 series con descansos: total peticiones HTTP < 80', () => {
+  let watchPostCount = 0;       // Reloj ➔ ntfy (POST series + fin)
+  let companionGetCount = 0;    // Reloj ➔ ntfy (GET consultas bajo demanda)
+  let webPostCount = 0;         // Web ➔ ntfy (POST snapshots con debounce)
+
+  // 1. Reloj inicia en day_select: 1 consulta inicial
+  companionGetCount++;
+
+  let lastPhoneQueryTime = 1000;
+  let currentTime = 1000;
+  let webLastHash = '';
+
+  const simulateWebBroadcast = (state) => {
+    const hash = computeBroadcastHash({
+      workoutActive: true,
+      activeDayId: 'fullbodyA',
+      currentSlotIndex: state.slotIdx,
+      currentSetIndex: state.setIdx,
+      sessionLoggedSets: state.loggedSets
+    }, { completed: Object.keys(state.loggedSets).flatMap(k => state.loggedSets[k].filter(s => s.completed)) });
+
+    if (hash !== webLastHash) {
+      webLastHash = hash;
+      webPostCount++;
+    }
+  };
+
+  const simulateWatchQuery = (force = false) => {
+    const minInterval = force ? 30000 : 60000;
+    if (currentTime - lastPhoneQueryTime >= minInterval) {
+      lastPhoneQueryTime = currentTime;
+      companionGetCount++;
+    }
+  };
+
+  const sessionState = {
+    slotIdx: 0,
+    setIdx: 0,
+    loggedSets: {}
+  };
+
+  // Simulación de 20 series (ejemplo mixto: series alternadas entre reloj y móvil)
+  for (let s = 1; s <= 20; s++) {
+    const slotKey = `slot_${Math.floor((s - 1) / 4)}`;
+    if (!sessionState.loggedSets[slotKey]) sessionState.loggedSets[slotKey] = [];
+
+    const isWatch = (s % 2 === 1);
+
+    if (isWatch) {
+      // Serie completada en reloj
+      watchPostCount++;
+      sessionState.loggedSets[slotKey].push({ kg: 80, reps: 8, completed: true, completedAt: currentTime });
+    } else {
+      // Serie completada en web
+      sessionState.loggedSets[slotKey].push({ kg: 80, reps: 8, completed: true, completedAt: currentTime });
+      simulateWebBroadcast(sessionState);
+    }
+
+    sessionState.setIdx = s % 4;
+    sessionState.slotIdx = Math.floor(s / 4);
+
+    // Descanso de 90 segundos entre series
+    if (s < 20) {
+      // Durante el descanso no hay cambios de hash => 0 peticiones web adicionales
+      currentTime += 90000;
+      // Al terminar descanso, consulta reloj respetando throttle
+      simulateWatchQuery(false);
+    }
+  }
+
+  // Fin de entrenamiento en el reloj
+  watchPostCount++; // POST WORKOUT_FINISHED
+
+  const totalHttpRequests = watchPostCount + companionGetCount + webPostCount;
+  console.log(`    📊 Tráfico en 20 series: Reloj POST=${watchPostCount}, Companion GET=${companionGetCount}, Web POST=${webPostCount} | Total=${totalHttpRequests}`);
+
+  assert.ok(totalHttpRequests < 80, `El total de peticiones (${totalHttpRequests}) debe ser inferior a 80`);
 });
 
 console.log('\n====================================================');

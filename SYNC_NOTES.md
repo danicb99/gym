@@ -2,6 +2,10 @@
 
 Este documento detalla la arquitectura de sincronización bidireccional entre la **PWA Web de VigorexiApp**, el servicio acompañante (**Zepp App Companion / app-side**) y la aplicación del reloj inteligente (**Amazfit Active 2 / Zepp OS 3.0**).
 
+> [!WARNING]
+> **Aviso Crítico de Seguridad (Rotación de Claves):**
+> Los binarios `.zpk` y los nombres de topics antiguos fueron expuestos públicamente en versiones anteriores del repositorio. Por seguridad y privacidad estricta de tus entrenamientos, **NO utilices el código de sincronización antiguo**. Debes generar un nuevo código secreto privado (de al menos 24 caracteres alfanuméricos) desde la propia web y copiarlo a tu archivo local `watch/app-side/config.js`. Asimismo, los archivos `.zpk` y `config.js` han sido retirados del repositorio y agregados a `.gitignore` para no volver a exponerse.
+
 ---
 
 ## 1. Decisiones de Diseño y Justificación

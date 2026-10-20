@@ -46,6 +46,9 @@ Page(BasePage({
 
   onInit() {
     this.state.app = getApp()
+    if (this.state.app && typeof this.state.app.flushPendingOutbox === 'function') {
+      this.state.app.flushPendingOutbox()
+    }
     this.enableWakeUpRelaunch()
     this.initCurrentValues()
   },
@@ -597,8 +600,8 @@ Page(BasePage({
         rt.active = false
         this.state.restPreWarned = false
         vibrateRestFinished()
-        // Al terminar el descanso: consultar bajo demanda con el móvil
-        this.checkPhoneSyncOnDemand(true)
+        // Al terminar el descanso: consultar bajo demanda con el móvil respetando throttle de 60s
+        this.checkPhoneSyncOnDemand(false)
       }
     }
 
@@ -719,6 +722,9 @@ Page(BasePage({
     this.updateClockDisplay()
     this.updateTimerDisplay()
     this.checkPhoneSyncOnDemand(false)
+    if (this.state.app && typeof this.state.app.flushPendingOutbox === 'function') {
+      this.state.app.flushPendingOutbox()
+    }
   },
 
   enableWakeUpRelaunch() {

@@ -12,6 +12,19 @@ Page({
     app: null
   },
 
+  onInit() {
+    this.state.app = getApp()
+    if (this.state.app && typeof this.state.app.flushPendingOutbox === 'function') {
+      this.state.app.flushPendingOutbox()
+    }
+  },
+
+  onResume() {
+    if (this.state.app && typeof this.state.app.flushPendingOutbox === 'function') {
+      this.state.app.flushPendingOutbox()
+    }
+  },
+
   build() {
     this.state.app = getApp()
     const app = this.state.app

@@ -7140,6 +7140,8 @@
         if (repsInp) {
           if (!repsInp.value && repsInp.placeholder) repsInp.value = repsInp.placeholder;
           workoutState.inputs[`${slotId}_${sIdx}_reps`] = repsInp.value.trim();
+          if (!workoutState.setTimestamps) workoutState.setTimestamps = {};
+          workoutState.setTimestamps[`${slotId}_${sIdx}`] = Date.now();
         }
 
         // 1RM Estimado y detección de nuevo Récord Personal (PR)

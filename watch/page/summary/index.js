@@ -7,6 +7,20 @@ import { replace } from '@zos/router'
 import { loadWorkoutData } from '../../utils/storage'
 
 Page({
+  onInit() {
+    const app = getApp()
+    if (app && typeof app.flushPendingOutbox === 'function') {
+      app.flushPendingOutbox()
+    }
+  },
+
+  onResume() {
+    const app = getApp()
+    if (app && typeof app.flushPendingOutbox === 'function') {
+      app.flushPendingOutbox()
+    }
+  },
+
   build() {
     const data = loadWorkoutData()
     const lastSession = (data.history && data.history.length > 0) ? data.history[0] : null

@@ -50,22 +50,28 @@ export function mergeSessionLoggedSets(localSets = {}, remoteSets = {}) {
 
       if (!lSet && !rSet) continue
 
-      if (lSet && lSet.completed && (!rSet || !rSet.completed)) {
+      const lComp = !!(lSet && lSet.completed)
+      const rComp = !!(rSet && rSet.completed)
+
+      // Regla 1: Una serie completada NUNCA es sobrescrita por una no completada
+      if (lComp && !rComp) {
         combined[i] = { ...lSet }
-      } else if (rSet && rSet.completed && (!lSet || !lSet.completed)) {
+      } else if (rComp && !lComp) {
         combined[i] = { ...rSet }
-      } else if (lSet && lSet.completed && rSet && rSet.completed) {
-        // Ambos completaron la misma serie: desempatar por el timestamp más reciente
-        const lTime = lSet.completedAt || lSet.timestamp || 0
-        const rTime = rSet.completedAt || rSet.timestamp || 0
-        if (rTime > lTime) {
-          combined[i] = { ...rSet }
-        } else {
-          combined[i] = { ...lSet }
-        }
       } else {
-        // Ninguno está completado: mantener el que tenga valores definidos
-        combined[i] = lSet ? { ...lSet } : { ...rSet }
+        // Ambas están completadas (o ninguna lo está): gana la más reciente según completedAt / timestamp
+        const lTime = Number(lSet?.completedAt || lSet?.timestamp || 0)
+        const rTime = Number(rSet?.completedAt || rSet?.timestamp || 0)
+
+        if (rTime > lTime) {
+          // Gana el cambio más reciente incluso si corrigió a la baja (menos peso o menos reps)
+          combined[i] = { ...rSet }
+        } else if (lTime > rTime) {
+          combined[i] = { ...lSet }
+        } else {
+          // Empate exacto de tiempo: mantener el que tenga valores válidos
+          combined[i] = rSet ? { ...rSet } : { ...lSet }
+        }
       }
     }
 

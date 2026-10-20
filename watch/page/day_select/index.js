@@ -23,6 +23,9 @@ Page(
 
     async onInit() {
       const app = getApp()
+      if (app && typeof app.flushPendingOutbox === 'function') {
+        app.flushPendingOutbox()
+      }
       // Si ya hay un entrenamiento activo guardado en memoria flash, reanudar inmediatamente
       if (app && app.globalData && app.globalData.activeDayId) {
         console.log('[DaySelect] Sesión activa detectada en flash, auto-resumiendo entreno:', app.globalData.activeDayId)
@@ -281,6 +284,10 @@ Page(
     },
 
     onResume() {
+      const app = getApp()
+      if (app && typeof app.flushPendingOutbox === 'function') {
+        app.flushPendingOutbox()
+      }
       if (this.state.clockWidget) {
         this.state.clockWidget.setProperty(hmUI.prop.TEXT, this.getClockStr())
       }

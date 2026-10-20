@@ -165,9 +165,22 @@ export async function flushOutbox(context) {
 }
 
 function scheduleOutboxRetry(context, delayMs) {
-  if (outboxRetryTimer) clearTimeout(outboxRetryTimer)
-  outboxRetryTimer = setTimeout(() => {
+  const appObj = (context && typeof context.getApp === 'function') ? context.getApp() : context
+  if (appObj && appObj._outboxRetryTimer) {
+    clearTimeout(appObj._outboxRetryTimer)
+    appObj._outboxRetryTimer = null
+  }
+  if (outboxRetryTimer) {
+    clearTimeout(outboxRetryTimer)
     outboxRetryTimer = null
+  }
+
+  const timer = setTimeout(() => {
+    outboxRetryTimer = null
+    if (appObj) appObj._outboxRetryTimer = null
     flushOutbox(context)
   }, delayMs)
+
+  outboxRetryTimer = timer
+  if (appObj) appObj._outboxRetryTimer = timer
 }

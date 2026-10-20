@@ -21,6 +21,9 @@ Page({
 
   onInit() {
     this.state.app = getApp()
+    if (this.state.app && typeof this.state.app.flushPendingOutbox === 'function') {
+      this.state.app.flushPendingOutbox()
+    }
     this.enableWakeUpRelaunch()
     const timerData = this.state.app.globalData.restTimer
     this.state.totalSeconds = (timerData && timerData.totalSeconds) || 90
@@ -265,6 +268,9 @@ Page({
     this.enableWakeUpRelaunch()
     this.updateUI()
     this.updateClockDisplay()
+    if (this.state.app && typeof this.state.app.flushPendingOutbox === 'function') {
+      this.state.app.flushPendingOutbox()
+    }
   },
 
   enableWakeUpRelaunch() {

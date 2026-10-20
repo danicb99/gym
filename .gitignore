@@ -1,5 +1,7 @@
 *.xlsm
 *.zip
+*.zpk
+watch/dist/
 .system_generated/
 scratch/
 watch/app-side/config.js

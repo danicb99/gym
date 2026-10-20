@@ -91,8 +91,9 @@ App(
 
     async checkPhoneLiveSession(force = false) {
       const now = Date.now()
-      // Throttle de 20s entre peticiones de red al móvil
-      if (!force && this.globalData.lastPhoneQueryTime && (now - this.globalData.lastPhoneQueryTime < 20000)) {
+      // Throttle de mínimo 60s entre consultas automáticas de red para no sobrecargar ntfy
+      const minInterval = force ? 30000 : 60000
+      if (this.globalData.lastPhoneQueryTime && (now - this.globalData.lastPhoneQueryTime < minInterval)) {
         return this.globalData.phoneLiveSession
       }
       this.globalData.lastPhoneQueryTime = now
@@ -386,6 +387,10 @@ App(
         return { text: `pend ${outboxCount}`, color: 0xfbbf24 }
       }
       return { text: 'ok', color: 0x10b981 }
+    },
+
+    flushPendingOutbox() {
+      flushOutbox(this)
     }
   })
 )

@@ -260,10 +260,14 @@
             const reps = (workoutState.inputs && workoutState.inputs[`${rowId}_reps`]) || sDef[1] || 10;
 
             if (isDone) {
+              const setTs = (workoutState.setTimestamps && workoutState.setTimestamps[rowId]) 
+                || (workoutState.sessionStartTime && workoutState.sessionStartTime[activeDay]) 
+                || Date.now();
               sessionLoggedSets[slot.slotId][sIdx] = {
                 kg: Number(kg),
                 reps: Number(reps),
-                completed: true
+                completed: true,
+                completedAt: setTs
               };
             } else if (!foundNext) {
               firstUnfinishedSlot = slotIdx;
@@ -626,13 +630,22 @@
     if (typeof workoutState !== 'undefined' && workoutState) {
       if (!workoutState.inputs) workoutState.inputs = {};
       if (!Array.isArray(workoutState.completed)) workoutState.completed = [];
+      if (!workoutState.setTimestamps) workoutState.setTimestamps = {};
 
       const rowKey = `${slotId}_${setIndex}`;
-      if (kg !== undefined && kg !== null && kg !== '') {
-        workoutState.inputs[`${rowKey}_kg`] = String(kg);
-      }
-      if (reps !== undefined && reps !== null && reps !== '') {
-        workoutState.inputs[`${rowKey}_reps`] = String(reps);
+      const existingTime = workoutState.setTimestamps[rowKey] || 0;
+      const incomingTime = completedAt || ts || Date.now();
+
+      // Regla de fusión: Gana el cambio más reciente según completedAt.
+      // Una serie completada nunca se sobrescribe por una no completada.
+      if (incomingTime >= existingTime) {
+        if (kg !== undefined && kg !== null && kg !== '') {
+          workoutState.inputs[`${rowKey}_kg`] = String(kg);
+        }
+        if (reps !== undefined && reps !== null && reps !== '') {
+          workoutState.inputs[`${rowKey}_reps`] = String(reps);
+        }
+        workoutState.setTimestamps[rowKey] = incomingTime;
       }
       if (!workoutState.completed.includes(rowKey)) {
         workoutState.completed.push(rowKey);
@@ -1020,8 +1033,12 @@
             <button id="btnSaveSyncCode" style="background:#10b981;color:#fff;border:none;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">💾 Guardar</button>
           </div>
 
-          <div style="margin-top:12px;font-size:11px;color:#64748b;line-height:1.4;">
-            💡 <em>Recuerda copiar este mismo código en el archivo <code>watch/app-side/config.js</code> antes de compilar o instalar en Zepp.</em>
+          <button id="btnCopyFullConfig" style="width:100%;margin-top:10px;background:#334155;border:1px solid #475569;color:#f8fafc;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+            📄 Copiar texto listo para config.js
+          </button>
+
+          <div style="margin-top:10px;font-size:11px;color:#64748b;line-height:1.4;">
+            💡 <em>Pega este texto en el archivo <code>watch/app-side/config.js</code> antes de compilar o instalar en Zepp.</em>
           </div>
         </div>
 
@@ -1079,6 +1096,21 @@
             showWatchToast('📋 Código copiado');
           });
         }
+      };
+    }
+
+    const btnCopyFull = document.getElementById('btnCopyFullConfig');
+    if (btnCopyFull) {
+      btnCopyFull.onclick = () => {
+        const input = document.getElementById('syncCodeInput');
+        const code = input ? input.value.trim() : cfg.code;
+        const text = `export const SYNC_CONFIG = {\n  SYNC_CODE: '${code}',\n  SERVER_URL: '${cfg.server}',\n  AUTH_TOKEN: '${cfg.token}'\n};\n`;
+        navigator.clipboard.writeText(text).then(() => {
+          showWatchToast('📄 Texto completo copiado para config.js');
+        }).catch(() => {
+          input.select();
+          showWatchToast('📄 Código copiado');
+        });
       };
     }
 
@@ -1142,10 +1174,16 @@
 
   // Hooking en saveRestTimerState para emitir inicio y cambio de descanso al reloj
   const origSaveRestTimer = window.saveRestTimerState;
+  let lastRestTimerActiveState = false;
   if (typeof origSaveRestTimer === 'function') {
     window.saveRestTimerState = function(...args) {
       const res = origSaveRestTimer.apply(this, args);
-      scheduleBroadcast(500);
+      const isNowActive = typeof isTimerActive !== 'undefined' ? !!isTimerActive : false;
+      // Solo emitir broadcast si cambió el estado de descanso (iniciado o finalizado), nunca durante el conteo
+      if (isNowActive !== lastRestTimerActiveState) {
+        lastRestTimerActiveState = isNowActive;
+        scheduleBroadcast(1500);
+      }
       return res;
     };
   }

@@ -17,7 +17,16 @@ Page(
 
     onInit() {
       this.state.app = getApp()
+      if (this.state.app && typeof this.state.app.flushPendingOutbox === 'function') {
+        this.state.app.flushPendingOutbox()
+      }
       this.enableWakeUpRelaunch()
+    },
+
+    onResume() {
+      if (this.state.app && typeof this.state.app.flushPendingOutbox === 'function') {
+        this.state.app.flushPendingOutbox()
+      }
     },
 
     build() {
