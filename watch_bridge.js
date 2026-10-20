@@ -370,8 +370,54 @@
         if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[summary.dayId];
         if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[summary.dayId];
 
+        // Actualizar marcas "Anterior" con los ejercicios completados en el reloj
+        if (Array.isArray(summary.exercises)) {
+          if (!workoutState.previous) workoutState.previous = {};
+          summary.exercises.forEach(ex => {
+            if (!ex.exId || !Array.isArray(ex.sets)) return;
+            if (!workoutState.previous[ex.exId]) workoutState.previous[ex.exId] = {};
+            ex.sets.forEach((st, sIdx) => {
+              if (st && (st.kg !== undefined || st.reps !== undefined)) {
+                workoutState.previous[ex.exId][sIdx] = `${st.kg}kg × ${st.reps}`;
+              }
+            });
+          });
+        }
+
+        // Limpiar el estado visual de las casillas del día terminado
+        const daySection = document.getElementById(summary.dayId);
+        if (daySection) {
+          daySection.querySelectorAll('.exercise-card').forEach(card => {
+            card.classList.remove('exercise-completed', 'manually-expanded');
+            card.querySelectorAll('.set-row').forEach(row => {
+              row.classList.remove('done');
+              const inputs = row.querySelectorAll('.set-input');
+              if (inputs[0]) inputs[0].value = '';
+              if (inputs[1]) inputs[1].value = '';
+            });
+          });
+        }
+
+        // Cancelar temporizador de descanso si estaba activo
+        if (typeof finishTimer === 'function' && typeof isTimerActive !== 'undefined' && isTimerActive) {
+          finishTimer();
+        }
+
         if (typeof saveWorkoutState === 'function') saveWorkoutState();
         if (typeof updateProgress === 'function') updateProgress();
+        if (typeof renderDaySelectorOptions === 'function') renderDaySelectorOptions();
+        if (typeof updateDayBannerLastDone === 'function') updateDayBannerLastDone(summary.dayId);
+
+        // Si fue una finalización fresca en directo, sugerir siguiente día y abrir Flex Card
+        if (!opts.silent) {
+          if (typeof getNextRecommendedDay === 'function' && typeof selectDay === 'function') {
+            const nextDay = getNextRecommendedDay();
+            if (nextDay) selectDay(nextDay);
+          }
+          if (typeof openWorkoutSummaryModal === 'function') {
+            openWorkoutSummaryModal(record);
+          }
+        }
       }
     } catch (e) {
       console.warn('[WatchBridge] Error archivando sesión del reloj:', e);
@@ -381,7 +427,7 @@
     if (!opts.silent) {
       showWatchToast(`⌚ ¡Entrenamiento completado y guardado desde el reloj!${durText}`);
     }
-    if (!opts.silent && typeof loadWorkoutState === 'function') {
+    if (typeof loadWorkoutState === 'function') {
       loadWorkoutState();
     }
   }
