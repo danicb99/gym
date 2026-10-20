@@ -102,26 +102,75 @@ AppSideService(
           console.log('[VigorexiApp Side] Error consultando sesión móvil:', err)
           res(null, { ok: false, session: null, status: 500, error: String(err) })
         }
-      } else if (req.method === 'WORKOUT_FINISHED') {
-        // Enviar resumen de sesión completada desde el reloj a la PWA móvil
+      } else if (req.method === 'SET_COMPLETED') {
+        // Retransmitir serie completada a la PWA con comprobación de estado HTTP
         try {
-          const payload = {
-            type: 'WORKOUT_FINISHED',
-            summary: req.params,
-            timestamp: Date.now()
+          const event = req.params
+          const envelope = (event && event.v) ? event : {
+            v: 1,
+            id: (event && event.id) || `watch-set-${Date.now()}`,
+            type: 'SET_COMPLETED',
+            ts: (event && (event.ts || event.timestamp)) || Date.now(),
+            src: 'watch',
+            ...event,
+            payload: event
           }
-          await safeFetch(this, {
+
+          const response = await safeFetch(this, {
             url: RELAY_WATCH_TO_PHONE,
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(envelope),
             timeout: 10000
           })
-          console.log('[VigorexiApp Side] Fin de entreno retransmitido a la PWA')
-          res(null, { status: 'OK' })
+
+          const status = response ? (response.status || 200) : 0
+          if (response && status >= 200 && status < 300) {
+            console.log('[VigorexiApp Side] Serie retransmitida con éxito:', envelope.id)
+            res(null, { ok: true, id: envelope.id, status: status })
+          } else {
+            const retryAfter = (response && response.headers && parseInt(response.headers['retry-after'], 10)) || 60
+            console.log('[VigorexiApp Side] Error HTTP retransmitiendo serie:', status)
+            res(null, { ok: false, id: envelope.id, status: status, retryAfter: retryAfter })
+          }
+        } catch (err) {
+          console.log('[VigorexiApp Side] Excepción retransmitiendo serie:', err)
+          res(null, { ok: false, status: 500, error: String(err) })
+        }
+      } else if (req.method === 'WORKOUT_FINISHED') {
+        // Enviar resumen de sesión completada desde el reloj con comprobación de estado HTTP
+        try {
+          const event = req.params
+          const envelope = (event && event.v) ? event : {
+            v: 1,
+            id: (event && event.id) || `watch-fin-${Date.now()}`,
+            type: 'WORKOUT_FINISHED',
+            ts: (event && (event.ts || event.timestamp)) || Date.now(),
+            src: 'watch',
+            ...event,
+            payload: event.summary ? event : { summary: event }
+          }
+
+          const response = await safeFetch(this, {
+            url: RELAY_WATCH_TO_PHONE,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(envelope),
+            timeout: 10000
+          })
+
+          const status = response ? (response.status || 200) : 0
+          if (response && status >= 200 && status < 300) {
+            console.log('[VigorexiApp Side] Fin de entreno retransmitido a la PWA con éxito:', envelope.id)
+            res(null, { ok: true, id: envelope.id, status: status })
+          } else {
+            const retryAfter = (response && response.headers && parseInt(response.headers['retry-after'], 10)) || 60
+            console.log('[VigorexiApp Side] Error HTTP retransmitiendo fin de entreno:', status)
+            res(null, { ok: false, id: envelope.id, status: status, retryAfter: retryAfter })
+          }
         } catch (err) {
           console.log('[VigorexiApp Side] Error retransmitiendo fin de entreno:', err)
-          res(null, { status: 'ERROR', error: String(err) })
+          res(null, { ok: false, status: 500, error: String(err) })
         }
       } else {
         res(null, { status: 'UNKNOWN_METHOD' })

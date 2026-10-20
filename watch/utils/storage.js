@@ -11,7 +11,8 @@ const DEFAULT_STORAGE = {
   activeSession: null,
   history: [],          // Sesiones completadas
   previousWeights: {},  // exId -> último peso y reps registrados
-  customSlots: {}       // slotId -> exId (máquinas alternas seleccionadas)
+  customSlots: {},      // slotId -> exId (máquinas alternas seleccionadas)
+  outbox: []            // Cola de eventos pendientes de sincronizar con el móvil/web
 }
 
 export function loadWorkoutData() {
@@ -46,6 +47,64 @@ export function saveWorkoutData(data) {
     console.log('[Storage] Error guardando datos locales:', e)
     return false
   }
+}
+
+export function getOutbox() {
+  const current = loadWorkoutData()
+  return Array.isArray(current.outbox) ? current.outbox : []
+}
+
+export function enqueueOutbox(event) {
+  if (!event || !event.id) return false
+  const current = loadWorkoutData()
+  if (!Array.isArray(current.outbox)) current.outbox = []
+  const exists = current.outbox.some(e => e.id === event.id)
+  if (!exists) {
+    current.outbox.push(event)
+    return saveWorkoutData(current)
+  }
+  return true
+}
+
+export function removeFromOutbox(eventId) {
+  if (!eventId) return false
+  const current = loadWorkoutData()
+  if (!Array.isArray(current.outbox)) return false
+  const prevLen = current.outbox.length
+  current.outbox = current.outbox.filter(e => e.id !== eventId)
+  if (current.outbox.length !== prevLen) {
+    return saveWorkoutData(current)
+  }
+  return true
+}
+
+export function updateOutboxRetries(eventId, retries) {
+  if (!eventId) return false
+  const current = loadWorkoutData()
+  if (!Array.isArray(current.outbox)) return false
+  const item = current.outbox.find(e => e.id === eventId)
+  if (item) {
+    item.retries = retries
+    return saveWorkoutData(current)
+  }
+  return false
+}
+
+export function markSessionSynced(sessionId) {
+  if (!sessionId) return false
+  const current = loadWorkoutData()
+  if (!Array.isArray(current.history)) return false
+  let updated = false
+  current.history.forEach(s => {
+    if (s.sessionId === sessionId || s.id === sessionId) {
+      s.synced = true
+      updated = true
+    }
+  })
+  if (updated) {
+    return saveWorkoutData(current)
+  }
+  return false
 }
 
 export function saveActiveSession(sessionState) {

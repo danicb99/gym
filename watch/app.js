@@ -6,13 +6,14 @@
 import { BaseApp } from '@zeppos/zml/base-app'
 import { loadWorkoutData, saveActiveSession, clearActiveSession, recordCompletedSession } from './utils/storage'
 import { ROUTINE_SLOTS, EXERCISE_CATALOG } from './utils/routine_data'
-import { notifySetCompleted, notifyWorkoutFinished, requestPhoneLiveWorkout } from './utils/sync_bridge'
+import { requestPhoneLiveWorkout, enqueueSetCompletedEvent, enqueueWorkoutFinishedEvent, flushOutbox } from './utils/sync_bridge'
 import { mergeSessionLoggedSets } from './utils/merge'
 
 App(
   BaseApp({
     globalData: {
       activeDayId: null,
+      sessionId: null,
       currentSlotIndex: 0,
       currentSetIndex: 0,
       sessionStartTime: null,
@@ -40,6 +41,7 @@ App(
       const saved = loadWorkoutData()
       if (saved && saved.activeSession) {
         this.globalData.activeDayId = saved.activeSession.activeDayId
+        this.globalData.sessionId = saved.activeSession.sessionId || `watch-${saved.activeSession.activeDayId}-${saved.activeSession.sessionStartTime}`
         this.globalData.currentSlotIndex = saved.activeSession.currentSlotIndex || 0
         this.globalData.currentSetIndex = saved.activeSession.currentSetIndex || 0
         this.globalData.sessionStartTime = saved.activeSession.sessionStartTime
@@ -63,6 +65,9 @@ App(
         }
         this.globalData.previousSets = Object.assign({}, localPrev, this.globalData.previousSets)
       }
+
+      // 1c. Reintentar eventos pendientes en la outbox desde arranques previos
+      flushOutbox(this)
 
       // 2. Comprobar en segundo plano si el móvil tiene un entreno en curso
       this.checkPhoneLiveSession()
@@ -108,6 +113,7 @@ App(
     adoptPhoneSession(phoneSession) {
       if (!phoneSession || !phoneSession.activeDayId) return
       this.globalData.activeDayId = phoneSession.activeDayId
+      this.globalData.sessionId = phoneSession.sessionId || `watch-${phoneSession.activeDayId}-${Date.now()}`
       this.globalData.currentSlotIndex = phoneSession.currentSlotIndex || 0
       this.globalData.currentSetIndex = phoneSession.currentSetIndex || 0
       this.globalData.sessionStartTime = phoneSession.sessionStartTime || Date.now()
@@ -146,6 +152,7 @@ App(
 
       saveActiveSession({
         activeDayId: this.globalData.activeDayId,
+        sessionId: this.globalData.sessionId,
         currentSlotIndex: this.globalData.currentSlotIndex,
         currentSetIndex: this.globalData.currentSetIndex,
         sessionStartTime: this.globalData.sessionStartTime,
@@ -157,6 +164,9 @@ App(
     mergePhoneSession(phoneSession) {
       if (!phoneSession || !phoneSession.activeDayId) return
       if (phoneSession.activeDayId !== this.globalData.activeDayId) return
+      if (phoneSession.sessionId && !this.globalData.sessionId) {
+        this.globalData.sessionId = phoneSession.sessionId
+      }
 
       // Fusión no destructiva: unión de series completadas sin sobrescribir valores locales
       this.globalData.sessionLoggedSets = mergeSessionLoggedSets(
@@ -198,6 +208,7 @@ App(
 
       saveActiveSession({
         activeDayId: this.globalData.activeDayId,
+        sessionId: this.globalData.sessionId,
         currentSlotIndex: this.globalData.currentSlotIndex,
         currentSetIndex: this.globalData.currentSetIndex,
         sessionStartTime: this.globalData.sessionStartTime,
@@ -208,15 +219,17 @@ App(
 
     startNewWorkout(dayId) {
       this.globalData.activeDayId = dayId
+      this.globalData.sessionStartTime = Date.now()
+      this.globalData.sessionId = `watch-${dayId}-${this.globalData.sessionStartTime}`
       this.globalData.currentSlotIndex = 0
       this.globalData.currentSetIndex = 0
-      this.globalData.sessionStartTime = Date.now()
       this.globalData.sessionLoggedSets = {}
       this.globalData.slotExOverrides = {}
       this.globalData.isPhoneSynced = false
 
       saveActiveSession({
         activeDayId: dayId,
+        sessionId: this.globalData.sessionId,
         currentSlotIndex: 0,
         currentSetIndex: 0,
         sessionStartTime: this.globalData.sessionStartTime,
@@ -284,9 +297,14 @@ App(
         timestamp: Date.now()
       }
 
+      if (!this.globalData.sessionId) {
+        this.globalData.sessionId = `watch-${this.globalData.activeDayId}-${this.globalData.sessionStartTime || Date.now()}`
+      }
+
       // Guardar en la flash local del reloj (persistencia offline)
       saveActiveSession({
         activeDayId: this.globalData.activeDayId,
+        sessionId: this.globalData.sessionId,
         currentSlotIndex: this.globalData.currentSlotIndex,
         currentSetIndex: this.globalData.currentSetIndex,
         sessionStartTime: this.globalData.sessionStartTime,
@@ -295,19 +313,30 @@ App(
         slotExtraSets: this.globalData.slotExtraSets
       })
 
-      // Notificar al smartphone por BLE -> Side Service -> WebApp
-      notifySetCompleted(this, slotId, setIndex, kg, reps)
+      // Encolar evento en outbox persistente y vaciar con confirmación
+      enqueueSetCompletedEvent(
+        this,
+        slotId,
+        setIndex,
+        kg,
+        reps,
+        this.globalData.sessionId,
+        this.globalData.activeDayId
+      )
     },
 
     finishWorkout() {
       const day = ROUTINE_SLOTS[this.globalData.activeDayId]
       const durationMinutes = Math.round((Date.now() - (this.globalData.sessionStartTime || Date.now())) / 60000)
+      const finishedSessionId = this.globalData.sessionId || `watch-${this.globalData.activeDayId}-${Date.now()}`
 
       const sessionSummary = {
+        sessionId: finishedSessionId,
         date: new Date().toISOString(),
         dayId: this.globalData.activeDayId,
         dayName: day ? day.title : 'Entrenamiento',
         durationMinutes: Math.max(1, durationMinutes),
+        synced: false,
         exercises: []
       }
 
@@ -335,13 +364,14 @@ App(
       sessionSummary.hrAvg = hrAvg
       sessionSummary.hrMax = this.globalData.hrMax || 0
 
-      // Guardar en el historial local del reloj
+      // Guardar en el historial local del reloj (marcado como synced: false)
       recordCompletedSession(sessionSummary)
       this.globalData.activeDayId = null
+      this.globalData.sessionId = null
       clearActiveSession()
 
-      // Notificar fin de entreno al smartphone
-      notifyWorkoutFinished(this, sessionSummary)
+      // Encolar fin de entreno en outbox persistente y vaciar con confirmación
+      enqueueWorkoutFinishedEvent(this, sessionSummary, finishedSessionId)
 
       return sessionSummary
     }
