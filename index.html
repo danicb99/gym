@@ -9,6 +9,8 @@
   <link rel="manifest" href="./manifest.json?v=2">
   <link rel="apple-touch-icon" href="./icon-192.png?v=2">
   <link rel="icon" type="image/png" href="./icon-192.png?v=2">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
   <title>Vigorexiapp - Elite Workout Tracker</title>
   <style>
     :root {
@@ -39,10 +41,12 @@
       --radius-lg: 20px;
       --safe-bottom: max(24px, env(safe-area-inset-bottom, 24px));
       --safe-top: max(12px, env(safe-area-inset-top, 12px));
+      --bn: "Barlow Condensed", "Arial Narrow", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --bd: "Barlow", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg); color: var(--text-main); padding-bottom: var(--safe-bottom); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--bd); -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text-main); padding-bottom: calc(85px + env(safe-area-inset-bottom, 24px)); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
     /* Background Ambient Glow */
     .ambient-glow { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 300px; background: radial-gradient(ellipse at 50% -20%, rgba(245, 158, 11, 0.08), transparent 70%); z-index: 0; pointer-events: none; }
@@ -376,7 +380,7 @@
     .demo-player.open { display: block; animation: slideUp 0.25s ease-out; }
     .demo-media { width: 100%; height: auto; max-height: 250px; display: block; object-fit: contain; margin: 0 auto; background: #000; }
     .demo-footer { padding: 10px 14px; background: rgba(15, 23, 40, 0.95); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); font-size: 0.72rem; gap: 8px; flex-wrap: wrap; }
-    .demo-cadence { color: var(--amber); font-weight: 600; }
+    .demo-cadence { display: none; } /* Deduplicado: la técnica se muestra de forma limpia en el desplegable de Técnica clave */
     .demo-links { display: flex; gap: 8px; }
     .ext-link { color: var(--cyan); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 3px; }
 
@@ -1332,6 +1336,195 @@
       color: var(--amber);
       font-size: 0.64rem;
       margin-left: 4px;
+    }
+
+  
+    /* Header Progress Information Bar */
+    .prog-text-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 14px 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto;
+      font-variant-numeric: tabular-nums;
+    }
+    .prog-text-row span:last-child {
+      color: var(--primary);
+    }
+
+    /* Floating Rest Dock (above bottom nav) */
+    .rest-dock {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      max-width: 656px;
+      margin: 0 auto;
+      bottom: calc(72px + env(safe-area-inset-bottom, 12px));
+      background: var(--amber);
+      color: #2a1800;
+      border-radius: 16px;
+      padding: 10px 16px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      z-index: 990;
+      animation: slideUpRestDock 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .rest-dock.on {
+      display: flex;
+    }
+    .rest-dock b {
+      font-family: var(--bn, sans-serif);
+      font-size: 32px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.5px;
+    }
+    .rest-dock span {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.25;
+      min-width: 0;
+    }
+    .rest-dock-mute {
+      border: 0;
+      background: rgba(0, 0, 0, 0.15);
+      color: inherit;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .rest-dock button#skipRestBtn {
+      border: 0;
+      background: rgba(0, 0, 0, 0.22);
+      color: inherit;
+      border-radius: 10px;
+      padding: 9px 14px;
+      font: 700 13px var(--bd, sans-serif);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .rest-dock button#skipRestBtn:active {
+      background: rgba(0, 0, 0, 0.35);
+    }
+    @keyframes slideUpRestDock {
+      from { transform: translateY(16px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* App Bottom Navigation Bar */
+    .app-bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      background: rgba(6, 10, 18, 0.96);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid var(--border);
+      padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+      z-index: 1000;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .nav-tab {
+      flex: 1;
+      background: none;
+      border: 0;
+      color: var(--text-muted);
+      font-family: var(--bd, sans-serif);
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 4px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .nav-tab svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .nav-tab.on {
+      color: var(--primary);
+      background: rgba(251, 191, 36, 0.12);
+    }
+    .nav-tab:active {
+      transform: scale(0.94);
+    }
+
+    /* Routine Plan Section & Cards */
+    .sec-heading {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin: 16px 2px 10px;
+    }
+    .routine-plan-card {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+    .routine-plan-card.active {
+      border-color: var(--primary);
+      background: rgba(251, 191, 36, 0.08);
+      box-shadow: 0 4px 20px rgba(251, 191, 36, 0.15);
+    }
+    .routine-plan-card b {
+      font-size: 1.05rem;
+      font-weight: 800;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+    }
+    .routine-plan-card small {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.80rem;
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+    .routine-plan-card .program-badge-active {
+      display: none;
+    }
+    .routine-plan-card.active .program-badge-active {
+      display: inline-block;
+      background: var(--primary);
+      color: #042f2e;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 12px;
     }
 
   </style>
@@ -6308,6 +6501,57 @@
       </div>
     </section>
 
+    <!-- ==========================================
+         PESTAÑA: RUTINA & PROGRAMACIÓN
+         ========================================== -->
+    <section id="routinePlanView" class="day-content">
+      <div class="day-banner">
+        <div>
+          <div class="day-banner-title">📋 Rutina & Programación</div>
+          <div class="day-banner-meta"><span>Sistemas de entrenamiento</span> • <span>Reglas de sobrecarga</span></div>
+        </div>
+      </div>
+
+      <div class="sec-heading" style="margin-top:0">Rutina activa</div>
+      
+      <button type="button" class="routine-plan-card" id="planCard-fullbody" onclick="switchRoutineProgram('fullbody')">
+        <b>
+          <span>⚡ Full Body rotativo · 3 días</span>
+          <span class="program-badge-active" id="badge-plan-fullbody">Activa</span>
+        </b>
+        <small>Máxima hipertrofia con fatiga óptima en piernas (solo 1 básico de pierna por sesión). Patrón continuo 1 ON - 1 OFF (Día entreno - Día descanso).</small>
+      </button>
+
+      <button type="button" class="routine-plan-card" id="planCard-torso_pierna" onclick="switchRoutineProgram('torso_pierna')">
+        <b>
+          <span>📋 Torso / Pierna · 4 días</span>
+          <span class="program-badge-active" id="badge-plan-torso_pierna">Activa</span>
+        </b>
+        <small>Distribución clásica con 2 días de torso (empuje/tracción) y 2 días de pierna (cuádriceps/cadena posterior) a la semana.</small>
+      </button>
+
+      <div class="sec-heading">Reglas de progresión</div>
+      <div class="guide-card" style="margin-bottom:12px;">
+        <div class="guide-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <span>La Regla de la Doble Progresión</span>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.55; margin-top:8px;">
+          Fija un peso con el que llegues a la base del rango objetivo (ej. 80 kg × 6 reps). Mantén la misma carga en las siguientes sesiones hasta ser capaz de completar <strong>todas las series en el techo del rango</strong> (ej. 4 series de 8 reps). Una vez conseguido, sube el peso (+2,5 kg o +5 kg) y reinicia en la base del rango (6 reps).
+        </p>
+      </div>
+
+      <div class="guide-card">
+        <div class="guide-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>RIR (Repeticiones en Reserva)</span>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.55; margin-top:8px;">
+          Entrena a <strong>RIR 1-2</strong> en los ejercicios básicos principales: termina la serie sintiendo que podrías haber realizado 1 o como máximo 2 repeticiones más con técnica perfecta. En ejercicios accesorios y brazos puedes aproximarte a RIR 0-1.
+        </p>
+      </div>
+    </section>
+
   </main>
 
   <!-- ==========================================
@@ -6720,6 +6964,35 @@
       localStorage.setItem('vigorexiapp_program', prog);
       const defaultDay = (prog === 'fullbody') ? 'fullbodyA' : 'torsoA';
       selectDay(targetDayId || defaultDay);
+    }
+
+    
+    // Navegación de 3 Pestañas Inferiores (Entrenar, Historial, Rutina)
+    function switchMainTab(tabName) {
+      document.querySelectorAll('.app-bottom-nav .nav-tab').forEach(b => b.classList.remove('on'));
+      const btn = document.getElementById(tabName === 'train' ? 'tabBtnTrain' : tabName === 'hist' ? 'tabBtnHist' : 'tabBtnPlan');
+      if (btn) btn.classList.add('on');
+
+      if (tabName === 'train') {
+        selectDay(lastActiveWorkoutDay || (currentProgram === 'fullbody' ? 'fullbodyA' : 'torsoA'));
+      } else if (tabName === 'hist') {
+        selectDay('historialView');
+      } else if (tabName === 'plan') {
+        selectDay('routinePlanView');
+      }
+    }
+
+    function updateRoutinePlanViewCards() {
+      const isFB = (currentProgram === 'fullbody');
+      const cardFB = document.getElementById('planCard-fullbody');
+      const cardTP = document.getElementById('planCard-torso_pierna');
+      if (cardFB) cardFB.classList.toggle('active', isFB);
+      if (cardTP) cardTP.classList.toggle('active', !isFB);
+
+      const optFB = document.getElementById('progOpt-fullbody');
+      const optTP = document.getElementById('progOpt-torso_pierna');
+      if (optFB) optFB.classList.toggle('active', isFB);
+      if (optTP) optTP.classList.toggle('active', !isFB);
     }
 
     function selectDay(dayId) {
@@ -9711,5 +9984,33 @@
 
   </script>
   <script src="./watch_bridge.js"></script>
+  <!-- ==========================================
+       DOCK DE DESCANSO FLOTANTE (Encima de la navegación inferior)
+       ========================================== -->
+  <div class="rest-dock" id="restTimerDock" role="timer">
+    <b id="restTimerDigits">02:00</b>
+    <span id="restTimerSub">Descanso<br>Siguiente serie lista</span>
+    <button type="button" class="rest-dock-mute" id="dockAudioBtn" onclick="toggleAudioMode()" title="Silenciar / Activar sonido">🔕</button>
+    <button type="button" id="skipRestBtn" onclick="resetTimerDock()">Saltar</button>
+  </div>
+
+  <!-- ==========================================
+       BARRA DE NAVEGACIÓN INFERIOR (3 Pestañas: Entrenar, Historial, Rutina)
+       ========================================== -->
+  <nav class="app-bottom-nav" id="appBottomNav" aria-label="Navegación principal">
+    <button type="button" class="nav-tab on" id="tabBtnTrain" onclick="switchMainTab('train')">
+      <svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>
+      <span>Entrenar</span>
+    </button>
+    <button type="button" class="nav-tab" id="tabBtnHist" onclick="switchMainTab('hist')">
+      <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      <span>Historial</span>
+    </button>
+    <button type="button" class="nav-tab" id="tabBtnPlan" onclick="switchMainTab('plan')">
+      <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+      <span>Rutina</span>
+    </button>
+  </nav>
+
 </body>
 </html>
