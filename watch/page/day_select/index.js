@@ -10,6 +10,7 @@ import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
 import { requestPhoneLiveWorkout } from '../../utils/sync_bridge'
 import { loadWorkoutData } from '../../utils/storage'
+import { THEME_COLORS } from '../../utils/theme'
 
 Page(
   BasePage({
@@ -92,80 +93,93 @@ Page(
         hmUI.createWidget(hmUI.widget.PAGE_SCROLLBAR)
       } catch (e) {}
 
+      // Chip Superior de Sincronización y Título
+      const initialSync = app.getSyncStatus ? app.getSyncStatus() : { text: 'ok', color: THEME_COLORS.emerald }
+      const syncLabel = initialSync.text ? ` • ${initialSync.text}` : ''
+
+      hmUI.createWidget(hmUI.widget.TEXT, {
+        x: 33,
+        y: 20,
+        w: 400,
+        h: 24,
+        color: initialSync.color || THEME_COLORS.emerald,
+        text_size: 14,
+        align_h: hmUI.align.CENTER_H,
+        align_v: hmUI.align.CENTER_V,
+        text: `VigorexiApp${syncLabel}`
+      })
+
       // Título Principal
       this.state.titleWidget = hmUI.createWidget(hmUI.widget.TEXT, {
         x: 33,
-        y: 30,
+        y: 44,
         w: 400,
-        h: 34,
-        color: 0xfbbf24, // Gold / Amber
-        text_size: 24,
+        h: 36,
+        color: THEME_COLORS.textMain,
+        text_size: 26,
         align_h: hmUI.align.CENTER_H,
         align_v: hmUI.align.CENTER_V,
-        text: 'VIGOREXIAPP'
+        text: 'Elegir Día'
       })
 
       // Subtítulo de estado
-      let subText = 'Buscando entreno en móvil...'
-      let subColor = 0x94a3b8
+      let subText = 'Selecciona tu sesión de hoy'
+      let subColor = THEME_COLORS.textMuted
       if (phoneSession && phoneSession.activeDayId) {
-        subText = '¡Entreno activo detectado!'
-        subColor = 0x38bdf8
+        subText = '¡Entreno activo detectado en móvil!'
+        subColor = THEME_COLORS.cyan
       } else if (activeLocal) {
         subText = 'Sesión en curso disponible'
+        subColor = THEME_COLORS.gold
       }
 
       this.state.subWidget = hmUI.createWidget(hmUI.widget.TEXT, {
         x: 33,
-        y: 66,
+        y: 78,
         w: 400,
-        h: 26,
+        h: 24,
         color: subColor,
-        text_size: 16,
+        text_size: 15,
         align_h: hmUI.align.CENTER_H,
         align_v: hmUI.align.CENTER_V,
         text: subText
       })
 
-      // Medidas XL para tarjetas (68px de alto, fuente 19px)
+      // Medidas de tarjetas
       const btnX = 45
       const btnW = 376
       const btnH = 68
-      const btnRadius = 34
-      const btnGap = 14
-      let curY = 106
+      const btnRadius = 26
+      const btnGap = 12
+      let curY = 110
 
       // 1. BOTÓN PRIORITARIO: Unirse al entrenamiento del móvil (Live Sync)
-      const phoneDayData = phoneSession ? ROUTINE_SLOTS[phoneSession.activeDayId] : null
-      const phoneDayTitle = phoneDayData ? phoneDayData.shortName : (phoneSession ? phoneSession.activeDayId : '')
-      const initialBtnText = phoneSession ? `🟢 Unirse a ${phoneDayTitle}` : '🔄 Sincronizar Móvil'
-      const initialBtnColor = phoneSession ? 0x0284c7 : 0x1e293b
+      if (phoneSession && phoneSession.activeDayId && phoneSession.workoutActive) {
+        const phoneDayData = ROUTINE_SLOTS[phoneSession.activeDayId]
+        const phoneDayTitle = phoneDayData ? phoneDayData.shortName : phoneSession.activeDayId
 
-      this.state.syncButton = hmUI.createWidget(hmUI.widget.BUTTON, {
-        x: btnX,
-        y: curY,
-        w: btnW,
-        h: btnH,
-        radius: btnRadius,
-        normal_color: initialBtnColor,
-        press_color: 0x0369a1,
-        color: 0xffffff,
-        text_size: 19,
-        text: initialBtnText,
-        click_func: () => {
-          if (app.globalData.phoneLiveSession) {
-            app.adoptPhoneSession(app.globalData.phoneLiveSession)
+        this.state.syncButton = hmUI.createWidget(hmUI.widget.BUTTON, {
+          x: btnX,
+          y: curY,
+          w: btnW,
+          h: 76,
+          radius: 28,
+          normal_color: THEME_COLORS.blueAction,
+          press_color: 0x0369a1,
+          color: 0xffffff,
+          text_size: 20,
+          text: `🟢 Seguir ${phoneDayTitle} (Móvil)`,
+          click_func: () => {
+            app.adoptPhoneSession(phoneSession)
             if (app.globalData.restTimer && app.globalData.restTimer.active && app.globalData.restTimer.remainingSeconds > 2) {
               push({ url: 'page/timer/index' })
             } else {
               push({ url: 'page/workout/index' })
             }
-          } else {
-            this.checkSync(true)
           }
-        }
-      })
-      curY += btnH + btnGap
+        })
+        curY += 76 + btnGap
+      }
 
       // 2. BOTÓN: Continuar sesión local si existe
       if (activeLocal && (!phoneSession || activeLocal !== phoneSession.activeDayId)) {
@@ -176,10 +190,10 @@ Page(
           w: btnW,
           h: btnH,
           radius: btnRadius,
-          normal_color: 0x10b981, // Emerald green
-          press_color: 0x059669,
-          color: 0xffffff,
-          text_size: 19,
+          normal_color: THEME_COLORS.emerald,
+          press_color: THEME_COLORS.emeraldDark,
+          color: THEME_COLORS.textDark,
+          text_size: 20,
           text: `▶ Continuar ${activeDay ? activeDay.shortName : 'Sesión'}`,
           click_func: () => {
             push({ url: 'page/workout/index' })
@@ -188,7 +202,7 @@ Page(
         curY += btnH + btnGap
       }
 
-      // 3. BOTONES DE RUTINA CON RECOMENDACIÓN POR ROTACIÓN
+      // 3. BOTONES DE RUTINA CON TARJETA DESTACADA PARA EL RECOMENDADO
       const ROTATION_FULLBODY = ['fullbodyA', 'fullbodyB', 'fullbodyC']
       const ROTATION_TP = ['torsoA', 'piernaA', 'torsoB', 'piernaB']
       let recommendedDayId = 'fullbodyA'
@@ -211,41 +225,31 @@ Page(
         } catch (e) {}
       }
 
-      const days = [
-        // --- FULL BODY 3 DÍAS (PRINCIPAL) ---
-        { id: 'fullbodyA', label: '🏋️ Día A: Squat + Torso' },
-        { id: 'fullbodyB', label: '🔥 Día B: RDL + Torso' },
-        { id: 'fullbodyC', label: '⚡ Día C: Pierna + Brazos' },
-        // --- TORSO / PIERNA 4 DÍAS (ALTERNO) ---
-        { id: 'torsoA', label: '💪 D1: Torso A (Empuje)' },
-        { id: 'piernaA', label: '🦵 D2: Pierna A (Cuádriceps)' },
-        { id: 'torsoB', label: '🔙 D3: Torso B (Tracción)' },
-        { id: 'piernaB', label: '🍑 D4: Pierna B (Isquios)' }
-      ]
-
-      days.forEach(day => {
+            days.forEach(day => {
         const isRec = (day.id === recommendedDayId)
-        const btnText = isRec ? `${day.label} ⭐` : day.label
-        const btnBg = isRec ? 0x0f2942 : 0x1e293b
-        const btnTextColor = isRec ? 0x38bdf8 : 0xf8fafc
+        const cardH = isRec ? 80 : 64
+        const cardRadius = isRec ? 26 : 22
+        const cardBg = isRec ? THEME_COLORS.gold : THEME_COLORS.stepperBg
+        const cardTextColor = isRec ? 0x060a12 : THEME_COLORS.textMain
+        const cardText = isRec ? `⭐ RECOMENDADO\n${day.label}` : day.label
 
         hmUI.createWidget(hmUI.widget.BUTTON, {
           x: btnX,
           y: curY,
           w: btnW,
-          h: btnH,
-          radius: btnRadius,
-          normal_color: btnBg,
-          press_color: 0x334155,
-          color: btnTextColor,
-          text_size: 19,
-          text: btnText,
+          h: cardH,
+          radius: cardRadius,
+          normal_color: cardBg,
+          press_color: isRec ? THEME_COLORS.goldDark : THEME_COLORS.stepperPress,
+          color: cardTextColor,
+          text_size: isRec ? 18 : 17,
+          text: cardText,
           click_func: () => {
             app.startNewWorkout(day.id)
             push({ url: 'page/workout/index' })
           }
         })
-        curY += btnH + btnGap
+        curY += cardH + btnGap
       })
 
       // Reloj inferior al final del scroll (Grande y limpio)

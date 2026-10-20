@@ -6,6 +6,7 @@ import * as hmUI from '@zos/ui'
 import { replace } from '@zos/router'
 import { vibrateRestFinished, vibratePreWarning } from '../../utils/haptics'
 import { keepScreenActive, restoreScreenBehavior } from '../../utils/display'
+import { THEME_COLORS } from '../../utils/theme'
 
 Page({
   state: {
@@ -37,124 +38,137 @@ Page({
   build() {
     const timerData = this.state.app.globalData.restTimer
 
-    // 1. TÍTULO SUPERIOR (Centrado en zona visible)
+    // 0. ANILLO PERIMETRAL DE DESCANSO
+    // Pista base
+    hmUI.createWidget(hmUI.widget.ARC, {
+      x: 8,
+      y: 8,
+      w: 450,
+      h: 450,
+      start_angle: -90,
+      end_angle: 270,
+      color: THEME_COLORS.ringTrack,
+      line_width: 8
+    })
+
+    // Arco de cuenta atrás en ámbar brillante
+    this.state.arcWidget = hmUI.createWidget(hmUI.widget.ARC, {
+      x: 8,
+      y: 8,
+      w: 450,
+      h: 450,
+      start_angle: -90,
+      end_angle: 270,
+      color: THEME_COLORS.timerAmber,
+      line_width: 8
+    })
+
+    // 1. TÍTULO SUPERIOR
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 65,
-      y: 38,
-      w: 336,
-      h: 28,
-      color: 0x38bdf8, // Cyan
-      text_size: 17,
+      x: 50,
+      y: 42,
+      w: 366,
+      h: 26,
+      color: THEME_COLORS.cyan,
+      text_size: 16,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: '⏱️ DESCANSO'
     })
 
-    // 2. PRÓXIMO EJERCICIO Y SERIE (Gold y Slate de alto contraste)
+    // 2. PRÓXIMO EJERCICIO Y SERIE (Gold)
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 65,
-      y: 70,
-      w: 336,
+      x: 50,
+      y: 74,
+      w: 366,
       h: 28,
-      color: 0xfbbf24, // Gold / Amber
-      text_size: 18,
+      color: THEME_COLORS.gold,
+      text_size: 19,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: timerData ? timerData.nextExerciseName : 'Siguiente serie'
+      text: timerData ? `Sigue: ${timerData.nextExerciseName}` : 'Siguiente serie lista'
     })
 
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 65,
-      y: 100,
-      w: 336,
+      x: 50,
+      y: 104,
+      w: 366,
       h: 24,
-      color: 0x94a3b8, // Slate
+      color: THEME_COLORS.textMuted,
       text_size: 15,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: timerData ? `Preparar Serie ${timerData.nextSetNum}` : 'Toma aire y magnesio'
     })
 
-    // 3. ANILLO DE PROGRESO CIRCULAR
-    this.state.arcWidget = hmUI.createWidget(hmUI.widget.ARC, {
-      x: 43,
-      y: 43,
-      w: 380,
-      h: 380,
-      start_angle: -90,
-      end_angle: 270,
-      color: 0x10b981, // Emerald green
-      line_width: 8
-    })
-
-    // 4. DÍGITOS GIGANTES DEL CRONÓMETRO
+    // 3. DÍGITOS GIGANTES DEL CRONÓMETRO (Ámbar AMOLED, 72px)
     this.state.digitsWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 65,
-      y: 162,
-      w: 336,
-      h: 76,
-      color: 0xffffff,
-      text_size: 54,
+      x: 50,
+      y: 138,
+      w: 366,
+      h: 96,
+      color: THEME_COLORS.timerAmber,
+      text_size: 72,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.formatTime(this.state.remainingSeconds)
     })
 
-    // 5. CONTROLES DE DESCANSO (+30s y Saltar / Listo)
-    const btnY = 268
+    // 4. CONTROLES DE ACCIÓN RÁPIDA (+15 s y Saltar)
+    const btnY = 256
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 80,
+      x: 73,
       y: btnY,
-      w: 142,
-      h: 52,
-      radius: 26,
-      normal_color: 0x1e293b,
-      press_color: 0x334155,
-      color: 0x38bdf8,
-      text_size: 18,
-      text: '+30s',
+      w: 150,
+      h: 62,
+      radius: 31,
+      normal_color: THEME_COLORS.stepperBg,
+      press_color: THEME_COLORS.stepperPress,
+      color: THEME_COLORS.textMain,
+      text_size: 22,
+      text: '+15 s',
       click_func: () => {
-        this.addTime(30)
+        this.addTime(15)
       }
     })
 
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 244,
+      x: 243,
       y: btnY,
-      w: 142,
-      h: 52,
-      radius: 26,
-      normal_color: 0x10b981,
-      press_color: 0x059669,
-      color: 0xffffff,
-      text_size: 18,
-      text: '¡Listo! ➔',
+      w: 150,
+      h: 62,
+      radius: 31,
+      normal_color: THEME_COLORS.emerald,
+      press_color: THEME_COLORS.emeraldDark,
+      color: THEME_COLORS.textDark,
+      text_size: 22,
+      text: 'Saltar',
       click_func: () => {
         this.finishRest()
       }
     })
 
-    // Subtexto motivacional inferior
+    // 5. AVISO HÁPTICO
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 65,
-      y: 334,
-      w: 336,
+      x: 50,
+      y: 336,
+      w: 366,
       h: 22,
-      color: 0x64748b,
+      color: THEME_COLORS.textDim,
       text_size: 13,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: 'Aviso háptico a los 10s y al terminar'
+      text: 'Vibración a los 10 s y al terminar'
     })
 
-    // Reloj inferior (Hora actual - Grande y limpio)
+    // 6. RELOJ INFERIOR
     this.state.clockWidget = hmUI.createWidget(hmUI.widget.TEXT, {
       x: 133,
-      y: 364,
+      y: 368,
       w: 200,
-      h: 38,
-      color: 0xf1f5f9,
-      text_size: 28,
+      h: 32,
+      color: THEME_COLORS.textMuted,
+      text_size: 22,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.getClockStr()

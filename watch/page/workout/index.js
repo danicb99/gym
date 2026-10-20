@@ -9,6 +9,7 @@ import { HeartRate } from '@zos/sensor'
 import { keepScreenActive, restoreScreenBehavior } from '../../utils/display'
 import { BasePage } from '@zeppos/zml/base-page'
 import { ROUTINE_SLOTS } from '../../utils/routine_data'
+import { THEME_COLORS } from '../../utils/theme'
 import { vibrateShort, vibrateRestFinished, vibratePreWarning } from '../../utils/haptics'
 
 function countCompletedSets(sessionLoggedSets) {
@@ -144,35 +145,60 @@ Page(BasePage({
     const currentSetNum = app.globalData.currentSetIndex + 1
     const totalSets = app.getTotalSetsForSlot ? app.getTotalSetsForSlot(slot) : ((slot.sets && slot.sets.length) || 4)
 
-    // 1. BARRA SUPERIOR (Pulsaciones, Duración, Slot #) - Centrado seguro dentro de [95, 371]
-    this.state.hrWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 95,
-      y: 24,
-      w: 72,
-      h: 34,
-      color: 0xf43f5e, // Rose red
-      text_size: 15,
-      align_h: hmUI.align.LEFT,
-      align_v: hmUI.align.CENTER_V,
-      text: '❤️ --'
+    // 0. ANILLO PERIMETRAL DE PROGRESO DE LA SESIÓN
+    let totalDaySets = 0
+    if (day && day.slots) {
+      day.slots.forEach(s => {
+        totalDaySets += (s.sets ? s.sets.length : 3)
+      })
+    }
+    const completedSets = countCompletedSets(app.globalData.sessionLoggedSets)
+    const progressRatio = totalDaySets > 0 ? Math.min(1, completedSets / totalDaySets) : 0
+    const sweepAngle = Math.round(progressRatio * 360)
+
+    // Pista base del anillo
+    hmUI.createWidget(hmUI.widget.ARC, {
+      x: 8,
+      y: 8,
+      w: 450,
+      h: 450,
+      start_angle: -90,
+      end_angle: 270,
+      color: THEME_COLORS.ringTrack,
+      line_width: 8
     })
 
-    // Ticker duración entreno / descanso activo (Píldora central interactiva con estado sync)
+    // Arco de avance
+    if (sweepAngle > 0) {
+      hmUI.createWidget(hmUI.widget.ARC, {
+        x: 8,
+        y: 8,
+        w: 450,
+        h: 450,
+        start_angle: -90,
+        end_angle: -90 + sweepAngle,
+        color: progressRatio >= 1 ? THEME_COLORS.emerald : THEME_COLORS.accentBlue,
+        line_width: 8
+      })
+    }
+
+    // 1. CHIP SUPERIOR DE ESTADO Y SINCRONIZACIÓN
     const elapsedMinutes = Math.floor((Date.now() - (app.globalData.sessionStartTime || Date.now())) / 60000)
     const isResting = app.globalData.restTimer && app.globalData.restTimer.active
-    const initialSync = app.getSyncStatus ? app.getSyncStatus() : { text: 'ok', color: 0x94a3b8 }
-    const initialLabel = initialSync.text ? ` ${initialSync.text}` : ''
+    const initialSync = app.getSyncStatus ? app.getSyncStatus() : { text: 'ok', color: THEME_COLORS.emerald }
+    const syncText = initialSync.text ? ` • ${initialSync.text}` : ''
+
     this.state.timerWidget = hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 168,
-      y: 22,
-      w: 126,
-      h: 36,
-      radius: 18,
-      normal_color: isResting ? 0x1e293b : 0x0f172a,
-      press_color: 0x334155,
-      color: isResting ? 0xfbbf24 : (initialSync.color || 0x94a3b8),
+      x: 133,
+      y: 18,
+      w: 200,
+      h: 34,
+      radius: 17,
+      normal_color: THEME_COLORS.surfaceSubtle,
+      press_color: THEME_COLORS.stepperBg,
+      color: isResting ? THEME_COLORS.timerAmber : (initialSync.color || THEME_COLORS.textMuted),
       text_size: 13,
-      text: isResting ? `⏳ Descanso${initialLabel}` : `⏱️ ${elapsedMinutes}m${initialLabel}`,
+      text: isResting ? `⏳ Descanso${syncText}` : `⏱️ ${elapsedMinutes}m${syncText}`,
       click_func: () => {
         const rt = app.globalData.restTimer
         if (rt && rt.active) {
@@ -181,27 +207,38 @@ Page(BasePage({
       }
     })
 
-    // Indicador Ejercicio X/Y (arriba a la derecha, dentro del radio visible)
-    hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 299,
-      y: 24,
-      w: 72,
+    this.state.hrWidget = hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 48,
+      y: 18,
+      w: 80,
       h: 34,
-      color: 0x38bdf8, // Cyan
+      color: THEME_COLORS.roseHeart,
       text_size: 15,
-      align_h: hmUI.align.RIGHT,
+      align_h: hmUI.align.CENTER_H,
+      align_v: hmUI.align.CENTER_V,
+      text: '❤️ --'
+    })
+
+    hmUI.createWidget(hmUI.widget.TEXT, {
+      x: 338,
+      y: 18,
+      w: 80,
+      h: 34,
+      color: THEME_COLORS.cyan,
+      text_size: 15,
+      align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: `Ej ${currentSlotNum}/${totalSlots}`
     })
 
-    // 2. NOMBRE DEL EJERCICIO (Gold / Amber, centrado nítido)
+    // 2. NOMBRE DEL EJERCICIO Y SERIE
     hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 65,
-      y: 64,
-      w: 336,
+      x: 50,
+      y: 60,
+      w: 366,
       h: 34,
-      color: 0xfbbf24,
-      text_size: 22,
+      color: THEME_COLORS.gold,
+      text_size: 24,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: ex ? ex.name : 'Ejercicio'
@@ -221,122 +258,81 @@ Page(BasePage({
           }
         }
         if (prevVal) {
-          prevText = ` • 🎯 Ant: ${prevVal}`
+          prevText = ` • Ant. ${prevVal}`
         }
       }
     }
 
-    // Serie y marca objetivo anterior (Cyan brillante)
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 50,
-      y: 100,
+      y: 94,
       w: 366,
-      h: 28,
-      color: 0x38bdf8,
+      h: 26,
+      color: THEME_COLORS.cyan,
       text_size: 16,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: `SERIE ${currentSetNum} DE ${totalSets}${prevText}`
+      text: `Serie ${currentSetNum} de ${totalSets}${prevText}`
     })
 
-    // 3. CONTROL DE KILOS CON STEPPERS DUALES ( [-5] [-2.5]  80.0 kg  [+2.5] [+5] )
-    const rowKgY = 138
-    const step = this.state.stepKg || 2.5
-    const bigStep = step >= 2 ? step * 2 : 2
-
-    // Botón outer -bigStep
+    // 3. FILA 1: KILOS ( [-]  80.0 kg  [+] ) CON STEPPERS GRANDES DE 68px
+    const rowKgY = 130
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 34,
+      x: 52,
       y: rowKgY,
-      w: 48,
-      h: 54,
-      radius: 16,
-      normal_color: 0x1e293b,
-      press_color: 0x334155,
-      color: 0x94a3b8,
-      text_size: 17,
-      text: `-${bigStep}`,
+      w: 68,
+      h: 68,
+      radius: 34,
+      normal_color: THEME_COLORS.stepperBg,
+      press_color: THEME_COLORS.stepperPress,
+      color: THEME_COLORS.textMain,
+      text_size: 34,
+      text: '-',
       click_func: () => {
-        this.adjustKg(-bigStep)
+        this.adjustKg(-this.state.stepKg)
       }
     })
 
-    // Botón inner -step
-    hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 88,
-      y: rowKgY,
-      w: 56,
-      h: 54,
-      radius: 18,
-      normal_color: 0x1e293b,
-      press_color: 0x334155,
-      color: 0xffffff,
-      text_size: 24,
-      text: `-${step}`,
-      click_func: () => {
-        this.adjustKg(-step)
-      }
-    })
-
-    // Valor central de peso
     this.state.kgWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 148,
+      x: 126,
       y: rowKgY,
-      w: 170,
-      h: 54,
-      color: 0xffffff,
-      text_size: 33,
+      w: 214,
+      h: 68,
+      color: THEME_COLORS.textMain,
+      text_size: 38,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.getKgDisplayStr()
     })
 
-    // Botón inner +step
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 322,
+      x: 346,
       y: rowKgY,
-      w: 56,
-      h: 54,
-      radius: 18,
-      normal_color: 0x1e293b,
-      press_color: 0x334155,
-      color: 0xffffff,
-      text_size: 24,
-      text: `+${step}`,
+      w: 68,
+      h: 68,
+      radius: 34,
+      normal_color: THEME_COLORS.stepperBg,
+      press_color: THEME_COLORS.stepperPress,
+      color: THEME_COLORS.textMain,
+      text_size: 34,
+      text: '+',
       click_func: () => {
-        this.adjustKg(step)
+        this.adjustKg(this.state.stepKg)
       }
     })
 
-    // Botón outer +bigStep
+    // 4. FILA 2: REPETICIONES / SEGUNDOS ( [-]  8 reps  [+] ) CON STEPPERS GRANDES DE 68px
+    const rowRepsY = 212
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 384,
-      y: rowKgY,
-      w: 48,
-      h: 54,
-      radius: 16,
-      normal_color: 0x1e293b,
-      press_color: 0x334155,
-      color: 0x94a3b8,
-      text_size: 17,
-      text: `+${bigStep}`,
-      click_func: () => {
-        this.adjustKg(bigStep)
-      }
-    })
-
-    // 4. CONTROL DE REPETICIONES / SEGUNDOS ( [-]  8 reps / 60 seg  [+] )
-    const rowRepsY = 206
-    hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 65,
+      x: 52,
       y: rowRepsY,
       w: 68,
-      h: 56,
-      radius: 24,
-      normal_color: 0x1e293b,
-      press_color: 0x334155,
-      color: 0xffffff,
-      text_size: 32,
+      h: 68,
+      radius: 34,
+      normal_color: THEME_COLORS.stepperBg,
+      press_color: THEME_COLORS.stepperPress,
+      color: THEME_COLORS.textMain,
+      text_size: 34,
       text: '-',
       click_func: () => {
         this.adjustReps(-1)
@@ -344,43 +340,43 @@ Page(BasePage({
     })
 
     this.state.repsWidget = hmUI.createWidget(hmUI.widget.TEXT, {
-      x: 143,
+      x: 126,
       y: rowRepsY,
-      w: 180,
-      h: 56,
-      color: 0xffffff,
-      text_size: 34,
+      w: 214,
+      h: 68,
+      color: THEME_COLORS.textMain,
+      text_size: 38,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.getRepsDisplayStr()
     })
 
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 333,
+      x: 346,
       y: rowRepsY,
       w: 68,
-      h: 56,
-      radius: 24,
-      normal_color: 0x1e293b,
-      press_color: 0x334155,
-      color: 0xffffff,
-      text_size: 32,
+      h: 68,
+      radius: 34,
+      normal_color: THEME_COLORS.stepperBg,
+      press_color: THEME_COLORS.stepperPress,
+      color: THEME_COLORS.textMain,
+      text_size: 34,
       text: '+',
       click_func: () => {
         this.adjustReps(1)
       }
     })
 
-    // 5. BOTÓN PRINCIPAL: COMPLETAR SERIE (o DUAL CRONO/GUARDAR para Isometría)
+    // 5. BOTÓN PRINCIPAL DE ACCIÓN: "✓ Hecha"
     const isIso = ex && ex.metricType === 'isometria'
     if (isIso) {
       this.state.cronoBtnWidget = hmUI.createWidget(hmUI.widget.BUTTON, {
-        x: 48,
-        y: 282,
-        w: 175,
-        h: 60,
-        radius: 30,
-        normal_color: 0x6366f1, // Indigo vibrante
+        x: 58,
+        y: 298,
+        w: 168,
+        h: 64,
+        radius: 32,
+        normal_color: THEME_COLORS.indigoPlank,
         press_color: 0x4f46e5,
         color: 0xffffff,
         text_size: 19,
@@ -391,15 +387,15 @@ Page(BasePage({
       })
 
       hmUI.createWidget(hmUI.widget.BUTTON, {
-        x: 243,
-        y: 282,
-        w: 175,
-        h: 60,
-        radius: 30,
-        normal_color: 0x10b981, // Emerald green
-        press_color: 0x059669,
-        color: 0xffffff,
-        text_size: 19,
+        x: 240,
+        y: 298,
+        w: 168,
+        h: 64,
+        radius: 32,
+        normal_color: THEME_COLORS.emerald,
+        press_color: THEME_COLORS.emeraldDark,
+        color: THEME_COLORS.textDark,
+        text_size: 20,
         text: '✓ GUARDAR',
         click_func: () => {
           this.stopPlankTimer()
@@ -408,46 +404,46 @@ Page(BasePage({
       })
     } else {
       hmUI.createWidget(hmUI.widget.BUTTON, {
-        x: 48,
-        y: 282,
-        w: 370,
-        h: 60,
-        radius: 30,
-        normal_color: 0x10b981, // Emerald green
-        press_color: 0x059669,
-        color: 0xffffff,
-        text_size: 21,
-        text: '✓ COMPLETAR SERIE',
+        x: 103,
+        y: 298,
+        w: 260,
+        h: 64,
+        radius: 32,
+        normal_color: THEME_COLORS.emerald,
+        press_color: THEME_COLORS.emeraldDark,
+        color: THEME_COLORS.textDark,
+        text_size: 24,
+        text: '✓ Hecha',
         click_func: () => {
           this.completeCurrentSet()
         }
       })
     }
 
-    // 6. HORA ACTUAL INFERIOR (25px, blanco suave)
+    // 6. HORA ACTUAL INFERIOR
     this.state.clockWidget = hmUI.createWidget(hmUI.widget.TEXT, {
       x: 133,
-      y: 352,
+      y: 374,
       w: 200,
-      h: 32,
-      color: 0xf1f5f9,
-      text_size: 25,
+      h: 28,
+      color: THEME_COLORS.textMuted,
+      text_size: 20,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text: this.getClockStr()
     })
 
-    // 7. BOTÓN INFERIOR: FLECHA HACIA ARRIBA (▲ Menú / Opciones)
+    // 7. BOTÓN INFERIOR: MENÚ
     hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 153,
-      y: 392,
-      w: 160,
-      h: 42,
-      radius: 21,
-      normal_color: 0x1e293b,
-      press_color: 0x334155,
-      color: 0x38bdf8,
-      text_size: 16,
+      x: 173,
+      y: 406,
+      w: 120,
+      h: 36,
+      radius: 18,
+      normal_color: THEME_COLORS.surfaceSubtle,
+      press_color: THEME_COLORS.stepperPress,
+      color: THEME_COLORS.cyan,
+      text_size: 14,
       text: '▲ Menú',
       click_func: () => {
         push({ url: 'page/options/index' })
