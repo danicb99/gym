@@ -243,22 +243,131 @@
     .day-content.active { display: flex !important; flex-direction: column; animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Day Header Banner */
-    .day-banner { background: linear-gradient(135deg, #0e192f, #091223); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 10px; order: 0 !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35); }
-    .day-banner-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-    .day-banner-title { font-size: 1.05rem; font-weight: 800; color: #fff; line-height: 1.25; }
-    .day-banner-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .progress-chip { background: var(--gold-subtle); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px; padding: 3px 9px; font-size: 0.70rem; font-weight: 700; color: var(--primary); display: inline-flex; align-items: center; gap: 4px; }
-    .session-timer-chip { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle); color: var(--text-muted); border-radius: 14px; padding: 3px 9px; font-size: 0.70rem; font-weight: 700; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 4px; }
-    .session-timer-chip.active { border-color: var(--primary); color: var(--primary); background: var(--gold-subtle); box-shadow: 0 0 10px var(--primary-glow); }
-
-    .day-banner-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .btn-guide-modal { background: var(--gold-subtle); color: var(--primary); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 7px 12px; font-size: 0.74rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; }
-    .btn-guide-modal:active { transform: scale(0.96); background: rgba(245, 158, 11, 0.18); }
-    .btn-finish-day { background: linear-gradient(135deg, #fbbf24, #d97706); color: #060a13; border: 1px solid #fbbf24; border-radius: 8px; padding: 7px 12px; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px var(--primary-glow); transition: all 0.15s ease; }
+    /* Compact & Discreet Workout Sub-bar */
+    .day-banner {
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 6px 10px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      order: 0 !important;
+      box-shadow: none;
+    }
+    .day-banner-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+    }
+    .day-content:not(#historialView):not(#routinePlanView) .day-banner-title {
+      display: none !important;
+    }
+    .day-banner-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.25;
+    }
+    .day-banner-meta {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .progress-chip {
+      display: none !important;
+    }
+    .session-timer-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 0.70rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .session-timer-chip.active {
+      border-color: rgba(56, 189, 248, 0.4);
+      color: var(--cyan);
+      background: rgba(56, 189, 248, 0.08);
+    }
+    .day-banner-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .btn-guide-modal {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 8px;
+      padding: 4px 9px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-guide-modal:hover, .btn-guide-modal:active {
+      background: var(--gold-subtle);
+      border-color: var(--border-gold);
+      color: var(--gold);
+    }
+    .btn-finish-day {
+      background: linear-gradient(135deg, #fbbf24, #d97706);
+      color: #060a13;
+      border: 1px solid #fbbf24;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 10px var(--primary-glow);
+      transition: all 0.15s ease;
+    }
     .btn-finish-day:active { transform: scale(0.96); }
-    .btn-reset-session { background: rgba(255, 255, 255, 0.05); color: var(--text-dim); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 6px 10px; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-    .btn-reset-session:hover, .btn-reset-session:active { background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.3); }
+    .btn-reset-session {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .btn-reset-session:hover, .btn-reset-session:active {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border-color: rgba(244, 63, 94, 0.3);
+    }
 
     /* Exercise Card */
     .exercise-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: border-color 0.2s, box-shadow 0.2s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); }
@@ -1000,21 +1109,22 @@
 
     /* Last done chip in day banners */
     .last-done-chip {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-      border-radius: 14px;
-      padding: 3px 9px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      color: #94a3b8;
+      border-radius: 8px;
+      padding: 3px 8px;
       font-size: 0.70rem;
-      font-weight: 700;
+      font-weight: 600;
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      white-space: nowrap;
     }
     .last-done-chip.recommended {
-      background: var(--gold-subtle);
-      border-color: rgba(245, 158, 11, 0.4);
-      color: var(--primary);
+      background: rgba(251, 191, 36, 0.12);
+      border-color: rgba(251, 191, 36, 0.35);
+      color: var(--gold);
     }
 
     /* Program Switcher Modal */
@@ -1761,7 +1871,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Guía y Calentamiento</span>
+            <span>Calentamiento</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('fullbodyA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -2407,7 +2517,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Guía y Calentamiento</span>
+            <span>Calentamiento</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('fullbodyB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -3053,7 +3163,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Guía y Calentamiento</span>
+            <span>Calentamiento</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('fullbodyC')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -3791,7 +3901,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Guía y Calentamiento</span>
+            <span>Calentamiento</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('torsoA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -4532,7 +4642,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Guía y Calentamiento</span>
+            <span>Calentamiento</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('piernaA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -5061,7 +5171,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Guía y Calentamiento</span>
+            <span>Calentamiento</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('torsoB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -5808,7 +5918,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Guía y Calentamiento</span>
+            <span>Calentamiento</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('piernaB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -7852,7 +7962,7 @@
         id: 'ses_' + Date.now(),
         date: new Date().toISOString(),
         dayId: dayId,
-        dayName: daySection.querySelector('.day-banner-title') ? daySection.querySelector('.day-banner-title').innerText : dayId,
+        dayName: (typeof ROUTINE_SLOTS !== 'undefined' && ROUTINE_SLOTS[dayId]) ? ROUTINE_SLOTS[dayId].title : (daySection.querySelector('.day-banner-title')?.innerText || dayId),
         durationMinutes: durationMin,
         durationFormatted: durationFormatted,
         exercises: []
@@ -9461,7 +9571,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=design5').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=design6').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -9644,12 +9754,12 @@
 
       if (lastInfo) {
         chip.innerHTML = isNext
-          ? `<strong>Siguiente en rotación</strong> • Último: ${lastInfo.dateFormatted} (${lastInfo.relative})`
-          : `Último entreno: ${lastInfo.dateFormatted} (${lastInfo.relative})`;
+          ? `<strong>Toca hoy</strong> • Último: ${lastInfo.relative}`
+          : `Último: ${lastInfo.relative}`;
         chip.classList.toggle('recommended', isNext);
         chip.style.display = 'inline-flex';
       } else {
-        chip.innerHTML = isNext ? `<strong>Siguiente en rotación</strong> • Primera vez` : `Aún no realizado`;
+        chip.innerHTML = isNext ? `<strong>Toca hoy</strong> • Primera vez` : `Aún no realizado`;
         chip.classList.toggle('recommended', isNext);
         chip.style.display = 'inline-flex';
       }
