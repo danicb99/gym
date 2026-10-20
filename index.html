@@ -250,21 +250,22 @@
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 14px;
-      padding: 6px 10px;
+      padding: 6px 8px;
       margin-bottom: 12px;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       order: 0 !important;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
     }
     .day-banner-main {
       display: flex;
       align-items: center;
       gap: 6px;
-      flex: 1;
+      flex: 1 1 auto;
       min-width: 0;
     }
     .day-content:not(#historialView):not(#routinePlanView) .day-banner-title {
@@ -284,6 +285,7 @@
       align-items: center;
       gap: 6px;
       flex-wrap: nowrap;
+      min-width: 0;
     }
     /* Ultra-sleek Workout Progress Capsule */
     .progress-chip {
@@ -291,16 +293,17 @@
       border: 1px solid rgba(251, 191, 36, 0.35);
       border-radius: 9999px;
       height: 28px;
-      padding: 0 8px 0 5px;
+      padding: 0 7px 0 5px;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       white-space: nowrap;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
       font-variant-numeric: tabular-nums;
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       cursor: default;
       user-select: none;
+      flex-shrink: 0;
     }
     .progress-chip:hover {
       border-color: rgba(251, 191, 36, 0.55);
@@ -324,7 +327,7 @@
     .progress-chip .prog-chip-counts {
       display: inline-flex;
       align-items: baseline;
-      gap: 1.5px;
+      gap: 1px;
       line-height: 1;
     }
     .progress-chip .prog-chip-done {
@@ -343,20 +346,12 @@
       font-weight: 600;
       font-size: 0.70rem;
     }
-    .progress-chip .prog-chip-unit {
-      color: #64748b;
-      font-size: 0.60rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-left: 2px;
-    }
     .progress-chip .prog-chip-badge {
       background: rgba(251, 191, 36, 0.15);
       border: 1px solid rgba(251, 191, 36, 0.28);
       color: #fbbf24;
       border-radius: 9999px;
-      padding: 1px 6px;
+      padding: 1px 5px;
       font-size: 0.65rem;
       font-weight: 800;
       line-height: 1.2;
@@ -384,16 +379,17 @@
       color: #94a3b8;
       border-radius: 9999px;
       height: 28px;
-      padding: 0 9px;
+      padding: 0 8px;
       font-size: 0.70rem;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       cursor: pointer;
       transition: all 0.15s ease;
       white-space: nowrap;
+      flex-shrink: 0;
     }
     .session-timer-chip:hover {
       border-color: rgba(255, 255, 255, 0.18);
@@ -414,7 +410,7 @@
     .day-banner-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       flex-shrink: 0;
     }
     .btn-guide-modal {
@@ -423,20 +419,31 @@
       border: 1px solid rgba(255, 255, 255, 0.09);
       border-radius: 9999px;
       height: 28px;
-      padding: 0 10px;
+      padding: 0 8px;
       font-size: 0.70rem;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       transition: all 0.15s ease;
       white-space: nowrap;
+      flex-shrink: 0;
     }
     .btn-guide-modal:hover, .btn-guide-modal:active {
       background: var(--gold-subtle);
       border-color: var(--border-gold);
       color: var(--gold);
+    }
+    @media (max-width: 360px) {
+      .btn-guide-modal span {
+        display: none;
+      }
+      .btn-guide-modal {
+        width: 28px;
+        padding: 0;
+        justify-content: center;
+      }
     }
     .btn-finish-day {
       background: linear-gradient(135deg, #fbbf24, #d97706);
@@ -1967,8 +1974,10 @@
           <div class="day-banner-title">Día A: Full Body A • Squat Pesado & Torso</div>
           <div class="day-banner-meta">
             <span class="progress-chip" id="progressChip-fullbodyA">
-              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
-              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">20</span><span class="prog-chip-unit">series</span></span>
+              <svg class="prog-ring" width="16" height="16" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">20</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
               <span class="prog-chip-badge">0%</span>
             </span>
             <span class="last-done-chip" id="lastDoneChip-fullbodyA" style="display:none;"></span>
@@ -1983,7 +1992,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Calentamiento</span>
+            <span class="guide-btn-text">Calentar</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('fullbodyA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -2619,8 +2628,10 @@
           <div class="day-banner-title">Día B: Full Body B • RDL & Torso Hipertrofia</div>
           <div class="day-banner-meta">
             <span class="progress-chip" id="progressChip-fullbodyB">
-              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
-              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">20</span><span class="prog-chip-unit">series</span></span>
+              <svg class="prog-ring" width="16" height="16" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">20</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
               <span class="prog-chip-badge">0%</span>
             </span>
             <span class="last-done-chip" id="lastDoneChip-fullbodyB" style="display:none;"></span>
@@ -2635,7 +2646,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Calentamiento</span>
+            <span class="guide-btn-text">Calentar</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('fullbodyB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -3271,8 +3282,10 @@
           <div class="day-banner-title">Día C: Full Body C • Pierna & Brazos/Core</div>
           <div class="day-banner-meta">
             <span class="progress-chip" id="progressChip-fullbodyC">
-              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
-              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">22</span><span class="prog-chip-unit">series</span></span>
+              <svg class="prog-ring" width="16" height="16" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">22</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
               <span class="prog-chip-badge">0%</span>
             </span>
             <span class="last-done-chip" id="lastDoneChip-fullbodyC" style="display:none;"></span>
@@ -3287,7 +3300,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Calentamiento</span>
+            <span class="guide-btn-text">Calentar</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('fullbodyC')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -4015,8 +4028,10 @@
           <div class="day-banner-title">Día 1: Torso A • Fuerza & Empuje</div>
           <div class="day-banner-meta">
             <span class="progress-chip" id="progressChip-torsoA">
-              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
-              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">23</span><span class="prog-chip-unit">series</span></span>
+              <svg class="prog-ring" width="16" height="16" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">23</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
               <span class="prog-chip-badge">0%</span>
             </span>
             <span class="last-done-chip" id="lastDoneChip-torsoA" style="display:none;"></span>
@@ -4031,7 +4046,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Calentamiento</span>
+            <span class="guide-btn-text">Calentar</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('torsoA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -4762,8 +4777,10 @@
           <div class="day-banner-title">Día 2: Pierna A • Sentadilla & Cuádriceps</div>
           <div class="day-banner-meta">
             <span class="progress-chip" id="progressChip-piernaA">
-              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
-              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">17</span><span class="prog-chip-unit">series</span></span>
+              <svg class="prog-ring" width="16" height="16" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">17</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
               <span class="prog-chip-badge">0%</span>
             </span>
             <span class="last-done-chip" id="lastDoneChip-piernaA" style="display:none;"></span>
@@ -4778,7 +4795,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Calentamiento</span>
+            <span class="guide-btn-text">Calentar</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('piernaA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -5297,8 +5314,10 @@
           <div class="day-banner-title">Día 3: Torso B • Tracción & Hipertrofia</div>
           <div class="day-banner-meta">
             <span class="progress-chip" id="progressChip-torsoB">
-              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
-              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">23</span><span class="prog-chip-unit">series</span></span>
+              <svg class="prog-ring" width="16" height="16" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">23</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
               <span class="prog-chip-badge">0%</span>
             </span>
             <span class="last-done-chip" id="lastDoneChip-torsoB" style="display:none;"></span>
@@ -5313,7 +5332,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Calentamiento</span>
+            <span class="guide-btn-text">Calentar</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('torsoB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -6050,8 +6069,10 @@
           <div class="day-banner-title">Día 4: Pierna B • Cadena Posterior & Búlgaras</div>
           <div class="day-banner-meta">
             <span class="progress-chip" id="progressChip-piernaB">
-              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
-              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">20</span><span class="prog-chip-unit">series</span></span>
+              <svg class="prog-ring" width="16" height="16" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">20</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
               <span class="prog-chip-badge">0%</span>
             </span>
             <span class="last-done-chip" id="lastDoneChip-piernaB" style="display:none;"></span>
@@ -6066,7 +6087,7 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            <span>Calentamiento</span>
+            <span class="guide-btn-text">Calentar</span>
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('piernaB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
@@ -7740,9 +7761,9 @@
       const startTime = workoutState.sessionStartTime ? workoutState.sessionStartTime[dayId] : null;
       if (!startTime) {
         const lastSes = getLastSessionForDay(dayId);
-        if (lastSes) {
-          const isToday = new Date(lastSes.date).toDateString() === new Date().toDateString();
-          chip.innerHTML = `${timerSvg}<span>${isToday ? 'Hoy: ' + lastSes.durationFormatted : 'Ant: ' + lastSes.durationFormatted}</span>`;
+        const isToday = lastSes && (new Date(lastSes.date).toDateString() === new Date().toDateString());
+        if (isToday) {
+          chip.innerHTML = `${timerSvg}<span>${lastSes.durationFormatted}</span>`;
           chip.style.borderColor = 'rgba(245, 158, 11, 0.4)';
           chip.style.color = '#fbbf24';
         } else {
@@ -8053,12 +8074,12 @@
       const offset = isComplete ? 0 : Math.max(0, circumference - (circumference * Math.min(percentage, 100) / 100));
       const strokeColor = isComplete ? '#10b981' : 'var(--gold)';
       const ringHtml = isComplete
-        ? `<svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22">
+        ? `<svg class="prog-ring" width="16" height="16" viewBox="0 0 22 22">
              <circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5" />
              <circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="${circumference}" stroke-dashoffset="0" stroke-linecap="round" />
              <path d="M7.5 11.2l2.3 2.3 4.7-4.7" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
            </svg>`
-        : `<svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22">
+        : `<svg class="prog-ring" width="16" height="16" viewBox="0 0 22 22">
              <circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5" />
              <circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="${strokeColor}" stroke-width="2.5" stroke-dasharray="${circumference}" stroke-dashoffset="${offset.toFixed(1)}" stroke-linecap="round" />
            </svg>`;
@@ -8067,7 +8088,6 @@
         ${ringHtml}
         <span class="prog-chip-counts">
           <strong class="prog-chip-done">${doneSets}</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">${totalSets}</span>
-          <span class="prog-chip-unit">series</span>
         </span>
         <span class="prog-chip-badge">${isComplete ? '100%' : pctRound + '%'}</span>
       `;
@@ -9751,7 +9771,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=design8').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=design9').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
