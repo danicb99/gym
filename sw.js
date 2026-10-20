@@ -1,11 +1,10 @@
-const CACHE_NAME = 'vigorexiapp-v35';
+const CACHE_NAME = 'vigorexiapp-v37';
 const NOTIF_BADGE = './badge-dumbbell.png?v=3';
 const NOTIF_ICON = './icon-192.png?v=3';
 
 const ASSETS = [
   './',
   './index.html',
-  './rutina_movil.html',
   './reloj.html',
   './qr_zepp.png',
   './watch_bridge.js',
@@ -49,6 +48,10 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
+
+  // El SW solo gestiona recursos propios; ntfy y otros orígenes van directos a la red
+  if (url.origin !== self.location.origin) return;
+
   const isNav = e.request.mode === 'navigate' || e.request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname.endsWith('/gym/') || url.pathname.endsWith('/gym');
 
   // Network-first para páginas HTML para que cualquier actualización en GitHub se aplique de inmediato
@@ -57,7 +60,7 @@ self.addEventListener('fetch', (e) => {
       fetch(e.request).then((networkRes) => {
         if (networkRes && networkRes.status === 200) {
           const clone = networkRes.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone)).catch(() => {});
         }
         return networkRes;
       }).catch(() => {
@@ -67,13 +70,16 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
+  // Solo se cachean peticiones GET; POST/SSE nunca entran en la Cache API
+  if (e.request.method !== 'GET') return;
+
   // Stale-while-revalidate / Cache-first con actualización en segundo plano para recursos estáticos
   e.respondWith(
     caches.match(e.request).then((cachedRes) => {
       const fetchPromise = fetch(e.request).then((networkRes) => {
         if (networkRes && networkRes.status === 200) {
           const clone = networkRes.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone)).catch(() => {});
         }
         return networkRes;
       }).catch(() => null);
@@ -144,6 +150,20 @@ function clearLiveRestNotification() {
   }).catch(() => {});
 }
 
+function hasVisibleClient() {
+  if (!self.clients || !self.clients.matchAll) return Promise.resolve(false);
+  return self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+    .then((clientList) => clientList.some((client) => client.visibilityState === 'visible'))
+    .catch(() => false);
+}
+
+// Con la app visible, la página es la única que notifica (evita doble sonido/vibración)
+function notifyRestFinished(state) {
+  return hasVisibleClient().then((visible) => {
+    if (!visible) return showRestFinishedNotification(state);
+  });
+}
+
 let activeTimerResolve = null;
 
 function stopLiveTicker() {
@@ -178,7 +198,7 @@ function startLiveTicker(state) {
       const finished = currentRestState;
       stopLiveTicker();
       currentRestState = null;
-      showRestFinishedNotification(finished);
+      notifyRestFinished(finished);
       notifyClients({ type: 'REST_TIMER_FINISHED' });
       resolve();
     }, delay);
@@ -195,7 +215,7 @@ function startLiveTicker(state) {
         const finished = currentRestState;
         stopLiveTicker();
         currentRestState = null;
-        showRestFinishedNotification(finished);
+        notifyRestFinished(finished);
         notifyClients({ type: 'REST_TIMER_FINISHED' });
         resolve();
       } else {

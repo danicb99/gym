@@ -4,8 +4,8 @@
  * Permite uso mixto: completar series en el móvil o en el reloj indistintamente.
  */
 (function() {
-  const RELAY_WATCH_TO_PHONE = 'https://ntfy.sh/vigorexiapp_sync_danicb99';
-  const RELAY_PHONE_TO_WATCH = 'https://ntfy.sh/vigorexiapp_watch_danicb99';
+  const RELAY_WATCH_TO_PHONE = 'https://ntfy.sh/vigorexiapp_sync_danicb99_7f3a91c4e2b8';
+  const RELAY_PHONE_TO_WATCH = 'https://ntfy.sh/vigorexiapp_watch_danicb99_7f3a91c4e2b8';
   
   let syncEventSource = null;
   let isBroadcasting = false;
@@ -47,7 +47,11 @@
       if (!activeDay && typeof lastActiveWorkoutDay !== 'undefined') {
         activeDay = lastActiveWorkoutDay;
       }
-      if (!activeDay || !ROUTINE_SLOTS[activeDay]) activeDay = 'torsoA';
+      if (!activeDay || !ROUTINE_SLOTS[activeDay]) {
+        activeDay = (typeof currentProgram !== 'undefined' && currentProgram === 'fullbody' && ROUTINE_SLOTS.fullbodyA)
+          ? 'fullbodyA'
+          : 'torsoA';
+      }
 
       const dayData = ROUTINE_SLOTS[activeDay];
       const sessionLoggedSets = {};
@@ -143,11 +147,14 @@
       };
 
       const hash = JSON.stringify({
-        d: activeDay,
+        d: payload.activeDayId,
         c: (workoutState.completed || []).length,
-        s: firstUnfinishedSlot,
-        set: firstUnfinishedSet,
-        r: restTimerPayload ? Math.round(restTimerPayload.remaining / 5) : 0
+        s: payload.currentSlotIndex,
+        set: payload.currentSetIndex,
+        r: restTimerPayload ? Math.round(restTimerPayload.remaining / 5) : 0,
+        logged: payload.sessionLoggedSets,
+        overrides: payload.slotExOverrides,
+        start: payload.sessionStartTime
       });
 
       if (hash === lastBroadcastHash) return;
@@ -171,11 +178,35 @@
   }
 
   let reconnectTimeout = null;
-  let lastCatchUpTimestamp = 0;
+  const CATCHUP_WINDOW_MS = 10 * 60 * 1000;
+  const WATCH_TS_KEY = 'vigorexiapp_watch_last_ts';
+
+  function getLastWatchTs() {
+    const stored = Number(localStorage.getItem(WATCH_TS_KEY));
+    return Number.isFinite(stored) ? stored : 0;
+  }
+
+  let lastCatchUpTimestamp = getLastWatchTs();
+
+  function setLastWatchTs(ts) {
+    if (!ts || ts <= lastCatchUpTimestamp) return;
+    lastCatchUpTimestamp = ts;
+    try { localStorage.setItem(WATCH_TS_KEY, String(ts)); } catch (e) {}
+  }
+
+  function insertSessionSorted(record) {
+    if (!Array.isArray(workoutState.sessions)) workoutState.sessions = [];
+    const ts = new Date(record.date).getTime();
+    const idx = workoutState.sessions.findIndex(s => new Date(s.date).getTime() < ts);
+    if (idx === -1) workoutState.sessions.push(record);
+    else workoutState.sessions.splice(idx, 0, record);
+  }
 
   async function catchUpFromWatch() {
     try {
-      const resp = await fetch(`${RELAY_WATCH_TO_PHONE}/json?poll=1&since=10m`);
+      const minTs = Date.now() - CATCHUP_WINDOW_MS;
+      const sinceSec = Math.max(0, Math.floor(Math.max(lastCatchUpTimestamp, minTs) / 1000));
+      const resp = await fetch(`${RELAY_WATCH_TO_PHONE}/json?poll=1&since=${sinceSec}`, { cache: 'no-store' });
       if (!resp.ok) return;
       const text = await resp.text();
       if (!text) return;
@@ -185,13 +216,16 @@
           const raw = JSON.parse(line);
           if (raw && raw.event === 'message' && raw.message) {
             const data = typeof raw.message === 'string' ? JSON.parse(raw.message) : raw.message;
-            if (data && data.timestamp && data.timestamp > lastCatchUpTimestamp) {
-              lastCatchUpTimestamp = data.timestamp;
-              if (data.type === 'SET_COMPLETED') {
-                handleSetCompletedFromWatch(data);
-              } else if (data.type === 'WORKOUT_FINISHED') {
-                handleWorkoutFinishedFromWatch(data);
-              }
+            if (!data || !data.timestamp) continue;
+            if (data.timestamp <= lastCatchUpTimestamp) continue;
+            if (Date.now() - data.timestamp > CATCHUP_WINDOW_MS) continue;
+
+            setLastWatchTs(data.timestamp);
+            const isFresh = Date.now() - data.timestamp < 120000;
+            if (data.type === 'SET_COMPLETED') {
+              handleSetCompletedFromWatch(data, { silent: !isFresh });
+            } else if (data.type === 'WORKOUT_FINISHED') {
+              handleWorkoutFinishedFromWatch(data, { silent: !isFresh });
             }
           }
         } catch (e) {}
@@ -225,7 +259,7 @@
           if (!raw.message) return;
           const data = typeof raw.message === 'string' ? JSON.parse(raw.message) : raw.message;
 
-          if (data.timestamp) lastCatchUpTimestamp = Math.max(lastCatchUpTimestamp, data.timestamp);
+          if (data.timestamp) setLastWatchTs(data.timestamp);
 
           if (data.type === 'SET_COMPLETED') {
             handleSetCompletedFromWatch(data);
@@ -254,7 +288,7 @@
   }
 
   // 3. Manejar serie completada en el reloj
-  function handleSetCompletedFromWatch(data) {
+  function handleSetCompletedFromWatch(data, opts = {}) {
     const { slotId, setIndex, kg, reps } = data;
     console.log('[WatchBridge] Serie recibida desde el reloj:', slotId, setIndex, kg, reps);
 
@@ -280,8 +314,8 @@
         checkExerciseCardCompletion(card);
       }
       
-      // Iniciar temporizador de descanso en la web
-      if (typeof startRestTimerFromCard === 'function') {
+      // Iniciar temporizador de descanso en la web (nunca al reproducir eventos antiguos)
+      if (!opts.silent && typeof startRestTimerFromCard === 'function') {
         startRestTimerFromCard(card);
       }
 
@@ -294,12 +328,14 @@
       }
 
       // Notificación visual flotante en la pantalla del móvil
-      showWatchToast(`⌚ Serie ${setIndex + 1} completada en el reloj (${kg}kg × ${reps})`);
+      if (!opts.silent) {
+        showWatchToast(`⌚ Serie ${setIndex + 1} completada en el reloj (${kg}kg × ${reps})`);
+      }
     }
   }
 
   // 4. Manejar fin de entreno desde el reloj
-  function handleWorkoutFinishedFromWatch(data) {
+  function handleWorkoutFinishedFromWatch(data, opts = {}) {
     console.log('[WatchBridge] Fin de entreno recibido desde el reloj:', data);
     try {
       const summary = data.summary || data;
@@ -319,13 +355,16 @@
           exercises: summary.exercises || []
         };
 
-        if (!workoutState.sessions) workoutState.sessions = [];
-        // Evitar duplicar si ya se guardó hace menos de 60 segundos
-        const exists = workoutState.sessions.some(s => 
-          s.dayId === record.dayId && Math.abs(new Date(s.date) - new Date(record.date)) < 60000
-        );
+        // Evitar duplicar la misma sesión (mismo día y fecha exacta o <60s)
+        const exists = Array.isArray(workoutState.sessions) && workoutState.sessions.some(s => {
+          if (!s || s.dayId !== record.dayId || !s.date) return false;
+          const a = new Date(s.date).getTime();
+          const b = new Date(record.date).getTime();
+          if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+          return a === b || Math.abs(a - b) < 60000;
+        });
         if (!exists) {
-          workoutState.sessions.unshift(record);
+          insertSessionSorted(record);
         }
 
         if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[summary.dayId];
@@ -339,8 +378,10 @@
     }
 
     const durText = (data.summary && data.summary.durationMinutes) ? ` (${data.summary.durationMinutes} min)` : '';
-    showWatchToast(`⌚ ¡Entrenamiento completado y guardado desde el reloj!${durText}`);
-    if (typeof loadWorkoutState === 'function') {
+    if (!opts.silent) {
+      showWatchToast(`⌚ ¡Entrenamiento completado y guardado desde el reloj!${durText}`);
+    }
+    if (!opts.silent && typeof loadWorkoutState === 'function') {
       loadWorkoutState();
     }
   }

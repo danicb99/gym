@@ -5,8 +5,8 @@
 
 import { BaseSideService } from '@zeppos/zml/base-side'
 
-const RELAY_WATCH_TO_PHONE = 'https://ntfy.sh/vigorexiapp_sync_danicb99'
-const RELAY_PHONE_TO_WATCH = 'https://ntfy.sh/vigorexiapp_watch_danicb99'
+const RELAY_WATCH_TO_PHONE = 'https://ntfy.sh/vigorexiapp_sync_danicb99_7f3a91c4e2b8'
+const RELAY_PHONE_TO_WATCH = 'https://ntfy.sh/vigorexiapp_watch_danicb99_7f3a91c4e2b8'
 
 async function safeFetch(ctx, options) {
   const fn = (ctx && typeof ctx.fetch === 'function')
