@@ -4,14 +4,88 @@
  * Permite uso mixto: completar series en el móvil o en el reloj indistintamente.
  */
 (function() {
-  const RELAY_WATCH_TO_PHONE = 'https://ntfy.sh/vigorexiapp_sync_danicb99_7f3a91c4e2b8';
-  const RELAY_PHONE_TO_WATCH = 'https://ntfy.sh/vigorexiapp_watch_danicb99_7f3a91c4e2b8';
+  const SYNC_CODE_KEY = 'vigorexiapp_sync_code';
+  const SYNC_SERVER_KEY = 'vigorexiapp_sync_server';
+  const SYNC_TOKEN_KEY = 'vigorexiapp_sync_token';
+  const DEFAULT_SYNC_CODE = 'vigorexi_danicb99_7f3a91c4e2b8';
+
+  function deriveTopicHash(code) {
+    const str = String(code || '').trim() || DEFAULT_SYNC_CODE;
+    let h1 = 0x811c9dc5;
+    let h2 = 0x9e3779b9;
+    for (let i = 0; i < str.length; i++) {
+      const ch = str.charCodeAt(i);
+      h1 ^= ch;
+      h1 = Math.imul(h1, 0x01000193);
+      h2 ^= ch;
+      h2 = Math.imul(h2, 0x5bd1e995);
+    }
+    const hex1 = (h1 >>> 0).toString(16).padStart(8, '0');
+    const hex2 = (h2 >>> 0).toString(16).padStart(8, '0');
+    return (hex1 + hex2).toLowerCase();
+  }
+
+  function getSyncConfig() {
+    const code = localStorage.getItem(SYNC_CODE_KEY) || DEFAULT_SYNC_CODE;
+    const server = (localStorage.getItem(SYNC_SERVER_KEY) || 'https://ntfy.sh').replace(/\/+$/, '');
+    const token = localStorage.getItem(SYNC_TOKEN_KEY) || '';
+    const isDefault = code === DEFAULT_SYNC_CODE;
+    const hash = deriveTopicHash(code);
+    return {
+      code,
+      server,
+      token,
+      isDefault,
+      hash,
+      phoneToWatch: `${server}/vigorexi_${hash}_p2w`,
+      watchToPhone: `${server}/vigorexi_${hash}_w2p`
+    };
+  }
+
+  let activeConfig = getSyncConfig();
+  let RELAY_WATCH_TO_PHONE = activeConfig.watchToPhone;
+  let RELAY_PHONE_TO_WATCH = activeConfig.phoneToWatch;
+
+  function reloadSyncConfig() {
+    activeConfig = getSyncConfig();
+    RELAY_WATCH_TO_PHONE = activeConfig.watchToPhone;
+    RELAY_PHONE_TO_WATCH = activeConfig.phoneToWatch;
+  }
+
+  function getAuthHeaders() {
+    const headers = {};
+    if (activeConfig.token && activeConfig.token.trim()) {
+      headers['Authorization'] = `Bearer ${activeConfig.token.trim()}`;
+    }
+    return headers;
+  }
+
+  function generateSecureSyncCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    if (window.crypto && window.crypto.getRandomValues) {
+      const values = new Uint8Array(28);
+      window.crypto.getRandomValues(values);
+      for (let i = 0; i < values.length; i++) {
+        result += chars[values[i] % chars.length];
+      }
+    } else {
+      for (let i = 0; i < 28; i++) {
+        result += chars[Math.floor(Math.random() * chars.length)];
+      }
+    }
+    return result;
+  }
   
   let syncEventSource = null;
   let isBroadcasting = false;
   let hasPendingBroadcast = false;
   let lastBroadcastHash = '';
   let lastBroadcastTime = 0;
+  let lastSuccessfulBroadcastTime = 0;
+  let lastSuccessfulReceiveTime = 0;
+  let lastSuccessfulSyncTime = 0;
+  let isSseConnected = false;
   let rateLimitResetTime = 0;
   let broadcastDebounceTimer = null;
   let broadcastRetryCount = 0;
@@ -289,8 +363,12 @@
 
       fetch(RELAY_PHONE_TO_WATCH, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(envelope)
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(envelope),
+        cache: 'no-store'
       }).then(resp => {
         if (resp.status === 429) {
           const retryHeader = resp.headers ? resp.headers.get('Retry-After') : null;
@@ -311,6 +389,8 @@
         // Éxito: guardar hash únicamente tras confirmación 2xx del relay
         lastBroadcastHash = hash;
         lastBroadcastTime = Date.now();
+        lastSuccessfulBroadcastTime = Date.now();
+        lastSuccessfulSyncTime = Date.now();
         broadcastRetryCount = 0;
         if (payload.workoutActive) getNextRev();
         updateSyncPillStatus('synced');
@@ -422,7 +502,12 @@
       const lastNtfyId = getLastNtfyId();
       // Si tenemos id previo de ntfy, pedir since=<id>; si no, pedir since=12h
       const sinceParam = lastNtfyId ? encodeURIComponent(lastNtfyId) : '12h';
-      const resp = await fetch(`${RELAY_WATCH_TO_PHONE}/json?poll=1&since=${sinceParam}`, { cache: 'no-store' });
+      const resp = await fetch(`${RELAY_WATCH_TO_PHONE}/json?poll=1&since=${sinceParam}`, {
+        headers: {
+          ...getAuthHeaders()
+        },
+        cache: 'no-store'
+      });
       if (!resp.ok) return;
       const text = await resp.text();
       if (!text) return;
@@ -468,7 +553,10 @@
     }
 
     try {
-      syncEventSource = new EventSource(`${RELAY_WATCH_TO_PHONE}/sse`);
+      const sseUrl = activeConfig.token
+        ? `${RELAY_WATCH_TO_PHONE}/sse?auth=${encodeURIComponent(activeConfig.token.trim())}`
+        : `${RELAY_WATCH_TO_PHONE}/sse`;
+      syncEventSource = new EventSource(sseUrl);
 
       syncEventSource.onopen = () => {
         console.log('[WatchBridge] Canal SSE conectado con el Amazfit Active 2');
@@ -595,6 +683,9 @@
 
     // 4. Marcar mensaje como procesado con éxito
     markMsgProcessed(id);
+    lastSuccessfulReceiveTime = Date.now();
+    lastSuccessfulSyncTime = Date.now();
+    renderSyncPill();
 
     // Notificación visual flotante en la pantalla del móvil
     if (!opts.silent) {
@@ -706,6 +797,9 @@
 
       // Marcar mensaje como procesado con éxito
       markMsgProcessed(id);
+      lastSuccessfulReceiveTime = Date.now();
+      lastSuccessfulSyncTime = Date.now();
+      renderSyncPill();
 
       // Si fue una finalización fresca en directo, sugerir siguiente día y abrir Flex Card
       if (!opts.silent) {
@@ -749,17 +843,30 @@
     }, 3500);
   }
 
-  // 6. Pill de estado en la cabecera
-  let currentSyncStatus = 'disconnected'; // 'synced' | 'pending' | 'disconnected' | 'rate_limited' | 'error'
-
+  // 6. Pill de estado e indicador visible en la cabecera
   function updateSyncPillStatus(state, extra) {
-    if (state) currentSyncStatus = state;
     renderSyncPill(extra);
   }
 
   function updateSyncPill(connected) {
-    currentSyncStatus = connected ? 'synced' : 'disconnected';
+    isSseConnected = !!connected;
     renderSyncPill();
+  }
+
+  function determineCurrentSyncStatus() {
+    const now = Date.now();
+    if (rateLimitResetTime > now) {
+      const waitSec = Math.max(1, Math.ceil((rateLimitResetTime - now) / 1000));
+      return { status: 'rate_limited', extra: waitSec };
+    }
+    if (hasPendingBroadcast || isBroadcasting || broadcastDebounceTimer !== null) {
+      const count = (hasPendingBroadcast ? 1 : 0) + (isBroadcasting ? 1 : 0) + (broadcastDebounceTimer ? 1 : 0);
+      return { status: 'pending', extra: Math.max(1, count) };
+    }
+    if (!isSseConnected) {
+      return { status: 'disconnected', extra: null };
+    }
+    return { status: 'synced', extra: null };
   }
 
   function renderSyncPill(extra) {
@@ -769,45 +876,258 @@
       if (headerContainer) {
         pill = document.createElement('div');
         pill.id = 'watchSyncPill';
-        pill.style.cssText = 'display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 8px;border-radius:12px;background:rgba(15,23,42,0.9);border:1px solid rgba(56,189,248,0.4);color:#94a3b8;cursor:pointer;white-space:nowrap;user-select:none;margin-left:auto;';
+        pill.style.cssText = 'display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:5px 10px;border-radius:14px;background:rgba(15,23,42,0.9);border:1px solid rgba(56,189,248,0.4);color:#94a3b8;cursor:pointer;white-space:nowrap;user-select:none;margin-left:auto;transition:all 0.2s ease;';
         pill.onclick = () => {
-          showWatchToast('⌚ Forzando sincronización con el reloj...');
-          rateLimitResetTime = 0; // Resetear bloqueo local al pulsar manualmente
-          scheduleBroadcast(0);
-          catchUpFromWatch();
+          openWatchSyncModal();
         };
         headerContainer.appendChild(pill);
       }
     }
     if (!pill) return;
 
-    if (currentSyncStatus === 'synced') {
-      pill.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;"></span> Sincronizado';
+    const { status, extra: calcExtra } = determineCurrentSyncStatus();
+    const valExtra = extra !== undefined ? extra : calcExtra;
+
+    if (status === 'synced') {
+      const ageSec = lastSuccessfulSyncTime > 0 ? Math.round((Date.now() - lastSuccessfulSyncTime) / 1000) : 0;
+      const isFresh = ageSec < 60;
+      const dotColor = isFresh ? '#10b981' : '#38bdf8';
+      pill.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${dotColor};box-shadow:0 0 8px ${dotColor};"></span> Sincronizado`;
       pill.style.color = '#38bdf8';
       pill.style.borderColor = 'rgba(16,185,129,0.4)';
-      pill.title = 'Sincronización activa con Amazfit Active 2';
-    } else if (currentSyncStatus === 'pending') {
-      pill.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#fbbf24;box-shadow:0 0 8px #fbbf24;"></span> Pendiente…';
+      const ageText = lastSuccessfulSyncTime > 0 ? `hace ${ageSec < 60 ? ageSec + 's' : Math.round(ageSec / 60) + 'm'}` : 'listo';
+      pill.title = `Sincronización activa con Amazfit Active 2 (${ageText}). Toca para ver detalles o configurar.`;
+    } else if (status === 'pending') {
+      const count = valExtra || 1;
+      pill.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:#fbbf24;box-shadow:0 0 8px #fbbf24;"></span> Pendiente (${count})`;
       pill.style.color = '#fbbf24';
       pill.style.borderColor = 'rgba(251,191,36,0.4)';
-      pill.title = 'Enviando actualización al reloj…';
-    } else if (currentSyncStatus === 'rate_limited') {
-      const sec = extra || 60;
-      pill.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;"></span> Límite (${sec}s)`;
+      pill.title = `Hay cambios locales pendientes de sincronizar con el reloj.`;
+    } else if (status === 'rate_limited') {
+      const sec = valExtra || 60;
+      pill.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px #f59e0b;"></span> Límite alcanzado (${sec}s)`;
       pill.style.color = '#f59e0b';
       pill.style.borderColor = 'rgba(245,158,11,0.5)';
-      pill.title = `Límite de peticiones alcanzado. Reintento en ${sec} segundos.`;
-    } else if (currentSyncStatus === 'error') {
-      pill.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#ef4444;"></span> Error sync';
-      pill.style.color = '#f87171';
-      pill.style.borderColor = 'rgba(239,68,68,0.5)';
-      pill.title = 'Fallo al conectar con el servidor de sincronización. Toca para reintentar.';
+      pill.title = `Límite de peticiones alcanzado en ntfy.sh. Reintento en ${sec} segundos.`;
     } else {
-      pill.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#64748b;"></span> Sin conexión';
-      pill.style.color = '#94a3b8';
-      pill.style.borderColor = 'rgba(100,116,139,0.3)';
-      pill.title = 'Canal SSE desconectado. Toca para reconectar.';
+      pill.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span> Sin conexión';
+      pill.style.color = '#f87171';
+      pill.style.borderColor = 'rgba(239,68,68,0.4)';
+      pill.title = 'Canal SSE desconectado o reconectando. Toca para detalles y reconexión.';
     }
+  }
+
+  // 7. Modal de estado y configuración de privacidad
+  function openWatchSyncModal() {
+    let modal = document.getElementById('watchSyncModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'watchSyncModal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;';
+      modal.onclick = (e) => {
+        if (e.target === modal) closeWatchSyncModal();
+      };
+      document.body.appendChild(modal);
+    }
+
+    const cfg = getSyncConfig();
+    const { status, extra } = determineCurrentSyncStatus();
+
+    let statusLabel = 'Desconectado';
+    let statusBadgeColor = '#ef4444';
+    let statusBg = 'rgba(239,68,68,0.15)';
+    if (status === 'synced') {
+      statusLabel = 'Sincronizado';
+      statusBadgeColor = '#10b981';
+      statusBg = 'rgba(16,185,129,0.15)';
+    } else if (status === 'pending') {
+      statusLabel = `Pendiente (${extra || 1})`;
+      statusBadgeColor = '#fbbf24';
+      statusBg = 'rgba(251,191,36,0.15)';
+    } else if (status === 'rate_limited') {
+      statusLabel = `Límite alcanzado (${extra || 60}s)`;
+      statusBadgeColor = '#f59e0b';
+      statusBg = 'rgba(245,158,11,0.15)';
+    }
+
+    const fmtTime = (ts) => {
+      if (!ts) return 'Ninguna en esta sesión';
+      const sec = Math.round((Date.now() - ts) / 1000);
+      if (sec < 60) return `hace ${sec} seg`;
+      const min = Math.round(sec / 60);
+      if (min < 60) return `hace ${min} min`;
+      return new Date(ts).toLocaleTimeString();
+    };
+
+    modal.innerHTML = `
+      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:24px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;padding:22px;color:#f8fafc;box-shadow:0 20px 40px rgba(0,0,0,0.7);">
+        <!-- Encabezado -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">⌚</span>
+            <div>
+              <h3 style="font-size:17px;font-weight:700;margin:0;color:#f8fafc;">Sincronización Reloj</h3>
+              <div style="font-size:12px;color:#94a3b8;">Amazfit Active 2 • VigorexiApp v1.5.0</div>
+            </div>
+          </div>
+          <button onclick="window.VigorexiWatchSync.closeModal()" style="background:#1e293b;border:none;color:#94a3b8;font-size:18px;width:32px;height:32px;border-radius:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+        </div>
+
+        <!-- Estado en tiempo real -->
+        <div style="background:#1e293b;border-radius:16px;padding:14px;margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <span style="font-size:13px;color:#94a3b8;">Estado del enlace:</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px;background:${statusBg};color:${statusBadgeColor};border:1px solid ${statusBadgeColor}44;">
+              <span style="width:7px;height:7px;border-radius:50%;background:${statusBadgeColor};"></span>
+              ${statusLabel}
+            </span>
+          </div>
+
+          <div style="font-size:12px;color:#cbd5e1;line-height:1.7;">
+            <div>📡 <strong>Canal SSE:</strong> ${isSseConnected ? '<span style="color:#10b981;">Conectado</span>' : '<span style="color:#f87171;">Desconectado</span>'}</div>
+            <div>📤 <strong>Última emisión al reloj:</strong> ${fmtTime(lastSuccessfulBroadcastTime)}</div>
+            <div>📥 <strong>Última recepción del reloj:</strong> ${fmtTime(lastSuccessfulReceiveTime)}</div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <button id="btnForceSyncNow" style="flex:1;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;border:none;padding:9px 12px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;">⚡ Forzar Sync</button>
+            <button id="btnReconnectSse" style="background:#334155;color:#f8fafc;border:none;padding:9px 12px;border-radius:12px;font-size:12px;font-weight:600;cursor:pointer;">🔄 Reconectar</button>
+          </div>
+        </div>
+
+        <!-- Código de sincronización y Privacidad -->
+        <div style="background:#1e293b;border-radius:16px;padding:14px;margin-bottom:16px;">
+          <div style="font-weight:700;font-size:13px;color:#38bdf8;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+            <span>🔐</span> Código Privado de Sincronización
+          </div>
+          <p style="font-size:12px;color:#94a3b8;margin-bottom:10px;line-height:1.4;">
+            Los canales de ntfy se derivan determinísticamente de este código para que nadie pueda ver ni inyectar datos en tu reloj.
+          </p>
+
+          ${cfg.isDefault ? `
+            <div style="background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.3);border-radius:10px;padding:10px;margin-bottom:12px;font-size:12px;color:#fbbf24;line-height:1.4;">
+              ⚠️ <strong>Usando código público por defecto</strong>. Genera tu propio código privado para que tu sincronización sea 100% segura.
+            </div>
+          ` : ''}
+
+          <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <input type="text" id="syncCodeInput" value="${cfg.code}" style="flex:1;background:#090d16;border:1px solid #334155;border-radius:10px;padding:8px 10px;color:#f8fafc;font-size:12px;font-family:monospace;" placeholder="Mínimo 24 caracteres">
+            <button id="btnCopySyncCode" style="background:#334155;border:none;color:#cbd5e1;padding:8px 12px;border-radius:10px;cursor:pointer;font-size:12px;" title="Copiar código">📋</button>
+          </div>
+
+          <div style="display:flex;gap:8px;">
+            <button id="btnGenSyncCode" style="flex:1;background:#0f172a;border:1px solid #38bdf844;color:#38bdf8;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">🎲 Generar nuevo</button>
+            <button id="btnSaveSyncCode" style="background:#10b981;color:#fff;border:none;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">💾 Guardar</button>
+          </div>
+
+          <div style="margin-top:12px;font-size:11px;color:#64748b;line-height:1.4;">
+            💡 <em>Recuerda copiar este mismo código en el archivo <code>watch/app-side/config.js</code> antes de compilar o instalar en Zepp.</em>
+          </div>
+        </div>
+
+        <!-- Ajustes de Servidor y Auth (Avanzado) -->
+        <details style="background:#1e293b;border-radius:16px;padding:12px 14px;font-size:12px;">
+          <summary style="cursor:pointer;color:#94a3b8;font-weight:600;user-select:none;">⚙️ Servidor Relay y Autenticación (Avanzado)</summary>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+            <div>
+              <label style="color:#cbd5e1;display:block;margin-bottom:4px;font-size:11px;">URL del Servidor Relay:</label>
+              <input type="text" id="syncServerInput" value="${cfg.server}" style="width:100%;box-sizing:border-box;background:#090d16;border:1px solid #334155;border-radius:8px;padding:6px 10px;color:#f8fafc;font-size:12px;">
+            </div>
+            <div>
+              <label style="color:#cbd5e1;display:block;margin-bottom:4px;font-size:11px;">Token de Autorización Bearer (Opcional):</label>
+              <input type="password" id="syncTokenInput" value="${cfg.token}" placeholder="Token para servidor privado" style="width:100%;box-sizing:border-box;background:#090d16;border:1px solid #334155;border-radius:8px;padding:6px 10px;color:#f8fafc;font-size:12px;">
+            </div>
+            <button id="btnSaveAdvanced" style="align-self:flex-end;background:#38bdf8;color:#090d16;border:none;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;margin-top:4px;">Guardar servidor</button>
+          </div>
+        </details>
+      </div>
+    `;
+
+    modal.style.display = 'flex';
+
+    // Event handlers
+    const btnForce = document.getElementById('btnForceSyncNow');
+    if (btnForce) {
+      btnForce.onclick = () => {
+        rateLimitResetTime = 0;
+        showWatchToast('⌚ Forzando sincronización inmediata...');
+        scheduleBroadcast(0);
+        catchUpFromWatch();
+        setTimeout(openWatchSyncModal, 500);
+      };
+    }
+
+    const btnReconn = document.getElementById('btnReconnectSse');
+    if (btnReconn) {
+      btnReconn.onclick = () => {
+        showWatchToast('🔄 Reconectando canal SSE...');
+        startListeningToWatchEvents();
+        setTimeout(openWatchSyncModal, 600);
+      };
+    }
+
+    const btnCopy = document.getElementById('btnCopySyncCode');
+    if (btnCopy) {
+      btnCopy.onclick = () => {
+        const input = document.getElementById('syncCodeInput');
+        if (input && input.value) {
+          navigator.clipboard.writeText(input.value).then(() => {
+            showWatchToast('📋 Código copiado al portapapeles');
+          }).catch(() => {
+            input.select();
+            document.execCommand('copy');
+            showWatchToast('📋 Código copiado');
+          });
+        }
+      };
+    }
+
+    const btnGen = document.getElementById('btnGenSyncCode');
+    if (btnGen) {
+      btnGen.onclick = () => {
+        const newCode = generateSecureSyncCode();
+        const input = document.getElementById('syncCodeInput');
+        if (input) input.value = newCode;
+      };
+    }
+
+    const btnSaveCode = document.getElementById('btnSaveSyncCode');
+    if (btnSaveCode) {
+      btnSaveCode.onclick = () => {
+        const input = document.getElementById('syncCodeInput');
+        const code = input ? input.value.trim() : '';
+        if (!code || code.length < 24) {
+          alert('El código de sincronización debe tener al menos 24 caracteres para ser seguro.');
+          return;
+        }
+        localStorage.setItem(SYNC_CODE_KEY, code);
+        reloadSyncConfig();
+        showWatchToast('💾 Código guardado. Reiniciando conexión...');
+        startListeningToWatchEvents();
+        scheduleBroadcast(500);
+        catchUpFromWatch();
+        setTimeout(openWatchSyncModal, 700);
+      };
+    }
+
+    const btnSaveAdv = document.getElementById('btnSaveAdvanced');
+    if (btnSaveAdv) {
+      btnSaveAdv.onclick = () => {
+        const srv = document.getElementById('syncServerInput');
+        const tok = document.getElementById('syncTokenInput');
+        if (srv) localStorage.setItem(SYNC_SERVER_KEY, srv.value.trim() || 'https://ntfy.sh');
+        if (tok) localStorage.setItem(SYNC_TOKEN_KEY, tok.value.trim());
+        reloadSyncConfig();
+        showWatchToast('💾 Ajustes avanzados guardados');
+        startListeningToWatchEvents();
+        setTimeout(openWatchSyncModal, 600);
+      };
+    }
+  }
+
+  function closeWatchSyncModal() {
+    const modal = document.getElementById('watchSyncModal');
+    if (modal) modal.style.display = 'none';
   }
 
   // Hooking en saveWorkoutState para emitir actualización con debounce de 1.5s
@@ -842,6 +1162,9 @@
     catchUpFromWatch();
     scheduleBroadcast(1200);
 
+    // Refresco periódico del pill de estado (countdown de límites y cambios)
+    setInterval(renderSyncPill, 5000);
+
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         onAppForeground();
@@ -855,6 +1178,11 @@
   window.VigorexiWatchSync = {
     broadcast: () => scheduleBroadcast(0),
     reconnect: onAppForeground,
-    catchUp: catchUpFromWatch
+    catchUp: catchUpFromWatch,
+    openModal: openWatchSyncModal,
+    closeModal: closeWatchSyncModal,
+    getConfig: getSyncConfig,
+    generateCode: generateSecureSyncCode,
+    deriveTopicHash: deriveTopicHash
   };
 })();

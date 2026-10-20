@@ -154,20 +154,22 @@ Page(BasePage({
       text: '❤️ --'
     })
 
-    // Ticker duración entreno / descanso activo (Píldora central interactiva)
+    // Ticker duración entreno / descanso activo (Píldora central interactiva con estado sync)
     const elapsedMinutes = Math.floor((Date.now() - (app.globalData.sessionStartTime || Date.now())) / 60000)
     const isResting = app.globalData.restTimer && app.globalData.restTimer.active
+    const initialSync = app.getSyncStatus ? app.getSyncStatus() : { text: 'ok', color: 0x94a3b8 }
+    const initialLabel = initialSync.text ? ` ${initialSync.text}` : ''
     this.state.timerWidget = hmUI.createWidget(hmUI.widget.BUTTON, {
-      x: 172,
+      x: 168,
       y: 22,
-      w: 122,
+      w: 126,
       h: 36,
       radius: 18,
       normal_color: isResting ? 0x1e293b : 0x0f172a,
       press_color: 0x334155,
-      color: isResting ? 0xfbbf24 : 0x94a3b8,
-      text_size: 14,
-      text: isResting ? '⏳ Descanso' : `⏱️ ${elapsedMinutes}m`,
+      color: isResting ? 0xfbbf24 : (initialSync.color || 0x94a3b8),
+      text_size: 13,
+      text: isResting ? `⏳ Descanso${initialLabel}` : `⏱️ ${elapsedMinutes}m${initialLabel}`,
       click_func: () => {
         const rt = app.globalData.restTimer
         if (rt && rt.active) {
@@ -565,6 +567,8 @@ Page(BasePage({
     if (!this.state.timerWidget) return
     const app = this.state.app
     const rt = app.globalData.restTimer
+    const syncStatus = app.getSyncStatus ? app.getSyncStatus() : { text: 'ok', color: 0x94a3b8 }
+    const statusLabel = syncStatus.text ? ` ${syncStatus.text}` : ''
 
     if (rt && rt.active) {
       const now = Date.now()
@@ -580,7 +584,7 @@ Page(BasePage({
         const m = Math.floor(rem / 60)
         const s = rem % 60
         const str = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`
-        this.state.timerWidget.setProperty(hmUI.prop.TEXT, `⏳ ${str}`)
+        this.state.timerWidget.setProperty(hmUI.prop.TEXT, `⏳ ${str}${statusLabel}`)
         this.state.timerWidget.setProperty(hmUI.prop.COLOR, 0xfbbf24) // Gold / Amber
         this.state.timerWidget.setProperty(hmUI.prop.NORMAL_COLOR, 0x1e293b)
 
@@ -599,9 +603,8 @@ Page(BasePage({
     }
 
     const elapsedMinutes = Math.floor((Date.now() - (app.globalData.sessionStartTime || Date.now())) / 60000)
-    const syncDot = app.globalData.isPhoneSynced ? ' 🟢' : ''
-    this.state.timerWidget.setProperty(hmUI.prop.TEXT, `⏱️ ${elapsedMinutes}m${syncDot}`)
-    this.state.timerWidget.setProperty(hmUI.prop.COLOR, 0x94a3b8)
+    this.state.timerWidget.setProperty(hmUI.prop.TEXT, `⏱️ ${elapsedMinutes}m${statusLabel}`)
+    this.state.timerWidget.setProperty(hmUI.prop.COLOR, syncStatus.color || 0x94a3b8)
     this.state.timerWidget.setProperty(hmUI.prop.NORMAL_COLOR, 0x0f172a)
   },
 

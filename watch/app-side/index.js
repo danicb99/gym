@@ -4,9 +4,45 @@
  */
 
 import { BaseSideService } from '@zeppos/zml/base-side'
+import { SYNC_CONFIG } from './config'
 
-const RELAY_WATCH_TO_PHONE = 'https://ntfy.sh/vigorexiapp_sync_danicb99_7f3a91c4e2b8'
-const RELAY_PHONE_TO_WATCH = 'https://ntfy.sh/vigorexiapp_watch_danicb99_7f3a91c4e2b8'
+function deriveTopicHash(code) {
+  const str = String(code || '').trim() || 'vigorexi_danicb99_7f3a91c4e2b8'
+  let h1 = 0x811c9dc5
+  let h2 = 0x9e3779b9
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i)
+    h1 ^= ch
+    h1 = Math.imul(h1, 0x01000193)
+    h2 ^= ch
+    h2 = Math.imul(h2, 0x5bd1e995)
+  }
+  const hex1 = (h1 >>> 0).toString(16).padStart(8, '0')
+  const hex2 = (h2 >>> 0).toString(16).padStart(8, '0')
+  return (hex1 + hex2).toLowerCase()
+}
+
+function getSyncEndpoints(config) {
+  const server = ((config && config.SERVER_URL) || 'https://ntfy.sh').replace(/\/+$/, '')
+  const code = (config && config.SYNC_CODE) || 'vigorexi_danicb99_7f3a91c4e2b8'
+  const hash = deriveTopicHash(code)
+  return {
+    phoneToWatch: `${server}/vigorexi_${hash}_p2w`,
+    watchToPhone: `${server}/vigorexi_${hash}_w2p`
+  }
+}
+
+const ENDPOINTS = getSyncEndpoints(SYNC_CONFIG)
+const RELAY_WATCH_TO_PHONE = ENDPOINTS.watchToPhone
+const RELAY_PHONE_TO_WATCH = ENDPOINTS.phoneToWatch
+
+function getAuthHeaders(config) {
+  const headers = {}
+  if (config && config.AUTH_TOKEN && String(config.AUTH_TOKEN).trim()) {
+    headers['Authorization'] = `Bearer ${String(config.AUTH_TOKEN).trim()}`
+  }
+  return headers
+}
 
 async function safeFetch(ctx, options) {
   const fn = (ctx && typeof ctx.fetch === 'function')
@@ -41,6 +77,9 @@ AppSideService(
           const response = await safeFetch(this, {
             url: `${RELAY_PHONE_TO_WATCH}/json?poll=1&since=latest`,
             method: 'GET',
+            headers: {
+              ...getAuthHeaders(SYNC_CONFIG)
+            },
             timeout: 10000
           })
 
@@ -119,7 +158,10 @@ AppSideService(
           const response = await safeFetch(this, {
             url: RELAY_WATCH_TO_PHONE,
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              ...getAuthHeaders(SYNC_CONFIG)
+            },
             body: JSON.stringify(envelope),
             timeout: 10000
           })
@@ -154,7 +196,10 @@ AppSideService(
           const response = await safeFetch(this, {
             url: RELAY_WATCH_TO_PHONE,
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              ...getAuthHeaders(SYNC_CONFIG)
+            },
             body: JSON.stringify(envelope),
             timeout: 10000
           })
@@ -191,7 +236,10 @@ AppSideService(
           await safeFetch(this, {
             url: RELAY_WATCH_TO_PHONE,
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              ...getAuthHeaders(SYNC_CONFIG)
+            },
             body: JSON.stringify(payload),
             timeout: 10000
           })

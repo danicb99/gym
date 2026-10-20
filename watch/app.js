@@ -6,7 +6,7 @@
 import { BaseApp } from '@zeppos/zml/base-app'
 import { loadWorkoutData, saveActiveSession, clearActiveSession, recordCompletedSession } from './utils/storage'
 import { ROUTINE_SLOTS, EXERCISE_CATALOG } from './utils/routine_data'
-import { requestPhoneLiveWorkout, enqueueSetCompletedEvent, enqueueWorkoutFinishedEvent, flushOutbox } from './utils/sync_bridge'
+import { requestPhoneLiveWorkout, enqueueSetCompletedEvent, enqueueWorkoutFinishedEvent, flushOutbox, getPendingOutboxCount } from './utils/sync_bridge'
 import { mergeSessionLoggedSets } from './utils/merge'
 
 App(
@@ -22,6 +22,7 @@ App(
       slotExtraSets: {},      // slotId -> delta de series añadidas/quitadas
       phoneLiveSession: null, // Datos del entreno activo en el móvil si existe
       isPhoneSynced: false,   // True si la sesión actual está enlazada al móvil
+      bleFailed: false,       // True si el último intento de comunicación BLE falló
       lastPhoneQueryTime: 0,  // Marca temporal para throttle de 20s
       restTimer: {
         active: false,
@@ -374,6 +375,17 @@ App(
       enqueueWorkoutFinishedEvent(this, sessionSummary, finishedSessionId)
 
       return sessionSummary
+    },
+
+    getSyncStatus() {
+      const outboxCount = getPendingOutboxCount()
+      if (this.globalData.bleFailed) {
+        return { text: 'sin móvil', color: 0xf43f5e }
+      }
+      if (outboxCount > 0) {
+        return { text: `pend ${outboxCount}`, color: 0xfbbf24 }
+      }
+      return { text: 'ok', color: 0x10b981 }
     }
   })
 )

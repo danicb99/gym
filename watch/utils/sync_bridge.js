@@ -35,9 +35,11 @@ export async function requestPhoneLiveWorkout(context) {
       method: SYNC_EVENTS.GET_PHONE_SESSION,
       params: { timestamp: Date.now() }
     }, { timeout: 10000 })
+    if (context && context.globalData) context.globalData.bleFailed = false
     return result && result.session ? result.session : null
   } catch (err) {
     console.log('[SyncBridge] No se pudo conectar con el móvil:', err)
+    if (context && context.globalData) context.globalData.bleFailed = true
     return null
   }
 }
@@ -125,6 +127,8 @@ export async function flushOutbox(context) {
           params: item
         }, { timeout: 10000 })
 
+        if (context && context.globalData) context.globalData.bleFailed = false
+
         if (response && response.ok === true) {
           console.log('[SyncBridge] Evento confirmado por el servidor:', item.id)
           removeFromOutbox(item.id)
@@ -147,6 +151,7 @@ export async function flushOutbox(context) {
       } catch (reqErr) {
         // Error de comunicación BLE o timeout con el móvil
         console.log('[SyncBridge] Error/timeout de comunicación con móvil:', reqErr)
+        if (context && context.globalData) context.globalData.bleFailed = true
         const retries = (item.retries || 0) + 1
         updateOutboxRetries(item.id, retries)
         const delaySec = BACKOFF_STEPS[Math.min(retries - 1, BACKOFF_STEPS.length - 1)] || 300

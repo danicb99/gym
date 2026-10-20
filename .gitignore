@@ -2,3 +2,4 @@
 *.zip
 .system_generated/
 scratch/
+watch/app-side/config.js
