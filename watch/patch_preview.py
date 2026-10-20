@@ -17,8 +17,9 @@ def patch_inner_zip(zip_bytes):
                     data = json.loads(content.decode('utf-8'))
                     if 'packageInfo' in data:
                         data['packageInfo']['mode'] = 'preview'
+                        data['packageInfo']['expiredTime'] = 315360000
                     else:
-                        data['packageInfo'] = {'mode': 'preview'}
+                        data['packageInfo'] = {'mode': 'preview', 'expiredTime': 315360000}
                     content = json.dumps(data, separators=(',', ':')).encode('utf-8')
                     print(f"  Patched app.json in inner zip, mode is now: {data['packageInfo']['mode']}")
                 except Exception as e:
