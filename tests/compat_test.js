@@ -83,7 +83,7 @@ assert(daySelectJs.includes('THEME_COLORS'), 'day_select/index.js debe importar 
 assert(summaryJs.includes('THEME_COLORS'), 'summary/index.js debe importar THEME_COLORS');
 
 // Steppers de 68px
-assert(workoutJs.includes('w: 68,\n      h: 68,\n      radius: 34'), 'workout/index.js debe tener steppers de 68px');
+assert(/w:\s*68,\s*h:\s*68,\s*radius:\s*34/.test(workoutJs), 'workout/index.js debe tener steppers de 68px');
 // Botón Hecha
 assert(workoutJs.includes("text: '✓ Hecha'"), "workout/index.js debe tener botón '✓ Hecha'");
 console.log('  ✓ Reloj incluye steppers de 68px, botón Hecha y widgets nativos');
