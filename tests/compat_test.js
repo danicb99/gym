@@ -11,7 +11,7 @@ const watchAppJson = JSON.parse(fs.readFileSync('watch/app.json', 'utf8'));
 
 // 1. Verificar versiones
 console.log('\n📦 1. Verificación de Versiones:');
-assert(swJs.includes('vigorexiapp-v1.6.0-design7'), 'sw.js debe tener la caché v1.6.0');
+assert(swJs.includes('vigorexiapp-v1.6.0-design8'), 'sw.js debe tener la caché v1.6.0');
 console.log('  ✓ sw.js caché actualizada a v1.6.0-design1');
 
 assert.strictEqual(watchAppJson.app.version.code, 16, 'watch/app.json code debe ser 16');

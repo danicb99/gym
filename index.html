@@ -245,9 +245,11 @@
 
     /* Compact & Discreet Workout Sub-bar */
     .day-banner {
-      background: rgba(15, 23, 42, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
       padding: 6px 10px;
       margin-bottom: 12px;
       display: flex;
@@ -256,7 +258,7 @@
       align-items: center;
       gap: 8px;
       order: 0 !important;
-      box-shadow: none;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
     }
     .day-banner-main {
       display: flex;
@@ -281,51 +283,133 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
     }
+    /* Ultra-sleek Workout Progress Capsule */
     .progress-chip {
-      background: rgba(251, 191, 36, 0.1);
-      border: 1px solid rgba(251, 191, 36, 0.3);
-      color: var(--gold);
-      border-radius: 8px;
-      padding: 3px 8px;
-      font-size: 0.70rem;
-      font-weight: 600;
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      border-radius: 9999px;
+      height: 28px;
+      padding: 0 8px 0 5px;
       display: inline-flex;
       align-items: center;
-      gap: 3px;
+      gap: 6px;
       white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
       font-variant-numeric: tabular-nums;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: default;
+      user-select: none;
     }
-    .progress-chip strong {
-      color: #fff;
+    .progress-chip:hover {
+      border-color: rgba(251, 191, 36, 0.55);
+      box-shadow: 0 2px 12px rgba(251, 191, 36, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+    .progress-chip .prog-ring {
+      display: block;
+      flex-shrink: 0;
+    }
+    .progress-chip .prog-ring-bg {
+      stroke: rgba(255, 255, 255, 0.10);
+    }
+    .progress-chip .prog-ring-fill {
+      stroke: var(--gold);
+      stroke-dasharray: 50.26;
+      stroke-dashoffset: 50.26;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      transition: stroke-dashoffset 0.4s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.3s ease;
+    }
+    .progress-chip .prog-chip-counts {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 1.5px;
+      line-height: 1;
+    }
+    .progress-chip .prog-chip-done {
+      color: #ffffff;
       font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: -0.2px;
+    }
+    .progress-chip .prog-chip-sep {
+      color: rgba(255, 255, 255, 0.35);
+      font-weight: 500;
+      font-size: 0.68rem;
+    }
+    .progress-chip .prog-chip-tot {
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 0.70rem;
+    }
+    .progress-chip .prog-chip-unit {
+      color: #64748b;
+      font-size: 0.60rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 2px;
+    }
+    .progress-chip .prog-chip-badge {
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px solid rgba(251, 191, 36, 0.28);
+      color: #fbbf24;
+      border-radius: 9999px;
+      padding: 1px 6px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.2px;
     }
     .progress-chip.completed {
-      background: rgba(16, 185, 129, 0.12);
-      border-color: rgba(16, 185, 129, 0.35);
-      color: var(--primary);
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.45) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border-color: rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    .progress-chip.completed .prog-ring-fill {
+      stroke: #10b981;
+    }
+    .progress-chip.completed .prog-chip-done {
+      color: #34d399;
+    }
+    .progress-chip.completed .prog-chip-badge {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
     }
     .session-timer-chip {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.09);
-      color: var(--text-muted);
-      border-radius: 8px;
-      padding: 3px 8px;
+      color: #94a3b8;
+      border-radius: 9999px;
+      height: 28px;
+      padding: 0 9px;
       font-size: 0.70rem;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       cursor: pointer;
       transition: all 0.15s ease;
       white-space: nowrap;
     }
+    .session-timer-chip:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.07);
+    }
     .session-timer-chip.active {
-      border-color: rgba(56, 189, 248, 0.4);
+      border-color: rgba(56, 189, 248, 0.45);
       color: var(--cyan);
-      background: rgba(56, 189, 248, 0.08);
+      background: rgba(56, 189, 248, 0.1);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
+    }
+    .session-timer-chip .timer-icon {
+      display: inline-flex;
+      align-items: center;
+      opacity: 0.8;
+      flex-shrink: 0;
     }
     .day-banner-actions {
       display: flex;
@@ -335,11 +419,12 @@
     }
     .btn-guide-modal {
       background: rgba(255, 255, 255, 0.04);
-      color: var(--text-muted);
+      color: #94a3b8;
       border: 1px solid rgba(255, 255, 255, 0.09);
-      border-radius: 8px;
-      padding: 4px 9px;
-      font-size: 0.72rem;
+      border-radius: 9999px;
+      height: 28px;
+      padding: 0 10px;
+      font-size: 0.70rem;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
@@ -357,8 +442,9 @@
       background: linear-gradient(135deg, #fbbf24, #d97706);
       color: #060a13;
       border: 1px solid #fbbf24;
-      border-radius: 8px;
-      padding: 5px 10px;
+      border-radius: 9999px;
+      height: 28px;
+      padding: 0 12px;
       font-size: 0.72rem;
       font-weight: 800;
       cursor: pointer;
@@ -371,17 +457,20 @@
     .btn-finish-day:active { transform: scale(0.96); }
     .btn-reset-session {
       background: rgba(255, 255, 255, 0.04);
-      color: var(--text-muted);
+      color: #64748b;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 8px;
-      padding: 4px 8px;
-      font-size: 0.76rem;
-      font-weight: 600;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      font-size: 0.85rem;
+      font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       transition: all 0.15s;
+      flex-shrink: 0;
     }
     .btn-reset-session:hover, .btn-reset-session:active {
       background: rgba(244, 63, 94, 0.15);
@@ -1130,11 +1219,12 @@
     /* Last done chip in day banners */
     .last-done-chip {
       background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       color: #94a3b8;
-      border-radius: 8px;
-      padding: 3px 8px;
-      font-size: 0.70rem;
+      border-radius: 9999px;
+      height: 28px;
+      padding: 0 9px;
+      font-size: 0.68rem;
       font-weight: 600;
       display: inline-flex;
       align-items: center;
@@ -1142,9 +1232,14 @@
       white-space: nowrap;
     }
     .last-done-chip.recommended {
-      background: rgba(251, 191, 36, 0.12);
-      border-color: rgba(251, 191, 36, 0.35);
+      background: rgba(251, 191, 36, 0.1);
+      border-color: rgba(251, 191, 36, 0.3);
       color: var(--gold);
+    }
+    @media (max-width: 520px) {
+      .last-done-chip {
+        display: none !important;
+      }
     }
 
     /* Program Switcher Modal */
@@ -1871,9 +1966,15 @@
         <div class="day-banner-main">
           <div class="day-banner-title">Día A: Full Body A • Squat Pesado & Torso</div>
           <div class="day-banner-meta">
-            <span class="progress-chip" id="progressChip-fullbodyA">0/20 series (0%)</span>
+            <span class="progress-chip" id="progressChip-fullbodyA">
+              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">20</span><span class="prog-chip-unit">series</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
             <span class="last-done-chip" id="lastDoneChip-fullbodyA" style="display:none;"></span>
-            <span class="session-timer-chip" id="sessionTimer-fullbodyA" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">⏱️ 00:00</span>
+            <span class="session-timer-chip" id="sessionTimer-fullbodyA" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
+              <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            </span>
           </div>
         </div>
         <div class="day-banner-actions">
@@ -2517,9 +2618,15 @@
         <div class="day-banner-main">
           <div class="day-banner-title">Día B: Full Body B • RDL & Torso Hipertrofia</div>
           <div class="day-banner-meta">
-            <span class="progress-chip" id="progressChip-fullbodyB">0/20 series (0%)</span>
+            <span class="progress-chip" id="progressChip-fullbodyB">
+              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">20</span><span class="prog-chip-unit">series</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
             <span class="last-done-chip" id="lastDoneChip-fullbodyB" style="display:none;"></span>
-            <span class="session-timer-chip" id="sessionTimer-fullbodyB" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">⏱️ 00:00</span>
+            <span class="session-timer-chip" id="sessionTimer-fullbodyB" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
+              <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            </span>
           </div>
         </div>
         <div class="day-banner-actions">
@@ -3163,9 +3270,15 @@
         <div class="day-banner-main">
           <div class="day-banner-title">Día C: Full Body C • Pierna & Brazos/Core</div>
           <div class="day-banner-meta">
-            <span class="progress-chip" id="progressChip-fullbodyC">0/22 series (0%)</span>
+            <span class="progress-chip" id="progressChip-fullbodyC">
+              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">22</span><span class="prog-chip-unit">series</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
             <span class="last-done-chip" id="lastDoneChip-fullbodyC" style="display:none;"></span>
-            <span class="session-timer-chip" id="sessionTimer-fullbodyC" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">⏱️ 00:00</span>
+            <span class="session-timer-chip" id="sessionTimer-fullbodyC" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
+              <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            </span>
           </div>
         </div>
         <div class="day-banner-actions">
@@ -3901,9 +4014,15 @@
         <div class="day-banner-main">
           <div class="day-banner-title">Día 1: Torso A • Fuerza & Empuje</div>
           <div class="day-banner-meta">
-            <span class="progress-chip" id="progressChip-torsoA">0/23 series (0%)</span>
+            <span class="progress-chip" id="progressChip-torsoA">
+              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">23</span><span class="prog-chip-unit">series</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
             <span class="last-done-chip" id="lastDoneChip-torsoA" style="display:none;"></span>
-            <span class="session-timer-chip" id="sessionTimer-torsoA" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">⏱️ 00:00</span>
+            <span class="session-timer-chip" id="sessionTimer-torsoA" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
+              <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            </span>
           </div>
         </div>
         <div class="day-banner-actions">
@@ -4642,9 +4761,15 @@
         <div class="day-banner-main">
           <div class="day-banner-title">Día 2: Pierna A • Sentadilla & Cuádriceps</div>
           <div class="day-banner-meta">
-            <span class="progress-chip" id="progressChip-piernaA">0/17 series (0%)</span>
+            <span class="progress-chip" id="progressChip-piernaA">
+              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">17</span><span class="prog-chip-unit">series</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
             <span class="last-done-chip" id="lastDoneChip-piernaA" style="display:none;"></span>
-            <span class="session-timer-chip" id="sessionTimer-piernaA" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">⏱️ 00:00</span>
+            <span class="session-timer-chip" id="sessionTimer-piernaA" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
+              <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            </span>
           </div>
         </div>
         <div class="day-banner-actions">
@@ -5171,9 +5296,15 @@
         <div class="day-banner-main">
           <div class="day-banner-title">Día 3: Torso B • Tracción & Hipertrofia</div>
           <div class="day-banner-meta">
-            <span class="progress-chip" id="progressChip-torsoB">0/23 series (0%)</span>
+            <span class="progress-chip" id="progressChip-torsoB">
+              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">23</span><span class="prog-chip-unit">series</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
             <span class="last-done-chip" id="lastDoneChip-torsoB" style="display:none;"></span>
-            <span class="session-timer-chip" id="sessionTimer-torsoB" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">⏱️ 00:00</span>
+            <span class="session-timer-chip" id="sessionTimer-torsoB" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
+              <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            </span>
           </div>
         </div>
         <div class="day-banner-actions">
@@ -5918,9 +6049,15 @@
         <div class="day-banner-main">
           <div class="day-banner-title">Día 4: Pierna B • Cadena Posterior & Búlgaras</div>
           <div class="day-banner-meta">
-            <span class="progress-chip" id="progressChip-piernaB">0/20 series (0%)</span>
+            <span class="progress-chip" id="progressChip-piernaB">
+              <svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22"><circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5"/><circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="50.26" stroke-dashoffset="50.26" stroke-linecap="round"/></svg>
+              <span class="prog-chip-counts"><strong class="prog-chip-done">0</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">20</span><span class="prog-chip-unit">series</span></span>
+              <span class="prog-chip-badge">0%</span>
+            </span>
             <span class="last-done-chip" id="lastDoneChip-piernaB" style="display:none;"></span>
-            <span class="session-timer-chip" id="sessionTimer-piernaB" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">⏱️ 00:00</span>
+            <span class="session-timer-chip" id="sessionTimer-piernaB" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
+              <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            </span>
           </div>
         </div>
         <div class="day-banner-actions">
@@ -7599,16 +7736,17 @@
     function updateSessionTimerDisplay(dayId) {
       const chip = document.getElementById('sessionTimer-' + dayId);
       if (!chip) return;
+      const timerSvg = '<svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg>';
       const startTime = workoutState.sessionStartTime ? workoutState.sessionStartTime[dayId] : null;
       if (!startTime) {
         const lastSes = getLastSessionForDay(dayId);
         if (lastSes) {
           const isToday = new Date(lastSes.date).toDateString() === new Date().toDateString();
-          chip.innerText = isToday ? `⏱️ Hoy: ${lastSes.durationFormatted}` : `⏱️ Ant: ${lastSes.durationFormatted}`;
+          chip.innerHTML = `${timerSvg}<span>${isToday ? 'Hoy: ' + lastSes.durationFormatted : 'Ant: ' + lastSes.durationFormatted}</span>`;
           chip.style.borderColor = 'rgba(245, 158, 11, 0.4)';
           chip.style.color = '#fbbf24';
         } else {
-          chip.innerText = '⏱️ 00:00';
+          chip.innerHTML = `${timerSvg}<span>00:00</span>`;
           chip.style.borderColor = '';
           chip.style.color = '';
         }
@@ -7618,16 +7756,18 @@
       chip.style.borderColor = '';
       chip.style.color = '';
       const elapsedSec = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+      let timeText = '00:00';
       if (elapsedSec >= 3600) {
         const h = Math.floor(elapsedSec / 3600);
         const m = Math.floor((elapsedSec % 3600) / 60).toString().padStart(2, '0');
         const s = (elapsedSec % 60).toString().padStart(2, '0');
-        chip.innerText = `⏱️ ${h}:${m}:${s}`;
+        timeText = `${h}:${m}:${s}`;
       } else {
         const m = Math.floor(elapsedSec / 60).toString().padStart(2, '0');
         const s = (elapsedSec % 60).toString().padStart(2, '0');
-        chip.innerText = `⏱️ ${m}:${s}`;
+        timeText = `${m}:${s}`;
       }
+      chip.innerHTML = `${timerSvg}<span>${timeText}</span>`;
       chip.classList.add('active');
     }
 
@@ -7906,6 +8046,33 @@
       }
     }
 
+    function renderProgressChipHtml(doneSets, totalSets, percentage) {
+      const isComplete = totalSets > 0 && doneSets >= totalSets;
+      const pctRound = Math.round(percentage);
+      const circumference = 50.26; // 2 * pi * 8
+      const offset = isComplete ? 0 : Math.max(0, circumference - (circumference * Math.min(percentage, 100) / 100));
+      const strokeColor = isComplete ? '#10b981' : 'var(--gold)';
+      const ringHtml = isComplete
+        ? `<svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22">
+             <circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5" />
+             <circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="${circumference}" stroke-dashoffset="0" stroke-linecap="round" />
+             <path d="M7.5 11.2l2.3 2.3 4.7-4.7" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+           </svg>`
+        : `<svg class="prog-ring" width="18" height="18" viewBox="0 0 22 22">
+             <circle class="prog-ring-bg" cx="11" cy="11" r="8" fill="none" stroke-width="2.5" />
+             <circle class="prog-ring-fill" cx="11" cy="11" r="8" fill="none" stroke="${strokeColor}" stroke-width="2.5" stroke-dasharray="${circumference}" stroke-dashoffset="${offset.toFixed(1)}" stroke-linecap="round" />
+           </svg>`;
+
+      return `
+        ${ringHtml}
+        <span class="prog-chip-counts">
+          <strong class="prog-chip-done">${doneSets}</strong><span class="prog-chip-sep">/</span><span class="prog-chip-tot">${totalSets}</span>
+          <span class="prog-chip-unit">series</span>
+        </span>
+        <span class="prog-chip-badge">${isComplete ? '100%' : pctRound + '%'}</span>
+      `;
+    }
+
     // Workout Progress Calculator
     function updateProgress() {
       const activeContent = document.querySelector('.day-content.active');
@@ -7922,9 +8089,7 @@
       const bannerChip = document.getElementById('progressChip-' + activeContent.id);
       if (bannerChip) {
         const isComplete = totalSets > 0 && doneSets >= totalSets;
-        bannerChip.innerHTML = isComplete
-          ? `✓ <strong>${doneSets}/${totalSets}</strong> (100%)`
-          : `<strong>${doneSets}/${totalSets}</strong> series · ${Math.round(percentage)}%`;
+        bannerChip.innerHTML = renderProgressChipHtml(doneSets, totalSets, percentage);
         bannerChip.classList.toggle('completed', isComplete);
       }
     }
@@ -9586,7 +9751,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=design7').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=design8').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
