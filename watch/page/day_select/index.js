@@ -153,33 +153,38 @@ Page(
       const btnGap = 12
       let curY = 110
 
-      // 1. BOTÓN PRIORITARIO: Unirse al entrenamiento del móvil (Live Sync)
-      if (phoneSession && phoneSession.activeDayId && phoneSession.workoutActive) {
-        const phoneDayData = ROUTINE_SLOTS[phoneSession.activeDayId]
-        const phoneDayTitle = phoneDayData ? phoneDayData.shortName : phoneSession.activeDayId
+      // 1. BOTÓN PRIORITARIO: Sincronización con el móvil / Unirse a sesión activa
+      const phoneDayData = phoneSession ? ROUTINE_SLOTS[phoneSession.activeDayId] : null
+      const phoneDayTitle = phoneDayData ? phoneDayData.shortName : (phoneSession ? phoneSession.activeDayId : '')
+      const hasLiveWorkout = phoneSession && phoneSession.activeDayId && phoneSession.workoutActive
+      const initialBtnText = hasLiveWorkout ? `🟢 Unirse a ${phoneDayTitle}` : '🔄 Sincronizar Móvil'
+      const initialBtnColor = hasLiveWorkout ? THEME_COLORS.blueAction : THEME_COLORS.stepperBg
 
-        this.state.syncButton = hmUI.createWidget(hmUI.widget.BUTTON, {
-          x: btnX,
-          y: curY,
-          w: btnW,
-          h: 76,
-          radius: 28,
-          normal_color: THEME_COLORS.blueAction,
-          press_color: 0x0369a1,
-          color: 0xffffff,
-          text_size: 20,
-          text: `🟢 Seguir ${phoneDayTitle} (Móvil)`,
-          click_func: () => {
-            app.adoptPhoneSession(phoneSession)
+      this.state.syncButton = hmUI.createWidget(hmUI.widget.BUTTON, {
+        x: btnX,
+        y: curY,
+        w: btnW,
+        h: 72,
+        radius: 26,
+        normal_color: initialBtnColor,
+        press_color: 0x0369a1,
+        color: 0xffffff,
+        text_size: 19,
+        text: initialBtnText,
+        click_func: () => {
+          if (app.globalData.phoneLiveSession && app.globalData.phoneLiveSession.workoutActive) {
+            app.adoptPhoneSession(app.globalData.phoneLiveSession)
             if (app.globalData.restTimer && app.globalData.restTimer.active && app.globalData.restTimer.remainingSeconds > 2) {
               push({ url: 'page/timer/index' })
             } else {
               push({ url: 'page/workout/index' })
             }
+          } else {
+            this.checkSync(true)
           }
-        })
-        curY += 76 + btnGap
-      }
+        }
+      })
+      curY += 72 + btnGap
 
       // 2. BOTÓN: Continuar sesión local si existe
       if (activeLocal && (!phoneSession || activeLocal !== phoneSession.activeDayId)) {
@@ -225,7 +230,19 @@ Page(
         } catch (e) {}
       }
 
-            days.forEach(day => {
+      const days = [
+        // --- FULL BODY 3 DÍAS (PRINCIPAL) ---
+        { id: 'fullbodyA', label: '🏋️ Día A: Squat + Torso' },
+        { id: 'fullbodyB', label: '🔥 Día B: RDL + Torso' },
+        { id: 'fullbodyC', label: '⚡ Día C: Pierna + Brazos' },
+        // --- TORSO / PIERNA 4 DÍAS (ALTERNO) ---
+        { id: 'torsoA', label: '💪 D1: Torso A (Empuje)' },
+        { id: 'piernaA', label: '🦵 D2: Pierna A (Cuádriceps)' },
+        { id: 'torsoB', label: '🔙 D3: Torso B (Tracción)' },
+        { id: 'piernaB', label: '🍑 D4: Pierna B (Isquios)' }
+      ]
+
+      days.forEach(day => {
         const isRec = (day.id === recommendedDayId)
         const cardH = isRec ? 80 : 64
         const cardRadius = isRec ? 26 : 22
