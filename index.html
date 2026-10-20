@@ -73,9 +73,41 @@
       margin: 0 auto;
     }
 
-    /* Header Day Picker (Native Styled Dropdown) */
-    .header-day-picker {
+    /* Header Day Display (Title & Subtitle, replaces dropdown) */
+    .header-day-info {
       display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      padding-right: 6px;
+    }
+    .header-day-title {
+      font-family: var(--font-display, "Barlow Condensed", "Arial Narrow", sans-serif);
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--gold);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: 0.01em;
+    }
+    .header-day-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+      font-weight: 500;
+    }
+
+    /* Header Day Picker (Native Styled Dropdown - Hidden, selector moved to Rutina) */
+    .header-day-picker {
+      display: none !important;
       align-items: center;
       gap: 6px;
       flex: 1;
@@ -1507,6 +1539,120 @@
       border-radius: 12px;
     }
 
+    /* Routine Days List & Day Cards */
+    .routine-days-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+      margin-bottom: 22px;
+    }
+    .routine-day-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 13px 15px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+    }
+    .routine-day-card:hover {
+      border-color: var(--border-gold);
+      background: var(--surface-elevated);
+    }
+    .routine-day-card.selected {
+      border-color: var(--gold);
+      background: rgba(251, 191, 36, 0.06);
+    }
+    .routine-day-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .routine-day-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .routine-day-title {
+      font-family: var(--font-display, "Barlow Condensed", sans-serif);
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .routine-day-card.selected .routine-day-title {
+      color: var(--gold);
+    }
+    .routine-day-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+    }
+    .badge-active-day {
+      background: var(--gold-subtle);
+      color: var(--gold);
+      border: 1px solid var(--border-gold);
+    }
+    .badge-next-day {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .routine-day-arrow {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: var(--text-muted);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+    .routine-day-card:hover .routine-day-arrow,
+    .routine-day-card.selected .routine-day-arrow {
+      stroke: var(--gold);
+    }
+    .routine-day-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+    .routine-day-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 5px;
+      gap: 10px;
+    }
+    .routine-day-last {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+    .routine-day-action-btn {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .routine-day-card.selected .routine-day-action-btn {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #03251a;
+    }
+
   </style>
 </head>
 <body>
@@ -1562,10 +1708,16 @@
   <!-- Top App Header with Day Dropdown & Top Rest Timer -->
   <header class="app-header">
     <div class="header-content">
-      <!-- Left: Day Selector Dropdown -->
-      <div class="header-day-picker">
-        <button id="btnProgramSwitch" class="btn-program-switch" onclick="toggleProgramModal()" title="Cambiar tipo de rutina (Full Body 3D / Torso-Pierna 4D)">⚡ 3D ▾</button>
-        <select id="daySelector" class="header-day-select" onchange="handleDaySelectChange(this.value)">
+      <!-- Left: Clean Day Title & Subtitle (tappable to open Routine / Day selector) -->
+      <div class="header-day-info" id="headerDayInfo" onclick="switchMainTab('plan')" title="Toca para ver o cambiar de día en Rutina">
+        <div class="header-day-title" id="headerDayTitle">Día A · Full Body</div>
+        <div class="header-day-sub" id="headerDaySub">Squat Pesado & Torso</div>
+      </div>
+
+      <!-- Hidden elements for test compatibility & legacy functions -->
+      <div class="header-day-picker" style="display:none !important;" aria-hidden="true">
+        <button id="btnProgramSwitch" class="btn-program-switch" type="button" style="display:none !important;">⚡ 3D ▾</button>
+        <select id="daySelector" class="header-day-select" style="display:none !important;" onchange="handleDaySelectChange(this.value)">
           <!-- Rendered dynamically -->
         </select>
       </div>
@@ -1586,10 +1738,10 @@
     
     <!-- Progress Indicator directly underneath -->
 
-    <div class="workout-progress">
+    <div class="workout-progress" id="headerWorkoutProgress">
       <div class="workout-progress-fill" id="workoutProgressBar"></div>
     </div>
-    <div class="prog-text-row">
+    <div class="prog-text-row" id="headerProgRow">
       <span id="headerProgSets">0 de 20 series</span>
       <span id="headerProgPct">0%</span>
     </div>
@@ -6514,6 +6666,11 @@
         <small>Distribución clásica con 2 días de torso (empuje/tracción) y 2 días de pierna (cuádriceps/cadena posterior) a la semana.</small>
       </button>
 
+      <div class="sec-heading">Días de entrenamiento</div>
+      <div id="routineDaysList" class="routine-days-list">
+        <!-- Rendered dynamically by renderRoutinePlanDays() -->
+      </div>
+
       <div class="sec-heading">Reglas de progresión</div>
       <div class="guide-card" style="margin-bottom:12px;">
         <div class="guide-title">
@@ -6541,16 +6698,8 @@
   <!-- ==========================================
        BARRA RÁPIDA DE STEPPERS (Ajuste sin teclado nativo)
        ========================================== -->
-  <div class="quick-stepper-bar" id="quickStepperBar" style="display:none !important;" aria-hidden="true"><span id="stepperTitle" style="display:none !important;"></span></div>
-      <div class="stepper-section">
-        <span class="stepper-sec-label">Reps</span>
-        <div class="stepper-btn-row">
-          <button type="button" class="btn-step" onclick="adjustActiveRowReps(-1)">-1</button>
-          <button type="button" class="btn-step" onclick="adjustActiveRowReps(+1)">+1</button>
-        </div>
-      </div>
-      <button type="button" class="btn-step-check" onclick="completeActiveRow()" title="Marcar serie completada">✓</button>
-    </div>
+  <div class="quick-stepper-bar" id="quickStepperBar" style="display:none !important;" aria-hidden="true">
+    <span id="stepperTitle" style="display:none !important;"></span>
   </div>
 
   <!-- ==========================================
@@ -6883,12 +7032,13 @@
 
     
     let currentProgram = localStorage.getItem('vigorexiapp_program') || 'fullbody';
+    const WORKOUT_DAYS = ['fullbodyA', 'fullbodyB', 'fullbodyC', 'torsoA', 'piernaA', 'torsoB', 'piernaB'];
 
     const PROGRAM_OPTIONS = {
       fullbody: [
-        { value: 'fullbodyA', text: '🏋️ Día A: Squat + Torso' },
-        { value: 'fullbodyB', text: '🔥 Día B: RDL + Torso' },
-        { value: 'fullbodyC', text: '⚡ Día C: Pierna + Hipertrofia' }
+        { value: 'fullbodyA', text: 'Día A: Squat + Torso' },
+        { value: 'fullbodyB', text: 'Día B: RDL + Torso' },
+        { value: 'fullbodyC', text: 'Día C: Pierna + Hipertrofia' }
       ],
       torso_pierna: [
         { value: 'torsoA', text: 'Día 1: Torso A • Empuje' },
@@ -6905,7 +7055,38 @@
       selectDay(targetDayId || defaultDay);
     }
 
-    
+    function updateHeaderDayDisplay(dayId) {
+      const titleEl = document.getElementById('headerDayTitle');
+      const subEl = document.getElementById('headerDaySub');
+      const progEl = document.getElementById('headerWorkoutProgress');
+      const progRow = document.getElementById('headerProgRow');
+      if (!titleEl || !subEl) return;
+
+      if (dayId === 'historialView') {
+        titleEl.textContent = 'Historial';
+        subEl.textContent = 'Estadísticas & Constancia';
+        if (progEl) progEl.style.display = 'none';
+        if (progRow) progRow.style.display = 'none';
+      } else if (dayId === 'routinePlanView') {
+        titleEl.textContent = 'Rutina';
+        subEl.textContent = (currentProgram === 'fullbody') ? 'Full Body · 3 días' : 'Torso / Pierna · 4 días';
+        if (progEl) progEl.style.display = 'none';
+        if (progRow) progRow.style.display = 'none';
+      } else {
+        const slot = (typeof ROUTINE_SLOTS !== 'undefined') ? ROUTINE_SLOTS[dayId] : null;
+        if (slot) {
+          const parts = (slot.title || '').split('•');
+          titleEl.textContent = parts[0] ? parts[0].trim() : (slot.shortName || dayId);
+          subEl.textContent = parts[1] ? parts[1].trim() : (slot.shortName || '');
+        } else {
+          titleEl.textContent = 'Entrenamiento';
+          subEl.textContent = '';
+        }
+        if (progEl) progEl.style.display = '';
+        if (progRow) progRow.style.display = '';
+      }
+    }
+
     // Navegación de 3 Pestañas Inferiores (Entrenar, Historial, Rutina)
     function switchMainTab(tabName) {
       document.querySelectorAll('.app-bottom-nav .nav-tab').forEach(b => b.classList.remove('on'));
@@ -6913,12 +7094,80 @@
       if (btn) btn.classList.add('on');
 
       if (tabName === 'train') {
-        selectDay(lastActiveWorkoutDay || (currentProgram === 'fullbody' ? 'fullbodyA' : 'torsoA'));
+        const fallback = (currentProgram === 'fullbody' ? 'fullbodyA' : 'torsoA');
+        const targetDay = (WORKOUT_DAYS.includes(lastActiveWorkoutDay)) ? lastActiveWorkoutDay : fallback;
+        selectDay(targetDay);
       } else if (tabName === 'hist') {
         selectDay('historialView');
       } else if (tabName === 'plan') {
         selectDay('routinePlanView');
       }
+    }
+
+    function selectWorkoutDayFromRoutine(dayId) {
+      selectDay(dayId);
+      switchMainTab('train');
+    }
+
+    function renderRoutinePlanDays() {
+      const container = document.getElementById('routineDaysList');
+      if (!container) return;
+      const prog = currentProgram || 'fullbody';
+      const days = (prog === 'fullbody') ? [
+        { id: 'fullbodyA', label: 'Día A: Squat Pesado & Torso', subtitle: 'Sentadilla barra, Press banca, Jalón al pecho, Gemelo, Bíceps/Tríceps' },
+        { id: 'fullbodyB', label: 'Día B: RDL & Torso Hipertrofia', subtitle: 'Peso muerto rumano, Press militar, Remo mancuerna, Elevaciones' },
+        { id: 'fullbodyC', label: 'Día C: Pierna & Brazos/Core', subtitle: 'Prensa inclinada, Zancadas búlgaras, Fondos paralelas, Martillo, Abdomen' }
+      ] : [
+        { id: 'torsoA', label: 'Día 1: Torso A • Fuerza & Empuje', subtitle: 'Press banca pesado, Dominadas libres, Inclinado mancuernas, Fondos' },
+        { id: 'piernaA', label: 'Día 2: Pierna A • Sentadilla & Cuádriceps', subtitle: 'Sentadilla barra, Prensa 45°, Extensión de cuádriceps, Gemelo' },
+        { id: 'torsoB', label: 'Día 3: Torso B • Tracción & Hipertrofia', subtitle: 'Remo mancuerna pesado, Inclinado mancuernas, Jalón neutro, Brazos' },
+        { id: 'piernaB', label: 'Día 4: Pierna B • Isquios & Búlgaras', subtitle: 'Peso muerto rumano, Búlgaras, Curl femoral sentado, Abdomen' }
+      ];
+
+      const nextRec = (typeof getNextRecommendedDay === 'function') ? getNextRecommendedDay(prog) : (prog === 'fullbody' ? 'fullbodyA' : 'torsoA');
+      const activeDay = (WORKOUT_DAYS.includes(lastActiveWorkoutDay)) ? lastActiveWorkoutDay : (prog === 'fullbody' ? 'fullbodyA' : 'torsoA');
+
+      let html = '';
+      days.forEach(d => {
+        const isSelected = (d.id === activeDay);
+        const isNext = (d.id === nextRec);
+        const lastInfo = (typeof getDayLastDoneInfo === 'function') ? getDayLastDoneInfo(d.id) : null;
+        
+        let badgeText = '';
+        let badgeClass = '';
+        if (isSelected) {
+          badgeText = 'Seleccionado';
+          badgeClass = 'badge-active-day';
+        } else if (isNext) {
+          badgeText = 'Toca hoy';
+          badgeClass = 'badge-next-day';
+        }
+
+        const lastDoneText = lastInfo 
+          ? `Último: ${lastInfo.relative}`
+          : 'Sin realizar aún';
+
+        html += `
+          <div class="routine-day-card ${isSelected ? 'selected' : ''}" onclick="selectWorkoutDayFromRoutine('${d.id}')">
+            <div class="routine-day-head">
+              <div class="routine-day-title-wrap">
+                <span class="routine-day-title">${d.label}</span>
+                ${badgeText ? `<span class="routine-day-badge ${badgeClass}">${badgeText}</span>` : ''}
+              </div>
+              <svg class="routine-day-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+            <div class="routine-day-sub">${d.subtitle}</div>
+            <div class="routine-day-foot">
+              <span class="routine-day-last">${lastDoneText}</span>
+              <button type="button" class="routine-day-action-btn" onclick="event.stopPropagation(); selectWorkoutDayFromRoutine('${d.id}')">
+                ${isSelected ? 'Continuar entreno →' : 'Entrenar este día →'}
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
     }
 
     function updateRoutinePlanViewCards() {
@@ -6932,19 +7181,40 @@
       const optTP = document.getElementById('progOpt-torso_pierna');
       if (optFB) optFB.classList.toggle('active', isFB);
       if (optTP) optTP.classList.toggle('active', !isFB);
+
+      const badgeFB = document.getElementById('badge-plan-fullbody');
+      const badgeTP = document.getElementById('badge-plan-torso_pierna');
+      if (badgeFB) badgeFB.style.display = isFB ? 'inline-block' : 'none';
+      if (badgeTP) badgeTP.style.display = !isFB ? 'inline-block' : 'none';
     }
 
     function selectDay(dayId) {
-      if (dayId !== 'historialView') {
+      if (WORKOUT_DAYS.includes(dayId)) {
         lastActiveWorkoutDay = dayId;
+        localStorage.setItem('vigorexiapp_last_day', dayId);
         const isFB = dayId.startsWith('fullbody');
         currentProgram = isFB ? 'fullbody' : 'torso_pierna';
         localStorage.setItem('vigorexiapp_program', currentProgram);
       }
+
+      // Sincronizar pestañas inferiores
+      document.querySelectorAll('.app-bottom-nav .nav-tab').forEach(b => b.classList.remove('on'));
+      if (dayId === 'historialView') {
+        const btn = document.getElementById('tabBtnHist');
+        if (btn) btn.classList.add('on');
+      } else if (dayId === 'routinePlanView') {
+        const btn = document.getElementById('tabBtnPlan');
+        if (btn) btn.classList.add('on');
+      } else {
+        const btn = document.getElementById('tabBtnTrain');
+        if (btn) btn.classList.add('on');
+      }
+
+      updateHeaderDayDisplay(dayId);
       renderDaySelectorOptions();
       const sel = document.getElementById('daySelector');
       if (sel) {
-        if (dayId === 'historialView') {
+        if (dayId === 'historialView' || dayId === 'routinePlanView') {
           sel.selectedIndex = -1;
         } else if (sel.value !== dayId) {
           sel.value = dayId;
@@ -6967,9 +7237,12 @@
         renderStreakCalendar();
         const retTxt = document.getElementById('historyBackText');
         if (retTxt) {
-          const dData = ROUTINE_SLOTS[lastActiveWorkoutDay];
+          const dData = (typeof ROUTINE_SLOTS !== 'undefined') ? ROUTINE_SLOTS[lastActiveWorkoutDay] : null;
           retTxt.innerText = `← Volver a ${dData ? dData.shortName : 'Entrenamiento'}`;
         }
+      } else if (dayId === 'routinePlanView') {
+        updateRoutinePlanViewCards();
+        renderRoutinePlanDays();
       } else {
         updateDayBannerLastDone(dayId);
         updateProgress();
@@ -6978,7 +7251,7 @@
     }
 
     function exitHistoryView() {
-      selectDay(lastActiveWorkoutDay || 'torsoA');
+      switchMainTab('train');
     }
 
     function openHistoryFromDay() {
@@ -9383,9 +9656,17 @@
       localStorage.setItem('vigorexiapp_program', newProg);
       closeProgramModal();
       renderDaySelectorOptions();
+      updateRoutinePlanViewCards();
+      renderRoutinePlanDays();
       const defaultDay = (newProg === 'fullbody') ? 'fullbodyA' : 'torsoA';
-      selectDay(defaultDay);
-      showToast(`Programa activo: ${newProg === 'fullbody' ? 'Full Body (3 Días)' : 'Torso / Pierna (4 Días)'}`);
+      lastActiveWorkoutDay = defaultDay;
+      localStorage.setItem('vigorexiapp_last_day', defaultDay);
+
+      const isRoutineTab = document.getElementById('routinePlanView')?.classList.contains('active');
+      if (!isRoutineTab) {
+        selectDay(defaultDay);
+      }
+      showToast(`Rutina activa: ${newProg === 'fullbody' ? 'Full Body (3 Días)' : 'Torso / Pierna (4 Días)'}`);
     }
 
     function toggleProgramModal() {
