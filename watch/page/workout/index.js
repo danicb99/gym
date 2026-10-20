@@ -548,14 +548,9 @@ Page(BasePage({
     this.stopWorkoutTicker()
     this.updateTimerDisplay()
     this.updateClockDisplay()
-    let tickCount = 0
     this.state.tickerTimer = setInterval(() => {
       this.updateTimerDisplay()
       this.updateClockDisplay()
-      tickCount++
-      if (tickCount % 5 === 0) {
-        this.syncWithPhoneInBackground()
-      }
     }, 1000)
   },
 
@@ -598,6 +593,8 @@ Page(BasePage({
         rt.active = false
         this.state.restPreWarned = false
         vibrateRestFinished()
+        // Al terminar el descanso: consultar bajo demanda con el móvil
+        this.checkPhoneSyncOnDemand(true)
       }
     }
 
@@ -608,52 +605,19 @@ Page(BasePage({
     this.state.timerWidget.setProperty(hmUI.prop.NORMAL_COLOR, 0x0f172a)
   },
 
-  async syncWithPhoneInBackground() {
+  // Consulta bajo demanda sin recargar la pantalla ni perder inputs en edición (prohibido replace)
+  async checkPhoneSyncOnDemand(force = false) {
     const app = this.state.app
     try {
-      await app.checkPhoneLiveSession()
-      const phoneSession = app.globalData.phoneLiveSession
+      const phoneSession = await app.checkPhoneLiveSession(force)
       if (!phoneSession || !phoneSession.activeDayId) return
-
       if (phoneSession.activeDayId === app.globalData.activeDayId) {
-        const watchCompleted = countCompletedSets(app.globalData.sessionLoggedSets)
-        const phoneCompleted = countCompletedSets(phoneSession.sessionLoggedSets)
-
-        // Prevenir regresión: Si el reloj lleva MÁS o IGUAL series completadas, no retroceder
-        if (phoneCompleted > watchCompleted) {
-          app.adoptPhoneSession(phoneSession)
-          replace({ url: 'page/workout/index' })
-          return
-        } else if (phoneCompleted === watchCompleted) {
-          const phoneSlot = phoneSession.currentSlotIndex || 0
-          const phoneSet = phoneSession.currentSetIndex || 0
-          const phoneScore = phoneSlot * 100 + phoneSet
-          const watchScore = app.globalData.currentSlotIndex * 100 + app.globalData.currentSetIndex
-          if (phoneScore > watchScore) {
-            app.adoptPhoneSession(phoneSession)
-            replace({ url: 'page/workout/index' })
-            return
-          }
-        }
-
-        if (phoneSession.restTimer && phoneSession.restTimer.active) {
-          const rt = phoneSession.restTimer
-          const now = Date.now()
-          if (rt.endTime && rt.endTime > now) {
-            const rem = Math.max(0, Math.round((rt.endTime - now) / 1000))
-            const ex = app.getActiveExercise()
-            app.globalData.restTimer = {
-              active: true,
-              endTime: rt.endTime,
-              remainingSeconds: rem,
-              totalSeconds: rt.duration || 90,
-              nextExerciseName: ex ? ex.name : '',
-              nextSetNum: (app.globalData.currentSetIndex || 0) + 1
-            }
-          }
-        }
+        app.mergePhoneSession(phoneSession)
+        this.updateTimerDisplay()
       }
-    } catch (e) {}
+    } catch (e) {
+      console.log('[Workout] Error en sincronización bajo demanda:', e)
+    }
   },
 
   completeCurrentSet() {
@@ -751,6 +715,7 @@ Page(BasePage({
     this.enableWakeUpRelaunch()
     this.updateClockDisplay()
     this.updateTimerDisplay()
+    this.checkPhoneSyncOnDemand(false)
   },
 
   enableWakeUpRelaunch() {

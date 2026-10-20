@@ -47,7 +47,7 @@ Page(
 
       try {
         const phoneSession = await requestPhoneLiveWorkout(this)
-        if (phoneSession && phoneSession.activeDayId) {
+        if (phoneSession && phoneSession.activeDayId && phoneSession.workoutActive === true) {
           app.globalData.phoneLiveSession = phoneSession
           const dayData = ROUTINE_SLOTS[phoneSession.activeDayId]
           const title = dayData ? dayData.shortName : phoneSession.activeDayId
@@ -61,12 +61,13 @@ Page(
             this.state.subWidget.setProperty(hmUI.prop.COLOR, 0x38bdf8)
           }
         } else {
+          app.globalData.phoneLiveSession = null
           if (this.state.syncButton) {
             this.state.syncButton.setProperty(hmUI.prop.TEXT, '🔄 Sincronizar Móvil')
             this.state.syncButton.setProperty(hmUI.prop.NORMAL_COLOR, 0x1e293b)
           }
           if (this.state.subWidget) {
-            this.state.subWidget.setProperty(hmUI.prop.TEXT, 'Selecciona rutina o sincroniza')
+            this.state.subWidget.setProperty(hmUI.prop.TEXT, manualTrigger ? 'Sin entreno activo en móvil' : 'Selecciona rutina o sincroniza')
             this.state.subWidget.setProperty(hmUI.prop.COLOR, 0x94a3b8)
           }
         }
@@ -189,19 +190,23 @@ Page(
       const ROTATION_TP = ['torsoA', 'piernaA', 'torsoB', 'piernaB']
       let recommendedDayId = 'fullbodyA'
 
-      try {
-        const localData = loadWorkoutData()
-        if (localData && localData.history && localData.history.length > 0) {
-          const lastDay = localData.history[0].dayId
-          if (ROTATION_FULLBODY.indexOf(lastDay) !== -1) {
-            const idx = ROTATION_FULLBODY.indexOf(lastDay)
-            recommendedDayId = ROTATION_FULLBODY[(idx + 1) % ROTATION_FULLBODY.length]
-          } else if (ROTATION_TP.indexOf(lastDay) !== -1) {
-            const idx = ROTATION_TP.indexOf(lastDay)
-            recommendedDayId = ROTATION_TP[(idx + 1) % ROTATION_TP.length]
+      if (phoneSession && phoneSession.recommendedDayId) {
+        recommendedDayId = phoneSession.recommendedDayId
+      } else {
+        try {
+          const localData = loadWorkoutData()
+          if (localData && localData.history && localData.history.length > 0) {
+            const lastDay = localData.history[0].dayId
+            if (ROTATION_FULLBODY.indexOf(lastDay) !== -1) {
+              const idx = ROTATION_FULLBODY.indexOf(lastDay)
+              recommendedDayId = ROTATION_FULLBODY[(idx + 1) % ROTATION_FULLBODY.length]
+            } else if (ROTATION_TP.indexOf(lastDay) !== -1) {
+              const idx = ROTATION_TP.indexOf(lastDay)
+              recommendedDayId = ROTATION_TP[(idx + 1) % ROTATION_TP.length]
+            }
           }
-        }
-      } catch (e) {}
+        } catch (e) {}
+      }
 
       const days = [
         // --- FULL BODY 3 DÍAS (PRINCIPAL) ---

@@ -44,8 +44,10 @@ AppSideService(
             timeout: 10000
           })
 
-          if (!response || !response.body) {
-            res(null, { session: null })
+          const status = response ? (response.status || 200) : 0
+          if (!response || status < 200 || status >= 300 || !response.body) {
+            console.log('[VigorexiApp Side] Respuesta HTTP no exitosa al consultar sesión:', status)
+            res(null, { ok: false, session: null, status: status })
             return
           }
 
@@ -71,11 +73,20 @@ AppSideService(
                 if (typeof sessionPayload === 'string') {
                   sessionPayload = JSON.parse(sessionPayload)
                 }
-                if (sessionPayload && sessionPayload.activeDayId) {
-                  // Verificar que no sea un entreno de hace más de 8 horas
-                  const ageMinutes = (Date.now() - (sessionPayload.timestamp || 0)) / 60000
-                  if (ageMinutes < 480) {
-                    latestSession = sessionPayload
+                const data = (sessionPayload && sessionPayload.payload) ? sessionPayload.payload : sessionPayload
+                if (!data) continue
+
+                // Si la web notificó explícitamente que no hay entreno activo, no hay sesión a adoptar
+                if (data.workoutActive === false) {
+                  latestSession = null
+                  break
+                }
+
+                if (data.activeDayId) {
+                  // Descartar snapshots con más de 3 horas (180 minutos)
+                  const ageMinutes = (Date.now() - (data.timestamp || 0)) / 60000
+                  if (ageMinutes <= 180) {
+                    latestSession = data
                     break
                   }
                 }
@@ -86,10 +97,10 @@ AppSideService(
           }
 
           console.log('[VigorexiApp Side] Sesión activa para el reloj:', latestSession ? `${latestSession.activeDayId} slot ${latestSession.currentSlotIndex} set ${latestSession.currentSetIndex}` : 'ninguna')
-          res(null, { session: latestSession })
+          res(null, { ok: true, session: latestSession, status: status })
         } catch (err) {
           console.log('[VigorexiApp Side] Error consultando sesión móvil:', err)
-          res(null, { session: null })
+          res(null, { ok: false, session: null, status: 500, error: String(err) })
         }
       } else if (req.method === 'WORKOUT_FINISHED') {
         // Enviar resumen de sesión completada desde el reloj a la PWA móvil

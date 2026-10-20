@@ -154,12 +154,17 @@
       const activeDay = getActiveWorkoutDay();
       const workoutActive = !!(activeDay && isWorkoutActive(activeDay));
 
+      const recDay = (typeof getNextRecommendedDay === 'function')
+        ? getNextRecommendedDay()
+        : 'fullbodyA';
+
       let payload;
       if (!workoutActive) {
         // Estado reposo: sin entreno activo, hash constante => 0 peticiones
         payload = {
           workoutActive: false,
           activeDayId: null,
+          recommendedDayId: recDay,
           sessionId: null,
           rev: getCurrentRev(),
           timestamp: Date.now()
@@ -252,6 +257,7 @@
           sessionId: sessionId,
           rev: getCurrentRev() + 1,
           activeDayId: activeDay,
+          recommendedDayId: recDay,
           currentSlotIndex: firstUnfinishedSlot,
           currentSetIndex: firstUnfinishedSet,
           sessionStartTime: (workoutState.sessionStartTime && workoutState.sessionStartTime[activeDay]) || null,

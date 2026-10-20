@@ -7,6 +7,7 @@ import { BaseApp } from '@zeppos/zml/base-app'
 import { loadWorkoutData, saveActiveSession, clearActiveSession, recordCompletedSession } from './utils/storage'
 import { ROUTINE_SLOTS, EXERCISE_CATALOG } from './utils/routine_data'
 import { notifySetCompleted, notifyWorkoutFinished, requestPhoneLiveWorkout } from './utils/sync_bridge'
+import { mergeSessionLoggedSets } from './utils/merge'
 
 App(
   BaseApp({
@@ -20,6 +21,7 @@ App(
       slotExtraSets: {},      // slotId -> delta de series añadidas/quitadas
       phoneLiveSession: null, // Datos del entreno activo en el móvil si existe
       isPhoneSynced: false,   // True si la sesión actual está enlazada al móvil
+      lastPhoneQueryTime: 0,  // Marca temporal para throttle de 20s
       restTimer: {
         active: false,
         remainingSeconds: 90,
@@ -81,15 +83,25 @@ App(
       }
     },
 
-    async checkPhoneLiveSession() {
+    async checkPhoneLiveSession(force = false) {
+      const now = Date.now()
+      // Throttle de 20s entre peticiones de red al móvil
+      if (!force && this.globalData.lastPhoneQueryTime && (now - this.globalData.lastPhoneQueryTime < 20000)) {
+        return this.globalData.phoneLiveSession
+      }
+      this.globalData.lastPhoneQueryTime = now
       try {
         const phoneSession = await requestPhoneLiveWorkout(this)
-        if (phoneSession && phoneSession.activeDayId) {
+        if (phoneSession && phoneSession.activeDayId && phoneSession.workoutActive !== false) {
           this.globalData.phoneLiveSession = phoneSession
           console.log('[VigorexiApp Watch] Entreno activo detectado en el móvil:', phoneSession.activeDayId)
+        } else {
+          this.globalData.phoneLiveSession = null
         }
+        return this.globalData.phoneLiveSession
       } catch (e) {
         console.log('[VigorexiApp Watch] No se pudo verificar sesión móvil:', e)
+        return null
       }
     },
 
@@ -129,6 +141,58 @@ App(
           }
         } else if (this.globalData.restTimer) {
           this.globalData.restTimer.active = false
+        }
+      }
+
+      saveActiveSession({
+        activeDayId: this.globalData.activeDayId,
+        currentSlotIndex: this.globalData.currentSlotIndex,
+        currentSetIndex: this.globalData.currentSetIndex,
+        sessionStartTime: this.globalData.sessionStartTime,
+        sessionLoggedSets: this.globalData.sessionLoggedSets,
+        slotExOverrides: this.globalData.slotExOverrides
+      })
+    },
+
+    mergePhoneSession(phoneSession) {
+      if (!phoneSession || !phoneSession.activeDayId) return
+      if (phoneSession.activeDayId !== this.globalData.activeDayId) return
+
+      // Fusión no destructiva: unión de series completadas sin sobrescribir valores locales
+      this.globalData.sessionLoggedSets = mergeSessionLoggedSets(
+        this.globalData.sessionLoggedSets,
+        phoneSession.sessionLoggedSets
+      )
+
+      if (phoneSession.slotExOverrides) {
+        this.globalData.slotExOverrides = Object.assign({}, this.globalData.slotExOverrides, phoneSession.slotExOverrides)
+      }
+      if (phoneSession.previousSets) {
+        this.globalData.previousSets = Object.assign({}, this.globalData.previousSets, phoneSession.previousSets)
+      }
+      this.globalData.isPhoneSynced = true
+
+      // Adoptar descanso solo si no hay descanso activo en curso en el reloj
+      if (phoneSession.restTimer && phoneSession.restTimer.active && (!this.globalData.restTimer || !this.globalData.restTimer.active)) {
+        const rt = phoneSession.restTimer
+        const now = Date.now()
+        let remaining = 0
+        if (rt.endTime && rt.endTime > now) {
+          remaining = Math.max(0, Math.round((rt.endTime - now) / 1000))
+        } else if (rt.remaining > 0) {
+          remaining = rt.remaining
+        }
+
+        if (remaining > 0) {
+          const ex = this.getActiveExercise()
+          this.globalData.restTimer = {
+            active: true,
+            endTime: rt.endTime || (now + remaining * 1000),
+            remainingSeconds: remaining,
+            totalSeconds: rt.duration || 90,
+            nextExerciseName: ex ? ex.name : '',
+            nextSetNum: (this.globalData.currentSetIndex || 0) + 1
+          }
         }
       }
 
