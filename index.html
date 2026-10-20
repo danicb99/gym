@@ -67,7 +67,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 9px 14px;
+      padding: 6px 14px 5px;
       gap: 8px;
       max-width: 680px;
       margin: 0 auto;
@@ -284,7 +284,27 @@
       flex-wrap: wrap;
     }
     .progress-chip {
-      display: none !important;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      color: var(--gold);
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 0.70rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-chip strong {
+      color: #fff;
+      font-weight: 800;
+    }
+    .progress-chip.completed {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: var(--primary);
     }
     .session-timer-chip {
       background: rgba(255, 255, 255, 0.04);
@@ -1457,18 +1477,9 @@
     }
 
   
-    /* Header Progress Information Bar */
+    /* Header Progress Information Bar - Hidden to slim down top sticky header */
     .prog-text-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 14px 6px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      max-width: 680px;
-      margin: 0 auto;
-      font-variant-numeric: tabular-nums;
+      display: none !important;
     }
     .prog-text-row span:last-child {
       color: var(--primary);
@@ -1841,9 +1852,9 @@
     <div class="workout-progress" id="headerWorkoutProgress">
       <div class="workout-progress-fill" id="workoutProgressBar"></div>
     </div>
-    <div class="prog-text-row" id="headerProgRow">
-      <span id="headerProgSets">0 de 20 series</span>
-      <span id="headerProgPct">0%</span>
+    <div class="prog-text-row" id="headerProgRow" style="display:none !important;" aria-hidden="true">
+      <span id="headerProgSets" style="display:none !important;">0 de 20 series</span>
+      <span id="headerProgPct" style="display:none !important;">0%</span>
     </div>
   </header>
 
@@ -7910,7 +7921,11 @@
       // Update the progress chip inside the active day banner
       const bannerChip = document.getElementById('progressChip-' + activeContent.id);
       if (bannerChip) {
-        bannerChip.innerText = `${doneSets}/${totalSets} series (${Math.round(percentage)}%)`;
+        const isComplete = totalSets > 0 && doneSets >= totalSets;
+        bannerChip.innerHTML = isComplete
+          ? `✓ <strong>${doneSets}/${totalSets}</strong> (100%)`
+          : `<strong>${doneSets}/${totalSets}</strong> series · ${Math.round(percentage)}%`;
+        bannerChip.classList.toggle('completed', isComplete);
       }
     }
 
@@ -9571,7 +9586,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=design6').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=design7').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
