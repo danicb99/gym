@@ -519,28 +519,8 @@
     }
 
     /* Active Row & Quick Stepper Bar */
-    .quick-stepper-bar {
-      position: fixed;
-      bottom: max(16px, env(safe-area-inset-bottom, 16px));
-      left: 50%;
-      transform: translateX(-50%) translateY(140%);
-      width: calc(100% - 24px);
-      max-width: 480px;
-      background: rgba(11, 19, 35, 0.96);
-      border: 1.5px solid var(--border-focus);
-      border-radius: 20px;
-      padding: 10px 14px 12px;
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8), 0 0 24px var(--primary-glow);
-      z-index: 999;
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .quick-stepper-bar.open {
-      transform: translateX(-50%) translateY(0);
+    .quick-stepper-bar, #quickStepperBar {
+      display: none !important;
     }
     .stepper-header {
       display: flex;
@@ -6561,21 +6541,7 @@
   <!-- ==========================================
        BARRA RÁPIDA DE STEPPERS (Ajuste sin teclado nativo)
        ========================================== -->
-  <div class="quick-stepper-bar" id="quickStepperBar">
-    <div class="stepper-header">
-      <span id="stepperTitle">⚡ Serie activa: —</span>
-      <button type="button" class="stepper-close-btn" onclick="closeQuickStepper()">✕</button>
-    </div>
-    <div class="stepper-actions">
-      <div class="stepper-section">
-        <span class="stepper-sec-label">Kilos (KG)</span>
-        <div class="stepper-btn-row">
-          <button type="button" class="btn-step" onclick="adjustActiveRowKg(-5)">-5</button>
-          <button type="button" class="btn-step" onclick="adjustActiveRowKg(-2.5)">-2.5</button>
-          <button type="button" class="btn-step" onclick="adjustActiveRowKg(+2.5)">+2.5</button>
-          <button type="button" class="btn-step" onclick="adjustActiveRowKg(+5)">+5</button>
-        </div>
-      </div>
+  <div class="quick-stepper-bar" id="quickStepperBar" style="display:none !important;" aria-hidden="true"><span id="stepperTitle" style="display:none !important;"></span></div>
       <div class="stepper-section">
         <span class="stepper-sec-label">Reps</span>
         <div class="stepper-btn-row">
@@ -6865,37 +6831,6 @@
       }
       activeRowEl = row;
       row.classList.add('active-row');
-
-      const card = row.closest('.exercise-card');
-      activeSlotId = card ? card.getAttribute('data-slot') : '';
-      activeSetIdx = parseInt(row.getAttribute('data-set-num')) - 1;
-      const exId = card ? card.getAttribute('data-current-ex') : '';
-      const ex = EXERCISE_CATALOG[exId];
-
-      const bar = document.getElementById('quickStepperBar');
-      const title = document.getElementById('stepperTitle');
-      if (title && ex) {
-        const parts = ex.name.split(' ');
-        const shortName = `${parts[0]} ${parts[1] || ''}`;
-        title.innerText = `⚡ Serie ${activeSetIdx + 1} • ${shortName}`;
-      }
-      const secLabels = bar ? bar.querySelectorAll('.stepper-sec-label') : [];
-      if (secLabels.length >= 2) {
-        if (ex && ex.metricType === 'isometria') {
-          secLabels[0].innerText = 'Lastre (+KG)';
-          secLabels[1].innerText = 'Segundos (s)';
-        } else if (ex && ex.metricType === 'peso_corporal') {
-          secLabels[0].innerText = 'Lastre (+KG)';
-          secLabels[1].innerText = 'Reps';
-        } else if (ex && ex.metricType === 'unilateral') {
-          secLabels[0].innerText = 'Kilos (KG)';
-          secLabels[1].innerText = 'Reps / Lado';
-        } else {
-          secLabels[0].innerText = 'Kilos (KG)';
-          secLabels[1].innerText = 'Reps';
-        }
-      }
-      if (bar) bar.classList.add('open');
     }
 
     function closeQuickStepper() {
