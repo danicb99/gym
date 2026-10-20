@@ -1,6 +1,24 @@
-# Guía Fácil de Sincronización para VigorexiApp
+# Guía Fácil de Uso y Sincronización para VigorexiApp (v1.6.0)
 
-Esta guía está pensada para que puedas poner en marcha y probar la sincronización entre tu móvil y tu reloj Amazfit Active 2 de forma sencilla, paso a paso y sin tecnicismos.
+Esta guía te explica de forma clara y sin tecnicismos cómo disfrutar del nuevo diseño v1.6.0 y verificar la sincronización entre tu móvil y tu reloj Amazfit Active 2.
+
+---
+
+## 🌟 Novedades del Nuevo Diseño (v1.6.0)
+
+1. **En el Móvil (PWA):**
+   * **Barra de navegación inferior con 3 pestañas:**
+     * **Entrenar:** Tu rutina activa con tarjetas compactas y enfoque sin distracciones.
+     * **Historial:** Tus estadísticas globales, calendario de constancia y copias de seguridad.
+     * **Rutina:** Selector directo de Full Body (3 días) o Torso/Pierna (4 días) y reglas de doble progresión.
+   * **Casillas grandes de 48 px:** Se pulsan comodísimamente con fatiga y **eliminan el auto-zoom molesto** en iPhone/Safari.
+   * **Temporizador flotante al pie:** Muestra la cuenta atrás de descanso encima de la barra inferior con botón directo de "Saltar".
+
+2. **En el Reloj Amazfit:**
+   * **Botones gigantes de 68 px:** Círculos táctiles enormes para subir o bajar kilos y repeticiones sin fallar el toque.
+   * **Botón ancho "✓ Hecha":** Mucho más visible para confirmar cada serie de un solo toque.
+   * **Anillo de progreso circular:** Una línea curva alrededor del borde de la pantalla te muestra cuánto te queda para terminar la sesión.
+   * **Pantalla de descanso mejorada:** Cuenta atrás en dígitos gigantes, aviso háptico a los 10 segundos y botones rápidos de `+15 s` y `Saltar`.
 
 ---
 
@@ -43,7 +61,7 @@ Esta guía está pensada para que puedas poner en marcha y probar la sincronizac
    - Ve a **Perfil** > **Amazfit Active 2** > **Modo Desarrollador**.
    - Toca el botón de **Escanear QR** (arriba a la derecha) y apunta a la pantalla del ordenador.
    - En tu reloj, sal un segundo a la esfera de la hora para que no esté abierta la app.
-   - Confirma la instalación en el móvil. ¡Listo! La versión 1.5.0 ya está en tu reloj.
+   - Confirma la instalación en el móvil. ¡Listo! La versión 1.6.0 ya está en tu reloj.
 
 ---
 
@@ -51,7 +69,7 @@ Esta guía está pensada para que puedas poner en marcha y probar la sincronizac
 
 1. Abre la web/PWA de VigorexiApp en tu teléfono.
 2. Desliza el dedo hacia abajo en la pantalla para recargar (o cierra la aplicación/pestaña del todo y vuelve a abrirla).
-3. Para asegurarte de que ya tienes la versión nueva, toca la píldora de arriba a la derecha: en el título de la ventana debe poner **«VigorexiApp v1.5.0»**.
+3. Para asegurarte de que ya tienes la versión nueva, toca la píldora de arriba a la derecha: en el título de la ventana debe poner **«VigorexiApp v1.6.0»**.
 
 ---
 
