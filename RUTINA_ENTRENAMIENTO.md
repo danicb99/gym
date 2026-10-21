@@ -8,7 +8,7 @@ VigorexiApp integra dos sistemas de entrenamiento de máxima evidencia científi
 
 1. **⚡ PROGRAMA PRINCIPAL: FULL BODY CÍCLICO ROTATIVO (3 DÍAS - V2)**
    * **Enfoque:** Alta frecuencia y máxima hipertrofia con **mayor volumen en pecho, cuádriceps y gemelos**, manteniendo una gestión óptima de fatiga.
-   * **Duración optimizada:** **40 a 46 minutos** en versión completa (gracias a superseries agonista-antagonista y descansos eficientes) y **33 a 38 minutos** en versión exprés.
+   * **Duración:** **~41 minutos** en versión completa (gracias a superseries agonista-antagonista, descansos eficientes y transiciones realistas de ~1 min) y **~32 a 36 minutos** en versión exprés.
    * **Intensidad:** RIR 1-2 en básicos y RIR 0-1 en accesorios y aislamiento.
    * **Ritmo de rotación flexible:** El ciclo A, B, C rota por sesiones, no por calendario fijo. Mínimo 3 por semana, máximo 3 seguidas, sin intentar recuperar entrenamientos perdidos.
 2. **📋 PROGRAMA ALTERNATIVO: TORSO / PIERNA CLÁSICO (4 DÍAS)**
@@ -32,13 +32,15 @@ VigorexiApp integra dos sistemas de entrenamiento de máxima evidencia científi
 
 *Para los ejercicios secundarios siguientes (poleas, mancuernas, máquinas), basta con **1 serie previa de tanteo** (3-4 reps ligeras) para comprobar el ajuste del asiento y la resistencia.*
 
+* **Excepción en Día A (Press de Banca):** Antes de la primera serie efectiva de Press de banca, realiza **1 serie de aproximación específica (~60% del peso objetivo × 5 reps con 45-60 s de descanso)** para aclimatar hombros y pectoral tras la sentadilla.
+
 ---
 
 ## 🔄 Dinámica de Superseries y Biseries
 
 * **Superserie:** Pareja de ejercicios de músculos distintos o antagonistas (ej. Pecho + Espalda, Deltoides + Gemelos, Cuádriceps + Hombro). Se realiza una serie del ejercicio **A**, se pasa **inmediatamente sin descanso** al ejercicio **B**, y el **temporizador de descanso corre únicamente al terminar la serie de B**.
 * **Biserie (Brazos / Accesorios):** Se alternan series de dos ejercicios (ej. Tríceps y Bíceps) con un descanso corto (**45 s**) tras cada serie individual para no acumular fatiga cruzada en el agarre.
-* **Versión Exprés (⚡):** Si dispones de menos de 40 minutos o el tiempo apremia, activa el interruptor "⚡ Exprés" en la cabecera. La app ocultará los ejercicios prescindibles (**biserie de brazos, plancha y crunch**), permitiéndote finalizar en **33-38 minutos** manteniendo intactos los estímulos principales.
+* **Versión Exprés (⚡):** Si dispones de menos de 40 minutos o el tiempo apremia, activa el interruptor "⚡ Exprés" en la cabecera. La app ocultará los ejercicios prescindibles (**biserie de brazos, plancha y crunch**), permitiéndote finalizar en **~32-36 minutos** manteniendo intactos los estímulos principales.
 
 ---
 
@@ -71,12 +73,12 @@ flowchart LR
 ---
 
 ### 🗓️ DÍA A: Sentadilla Pesada + Torso
-*Duración estimada: **~42 min** (Completa) / **~33 min** (Exprés) | Total: 23 series*
+*Duración estimada: **~41 min** (Completa) / **~32 min** (Exprés) | Total: 23 series*
 
 | # | Ejercicio | Series × Reps | Carga Ref. *(ajustar)* | RIR | Descanso |
 | :-: | :--- | :---: | :---: | :---: | :---: |
 | **1** | **Sentadilla trasera con barra (Back Squat)** | 3 × 6-8 | 100 kg | 1-2 | 120 - 150 s *(Fuerza Cuádriceps)* |
-| **2a** | **⚡ SUPERSERIE: Press de banca plano con barra** | 4 × 6-8 | 80 kg | 1-2 | Inmediato a 2b |
+| **2a** | **⚡ SUPERSERIE: Press de banca plano con barra**<br>*Aprox. previa: ~60% × 5 reps (descanso 45-60 s)* | 4 × 6-8 | 80 kg | 1-2 | Inmediato a 2b |
 | **2b** | **⚡ SUPERSERIE: Jalón al pecho prono (agarre ancho)** | 4 × 8-10 | 70 kg | 1-2 | **90 - 120 s tras la pareja** |
 | **3a** | **⚡ SUPERSERIE: Elevaciones laterales con mancuernas** | 3 × 12-15 | 12 kg | 0-1 | Inmediato a 3b |
 | **3b** | **⚡ SUPERSERIE: Elevación de talones de pie (gemelos)** | 3 × 12-15 | 70 kg *(pausa 1s abajo)* | 0-1 | **45 - 60 s tras la pareja** |
@@ -92,7 +94,7 @@ flowchart LR
 ---
 
 ### 🗓️ DÍA B: Bisagra Cadera (RDL) + Torso
-*Duración estimada: **~43 min** (Completa) / **~38 min** (Exprés) | Total: 23 series*
+*Duración estimada: **~41 min** (Completa) / **~36 min** (Exprés) | Total: 23 series*
 
 | # | Ejercicio | Series × Reps | Carga Ref. *(ajustar)* | RIR | Descanso |
 | :-: | :--- | :---: | :---: | :---: | :---: |
@@ -113,7 +115,7 @@ flowchart LR
 ---
 
 ### 🗓️ DÍA C: Prensa + Torso y Brazos
-*Duración estimada: **~43 min** (Completa) / **~30-33 min** (Exprés) | Total: 27 series*
+*Duración estimada: **~41 min** (Completa) / **~32 min** (Exprés) | Total: 27 series*
 
 | # | Ejercicio | Series × Reps | Carga Ref. *(ajustar)* | RIR | Descanso |
 | :-: | :--- | :---: | :---: | :---: | :---: |
@@ -152,7 +154,7 @@ Día A ──> Día B ──> Día C ──> Día A ──> Día B ... (rotació
    * **Cómo hacerla:** Mantén la misma rutina pero realiza la mitad de las series (o RIR 3-4 con cargas moderadas). Permite disipar la fatiga acumulada en tejido conectivo y sistema nervioso central.
 6. **Pausa de dieta (Diet Break) cada 8 a 12 semanas en déficit:**
    * En fases de definición o pérdida de grasa, tras 8 a 12 semanas de déficit calórico continuo, introduce **1 semana a calorías de mantenimiento** (subiendo hidratos de carbono saludables).
-   * Restablece los niveles de leptina, función tiroidea y gasto metabólico, protegiendo la masa muscular y reduciendo la fatiga psicológica.
+   * Ayuda a la adherencia psicológica y a reducir la fatiga acumulada del déficit continuo; la evidencia científica de otros efectos metabólicos o de reactivación hormonal es limitada.
 
 ---
 
@@ -160,59 +162,59 @@ Día A ──> Día B ──> Día C ──> Día A ──> Día B ... (rotació
 *Para periodos donde prefieras separar 100% tren superior y tren inferior.*
 
 ### DÍA 1: LUNES – TORSO A (Empuje)
-1. Press de banca plano barra: $4 	imes 6	ext{--}8$ (80 kg) | 120-150 s
-2. Jalón al pecho prono ancho: $4 	imes 8	ext{--}10$ (70 kg) | 90-120 s
-3. Press militar sentado mancuernas: $3 	imes 8	ext{--}10$ (24 kg) | 90 s
-4. Remo en polea baja neutro: $3 	imes 10	ext{--}12$ (65 kg) | 90 s
-5. Elevaciones laterales mancuernas: $3 	imes 12	ext{--}15$ (12 kg) | 75 s
-6. Biserie Brazos (Extensión tríceps $3 	imes 10	ext{--}12$ + Curl bíceps $3 	imes 10	ext{--}12$) | 45 s
+1. Press de banca plano barra: $4 \times 6\text{--}8$ (80 kg) | 120-150 s
+2. Jalón al pecho prono ancho: $4 \times 8\text{--}10$ (70 kg) | 90-120 s
+3. Press militar sentado mancuernas: $3 \times 8\text{--}10$ (24 kg) | 90 s
+4. Remo en polea baja neutro: $3 \times 10\text{--}12$ (65 kg) | 90 s
+5. Elevaciones laterales mancuernas: $3 \times 12\text{--}15$ (12 kg) | 75 s
+6. Biserie Brazos (Extensión tríceps $3 \times 10\text{--}12$ + Curl bíceps $3 \times 10\text{--}12$) | 45 s
 
 ### DÍA 2: MARTES – PIERNA A (Cuádriceps)
-1. Sentadilla trasera con barra: $3 	imes 6	ext{--}8$ (100 kg) | 150-180 s
-2. Extensiones de cuádriceps en máquina: $3 	imes 10	ext{--}12$ (60 kg) | 90 s
-3. Curl femoral tumbado: $3 	imes 10	ext{--}12$ (45 kg) | 90 s
-4. Elevación de talones de pie: $3 	imes 12	ext{--}15$ (70 kg) | 60 s
-5. Plancha abdominal isométrica: $3 	imes 45	ext{--}60	ext{ s}$ | 45 s
+1. Sentadilla trasera con barra: $3 \times 6\text{--}8$ (100 kg) | 150-180 s
+2. Extensiones de cuádriceps en máquina: $3 \times 10\text{--}12$ (60 kg) | 90 s
+3. Curl femoral tumbado: $3 \times 10\text{--}12$ (45 kg) | 90 s
+4. Elevación de talones de pie: $3 \times 12\text{--}15$ (70 kg) | 60 s
+5. Plancha abdominal isométrica: $3 \times 45\text{--}60\text{ s}$ | 45 s
 
 ### DÍA 3: JUEVES – TORSO B (Tracción)
-1. Remo unilateral con mancuerna: $4 	imes 8	ext{--}10$ (34 kg) | 90-120 s
-2. Press inclinado mancuernas: $4 	imes 8	ext{--}10$ (30 kg) | 90-120 s
-3. Jalón neutro cerrado: $4 	imes 8	ext{--}10$ (70 kg) | 90-120 s
-4. Elevaciones laterales polea: $3 	imes 12	ext{--}15$ (10 kg) | 75 s
-5. Face pull en polea alta: $3 	imes 12	ext{--}15$ (25 kg) | 60 s
-6. Biserie Brazos (Press francés $3 	imes 10	ext{--}12$ + Curl martillo $3 	imes 10	ext{--}12$) | 45 s
+1. Remo unilateral con mancuerna: $4 \times 8\text{--}10$ (34 kg) | 90-120 s
+2. Press inclinado mancuernas: $4 \times 8\text{--}10$ (30 kg) | 90-120 s
+3. Jalón neutro cerrado: $4 \times 8\text{--}10$ (70 kg) | 90-120 s
+4. Elevaciones laterales polea: $3 \times 12\text{--}15$ (10 kg) | 75 s
+5. Face pull en polea alta: $3 \times 12\text{--}15$ (25 kg) | 60 s
+6. Biserie Brazos (Press francés $3 \times 10\text{--}12$ + Curl martillo $3 \times 10\text{--}12$) | 45 s
 
 ### DÍA 4: VIERNES – PIERNA B (Isquios & Cadena Posterior)
-1. Peso Muerto Rumano (RDL): $3 	imes 8	ext{--}10$ (90 kg) | 120-150 s
-2. Sentadilla búlgara con mancuernas: $3 	imes 8	ext{--}10$ / pierna (20 kg) | 90 s
-3. Curl femoral sentado: $3 	imes 10	ext{--}12$ (55 kg) | 90 s
-4. Extensiones de cuádriceps: $3 	imes 12	ext{--}15$ (55 kg) | 75 s
-5. Elevación de talones sentado: $3 	imes 12	ext{--}15$ (45 kg) | 60 s
-6. Crunch en polea alta: $3 	imes 12	ext{--}15$ (40 kg) | 60 s
+1. Peso Muerto Rumano (RDL): $3 \times 8\text{--}10$ (90 kg) | 120-150 s
+2. Sentadilla búlgara con mancuernas: $3 \times 8\text{--}10$ / pierna (20 kg) | 90 s
+3. Curl femoral sentado: $3 \times 10\text{--}12$ (55 kg) | 90 s
+4. Extensiones de cuádriceps: $3 \times 12\text{--}15$ (55 kg) | 75 s
+5. Elevación de talones sentado: $3 \times 12\text{--}15$ (45 kg) | 60 s
+6. Crunch en polea alta: $3 \times 12\text{--}15$ (40 kg) | 60 s
 
 ---
 
 # 🥗 GUÍA NUTRICIONAL Y FISIOLÓGICA PERSONALIZADA (DANI)
 
 ### 📊 Diagnóstico y Objetivos
-* **Edad:** 39 años | **Altura:** 173 cm | **Peso:** 72 kg | **Tasa Metabólica Basal:** $1.610 	ext{ kcal}$
+* **Edad:** 39 años | **Altura:** 173 cm | **Peso:** 72 kg | **Tasa Metabólica Basal:** $1.610 \text{ kcal}$
 * **Objetivo:** **Recomposición Corporal Estética.** Reducción de grasa subcutánea manteniendo íntegra la masa magra y la fuerza, mejorando la vascularización y el tono muscular.
 
 > [!NOTE]
 > **Expectativas en fase de déficit:** Durante un déficit calórico, **mantener las cargas y la fuerza en los ejercicios básicos ya es un excelente resultado adaptativo** (indica preservación total del tejido muscular). El control de la grasa no se mide por la báscula de un solo día (fluctuaciones de agua y glucógeno), sino por la **tendencia del promedio semanal de peso**.
 
 ### 🔢 Números Diarios Clave
-* **Calorías Objetivo:** **$mathbf{1.850	ext{ a }1.900	ext{ kcal/día}}$** (Déficit controlado del 15%).
-* **Proteína:** **$150	ext{ g/día}$** ($2.1	ext{ g/kg}$) $ightarrow$ Preservación de masa magra y alta saciedad.
-* **Grasas Saludables:** **$60	ext{ g/día}$** ($0.85	ext{ g/kg}$) $ightarrow$ Soporte hormonal y salud articular.
-* **Carbohidratos:** **$175	ext{ g/día}$** ($2.4	ext{ g/kg}$) $ightarrow$ Glucógeno muscular y rendimiento en los básicos.
+* **Calorías Objetivo:** **$\mathbf{1.850\text{ a }1.900\text{ kcal/día}}$** (Déficit controlado del 15%).
+* **Proteína:** **$150\text{ g/día}$** ($2.1\text{ g/kg}$) $\rightarrow$ Preservación de masa magra y alta saciedad.
+* **Grasas Saludables:** **$60\text{ g/día}$** ($0.85\text{ g/kg}$) $\rightarrow$ Soporte hormonal y salud articular.
+* **Carbohidratos:** **$175\text{ g/día}$** ($2.4\text{ g/kg}$) $\rightarrow$ Glucógeno muscular y rendimiento en los básicos.
 * **Creatina Monohidrato:** **5 g diarios fijos** todos los días (con o sin entreno).
 
 ### ⏰ Distribución Peri-Entreno para las 15:15
 1. **13:00 (Comida Ligera Pre-Entreno):**
    * Pollo/pavo a la plancha (100 g) o atún al natural + 50-60 g de arroz blanco o 200 g de patata cocida + verduras ligeras al vapor.
    * *Baja en grasa para permitir vaciado gástrico rápido en 2 horas.*
-2. **15:15 (Entrenamiento Full Body - 40 a 46 min):**
+2. **15:15 (Entrenamiento Full Body - ~41 min):**
    * Agua abundante (750 ml). Opcional: café solo 40 min antes de salir de la oficina.
 3. **17:30 - 18:00 (Merienda Fuerte Post-Entreno):**
    * Batido de proteína Whey (30 g) + 5 g de creatina monohidrato + 1 plátano maduro o tortitas de avena.

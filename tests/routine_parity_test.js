@@ -57,6 +57,11 @@ expectedDays.forEach(dayId => {
       assert.strictEqual(s[1], wSlot.sets[sIdx][1], `Reps de serie ${sIdx + 1} en ${mSlot.slotId} difiere: ${s[1]} vs ${wSlot.sets[sIdx][1]}`);
     });
 
+    // Calentamiento / Consejos de aproximación
+    if (mSlot.warmupTip || wSlot.warmupTip) {
+      assert.strictEqual(mSlot.warmupTip, wSlot.warmupTip, `warmupTip en ${mSlot.slotId} difiere`);
+    }
+
     // Emparejamientos (Superseries / Biseries)
     if (mSlot.pairSlotId || wSlot.pairSlotId) {
       assert.strictEqual(mSlot.pairSlotId, wSlot.pairSlotId, `pairSlotId en ${mSlot.slotId} difiere`);

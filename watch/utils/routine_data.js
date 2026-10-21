@@ -15,7 +15,7 @@ export const ROUTINE_SLOTS = {
     totalSets: 23,
     slots: [
       { slotId: "fullbodyA_1", defaultExId: "squat", num: 1, sets: [["100", "8"], ["100", "8"], ["100", "7"]] },
-      { slotId: "fullbodyA_2", defaultExId: "banca", num: "2a", sets: [["80", "8"], ["80", "8"], ["80", "7"], ["80", "6"]], pairSlotId: "fullbodyA_3", pairRole: "a", pairType: "superserie", pairRest: 105, pairName: "Banca + Jalón" },
+      { slotId: "fullbodyA_2", defaultExId: "banca", num: "2a", sets: [["80", "8"], ["80", "8"], ["80", "7"], ["80", "6"]], pairSlotId: "fullbodyA_3", pairRole: "a", pairType: "superserie", pairRest: 105, pairName: "Banca + Jalón", warmupTip: "Aprox: ~60% x 5 (45-60s)" },
       { slotId: "fullbodyA_3", defaultExId: "jalon", num: "2b", sets: [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]], pairSlotId: "fullbodyA_2", pairRole: "b", pairType: "superserie", pairRest: 105, pairName: "Banca + Jalón" },
       { slotId: "fullbodyA_4", defaultExId: "laterales1", num: "3a", sets: [["12", "15"], ["12", "14"], ["12", "12"]], pairSlotId: "fullbodyA_7", pairRole: "a", pairType: "superserie", pairRest: 50, pairName: "Laterales + Gemelos" },
       { slotId: "fullbodyA_7", defaultExId: "gemelopie", num: "3b", sets: [["70", "15"], ["70", "14"], ["70", "12"]], pairSlotId: "fullbodyA_4", pairRole: "b", pairType: "superserie", pairRest: 50, pairName: "Laterales + Gemelos" },

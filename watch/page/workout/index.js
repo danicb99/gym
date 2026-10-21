@@ -272,7 +272,7 @@ Page(BasePage({
       text_size: 16,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: `Serie ${currentSetNum} de ${totalSets}${prevText}`
+      text: (slot && slot.warmupTip && currentSetNum === 1) ? `S1 de ${totalSets} • ${slot.warmupTip}` : `Serie ${currentSetNum} de ${totalSets}${prevText}`
     })
 
     // 3. FILA 1: KILOS ( [-]  80.0 kg  [+] ) CON STEPPERS GRANDES DE 68px
