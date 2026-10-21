@@ -76,17 +76,24 @@ App(
 
     onDestroy() {
       console.log('[VigorexiApp Watch] App destruida')
-      if (this.globalData.activeDayId) {
-        saveActiveSession({
-          activeDayId: this.globalData.activeDayId,
-          currentSlotIndex: this.globalData.currentSlotIndex,
-          currentSetIndex: this.globalData.currentSetIndex,
-          sessionStartTime: this.globalData.sessionStartTime,
-          sessionLoggedSets: this.globalData.sessionLoggedSets,
-          slotExOverrides: this.globalData.slotExOverrides,
-          slotExtraSets: this.globalData.slotExtraSets
-        })
+      this.persistActiveSession()
+    },
+
+    persistActiveSession() {
+      if (!this.globalData.activeDayId) return
+      if (!this.globalData.sessionId) {
+        this.globalData.sessionId = `watch-${this.globalData.activeDayId}-${this.globalData.sessionStartTime || Date.now()}`
       }
+      saveActiveSession({
+        activeDayId: this.globalData.activeDayId,
+        sessionId: this.globalData.sessionId,
+        currentSlotIndex: this.globalData.currentSlotIndex,
+        currentSetIndex: this.globalData.currentSetIndex,
+        sessionStartTime: this.globalData.sessionStartTime,
+        sessionLoggedSets: this.globalData.sessionLoggedSets,
+        slotExOverrides: this.globalData.slotExOverrides,
+        slotExtraSets: this.globalData.slotExtraSets || {}
+      })
     },
 
     async checkPhoneLiveSession(force = false) {
@@ -155,15 +162,7 @@ App(
         }
       }
 
-      saveActiveSession({
-        activeDayId: this.globalData.activeDayId,
-        sessionId: this.globalData.sessionId,
-        currentSlotIndex: this.globalData.currentSlotIndex,
-        currentSetIndex: this.globalData.currentSetIndex,
-        sessionStartTime: this.globalData.sessionStartTime,
-        sessionLoggedSets: this.globalData.sessionLoggedSets,
-        slotExOverrides: this.globalData.slotExOverrides
-      })
+      this.persistActiveSession()
     },
 
     mergePhoneSession(phoneSession) {
@@ -214,15 +213,7 @@ App(
         }
       }
 
-      saveActiveSession({
-        activeDayId: this.globalData.activeDayId,
-        sessionId: this.globalData.sessionId,
-        currentSlotIndex: this.globalData.currentSlotIndex,
-        currentSetIndex: this.globalData.currentSetIndex,
-        sessionStartTime: this.globalData.sessionStartTime,
-        sessionLoggedSets: this.globalData.sessionLoggedSets,
-        slotExOverrides: this.globalData.slotExOverrides
-      })
+      this.persistActiveSession()
     },
 
     startNewWorkout(dayId) {
@@ -247,15 +238,7 @@ App(
         nextSetNum: 1
       }
 
-      saveActiveSession({
-        activeDayId: dayId,
-        sessionId: this.globalData.sessionId,
-        currentSlotIndex: 0,
-        currentSetIndex: 0,
-        sessionStartTime: this.globalData.sessionStartTime,
-        sessionLoggedSets: {},
-        slotExOverrides: {}
-      })
+      this.persistActiveSession()
     },
 
     getActiveSlot() {
@@ -281,29 +264,13 @@ App(
     addExtraSet(slotId) {
       if (!this.globalData.slotExtraSets) this.globalData.slotExtraSets = {}
       this.globalData.slotExtraSets[slotId] = (this.globalData.slotExtraSets[slotId] || 0) + 1
-      saveActiveSession({
-        activeDayId: this.globalData.activeDayId,
-        currentSlotIndex: this.globalData.currentSlotIndex,
-        currentSetIndex: this.globalData.currentSetIndex,
-        sessionStartTime: this.globalData.sessionStartTime,
-        sessionLoggedSets: this.globalData.sessionLoggedSets,
-        slotExOverrides: this.globalData.slotExOverrides,
-        slotExtraSets: this.globalData.slotExtraSets
-      })
+      this.persistActiveSession()
     },
 
     removeSet(slotId) {
       if (!this.globalData.slotExtraSets) this.globalData.slotExtraSets = {}
       this.globalData.slotExtraSets[slotId] = (this.globalData.slotExtraSets[slotId] || 0) - 1
-      saveActiveSession({
-        activeDayId: this.globalData.activeDayId,
-        currentSlotIndex: this.globalData.currentSlotIndex,
-        currentSetIndex: this.globalData.currentSetIndex,
-        sessionStartTime: this.globalData.sessionStartTime,
-        sessionLoggedSets: this.globalData.sessionLoggedSets,
-        slotExOverrides: this.globalData.slotExOverrides,
-        slotExtraSets: this.globalData.slotExtraSets
-      })
+      this.persistActiveSession()
     },
 
     recordSet(slotId, setIndex, kg, reps) {
@@ -322,16 +289,7 @@ App(
       }
 
       // Guardar en la flash local del reloj (persistencia offline)
-      saveActiveSession({
-        activeDayId: this.globalData.activeDayId,
-        sessionId: this.globalData.sessionId,
-        currentSlotIndex: this.globalData.currentSlotIndex,
-        currentSetIndex: this.globalData.currentSetIndex,
-        sessionStartTime: this.globalData.sessionStartTime,
-        sessionLoggedSets: this.globalData.sessionLoggedSets,
-        slotExOverrides: this.globalData.slotExOverrides,
-        slotExtraSets: this.globalData.slotExtraSets
-      })
+      this.persistActiveSession()
 
       // Encolar evento en outbox persistente y vaciar con confirmación
       enqueueSetCompletedEvent(

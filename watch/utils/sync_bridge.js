@@ -14,6 +14,7 @@ export const SYNC_EVENTS = {
 
 let isFlushingOutbox = false
 let outboxRetryTimer = null
+let eventSequence = 0
 const BACKOFF_STEPS = [2, 5, 15, 60, 300] // segundos
 
 export function getPendingOutboxCount() {
@@ -48,13 +49,16 @@ export async function requestPhoneLiveWorkout(context) {
  * Encola una serie completada en el outbox persistente y lanza el vaciado
  */
 export function enqueueSetCompletedEvent(context, slotId, setIndex, kg, reps, sessionId, dayId) {
-  const sId = sessionId || `watch-${dayId || 'live'}-${Date.now()}`
-  const eventId = `watch-${sId}-s-${slotId}_${setIndex}`
+  const now = Date.now()
+  const sId = sessionId || `watch-${dayId || 'live'}-${now}`
+  // Un id único por registro permite enviar correcciones de la misma serie.
+  // La idempotencia del reenvío la garantiza el outbox persistente.
+  const eventId = `watch-${sId}-s-${slotId}_${setIndex}-${now}-${++eventSequence}`
   const event = {
     v: 1,
     id: eventId,
     type: 'SET_COMPLETED',
-    ts: Date.now(),
+    ts: now,
     src: 'watch',
     payload: {
       sessionId: sId,
@@ -63,7 +67,7 @@ export function enqueueSetCompletedEvent(context, slotId, setIndex, kg, reps, se
       setIndex: setIndex,
       kg: Number(kg),
       reps: Number(reps),
-      completedAt: Date.now()
+      completedAt: now
     }
   }
 
@@ -117,6 +121,7 @@ export async function flushOutbox(context) {
   }
 
   isFlushingOutbox = true
+  let retryScheduled = false
 
   try {
     for (const item of outbox) {
@@ -146,6 +151,7 @@ export async function flushOutbox(context) {
             : (BACKOFF_STEPS[Math.min(retries - 1, BACKOFF_STEPS.length - 1)] || 300)
           console.log(`[SyncBridge] Reintento programado en ${delaySec}s para evento ${item.id}`)
           scheduleOutboxRetry(context, delaySec * 1000)
+          retryScheduled = true
           break
         }
       } catch (reqErr) {
@@ -156,11 +162,18 @@ export async function flushOutbox(context) {
         updateOutboxRetries(item.id, retries)
         const delaySec = BACKOFF_STEPS[Math.min(retries - 1, BACKOFF_STEPS.length - 1)] || 300
         scheduleOutboxRetry(context, delaySec * 1000)
+        retryScheduled = true
         break
       }
     }
   } finally {
     isFlushingOutbox = false
+  }
+
+  // Si durante el envío se encolaron eventos nuevos (p. ej. WORKOUT_FINISHED),
+  // drenar de nuevo. Si hubo fallo, respetar el backoff ya programado.
+  if (!retryScheduled && getPendingOutboxCount() > 0) {
+    setTimeout(() => flushOutbox(context), 0)
   }
 }
 

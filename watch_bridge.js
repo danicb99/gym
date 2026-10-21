@@ -8,6 +8,7 @@
   const SYNC_SERVER_KEY = 'vigorexiapp_sync_server';
   const SYNC_TOKEN_KEY = 'vigorexiapp_sync_token';
   const DEFAULT_SYNC_CODE = 'vigorexi_danicb99_7f3a91c4e2b8';
+  const LAST_NTFY_ID_KEY = 'vigorexiapp_last_ntfy_id';
 
   function deriveTopicHash(code) {
     const str = String(code || '').trim() || DEFAULT_SYNC_CODE;
@@ -47,9 +48,35 @@
   let RELAY_PHONE_TO_WATCH = activeConfig.phoneToWatch;
 
   function reloadSyncConfig() {
+    const previousWatchTopic = RELAY_WATCH_TO_PHONE;
+    const previousPhoneTopic = RELAY_PHONE_TO_WATCH;
+    const previousToken = activeConfig.token;
     activeConfig = getSyncConfig();
     RELAY_WATCH_TO_PHONE = activeConfig.watchToPhone;
     RELAY_PHONE_TO_WATCH = activeConfig.phoneToWatch;
+
+    const endpointChanged = previousWatchTopic !== RELAY_WATCH_TO_PHONE ||
+      previousPhoneTopic !== RELAY_PHONE_TO_WATCH ||
+      previousToken !== activeConfig.token;
+    if (!endpointChanged) return;
+
+    // El canal SSE y el cursor de ntfy pertenecen al topic anterior:
+    // cerrarlos y forzar un snapshot nuevo en el topic recién configurado.
+    if (syncEventSource) {
+      try { syncEventSource.close(); } catch (e) {}
+      syncEventSource = null;
+    }
+    clearTimeout(reconnectTimeout);
+    reconnectTimeout = null;
+    clearTimeout(broadcastDebounceTimer);
+    broadcastDebounceTimer = null;
+    hasPendingBroadcast = false;
+    isBroadcasting = false;
+    lastBroadcastHash = '';
+    lastBroadcastTime = 0;
+    rateLimitResetTime = 0;
+    broadcastRetryCount = 0;
+    try { localStorage.removeItem(LAST_NTFY_ID_KEY); } catch (e) {}
   }
 
   function getAuthHeaders() {
@@ -429,7 +456,6 @@
   let reconnectTimeout = null;
   const CATCHUP_MAX_AGE_MS = 12 * 60 * 60 * 1000; // Ventana máxima de 12 horas en ntfy.sh
   const PROCESSED_IDS_KEY = 'vigorexiapp_processed_msg_ids';
-  const LAST_NTFY_ID_KEY = 'vigorexiapp_last_ntfy_id';
 
   function getProcessedMsgIds() {
     try {
@@ -718,9 +744,9 @@
   }
 
   // 2. Escuchar eventos entrantes desde el reloj vía SSE
-  function startListeningToWatchEvents() {
+  function startListeningToWatchEvents(force = false) {
     if (syncEventSource) {
-      if (syncEventSource.readyState === EventSource.OPEN || syncEventSource.readyState === EventSource.CONNECTING) {
+      if (!force && (syncEventSource.readyState === EventSource.OPEN || syncEventSource.readyState === EventSource.CONNECTING)) {
         return;
       }
       try { syncEventSource.close(); } catch (e) {}
@@ -791,9 +817,27 @@
     const kg = payload.kg;
     const reps = payload.reps;
     const dayId = payload.dayId;
+    const sessionId = payload.sessionId || (payload.summary && payload.summary.sessionId) || null;
     const completedAt = payload.completedAt || ts;
 
     if (!slotId || setIndex === undefined) return false;
+
+    if (typeof workoutState !== 'undefined' && workoutState) {
+      // Ignorar eventos de una sesión ya archivada (catch-up/outbox antiguo)
+      if (sessionId && Array.isArray(workoutState.sessions) &&
+          workoutState.sessions.some(s => s && (s.sessionId === sessionId || s.id === sessionId))) {
+        markMsgProcessed(id);
+        return true;
+      }
+
+      // No mezclar series de otra sesión concurrente en el mismo día
+      const activeSessionId = dayId && workoutState.sessionIds ? workoutState.sessionIds[dayId] : null;
+      if (sessionId && activeSessionId && activeSessionId !== sessionId) {
+        console.log('[WatchBridge] Serie de otra sesión, ignorando:', id, activeSessionId, sessionId);
+        markMsgProcessed(id);
+        return true;
+      }
+    }
 
     console.log('[WatchBridge] Procesando serie del reloj:', id, slotId, setIndex, kg, reps);
 
@@ -807,19 +851,30 @@
       const existingTime = workoutState.setTimestamps[rowKey] || 0;
       const incomingTime = completedAt || ts || Date.now();
 
-      // Regla de fusión: Gana el cambio más reciente según completedAt.
-      // Una serie completada nunca se sobrescribe por una no completada.
-      if (incomingTime >= existingTime) {
-        if (kg !== undefined && kg !== null && kg !== '') {
-          workoutState.inputs[`${rowKey}_kg`] = String(kg);
-        }
-        if (reps !== undefined && reps !== null && reps !== '') {
-          workoutState.inputs[`${rowKey}_reps`] = String(reps);
-        }
-        workoutState.setTimestamps[rowKey] = incomingTime;
+      // Regla de fusión: gana el cambio más reciente según completedAt.
+      // Un evento antiguo no debe resucitar un día archivado ni deshacer un cambio posterior.
+      if (incomingTime < existingTime) {
+        console.log('[WatchBridge] Evento de serie antiguo, ignorando:', id, incomingTime, existingTime);
+        markMsgProcessed(id);
+        return true;
       }
+
+      if (kg !== undefined && kg !== null && kg !== '') {
+        workoutState.inputs[`${rowKey}_kg`] = String(kg);
+      }
+      if (reps !== undefined && reps !== null && reps !== '') {
+        workoutState.inputs[`${rowKey}_reps`] = String(reps);
+      }
+      workoutState.setTimestamps[rowKey] = incomingTime;
       if (!workoutState.completed.includes(rowKey)) {
         workoutState.completed.push(rowKey);
+      }
+
+      // Adoptar el sessionId del reloj si el móvil aún no tenía sesión para este día.
+      // Evita que el siguiente broadcast genere un id web distinto y parta la sesión.
+      if (dayId && sessionId) {
+        if (!workoutState.sessionIds) workoutState.sessionIds = {};
+        if (!workoutState.sessionIds[dayId]) workoutState.sessionIds[dayId] = sessionId;
       }
 
       // Marcar sessionStartTime si no existía para este día
@@ -903,6 +958,16 @@
     if (typeof workoutState !== 'undefined' && Array.isArray(workoutState.sessions)) {
       const alreadyExists = workoutState.sessions.some(s => s && (s.sessionId === sessionId || s.id === sessionId));
       if (alreadyExists) {
+        markMsgProcessed(id);
+        return true;
+      }
+    }
+
+    // Si el móvil tiene otra sesión activa para ese día, no archivar la sesión equivocada
+    if (typeof workoutState !== 'undefined' && workoutState && workoutState.sessionIds) {
+      const activeSessionId = workoutState.sessionIds[summary.dayId];
+      if (activeSessionId && activeSessionId !== sessionId) {
+        console.log('[WatchBridge] Fin de otra sesión, ignorando:', id, activeSessionId, sessionId);
         markMsgProcessed(id);
         return true;
       }
@@ -1255,7 +1320,7 @@
     if (btnReconn) {
       btnReconn.onclick = () => {
         showWatchToast('🔄 Reconectando canal SSE...');
-        startListeningToWatchEvents();
+        startListeningToWatchEvents(true);
         setTimeout(openWatchSyncModal, 600);
       };
     }
@@ -1328,7 +1393,9 @@
         if (tok) localStorage.setItem(SYNC_TOKEN_KEY, tok.value.trim());
         reloadSyncConfig();
         showWatchToast('💾 Ajustes avanzados guardados');
-        startListeningToWatchEvents();
+        startListeningToWatchEvents(true);
+        scheduleBroadcast(500);
+        catchUpFromWatch();
         setTimeout(openWatchSyncModal, 600);
       };
     }

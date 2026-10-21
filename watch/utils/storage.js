@@ -58,12 +58,16 @@ export function enqueueOutbox(event) {
   if (!event || !event.id) return false
   const current = loadWorkoutData()
   if (!Array.isArray(current.outbox)) current.outbox = []
-  const exists = current.outbox.some(e => e.id === event.id)
-  if (!exists) {
+  const index = current.outbox.findIndex(e => e.id === event.id)
+  if (index === -1) {
     current.outbox.push(event)
-    return saveWorkoutData(current)
+  } else {
+    // Mismo evento re-encolado: actualizar payload sin perder el backoff acumulado
+    current.outbox[index] = Object.assign({}, event, {
+      retries: current.outbox[index].retries || 0
+    })
   }
-  return true
+  return saveWorkoutData(current)
 }
 
 export function removeFromOutbox(eventId) {
