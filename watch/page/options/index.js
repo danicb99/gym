@@ -215,7 +215,16 @@ Page(
         text: 'Sincronizar con Móvil',
         click_func: async () => {
           try {
-            await app.checkPhoneLiveSession()
+            const phoneSession = await app.checkPhoneLiveSession(true)
+            if (phoneSession && phoneSession.workoutActive === true && phoneSession.activeDayId) {
+              if (phoneSession.activeDayId !== app.globalData.activeDayId) {
+                app.adoptPhoneSession(phoneSession)
+              } else {
+                app.mergePhoneSession(phoneSession)
+              }
+              replace({ url: 'page/workout/index' })
+              return
+            }
           } catch (e) {}
           back()
         }
@@ -237,6 +246,27 @@ Page(
         click_func: () => {
           app.finishWorkout()
           replace({ url: 'page/summary/index' })
+        }
+      })
+      curY += btnH + btnGap
+
+      // OPCIÓN 8: DESCARTAR Y ELEGIR DÍA
+      hmUI.createWidget(hmUI.widget.BUTTON, {
+        x: btnX,
+        y: curY,
+        w: btnW,
+        h: btnH,
+        radius: btnRadius,
+        normal_color: 0x334155,
+        press_color: 0x1e293b,
+        color: 0xfbbf24,
+        text_size: 18,
+        text: '🗑️ Descartar y Elegir Día',
+        click_func: () => {
+          if (typeof app.discardActiveSession === 'function') {
+            app.discardActiveSession()
+          }
+          replace({ url: 'page/day_select/index' })
         }
       })
       curY += btnH + btnGap

@@ -41,14 +41,21 @@ App(
       // 1. Restaurar sesión autónoma previa si existía en memoria flash
       const saved = loadWorkoutData()
       if (saved && saved.activeSession) {
-        this.globalData.activeDayId = saved.activeSession.activeDayId
-        this.globalData.sessionId = saved.activeSession.sessionId || `watch-${saved.activeSession.activeDayId}-${saved.activeSession.sessionStartTime}`
-        this.globalData.currentSlotIndex = saved.activeSession.currentSlotIndex || 0
-        this.globalData.currentSetIndex = saved.activeSession.currentSetIndex || 0
-        this.globalData.sessionStartTime = saved.activeSession.sessionStartTime
-        this.globalData.sessionLoggedSets = saved.activeSession.sessionLoggedSets || {}
-        this.globalData.slotExOverrides = saved.activeSession.slotExOverrides || {}
-        this.globalData.slotExtraSets = saved.activeSession.slotExtraSets || {}
+        const sTime = saved.activeSession.sessionStartTime
+        const maxAge = 8 * 3600 * 1000 // 8 horas máximo de validez
+        if (!sTime || (Date.now() - sTime > maxAge)) {
+          console.log('[VigorexiApp Watch] Sesión en flash caducada o antigua (>8h), limpiando...')
+          clearActiveSession()
+        } else {
+          this.globalData.activeDayId = saved.activeSession.activeDayId
+          this.globalData.sessionId = saved.activeSession.sessionId || `watch-${saved.activeSession.activeDayId}-${saved.activeSession.sessionStartTime}`
+          this.globalData.currentSlotIndex = saved.activeSession.currentSlotIndex || 0
+          this.globalData.currentSetIndex = saved.activeSession.currentSetIndex || 0
+          this.globalData.sessionStartTime = saved.activeSession.sessionStartTime
+          this.globalData.sessionLoggedSets = saved.activeSession.sessionLoggedSets || {}
+          this.globalData.slotExOverrides = saved.activeSession.slotExOverrides || {}
+          this.globalData.slotExtraSets = saved.activeSession.slotExtraSets || {}
+        }
       }
 
       // 1b. Cargar marcas anteriores (previousSets) desde el historial local si no hay sesión del móvil
@@ -215,7 +222,41 @@ App(
         }
       }
 
+      // Sincronizar slotIndex y setIndex si el móvil avanza o si el reloj no ha marcado series
+      if (typeof phoneSession.currentSlotIndex === 'number') {
+        const currentSlot = this.getActiveSlot()
+        const currentSlotLogged = currentSlot ? (this.globalData.sessionLoggedSets[currentSlot.slotId] || []) : []
+        const hasUnsyncedWork = currentSlotLogged.some(s => s && s.completed)
+        if (!hasUnsyncedWork || phoneSession.currentSlotIndex > this.globalData.currentSlotIndex) {
+          this.globalData.currentSlotIndex = phoneSession.currentSlotIndex
+          if (typeof phoneSession.currentSetIndex === 'number') {
+            this.globalData.currentSetIndex = phoneSession.currentSetIndex
+          }
+        }
+      }
+
       this.persistActiveSession()
+    },
+
+    discardActiveSession() {
+      this.globalData.activeDayId = null
+      this.globalData.sessionId = null
+      this.globalData.currentSlotIndex = 0
+      this.globalData.currentSetIndex = 0
+      this.globalData.sessionStartTime = null
+      this.globalData.sessionLoggedSets = {}
+      this.globalData.slotExOverrides = {}
+      this.globalData.slotExtraSets = {}
+      this.globalData.phoneLiveSession = null
+      this.globalData.isPhoneSynced = false
+      this.globalData.restTimer = {
+        active: false,
+        remainingSeconds: 90,
+        totalSeconds: 90,
+        nextExerciseName: '',
+        nextSetNum: 1
+      }
+      clearActiveSession()
     },
 
     startNewWorkout(dayId) {

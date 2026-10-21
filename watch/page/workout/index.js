@@ -607,15 +607,37 @@ Page(BasePage({
     this.state.timerWidget.setProperty(hmUI.prop.NORMAL_COLOR, 0x0f172a)
   },
 
-  // Consulta bajo demanda sin recargar la pantalla ni perder inputs en edición (prohibido replace)
+  // Consulta bajo demanda y adopción dinámica de sesión activa del móvil
   async checkPhoneSyncOnDemand(force = false) {
     const app = this.state.app
     try {
       const phoneSession = await app.checkPhoneLiveSession(force)
-      if (!phoneSession || !phoneSession.activeDayId) return
-      if (phoneSession.activeDayId === app.globalData.activeDayId) {
+      if (!phoneSession) return
+
+      if (phoneSession.workoutActive === true && phoneSession.activeDayId) {
+        if (phoneSession.activeDayId !== app.globalData.activeDayId) {
+          console.log('[Workout] Móvil en día diferente:', phoneSession.activeDayId, 'Adoptando sesión del móvil...')
+          app.adoptPhoneSession(phoneSession)
+          replace({ url: 'page/workout/index' })
+          return
+        }
+
+        const prevSlot = app.globalData.currentSlotIndex
+        const prevSet = app.globalData.currentSetIndex
         app.mergePhoneSession(phoneSession)
+
+        if (app.globalData.currentSlotIndex !== prevSlot || app.globalData.currentSetIndex !== prevSet) {
+          console.log('[Workout] Slot o serie cambiados por el móvil, actualizando vista...')
+          replace({ url: 'page/workout/index' })
+          return
+        }
+
         this.updateTimerDisplay()
+      } else if (phoneSession.workoutActive === false && app.globalData.isPhoneSynced) {
+        console.log('[Workout] Entreno completado en el móvil, archivando en el reloj...')
+        app.finishWorkout()
+        replace({ url: 'page/summary/index' })
+        return
       }
     } catch (e) {
       console.log('[Workout] Error en sincronización bajo demanda:', e)

@@ -27,14 +27,44 @@ Page(
       if (app && typeof app.flushPendingOutbox === 'function') {
         app.flushPendingOutbox()
       }
-      // Si ya hay un entrenamiento activo guardado en memoria flash, reanudar inmediatamente
+      this.enableWakeUpRelaunch()
+
+      // Si ya hay un entrenamiento activo guardado en memoria flash, comprobar si el móvil tiene otra sesión activa
       if (app && app.globalData && app.globalData.activeDayId) {
-        console.log('[DaySelect] Sesión activa detectada en flash, auto-resumiendo entreno:', app.globalData.activeDayId)
-        replace({ url: 'page/workout/index' })
-        return
+        try {
+          const phoneSession = await requestPhoneLiveWorkout(this)
+          if (phoneSession && phoneSession.workoutActive === true && phoneSession.activeDayId) {
+            if (phoneSession.activeDayId !== app.globalData.activeDayId) {
+              console.log('[DaySelect] Móvil tiene otra sesión activa:', phoneSession.activeDayId, 'Adoptando...')
+              app.adoptPhoneSession(phoneSession)
+            } else {
+              app.mergePhoneSession(phoneSession)
+            }
+            replace({ url: 'page/workout/index' })
+            return
+          } else if (phoneSession && phoneSession.workoutActive === false) {
+            // El móvil está en reposo: si la sesión en reloj tiene más de 2h, descartarla para permitir elegir día
+            const now = Date.now()
+            const sTime = app.globalData.sessionStartTime || 0
+            if (now - sTime > 2 * 3600 * 1000) {
+              console.log('[DaySelect] Móvil en reposo y sesión en reloj antigua (>2h), descartando...')
+              if (typeof app.discardActiveSession === 'function') {
+                app.discardActiveSession()
+              }
+            } else {
+              replace({ url: 'page/workout/index' })
+              return
+            }
+          } else {
+            replace({ url: 'page/workout/index' })
+            return
+          }
+        } catch (e) {
+          replace({ url: 'page/workout/index' })
+          return
+        }
       }
 
-      this.enableWakeUpRelaunch()
       // Iniciar búsqueda automática de sesión en móvil
       this.checkSync(false)
     },
