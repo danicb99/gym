@@ -1874,6 +1874,62 @@
       color: #03251a;
     }
 
+  
+    /* Fase 4: Modo Exprés, Avisos y Duración Estimada */
+    .est-duration-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+    }
+    .banner-alert-box {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.74rem;
+      line-height: 1.45;
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .banner-alert-icon {
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+    .btn-express-toggle {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      border-radius: 9999px;
+      padding: 4px 11px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .btn-express-toggle.active {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: #fbbf24;
+      color: #fbbf24;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+    }
+    body.express-mode .exercise-card[data-skippable="true"] {
+      display: none !important;
+    }
+
   </style>
 </head>
 <body>
@@ -1983,10 +2039,12 @@
             <span class="last-done-chip" id="lastDoneChip-fullbodyA" style="display:none;"></span>
             <span class="session-timer-chip" id="sessionTimer-fullbodyA" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
               <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            <span class="est-duration-chip" id="estDurationChip-fullbodyA" title="Duración estimada del entrenamiento">⏱️ ~43 min</span>
             </span>
           </div>
         </div>
         <div class="day-banner-actions">
+          <button id="btnExpress-fullbodyA" class="btn-express-toggle" type="button" onclick="toggleExpressMode()" title="Versión exprés: omite accesorios para terminar en 33-38 min">⚡ Exprés</button>
           <button class="btn-guide-modal" onclick="openGuideModal('fullbodyA')" title="Ver protocolo de calentamiento y aproximación">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -1996,6 +2054,7 @@
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('fullbodyA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
+        <div class="banner-alert-box" id="bannerAlertBox-fullbodyA" style="display:none;"></div>
       </div>
 
             <!-- Exercise 1: fullbodyA_1 -->
@@ -2742,10 +2801,12 @@
             <span class="last-done-chip" id="lastDoneChip-fullbodyB" style="display:none;"></span>
             <span class="session-timer-chip" id="sessionTimer-fullbodyB" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
               <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            <span class="est-duration-chip" id="estDurationChip-fullbodyB" title="Duración estimada del entrenamiento">⏱️ ~43 min</span>
             </span>
           </div>
         </div>
         <div class="day-banner-actions">
+          <button id="btnExpress-fullbodyB" class="btn-express-toggle" type="button" onclick="toggleExpressMode()" title="Versión exprés: omite accesorios para terminar en 33-38 min">⚡ Exprés</button>
           <button class="btn-guide-modal" onclick="openGuideModal('fullbodyB')" title="Ver protocolo de calentamiento y aproximación">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -2755,6 +2816,7 @@
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('fullbodyB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
+        <div class="banner-alert-box" id="bannerAlertBox-fullbodyB" style="display:none;"></div>
       </div>
 
             <!-- Exercise 1: fullbodyB_1 -->
@@ -3501,10 +3563,12 @@
             <span class="last-done-chip" id="lastDoneChip-fullbodyC" style="display:none;"></span>
             <span class="session-timer-chip" id="sessionTimer-fullbodyC" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
               <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            <span class="est-duration-chip" id="estDurationChip-fullbodyC" title="Duración estimada del entrenamiento">⏱️ ~43 min</span>
             </span>
           </div>
         </div>
         <div class="day-banner-actions">
+          <button id="btnExpress-fullbodyC" class="btn-express-toggle" type="button" onclick="toggleExpressMode()" title="Versión exprés: omite accesorios para terminar en 33-38 min">⚡ Exprés</button>
           <button class="btn-guide-modal" onclick="openGuideModal('fullbodyC')" title="Ver protocolo de calentamiento y aproximación">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -3514,6 +3578,7 @@
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('fullbodyC')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
+        <div class="banner-alert-box" id="bannerAlertBox-fullbodyC" style="display:none;"></div>
       </div>
 
             <!-- Exercise 1a: fullbodyC_1 -->
@@ -4448,6 +4513,7 @@
             <span class="last-done-chip" id="lastDoneChip-torsoA" style="display:none;"></span>
             <span class="session-timer-chip" id="sessionTimer-torsoA" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
               <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            <span class="est-duration-chip" id="estDurationChip-torsoA" title="Duración estimada del entrenamiento">⏱️ ~43 min</span>
             </span>
           </div>
         </div>
@@ -4461,6 +4527,7 @@
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('torsoA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
+        <div class="banner-alert-box" id="bannerAlertBox-torsoA" style="display:none;"></div>
       </div>
 
       <!-- Exercise 1: torsoA_1 -->
@@ -5199,6 +5266,7 @@
             <span class="last-done-chip" id="lastDoneChip-piernaA" style="display:none;"></span>
             <span class="session-timer-chip" id="sessionTimer-piernaA" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
               <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            <span class="est-duration-chip" id="estDurationChip-piernaA" title="Duración estimada del entrenamiento">⏱️ ~43 min</span>
             </span>
           </div>
         </div>
@@ -5212,6 +5280,7 @@
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('piernaA')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
+        <div class="banner-alert-box" id="bannerAlertBox-piernaA" style="display:none;"></div>
       </div>
 
       <!-- Exercise 1: piernaA_1 -->
@@ -5738,6 +5807,7 @@
             <span class="last-done-chip" id="lastDoneChip-torsoB" style="display:none;"></span>
             <span class="session-timer-chip" id="sessionTimer-torsoB" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
               <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            <span class="est-duration-chip" id="estDurationChip-torsoB" title="Duración estimada del entrenamiento">⏱️ ~43 min</span>
             </span>
           </div>
         </div>
@@ -5751,6 +5821,7 @@
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('torsoB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
+        <div class="banner-alert-box" id="bannerAlertBox-torsoB" style="display:none;"></div>
       </div>
 
       <!-- Exercise 1: torsoB_1 -->
@@ -6495,6 +6566,7 @@
             <span class="last-done-chip" id="lastDoneChip-piernaB" style="display:none;"></span>
             <span class="session-timer-chip" id="sessionTimer-piernaB" onclick="openHistoryFromDay()" style="cursor:pointer;" title="Toca para ver el historial y duración de hoy">
               <svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg><span>00:00</span>
+            <span class="est-duration-chip" id="estDurationChip-piernaB" title="Duración estimada del entrenamiento">⏱️ ~43 min</span>
             </span>
           </div>
         </div>
@@ -6508,6 +6580,7 @@
           </button>
           <button class="btn-reset-session" onclick="resetDayChecks('piernaB')" title="Reiniciar casillas de hoy sin sobreescribir Anterior">↺</button>
         </div>
+        <div class="banner-alert-box" id="bannerAlertBox-piernaB" style="display:none;"></div>
       </div>
 
       <!-- Exercise 1: piernaB_1 -->
@@ -7345,7 +7418,7 @@
           <span>⚡ Full Body rotativo · 3 días</span>
           <span class="program-badge-active" id="badge-plan-fullbody">Activa</span>
         </b>
-        <small>Máxima hipertrofia con fatiga óptima en piernas (solo 1 básico de pierna por sesión). Patrón continuo 1 ON - 1 OFF (Día entreno - Día descanso).</small>
+        <small>Máxima hipertrofia con fatiga óptima en piernas. El ciclo A, B, C rota por sesiones, no por calendario. Entrena el siguiente día que toque, sin recuperar sesiones perdidas. Mínimo 3 por semana, máximo 3 seguidas.</small>
       </button>
 
       <button type="button" class="routine-plan-card" id="planCard-torso_pierna" onclick="switchRoutineProgram('torso_pierna')">
@@ -7526,7 +7599,7 @@
             <span class="program-opt-title">⚡ Full Body Cíclico Rotativo (3 Días)</span>
             <span class="program-badge-active" id="badge-prog-fullbody">Activo</span>
           </div>
-          <div class="program-opt-desc">Máxima hipertrofia con gestión de fatiga en piernas (solo 1 básico de pierna por sesión). Patrón continuo 1 ON - 1 OFF.</div>
+          <div class="program-opt-desc">Máxima hipertrofia con gestión de fatiga en piernas. El ciclo A, B, C rota por sesiones, no por calendario. Entrena el siguiente día que toque, sin recuperar sesiones perdidas. Mínimo 3 por semana, máximo 3 seguidas.</div>
           <div class="program-opt-days">Día A: Squat • Día B: RDL • Día C: Prensa & Hipertrofia</div>
         </div>
         <div class="program-option-card" id="progOpt-torso_pierna" onclick="switchRoutineProgram('torso_pierna')">
@@ -8121,6 +8194,175 @@
       `;
     }
 
+    
+    // --- Fase 4: Modo Exprés, Duración Estimada y Avisos de Ritmo ---
+    let isExpressMode = false;
+    const _hasShown42MinAlert = {};
+
+    function toggleExpressMode() {
+      isExpressMode = !isExpressMode;
+      document.body.classList.toggle('express-mode', isExpressMode);
+
+      ['fullbodyA', 'fullbodyB', 'fullbodyC'].forEach(id => {
+        const btn = document.getElementById('btnExpress-' + id);
+        if (btn) btn.classList.toggle('active', isExpressMode);
+      });
+
+      updateAllEstimatedDurations();
+      updateProgress();
+
+      showToast(isExpressMode ? '⚡ Modo Exprés activado (33-38 min): accesorios ocultos' : 'Modo Completo activado (40-46 min)');
+    }
+
+    function initExpressMode() {
+      document.body.classList.toggle('express-mode', isExpressMode);
+      ['fullbodyA', 'fullbodyB', 'fullbodyC'].forEach(id => {
+        const btn = document.getElementById('btnExpress-' + id);
+        if (btn) btn.classList.toggle('active', isExpressMode);
+      });
+    }
+
+    function calculateDayEstimatedDuration(dayId, isExpress = false) {
+      const day = ROUTINE_SLOTS[dayId];
+      if (!day || !day.slots) return isExpress ? 33 : 43;
+
+      let totalSeconds = 6 * 60; // 6 min calentamiento primer básico
+      const processedPairs = new Set();
+      const transitionTime = 75; // ~1 min 15 s entre bloques/máquinas
+
+      day.slots.forEach(slot => {
+        if (isExpress && slot.isSkippable) return;
+
+        if (slot.pairSlotId) {
+          if (processedPairs.has(slot.slotId)) return;
+          processedPairs.add(slot.slotId);
+          processedPairs.add(slot.pairSlotId);
+
+          const pairedSlot = day.slots.find(s => s.slotId === slot.pairSlotId);
+          const isPairedSkipped = isExpress && pairedSlot && pairedSlot.isSkippable;
+
+          if (isPairedSkipped) {
+            // Un miembro de la pareja omitido (ej. plancha en Día B, queda face pull solo)
+            const numSets = (slot.sets || []).length;
+            const exRest = slot.pairRest || 45;
+            totalSeconds += numSets * 40 + (numSets - 1) * exRest + transitionTime;
+            return;
+          }
+
+          const numSets = (slot.sets || []).length;
+          const pairRest = slot.pairRest || 90;
+          const pairType = slot.pairType || 'superserie';
+
+          if (pairType === 'superserie') {
+            // 40s slot A + 40s slot B = 80s trabajo por ronda + descanso tras pareja
+            totalSeconds += numSets * 80 + (numSets - 1) * pairRest + transitionTime;
+          } else {
+            // Biserie (brazos): alternancia A - descanso - B - descanso
+            totalSeconds += numSets * (40 + pairRest + 40 + pairRest) - pairRest + transitionTime;
+          }
+        } else {
+          // Ejercicio individual (Sentadilla, RDL, Crunch)
+          const numSets = (slot.sets || []).length;
+          const isIso = slot.defaultExId === 'plancha';
+          const workSec = isIso ? 50 : 40;
+          let exRest = 120;
+          if (slot.defaultExId === 'squat' || slot.defaultExId === 'rdl') exRest = 135;
+          else if (slot.defaultExId === 'crunch') exRest = 60;
+          totalSeconds += numSets * workSec + (numSets - 1) * exRest + transitionTime;
+        }
+      });
+
+      return Math.round(totalSeconds / 60);
+    }
+
+    function updateAllEstimatedDurations() {
+      const days = ['fullbodyA', 'fullbodyB', 'fullbodyC', 'torsoA', 'piernaA', 'torsoB', 'piernaB'];
+      days.forEach(dayId => {
+        const chip = document.getElementById('estDurationChip-' + dayId);
+        if (chip) {
+          const estMin = calculateDayEstimatedDuration(dayId, isExpressMode);
+          chip.textContent = isExpressMode ? `⏱️ ~${estMin}m (Exprés)` : `⏱️ ~${estMin} min`;
+        }
+      });
+    }
+
+    function getConsecutiveTrainingAlert(currentDayId) {
+      const sessions = Array.isArray(workoutState.sessions) ? workoutState.sessions : [];
+      if (sessions.length === 0) return null;
+
+      const today = new Date();
+      const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+      const oneDayMs = 24 * 60 * 60 * 1000;
+
+      const sessionDays = [];
+      const seenDates = new Set();
+
+      sessions.forEach(s => {
+        if (!s || !s.date) return;
+        const d = new Date(s.date);
+        const mid = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+        if (!seenDates.has(mid)) {
+          seenDates.add(mid);
+          sessionDays.push({ mid, session: s });
+        }
+      });
+
+      sessionDays.sort((a, b) => b.mid - a.mid);
+      if (sessionDays.length === 0) return null;
+
+      const latest = sessionDays[0];
+      const diffFromToday = Math.round((todayMidnight - latest.mid) / oneDayMs);
+
+      // 1. Si pasaron 5 días o más sin entrenar
+      if (diffFromToday >= 5) {
+        return {
+          text: `Vuelves tras ${diffFromToday} días: empieza con 5-10% menos de peso para readaptar tendones y evitar fatiga excesiva.`
+        };
+      }
+
+      // 2. Comprobar racha de días consecutivos
+      if (diffFromToday === 1 || diffFromToday === 0) {
+        let streak = 0;
+        let checkDay = (diffFromToday === 0) ? todayMidnight : (todayMidnight - oneDayMs);
+
+        for (const item of sessionDays) {
+          if (item.mid === checkDay) {
+            streak++;
+            checkDay -= oneDayMs;
+          } else if (item.mid < checkDay) {
+            break;
+          }
+        }
+
+        if (streak >= 3) {
+          return {
+            text: 'Llevas 3 días seguidos: hoy en pierna y bisagra de cadera deja 2-3 en reserva y mañana descansa.'
+          };
+        }
+
+        if (diffFromToday === 1) {
+          const lastDayTitle = latest.session.dayName || latest.session.dayId || 'ayer';
+          return {
+            text: `Ayer entrenaste ${lastDayTitle}: hoy en pierna y bisagra de cadera deja 2-3 repeticiones en reserva.`
+          };
+        }
+      }
+
+      return null;
+    }
+
+    function renderBannerAlerts(dayId) {
+      const alert = getConsecutiveTrainingAlert(dayId);
+      const box = document.getElementById('bannerAlertBox-' + dayId);
+      if (!box) return;
+      if (alert) {
+        box.innerHTML = `<span class="banner-alert-icon">💡</span><span>${alert.text}</span>`;
+        box.style.display = 'flex';
+      } else {
+        box.style.display = 'none';
+      }
+    }
+
     // Toggle 3D Player
     function togglePlayer(playerId) {
       const player = document.getElementById(playerId);
@@ -8365,7 +8607,10 @@
         card.classList.add('collapsed');
         card.classList.remove('manually-expanded');
 
-        const allCards = Array.from(section.querySelectorAll('.exercise-card'));
+        let allCards = Array.from(section.querySelectorAll('.exercise-card'));
+        if (document.body.classList.contains('express-mode')) {
+          allCards = allCards.filter(c => c.getAttribute('data-skippable') !== 'true');
+        }
         const nextPending = allCards.find(c => {
           const cDone = c.querySelectorAll('.set-row.done').length;
           const cTot = c.querySelectorAll('.set-row').length;
@@ -8385,7 +8630,10 @@
       saveWorkoutState();
 
       // Check if ALL sets in the entire day are now completed!
-      const allRowsInDay = section ? Array.from(section.querySelectorAll('.set-row')) : [];
+      let allRowsInDay = section ? Array.from(section.querySelectorAll('.set-row')) : [];
+      if (document.body.classList.contains('express-mode')) {
+        allRowsInDay = allRowsInDay.filter(r => !r.closest('.exercise-card[data-skippable="true"]'));
+      }
       const isDayFullyFinished = (allRowsInDay.length > 0) && allRowsInDay.every(r => r.classList.contains('done'));
 
       if (isDone && isDayFullyFinished) {
@@ -8703,6 +8951,7 @@
 
     // Finish & Archive Day Session
     function finishDaySession(dayId) {
+      _hasShown42MinAlert[dayId] = false;
       const daySection = document.getElementById(dayId);
       if (!daySection) return;
 
@@ -8901,6 +9150,7 @@
 
     // Reset Day Checks
     function resetDayChecks(dayId) {
+      _hasShown42MinAlert[dayId] = false;
       if (!confirm('¿Quieres reiniciar las casillas de hoy?\n(La columna "Anterior" y el historial no se borrarán)')) return;
       const daySection = document.getElementById(dayId);
       if (daySection) {
