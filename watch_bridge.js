@@ -885,7 +885,7 @@
   function renderSyncPill(extra) {
     let pill = document.getElementById('watchSyncPill');
     if (!pill) {
-      const headerContainer = document.querySelector('.header-content, .app-header');
+      const headerContainer = document.getElementById('headerCenterWatch') || document.querySelector('.header-center-watch, .header-content, .app-header-fixed, .app-header');
       if (headerContainer) {
         pill = document.createElement('div');
         pill.id = 'watchSyncPill';

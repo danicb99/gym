@@ -1,6 +1,6 @@
-# Guía Fácil de Uso y Sincronización para VigorexiApp (v1.8.0)
+# Guía Fácil de Uso y Sincronización para VigorexiApp (v1.8.1)
 
-Esta guía te explica de forma clara y sin tecnicismos cómo disfrutar de tu nueva interfaz **v1.8.0** (cabecera compacta fija, agrupación visual de superseries, series de calentamiento visibles, notas en hojas inferiores y navegación mejorada), además de los pasos para actualizar tu móvil y tu reloj Amazfit Active 2.
+Esta guía te explica de forma clara y sin tecnicismos cómo disfrutar de tu nueva interfaz **v1.8.1** (cabecera compacta fija, agrupación visual de superseries, series de calentamiento visibles, notas en hojas inferiores y navegación mejorada), además de los pasos para actualizar tu móvil y tu reloj Amazfit Active 2.
 
 ---
 
@@ -13,7 +13,7 @@ Antes de actualizar nada, abre la app en tu móvil y haz una copia de seguridad 
 
 ---
 
-## 🌟 Novedades de la Versión 1.8.0 (Rediseño de Interfaz y Contenido)
+## 🌟 Novedades de la Versión 1.8.1 (Rediseño de Interfaz y Contenido)
 
 1. **📌 Cabecera Fija Compacta (<100 px):**
    * Ya no ocupa media pantalla: al hacer scroll, se queda fijada discretamente arriba sin tapar ningún ejercicio.
@@ -49,7 +49,7 @@ Antes de actualizar nada, abre la app en tu móvil y haz una copia de seguridad 
 
 1. Abre la web/app de VigorexiApp en tu móvil (https://danicb99.github.io/gym/).
 2. Desliza con el dedo hacia abajo en la pantalla para recargar (o cierra la aplicación por completo y vuelve a abrirla).
-3. Entra en la pestaña **Rutina** (desde el chip superior `[ Día ▾ ]` o menú): comprueba que pone la etiqueta verde **v1.8.0** arriba. ¡Tu móvil ya está actualizado!
+3. Entra en la pestaña **Rutina** (desde el chip superior `[ Día ▾ ]` o menú): comprueba que pone la etiqueta verde **v1.8.1** arriba. ¡Tu móvil ya está actualizado!
 
 ---
 
@@ -57,7 +57,7 @@ Antes de actualizar nada, abre la app en tu móvil y haz una copia de seguridad 
 
 > [!IMPORTANT]
 > **Reinstalar el reloj es OBLIGATORIO tras este cambio.**
-> La rutina y el emparejamiento están sincronizados con la versión 1.8.0.
+> La rutina y el emparejamiento están sincronizados con la versión 1.8.1.
 
 Sigue estos sencillos pasos desde tu ordenador:
 
@@ -84,7 +84,7 @@ npx @zeppos/zeus-cli preview
 4. Toca el botón de **Escanear QR** (arriba a la derecha) y enfoca la cámara a la pantalla del ordenador.
 5. **En tu reloj:** sal a la pantalla principal de la hora para que la app no esté abierta.
 6. Pulsa **Instalar** en la pantalla del móvil.
-7. ¡Listo! La versión **1.8.0** estará instalada en tu reloj.
+7. ¡Listo! La versión **1.8.1** estará instalada en tu reloj.
 
 ---
 
