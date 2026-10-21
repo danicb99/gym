@@ -1995,6 +1995,76 @@
       display: none !important;
     }
 
+  
+    /* Fase 4: Serie 0 de calentamiento y aproximación */
+    .warmup-row {
+      background: rgba(148, 163, 184, 0.03);
+      border-bottom: 1px dashed rgba(148, 163, 184, 0.22);
+      transition: background 0.2s ease, opacity 0.2s ease;
+    }
+    .warmup-row .warmup-badge-cell {
+      cursor: pointer;
+      user-select: none;
+    }
+    .warmup-row .warmup-label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #94a3b8;
+      background: rgba(148, 163, 184, 0.15);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 1px 6px;
+      border-radius: 6px;
+      letter-spacing: 0.02em;
+      transition: all 0.15s ease;
+    }
+    .warmup-row .warmup-badge-cell:active .warmup-label {
+      transform: scale(0.92);
+      background: rgba(148, 163, 184, 0.3);
+    }
+    .warmup-row .warmup-hint-cell {
+      font-size: 0.7rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+    .warmup-row .input-warmup-kg,
+    .warmup-row .input-warmup-reps {
+      color: #94a3b8;
+      opacity: 0.85;
+      font-size: 0.88rem;
+    }
+    .warmup-row .warmup-check-btn {
+      background: rgba(148, 163, 184, 0.08);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #64748b;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+    }
+    .warmup-row.done {
+      background: rgba(16, 185, 129, 0.04);
+      opacity: 0.65;
+    }
+    .warmup-row.done .warmup-label {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .warmup-row.done .warmup-check-btn {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #10b981;
+    }
+    .warmup-skip-hint {
+      font-size: 0.68rem;
+      color: #64748b;
+      padding: 4px 10px;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
   </style>
 </head>
 <body>
@@ -2180,6 +2250,20 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0a">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0a</span></td>
+              <td class="set-cell warmup-hint-cell">~50%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="50" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
+            <tr class="warmup-row" data-warmup-num="0b">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0b</span></td>
+              <td class="set-cell warmup-hint-cell">~75%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="75" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="4" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -2288,6 +2372,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~60%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="50" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="5" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -2394,6 +2485,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~55%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="35" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -2506,6 +2604,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~50%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="6" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -2605,6 +2710,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~55%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="40" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -2945,6 +3057,20 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0a">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0a</span></td>
+              <td class="set-cell warmup-hint-cell">~50%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="50" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
+            <tr class="warmup-row" data-warmup-num="0b">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0b</span></td>
+              <td class="set-cell warmup-hint-cell">~75%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="75" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="4" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -3048,6 +3174,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~55%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="16" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -3154,6 +3287,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~55%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="35" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -3266,6 +3406,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~55%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="12" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -3365,6 +3512,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~55%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="30" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -3708,6 +3862,20 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0a">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0a</span></td>
+              <td class="set-cell warmup-hint-cell">~50%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="80" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
+            <tr class="warmup-row" data-warmup-num="0b">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0b</span></td>
+              <td class="set-cell warmup-hint-cell">~75%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="120" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="4" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -3807,6 +3975,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~55%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="25" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -3912,6 +4087,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~55%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="35" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -4011,6 +4193,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~55%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="10" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -4116,6 +4305,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~50%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="5" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -4215,6 +4411,13 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0</span></td>
+              <td class="set-cell warmup-hint-cell">~55%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="40" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -4651,6 +4854,20 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0a">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0a</span></td>
+              <td class="set-cell warmup-hint-cell">~50%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="45" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
+            <tr class="warmup-row" data-warmup-num="0b">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0b</span></td>
+              <td class="set-cell warmup-hint-cell">~75%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="65" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="4" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -5394,6 +5611,20 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0a">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0a</span></td>
+              <td class="set-cell warmup-hint-cell">~50%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="50" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
+            <tr class="warmup-row" data-warmup-num="0b">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0b</span></td>
+              <td class="set-cell warmup-hint-cell">~75%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="75" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="4" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -5925,6 +6156,20 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0a">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0a</span></td>
+              <td class="set-cell warmup-hint-cell">~50%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="16" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
+            <tr class="warmup-row" data-warmup-num="0b">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0b</span></td>
+              <td class="set-cell warmup-hint-cell">~75%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="24" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="4" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -6674,6 +6919,20 @@
           <table class="sets-table">
             <thead><tr><th>Set</th><th>Anterior</th><th>KG</th><th>Reps</th><th>✓</th></tr></thead>
             <tbody>
+            <tr class="warmup-row" data-warmup-num="0a">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0a</span></td>
+              <td class="set-cell warmup-hint-cell">~50%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="50" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="8" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
+            <tr class="warmup-row" data-warmup-num="0b">
+              <td class="set-cell warmup-badge-cell" onclick="openWarmupFromRow(this)" title="Abrir calculadora de calentamiento"><span class="warmup-label">0b</span></td>
+              <td class="set-cell warmup-hint-cell">~75%</td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-kg" placeholder="75" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><input type="number" inputmode="decimal" step="any" class="set-input input-warmup-reps" placeholder="4" oninput="handleWarmupInput(this)"></td>
+              <td class="set-cell"><button type="button" class="check-btn warmup-check-btn" onclick="toggleWarmupCheck(this)"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button></td>
+            </tr>
             <tr class="set-row" data-set-num="1">
               <td class="set-cell">1</td>
               <td class="set-cell set-prev empty" onclick="editPrevious(this)" title="Toca para editar marca de referencia">—</td>
@@ -8302,6 +8561,43 @@
       ['fullbodyA', 'fullbodyB', 'fullbodyC'].forEach(dayId => {
         updateExerciseCardNumbering(dayId);
       });
+    }
+
+    
+    /* Fase 4: Manejo de filas de calentamiento y aproximación (Serie 0) */
+    function openWarmupFromRow(cell) {
+      const card = cell.closest('.exercise-card');
+      if (!card) return;
+      const exId = card.getAttribute('data-current-ex');
+      const firstKgInp = card.querySelector('.input-kg');
+      const targetWeight = firstKgInp ? (parseFloat(firstKgInp.value) || parseFloat(firstKgInp.placeholder) || 0) : 0;
+      openGuideModal(exId, targetWeight);
+    }
+
+    function toggleWarmupCheck(btn) {
+      const row = btn.closest('.warmup-row');
+      const card = btn.closest('.exercise-card');
+      if (!row || !card) return;
+      const isDone = row.classList.toggle('done');
+      if (navigator.vibrate) navigator.vibrate(isDone ? [25] : [10]);
+
+      const slotId = card.getAttribute('data-slot');
+      const warmupNum = row.getAttribute('data-warmup-num');
+      if (!workoutState.warmupChecks) workoutState.warmupChecks = {};
+      workoutState.warmupChecks[`${slotId}_${warmupNum}`] = isDone;
+      saveWorkoutState();
+    }
+
+    function handleWarmupInput(inp) {
+      const row = inp.closest('.warmup-row');
+      const card = inp.closest('.exercise-card');
+      if (!row || !card) return;
+      const slotId = card.getAttribute('data-slot');
+      const warmupNum = row.getAttribute('data-warmup-num');
+      const isKg = inp.classList.contains('input-warmup-kg');
+      if (!workoutState.warmupInputs) workoutState.warmupInputs = {};
+      workoutState.warmupInputs[`${slotId}_${warmupNum}_${isKg ? 'kg' : 'reps'}`] = inp.value.trim();
+      saveWorkoutState();
     }
 
     function toggleExpressMode() {
@@ -10767,6 +11063,29 @@
       autoSelectInitialDay();
       initAll1RMBadges();
       renderDaySelectorOptions();
+      
+      // Restaurar checks e inputs de filas de calentamiento (Serie 0)
+      document.querySelectorAll('.warmup-row').forEach(wRow => {
+        const card = wRow.closest('.exercise-card');
+        if (!card) return;
+        const slotId = card.getAttribute('data-slot');
+        const wNum = wRow.getAttribute('data-warmup-num');
+        const kgInp = wRow.querySelector('.input-warmup-kg');
+        const repsInp = wRow.querySelector('.input-warmup-reps');
+
+        if (workoutState.warmupInputs) {
+          if (kgInp && workoutState.warmupInputs[`${slotId}_${wNum}_kg`]) {
+            kgInp.value = workoutState.warmupInputs[`${slotId}_${wNum}_kg`];
+          }
+          if (repsInp && workoutState.warmupInputs[`${slotId}_${wNum}_reps`]) {
+            repsInp.value = workoutState.warmupInputs[`${slotId}_${wNum}_reps`];
+          }
+        }
+        if (workoutState.warmupChecks && workoutState.warmupChecks[`${slotId}_${wNum}`]) {
+          wRow.classList.add('done');
+        }
+      });
+
       updateProgress();
       const activeSec = document.querySelector('.day-content.active');
       if (activeSec && activeSec.id !== 'historialView' && activeSec.id !== 'routinePlanView') {
