@@ -7908,6 +7908,18 @@
       // Intencionalmente no propaga valores hacia series posteriores
     }
 
+    function getSlotConfig(slotId) {
+      if (typeof ROUTINE_SLOTS === 'undefined') return null;
+      for (const dayKey in ROUTINE_SLOTS) {
+        const day = ROUTINE_SLOTS[dayKey];
+        if (day && day.slots) {
+          const found = day.slots.find(s => s.slotId === slotId);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
     // Set Completion Logic + Auto-collapse finished exercise + Overload & PR Engine
     function completeSet(btn, restSeconds) {
       const row = btn.closest('.set-row');
@@ -8026,21 +8038,62 @@
           openWorkoutSummaryModal(sessionRecord || getLastSession());
         }, 350);
 
-      } else if (isDone && restSeconds) {
-        // SERIE NORMAL: Iniciar temporizador de descanso normal
-        const titleEl = card ? card.querySelector('.ex-title') : null;
-        const exName = titleEl ? titleEl.innerText.replace(/^\d+\.\s*/, '').trim() : '';
-        const setInfo = `Serie ${sIdx + 1}`;
-        triggerRest(restSeconds, exName, setInfo);
+      } else if (isDone) {
         const curSlotId = card ? card.getAttribute('data-slot') : '';
-        if (curSlotId === 'torsoA_6') {
-          showToast('Biserie: 45s de descanso - Toca Bíceps');
-        } else if (curSlotId === 'torsoA_7') {
-          showToast('Biserie: 45s de descanso - Toca Tríceps');
-        } else if (curSlotId === 'torsoB_6') {
-          showToast('Biserie: 45s de descanso - Toca Curl Martillo');
-        } else if (curSlotId === 'torsoB_7') {
-          showToast('Biserie: 45s de descanso - Toca Press Francés');
+        const slotCfg = getSlotConfig(curSlotId);
+        const titleEl = card ? card.querySelector('.ex-title') : null;
+        const exName = titleEl ? titleEl.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim() : '';
+        const setInfo = `Serie ${sIdx + 1}`;
+
+        if (slotCfg && slotCfg.pairSlotId) {
+          const pairedCard = document.getElementById('card-' + slotCfg.pairSlotId);
+          const pairedTitle = pairedCard ? pairedCard.querySelector('.ex-title') : null;
+          const pairedName = pairedTitle ? pairedTitle.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim() : 'ejercicio complementario';
+          const pairType = slotCfg.pairType || 'superserie';
+          const pairRole = slotCfg.pairRole || 'a';
+          const pairRest = slotCfg.pairRest || restSeconds || 90;
+
+          if (pairType === 'superserie') {
+            if (pairRole === 'a') {
+              // 1er ejercicio de la superserie: SIN descanso, pasar inmediatamente a la pareja
+              showToast(`⚡ Superserie: Sin descanso, pasa directo a ${pairedName} (Serie ${sIdx + 1})`);
+              if (pairedCard) {
+                pairedCard.classList.remove('collapsed');
+                pairedCard.classList.add('manually-expanded');
+                setTimeout(() => {
+                  pairedCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 200);
+              }
+            } else {
+              // 2do ejercicio de la pareja: DESCANSO TRAS LA PAREJA
+              triggerRest(pairRest, `Superserie: ${exName}`, `Descanso tras pareja (Ronda ${sIdx + 1})`);
+              showToast(`⏱️ Descanso de superserie: ${pairRest}s tras la pareja. Siguiente ronda: ${pairedName}`);
+              if (pairedCard) {
+                pairedCard.classList.remove('collapsed');
+                pairedCard.classList.add('manually-expanded');
+              }
+            }
+          } else {
+            // Biserie tradicional (descanso de 45s tras cada serie)
+            triggerRest(pairRest, exName, setInfo);
+            showToast(`⚡ Biserie: ${pairRest}s de descanso - Toca ${pairedName}`);
+            if (pairedCard) {
+              pairedCard.classList.remove('collapsed');
+              pairedCard.classList.add('manually-expanded');
+            }
+          }
+        } else if (restSeconds) {
+          // SERIE NORMAL: Iniciar temporizador de descanso normal
+          triggerRest(restSeconds, exName, setInfo);
+          if (curSlotId === 'torsoA_6') {
+            showToast('Biserie: 45s de descanso - Toca Bíceps');
+          } else if (curSlotId === 'torsoA_7') {
+            showToast('Biserie: 45s de descanso - Toca Tríceps');
+          } else if (curSlotId === 'torsoB_6') {
+            showToast('Biserie: 45s de descanso - Toca Curl Martillo');
+          } else if (curSlotId === 'torsoB_7') {
+            showToast('Biserie: 45s de descanso - Toca Press Francés');
+          }
         }
       }
     }
