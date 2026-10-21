@@ -7401,7 +7401,7 @@
       <div class="modal-header">
         <div>
           <div class="modal-title">📖 Protocolo de Calentamiento</div>
-          <div class="modal-subtitle">Series de aproximación y técnica progresiva</div>
+          <div class="modal-subtitle">Protocolo ágil en 2 fases para el 1er básico (~6 min)</div>
         </div>
         <button class="modal-close-btn" onclick="closeGuideModal()">✕</button>
       </div>
@@ -8086,38 +8086,33 @@
 
       if (targetWeight && targetWeight > 0) {
         const minBarWeight = (isBarbell && targetWeight >= 40) ? 20 : (targetWeight > 10 ? 5 : 2);
-        const rampa1 = Math.max(minBarWeight, roundPlate(targetWeight * 0.5));
-        const rampa2 = Math.max(rampa1, roundPlate(targetWeight * 0.7));
-        const activacion = Math.max(rampa2, roundPlate(targetWeight * 0.9));
-        const mobilityDesc = (isBarbell && targetWeight >= 30) ? 'Solo la barra (20 kg)' : (isBarbell ? 'Barra o mancuernas ligeras' : 'Carga muy liviana (~20%)');
+        const fase1Kg = Math.max(minBarWeight, roundPlate(targetWeight * 0.5));
+        const fase2Kg = Math.max(fase1Kg, roundPlate(targetWeight * 0.725));
+        const fase1Desc = isBarbell && targetWeight >= 40 ? 'Barra sola (20 kg) o 50%' : `~50% = ${fase1Kg} kg`;
 
         tableBody = `
-          <tr><td>1. Movilidad</td><td>${mobilityDesc}</td><td>10-12</td><td>30 s</td></tr>
-          <tr><td>2. Rampa 1</td><td style="color:var(--cyan); font-weight:700;">50% = ${rampa1} kg</td><td>5</td><td>60 s</td></tr>
-          <tr><td>3. Rampa 2</td><td style="color:var(--cyan); font-weight:700;">70% = ${rampa2} kg</td><td>3</td><td>90 s</td></tr>
-          <tr><td>4. Activación</td><td style="color:var(--amber); font-weight:700;">90% = ${activacion} kg</td><td>1</td><td>120 s</td></tr>
-          <tr><td style="color:var(--primary); font-weight:700;">5. EFECTIVAS</td><td style="color:var(--primary); font-weight:800;">100% = ${targetWeight} kg</td><td>Al objetivo</td><td>Descanso completo</td></tr>
+          <tr><td>1. Fase 1 (Aproximación)</td><td style="color:var(--cyan); font-weight:700;">${fase1Desc} (${fase1Kg} kg)</td><td>8</td><td>30 - 45 s</td></tr>
+          <tr><td>2. Fase 2 (Media)</td><td style="color:var(--cyan); font-weight:700;">~70-75% = ${fase2Kg} kg</td><td>3 - 5</td><td>60 - 90 s</td></tr>
+          <tr><td style="color:var(--primary); font-weight:700;">3. EFECTIVAS</td><td style="color:var(--primary); font-weight:800;">100% = ${targetWeight} kg</td><td>Reps objetivo</td><td>Descanso oficial</td></tr>
         `;
-        noteHTML = `<div style="font-size:0.72rem; color:#34d399; margin-top:8px; font-weight:600;">⚡ Kilos calculados automáticamente con tu marca previa de ${targetWeight} kg en ${ex.name}.</div>`;
+        noteHTML = `<div style="font-size:0.72rem; color:#34d399; margin-top:8px; font-weight:600;">⚡ Protocolo ágil en 2 fases: listo en ~5-6 min sin fatiga residual. Kilos calculados con tu marca de ${targetWeight} kg en ${ex.name}. Los siguientes ejercicios accesorios mantienen solo 1 serie de tanteo.</div>`;
       } else {
-        const mobilityDesc = isBarbell ? 'Solo la barra (20 kg)' : 'Carga muy liviana (~20%)';
+        const fase1Desc = isBarbell ? 'Barra sola (20 kg) o ~50%' : '~50% del peso de trabajo';
         tableBody = `
-          <tr><td>1. Movilidad</td><td>${mobilityDesc}</td><td>10-12</td><td>30 s</td></tr>
-          <tr><td>2. Rampa 1</td><td>50% del peso de trabajo</td><td>5</td><td>60 s</td></tr>
-          <tr><td>3. Rampa 2</td><td>70% del peso de trabajo</td><td>3</td><td>90 s</td></tr>
-          <tr><td>4. Activación</td><td>90% del peso de trabajo</td><td>1</td><td>120 s</td></tr>
-          <tr><td style="color:var(--primary); font-weight:700;">5. EFECTIVAS</td><td style="color:var(--primary); font-weight:700;">100% (Peso de la sesión)</td><td>Al objetivo</td><td>Descanso completo</td></tr>
+          <tr><td>1. Fase 1 (Aproximación)</td><td>${fase1Desc}</td><td>8</td><td>30 - 45 s</td></tr>
+          <tr><td>2. Fase 2 (Media)</td><td>~70-75% del peso de trabajo</td><td>3 - 5</td><td>60 - 90 s</td></tr>
+          <tr><td style="color:var(--primary); font-weight:700;">3. EFECTIVAS</td><td style="color:var(--primary); font-weight:700;">100% (Peso de la sesión)</td><td>Reps objetivo</td><td>Descanso oficial</td></tr>
         `;
-        noteHTML = `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:8px;">ℹ️ Sin marcas previas registradas para ${ex.name}. Se muestran los porcentajes estándar.</div>`;
+        noteHTML = `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:8px;">ℹ️ Protocolo ágil en 2 fases para el primer gran básico. Ejercicios accesorios siguientes: 1 serie de tanteo para calibrar.</div>`;
       }
 
       card.innerHTML = `
         <div class="guide-title">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-          <span>Series de Aproximación: ${ex.name}</span>
+          <span>Calentamiento Ágil (2 Fases): ${ex.name}</span>
         </div>
         <table class="guide-table">
-          <thead><tr><th>Serie</th><th>Carga</th><th>Reps</th><th>Descanso</th></tr></thead>
+          <thead><tr><th>Fase</th><th>Carga</th><th>Reps</th><th>Descanso</th></tr></thead>
           <tbody>
             ${tableBody}
           </tbody>
@@ -8125,7 +8120,6 @@
         ${noteHTML}
       `;
     }
-
 
     // Toggle 3D Player
     function togglePlayer(playerId) {
