@@ -2310,6 +2310,274 @@
       min-height: 44px;
     }
 
+  
+    /* Fase 6: Cabecera Fija Compacta (<105px) y Nueva Navegación */
+    .app-header-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 98px;
+      background: rgba(6, 10, 18, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px 14px 0 14px;
+      box-sizing: border-box;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    main.container {
+      padding-top: 108px !important;
+      padding-bottom: 84px !important;
+    }
+    .header-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 38px;
+    }
+    .header-brand-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .app-brand-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+    .app-brand-sub {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #94a3b8;
+      letter-spacing: 0.01em;
+    }
+    .header-day-chip-wrap {
+      position: relative;
+    }
+    .header-day-chip {
+      background: rgba(251, 191, 36, 0.12);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: var(--primary);
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      min-height: 44px;
+      transition: all 0.18s ease;
+    }
+    .header-day-chip:active {
+      transform: scale(0.95);
+      background: rgba(251, 191, 36, 0.2);
+    }
+    .day-chip-arrow {
+      font-size: 0.75rem;
+      transition: transform 0.2s ease;
+    }
+    .day-picker-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: #11141c;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      padding: 6px;
+      min-width: 230px;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+      z-index: 1050;
+    }
+    .day-picker-dropdown.open {
+      display: flex;
+    }
+    .dropdown-header {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #64748b;
+      padding: 6px 10px 4px 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .dropdown-item {
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .dropdown-item:active, .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .dropdown-item.highlight {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+    .dropdown-item .item-title {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .dropdown-item .item-sub {
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+    .dropdown-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 4px 0;
+    }
+
+    /* Middle Row: Status & Actions */
+    .header-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 42px;
+    }
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-time-chip {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      padding: 4px 8px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+    }
+    .status-sets-chip {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      padding: 4px 8px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+    }
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hdr-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
+      border-radius: 8px;
+      height: 44px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0 10px;
+      transition: all 0.15s ease;
+    }
+    .hdr-btn:active {
+      transform: scale(0.94);
+    }
+    .hdr-btn-info {
+      width: 44px;
+      padding: 0;
+      font-size: 1.05rem;
+      color: #a855f7;
+      background: rgba(168, 85, 247, 0.1);
+      border-color: rgba(168, 85, 247, 0.25);
+    }
+    .hdr-btn-express {
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.08);
+      border-color: rgba(251, 191, 36, 0.2);
+    }
+    .hdr-btn-express.active {
+      background: var(--gold);
+      color: #0b0f19;
+      border-color: var(--gold);
+    }
+    .hdr-btn-reset {
+      width: 44px;
+      padding: 0;
+      font-size: 1.1rem;
+      color: #94a3b8;
+    }
+
+    /* Bottom Track: Horizontal Thin Progress Bar */
+    .header-progress-track {
+      width: 100%;
+      height: 3.5px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      margin-left: -14px;
+      margin-right: -14px;
+      width: calc(100% + 28px);
+    }
+    .header-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #fbbf24);
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Bottom Nav Update with Timer Running */
+    .nav-tab.timer-running {
+      color: #10b981 !important;
+      animation: pulseTimer 1.8s infinite ease-in-out;
+    }
+    @keyframes pulseTimer {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Back to train bar in Routine tab */
+    .routine-back-bar {
+      display: flex;
+      align-items: center;
+      margin-bottom: 14px;
+      padding: 4px 0;
+    }
+    .routine-back-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .routine-back-btn:active {
+      transform: scale(0.96);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
   </style>
 </head>
 <body>
@@ -2363,38 +2631,62 @@
   <div class="ambient-glow"></div>
 
   <!-- Top App Header with Day Dropdown & Top Rest Timer -->
-  <header class="app-header">
-    <div class="header-content">
-      <!-- Left: Clean Day Title & Subtitle (tappable to open Routine / Day selector) -->
-      <div class="header-day-info" id="headerDayInfo" onclick="switchMainTab('plan')" title="Toca para ver o cambiar de día en Rutina">
-        <div class="header-day-title" id="headerDayTitle">Día A · Full Body</div>
-        <div class="header-day-sub" id="headerDaySub">Squat Pesado & Torso</div>
+  
+  <!-- Top Fixed Compact Header (<105px) -->
+  <header class="app-header-fixed" id="appHeaderFixed">
+    <!-- Top Row: Brand & Day Selector Chip -->
+    <div class="header-top-row">
+      <div class="header-brand-wrap">
+        <span class="app-brand-title">VigorexiApp</span>
+        <span class="app-brand-sub" id="headerRoutineSub">Full Body · 3 días · <span id="headerEstDuration">~42 min</span></span>
       </div>
-
-
-
-      <!-- Right: Compact Top Rest Timer Dock -->
-      <div class="top-timer-widget" id="topTimerWidget">
-        <div class="timer-digits-wrap" onclick="togglePlayTimer()" title="Iniciar / Pausar descanso">
-          <span class="timer-icon">⏱️</span>
-          <span class="timer-digits" id="timerDisplay">00:00</span>
-        </div>
-        <div class="top-timer-controls">
-          <button class="t-btn-top audio-btn" id="audioModeBtn" onclick="toggleAudioMode()" title="Audio de descansos: Toca para activar en auriculares Bluetooth">🔕</button>
-          <button class="t-btn-top play" id="timerPlayBtn" onclick="togglePlayTimer()">Iniciar</button>
-          <button class="t-btn-top skip" onclick="resetTimerDock()" title="Reiniciar / Cancelar">✕</button>
+      <div class="header-day-chip-wrap">
+        <button type="button" class="header-day-chip" id="headerDayChip" onclick="toggleDayPickerDropdown()">
+          <span id="headerDayChipLabel">Día A</span>
+          <span class="day-chip-arrow">▾</span>
+        </button>
+        <!-- Dropdown Menu -->
+        <div class="day-picker-dropdown" id="dayPickerDropdown">
+          <div class="dropdown-header">Elegir Día de Entrenamiento</div>
+          <div class="dropdown-item" onclick="selectDayFromDropdown('fullbodyA')">
+            <span class="item-title">Día A · Full Body</span>
+            <span class="item-sub">Squat Pesado & Torso</span>
+          </div>
+          <div class="dropdown-item" onclick="selectDayFromDropdown('fullbodyB')">
+            <span class="item-title">Día B · Full Body</span>
+            <span class="item-sub">RDL & Torso Inclinado</span>
+          </div>
+          <div class="dropdown-item" onclick="selectDayFromDropdown('fullbodyC')">
+            <span class="item-title">Día C · Full Body</span>
+            <span class="item-sub">Prensa & Aislamiento</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" onclick="openProgramSwitchModal()">
+            <span class="item-title">🔄 Cambiar a Torso/Pierna (4 días)</span>
+          </div>
+          <div class="dropdown-item highlight" onclick="goToRoutinePlanTab()">
+            <span class="item-title">📋 Ver Rutina Completa</span>
+          </div>
         </div>
       </div>
     </div>
-    
-    <!-- Progress Indicator directly underneath -->
 
-    <div class="workout-progress" id="headerWorkoutProgress">
-      <div class="workout-progress-fill" id="workoutProgressBar"></div>
+    <!-- Middle Row: Status & Actions -->
+    <div class="header-status-row">
+      <div class="status-left">
+        <span class="status-time-chip" id="headerSessionTimer" title="Tiempo de sesión">⏱️ 00:00</span>
+        <span class="status-sets-chip" id="headerSetsProgress">0/23 series · 0%</span>
+      </div>
+      <div class="status-right">
+        <button type="button" class="hdr-btn hdr-btn-info" onclick="openInfoSheet()" title="Información RIR y Superseries">ⓘ</button>
+        <button type="button" class="hdr-btn hdr-btn-express" id="hdrBtnExpress" onclick="toggleExpressMode()" title="Modo Exprés (omite accesorios)">⚡ Exprés</button>
+        <button type="button" class="hdr-btn hdr-btn-reset" onclick="confirmResetCurrentDay()" title="Reiniciar día">↺</button>
+      </div>
     </div>
-    <div class="prog-text-row" id="headerProgRow" style="display:none !important;" aria-hidden="true">
-      <span id="headerProgSets" style="display:none !important;">0 de 20 series</span>
-      <span id="headerProgPct" style="display:none !important;">0%</span>
+
+    <!-- Bottom Row: Thin Horizontal Progress Bar -->
+    <div class="header-progress-track">
+      <div class="header-progress-fill" id="headerProgressFill" style="width: 0%;"></div>
     </div>
   </header>
 
@@ -8526,6 +8818,22 @@
     }
 
     function selectDay(dayId) {
+      // Actualizar chip de día y subtítulo en la cabecera fija
+      const chipLabel = document.getElementById('headerDayChipLabel');
+      if (chipLabel) {
+        const dayNames = {
+          fullbodyA: 'Día A', fullbodyB: 'Día B', fullbodyC: 'Día C',
+          torsoA: 'Torso A', piernaA: 'Pierna A', torsoB: 'Torso B', piernaB: 'Pierna B'
+        };
+        chipLabel.innerText = dayNames[dayId] || dayId;
+      }
+      const routineSub = document.getElementById('headerRoutineSub');
+      if (routineSub) {
+        const isFB = dayId.startsWith('fullbody');
+        const durEst = calculateDayEstimatedDuration(dayId, isExpressMode);
+        routineSub.innerHTML = isFB ? `Full Body · 3 días · <span id="headerEstDuration">~${durEst} min</span>` : `Torso/Pierna · 4 días · <span id="headerEstDuration">~${durEst} min</span>`;
+      }
+
       if (WORKOUT_DAYS.includes(dayId)) {
         lastActiveWorkoutDay = dayId;
         localStorage.setItem('vigorexiapp_last_day', dayId);
@@ -8988,6 +9296,69 @@
       togglePlayer('player-' + slotId);
     }
 
+    
+    /* Fase 6: Lógica de cabecera fija, selector de día en chip y navegación */
+    function toggleDayPickerDropdown() {
+      const dd = document.getElementById('dayPickerDropdown');
+      if (dd) dd.classList.toggle('open');
+    }
+
+    function selectDayFromDropdown(dayId) {
+      const dd = document.getElementById('dayPickerDropdown');
+      if (dd) dd.classList.remove('open');
+      selectDay(dayId);
+      switchMainTab('train');
+    }
+
+    function goToRoutinePlanTab() {
+      const dd = document.getElementById('dayPickerDropdown');
+      if (dd) dd.classList.remove('open');
+      switchMainTab('plan');
+    }
+
+    function openInfoSheet() {
+      const backdrop = document.getElementById('infoSheetBackdrop');
+      if (backdrop) backdrop.classList.add('open');
+      document.body.classList.add('modal-open');
+    }
+
+    function closeInfoSheet(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('bottom-sheet-close') && !e.target.classList.contains('primary-btn-compact')) return;
+      const backdrop = document.getElementById('infoSheetBackdrop');
+      if (backdrop) backdrop.classList.remove('open');
+      document.body.classList.remove('modal-open');
+    }
+
+    function confirmResetCurrentDay() {
+      const activeSection = document.querySelector('.day-content.active');
+      const dayId = (activeSection && activeSection.id !== 'historialView') ? activeSection.id : lastActiveWorkoutDay;
+      if (confirm('¿Reiniciar las series y tiempos del día de hoy? No afectará a sesiones ya guardadas.')) {
+        resetDayWorkout(dayId);
+      }
+    }
+
+    function handleBottomTimerClick() {
+      if (isTimerActive && timerRemaining > 0) {
+        // Si hay temporizador corriendo, mostrar toast con descanso restante y opción de +30s
+        showToast(`⏱️ Descanso restante: ${formatClock(timerRemaining)}`);
+        const dock = document.getElementById('restTimerDock');
+        if (dock) dock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        // Abrir descanso manual de 90s o modal
+        triggerRest(90, 'Descanso Manual', '');
+        showToast('⏱️ Temporizador de 90s iniciado');
+      }
+    }
+
+    // Cerrar dropdown al hacer click fuera
+    document.addEventListener('click', (e) => {
+      const chipWrap = document.querySelector('.header-day-chip-wrap');
+      const dd = document.getElementById('dayPickerDropdown');
+      if (dd && dd.classList.contains('open') && chipWrap && !chipWrap.contains(e.target)) {
+        dd.classList.remove('open');
+      }
+    });
+
     function toggleExpressMode() {
       isExpressMode = !isExpressMode;
       document.body.classList.toggle('express-mode', isExpressMode);
@@ -8998,6 +9369,10 @@
       });
 
       updateAllEstimatedDurations();
+      
+      const hdrExpress = document.getElementById('hdrBtnExpress');
+      if (hdrExpress) hdrExpress.classList.toggle('active', isExpressMode);
+
       updateAllExerciseNumberings();
       updateAllNoteDots();
       updateProgress();
@@ -9206,6 +9581,19 @@
     function updateSessionTimerDisplay(dayId) {
       const chip = document.getElementById('sessionTimer-' + dayId);
       if (!chip) return;
+      
+      const hdrSessionTimer = document.getElementById('headerSessionTimer');
+      if (hdrSessionTimer) {
+        if (startTime) {
+          const elapsedSecs = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+          const m = Math.floor(elapsedSecs / 60);
+          const s = elapsedSecs % 60;
+          hdrSessionTimer.innerText = `⏱️ ${m}:${s < 10 ? '0' : ''}${s}`;
+        } else {
+          hdrSessionTimer.innerText = '⏱️ 00:00';
+        }
+      }
+
       const timerSvg = '<svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg>';
       const startTime = workoutState.sessionStartTime ? workoutState.sessionStartTime[dayId] : null;
       if (!startTime) {
@@ -10874,6 +11262,21 @@
     function updateTimerUI() {
       const display = document.getElementById('timerDisplay');
       if (display) display.innerText = formatClock(timerRemaining);
+      
+      const bottomTimer = document.getElementById('tabBtnTimer');
+      if (bottomTimer) {
+        const label = bottomTimer.querySelector('span');
+        if (isTimerActive && timerRemaining > 0) {
+          const mins = Math.floor(timerRemaining / 60);
+          const secs = timerRemaining % 60;
+          if (label) label.innerText = `⏱️ ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+          bottomTimer.classList.add('timer-running');
+        } else {
+          if (label) label.innerText = 'Temporizador';
+          bottomTimer.classList.remove('timer-running');
+        }
+      }
+
 
       const widget = document.getElementById('topTimerWidget');
       if (widget) {
@@ -12249,6 +12652,7 @@
   <!-- ==========================================
        BARRA DE NAVEGACIÓN INFERIOR (3 Pestañas: Entrenar, Historial, Rutina)
        ========================================== -->
+  
   <nav class="app-bottom-nav" id="appBottomNav" aria-label="Navegación principal">
     <button type="button" class="nav-tab on" id="tabBtnTrain" onclick="switchMainTab('train')">
       <svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>
@@ -12258,43 +12662,26 @@
       <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
       <span>Historial</span>
     </button>
-    <button type="button" class="nav-tab" id="tabBtnPlan" onclick="switchMainTab('plan')">
-      <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
-      <span>Rutina</span>
+    <button type="button" class="nav-tab" id="tabBtnTimer" onclick="handleBottomTimerClick()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg>
+      <span>Temporizador</span>
     </button>
   </nav>
 
   <!-- Hidden elements for test compatibility & legacy functions (completely removed from header) -->
   <div style="display:none !important; width:0; height:0; overflow:hidden;" aria-hidden="true">
-    <div class="header-day-picker" style="display:none !important;">
-      <button id="btnProgramSwitch" class="btn-program-switch" type="button" style="display:none !important;">⚡ 3D ▾</button>
-      <select id="daySelector" class="header-day-select" style="display:none !important;" onchange="handleDaySelectChange(this.value)">
-        <!-- Rendered dynamically -->
-      </select>
+    <button type="button" id="tabBtnPlan" onclick="switchMainTab('plan')">Rutina</button>
+    <div class="top-timer-widget" id="topTimerWidget">
+      <span class="timer-digits" id="timerDisplay">00:00</span>
+      <button class="t-btn-top audio-btn" id="audioModeBtn" onclick="toggleAudioMode()">🔕</button>
+      <button class="t-btn-top play" id="timerPlayBtn" onclick="togglePlayTimer()">Iniciar</button>
     </div>
-  </div>
-
-  <!-- Bottom Sheet: Notas del Ejercicio -->
-  <div class="bottom-sheet-backdrop" id="notesSheetBackdrop" onclick="closeNotesSheet(event)">
-    <div class="bottom-sheet" id="notesSheet" onclick="event.stopPropagation()">
-      <div class="bottom-sheet-drag-handle"></div>
-      <div class="bottom-sheet-header">
-        <div class="bottom-sheet-title-group">
-          <span class="bottom-sheet-icon">📝</span>
-          <div>
-            <h3 class="bottom-sheet-title" id="notesSheetTitle">Notas del Ejercicio</h3>
-            <p class="bottom-sheet-sub" id="notesSheetSub">Se guardan automáticamente en tu dispositivo</p>
-          </div>
-        </div>
-        <button type="button" class="bottom-sheet-close" onclick="closeNotesSheet()">✕</button>
-      </div>
-      <div class="bottom-sheet-body">
-        <textarea id="notesSheetTextarea" class="bottom-sheet-textarea" placeholder="Sensaciones, posición de clavijas, agarre o notas personales..." oninput="handleNotesSheetInput(this)"></textarea>
-        <div class="bottom-sheet-footer">
-          <span class="auto-save-status" id="notesSaveStatus">✓ Guardado automático</span>
-          <button type="button" class="primary-btn-compact" onclick="closeNotesSheet()">Listo</button>
-        </div>
-      </div>
+    <div class="workout-progress" id="workoutProgressBar"></div>
+    <div id="headerProgSets">0 de 20 series</div>
+    <div id="headerProgPct">0%</div>
+    <div class="header-day-picker">
+      <button id="btnProgramSwitch" class="btn-program-switch" type="button">⚡ 3D ▾</button>
+      <select id="daySelector" class="header-day-select" onchange="handleDaySelectChange(this.value)"></select>
     </div>
   </div>
 
@@ -12327,6 +12714,52 @@
             Ver Animación 3D
           </button>
           <button type="button" class="primary-btn-compact" onclick="closeTechniqueSheet()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Bottom Sheet: Información RIR y Superseries -->
+  <div class="bottom-sheet-backdrop" id="infoSheetBackdrop" onclick="closeInfoSheet(event)">
+    <div class="bottom-sheet" id="infoSheet" onclick="event.stopPropagation()">
+      <div class="bottom-sheet-drag-handle"></div>
+      <div class="bottom-sheet-header">
+        <div class="bottom-sheet-title-group">
+          <span class="bottom-sheet-icon">ⓘ</span>
+          <div>
+            <h3 class="bottom-sheet-title">Guía Rápida: RIR y Superseries</h3>
+            <p class="bottom-sheet-sub">Conceptos clave para tu sesión</p>
+          </div>
+        </div>
+        <button type="button" class="bottom-sheet-close" onclick="closeInfoSheet()">✕</button>
+      </div>
+      <div class="bottom-sheet-body">
+        <div class="technique-box" style="margin-bottom: 12px;">
+          <h4 class="technique-heading">¿QUÉ ES EL RIR (REPETICIONES EN RESERVA)?</h4>
+          <p class="technique-cues-text" style="font-size: 0.84rem; margin-bottom: 6px;">
+            El <strong>RIR</strong> mide la cercanía al fallo muscular de cada serie efectiva:
+          </p>
+          <ul style="margin: 0; padding-left: 18px; font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+            <li><strong>RIR 0:</strong> Fallo muscular técnico (imposible completar otra repetición).</li>
+            <li><strong>RIR 1:</strong> Dejas 1 repetición en el tanque (estímulo óptimo de hipertrofia).</li>
+            <li><strong>RIR 1-2:</strong> Dejas 1 a 2 repeticiones (ejercicios pesados y básicos).</li>
+          </ul>
+        </div>
+
+        <div class="technique-box">
+          <h4 class="technique-heading">¿CÓMO FUNCIONAN LAS SUPERSERIES?</h4>
+          <p class="technique-cues-text" style="font-size: 0.84rem; line-height: 1.5;">
+            1. Haces una serie del <strong>Ejercicio A</strong>.<br>
+            2. <strong>Sin descanso</strong> pasas directo a la serie del <strong>Ejercicio B</strong>.<br>
+            3. Al terminar la de B, <strong>empieza el descanso</strong> (90-120 s).<br>
+            4. Vuelves a la siguiente serie de A hasta completar la pareja.<br>
+            <em>Ahorra un 35% de tiempo manteniendo el máximo rendimiento.</em>
+          </p>
+        </div>
+
+        <div style="margin-top: 14px; display: flex; justify-content: flex-end;">
+          <button type="button" class="primary-btn-compact" onclick="closeInfoSheet()">Entendido</button>
         </div>
       </div>
     </div>
