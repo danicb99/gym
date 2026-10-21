@@ -272,7 +272,7 @@ Page(BasePage({
       text_size: 16,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
-      text: `Serie ${currentSetNum} de ${totalSets}${prevText}`
+      text: (slot && slot.warmupTip && currentSetNum === 1) ? `S1 de ${totalSets} • ${slot.warmupTip}` : `Serie ${currentSetNum} de ${totalSets}${prevText}`
     })
 
     // 3. FILA 1: KILOS ( [-]  80.0 kg  [+] ) CON STEPPERS GRANDES DE 68px
@@ -636,7 +636,90 @@ Page(BasePage({
     const totalSetsInSlot = app.getTotalSetsForSlot ? app.getTotalSetsForSlot(slot) : ((slot.sets && slot.sets.length) || 4)
     const restDuration = (ex && ex.rest) ? ex.rest : 90
 
-    // Avanzar contador de series
+    // COMPROBAR SI ESTE SLOT ES PARTE DE UNA SUPERSERIE O BISERIE
+    if (slot && slot.pairSlotId && day && Array.isArray(day.slots)) {
+      const pairedSlotIdx = day.slots.findIndex(s => s.slotId === slot.pairSlotId)
+      const pairedSlot = pairedSlotIdx !== -1 ? day.slots[pairedSlotIdx] : null
+      const pairType = slot.pairType || 'superserie'
+      const pairRole = slot.pairRole || 'a'
+      const pairRest = slot.pairRest || restDuration || 90
+
+      if (pairRole === 'a') {
+        if (pairType === 'superserie') {
+          // SUPERSERIE: Sin descanso tras el ejercicio 1. Salto inmediato al ejercicio 2 de la pareja
+          if (pairedSlot) {
+            app.globalData.currentSlotIndex = pairedSlotIdx
+            // currentSetIndex se mantiene igual para la pareja (misma ronda)
+            if (app.globalData.restTimer) app.globalData.restTimer.active = false
+            replace({ url: 'page/workout/index' })
+            return
+          }
+        } else {
+          // BISERIE: Descanso corto tras cada serie (ej: 45s) y luego turno de la pareja
+          if (pairedSlot) {
+            app.globalData.currentSlotIndex = pairedSlotIdx
+            const nextEx = app.getActiveExercise()
+            app.globalData.restTimer = {
+              active: true,
+              endTime: Date.now() + pairRest * 1000,
+              remainingSeconds: pairRest,
+              totalSeconds: pairRest,
+              nextExerciseName: nextEx ? nextEx.name : '',
+              nextSetNum: app.globalData.currentSetIndex + 1
+            }
+            replace({ url: 'page/timer/index' })
+            return
+          }
+        }
+      } else {
+        // pairRole === 'b': Se ha completado la ronda de la pareja
+        const hasMoreRounds = (app.globalData.currentSetIndex + 1 < totalSetsInSlot)
+        if (hasMoreRounds) {
+          // Quedan más rondas: Volvemos al ejercicio 'a' con setIndex + 1
+          if (pairedSlot) {
+            app.globalData.currentSlotIndex = pairedSlotIdx
+            app.globalData.currentSetIndex += 1
+            const nextEx = app.getActiveExercise()
+            app.globalData.restTimer = {
+              active: true,
+              endTime: Date.now() + pairRest * 1000,
+              remainingSeconds: pairRest,
+              totalSeconds: pairRest,
+              nextExerciseName: nextEx ? nextEx.name : '',
+              nextSetNum: app.globalData.currentSetIndex + 1
+            }
+            replace({ url: 'page/timer/index' })
+            return
+          }
+        } else {
+          // Pareja completamente terminada en todas sus series
+          const maxPairIdx = Math.max(app.globalData.currentSlotIndex, pairedSlotIdx)
+          if (maxPairIdx + 1 < day.slots.length) {
+            app.globalData.currentSlotIndex = maxPairIdx + 1
+            app.globalData.currentSetIndex = 0
+            const nextSlot = app.getActiveSlot()
+            const nextEx = app.getActiveExercise()
+            app.globalData.restTimer = {
+              active: true,
+              endTime: Date.now() + pairRest * 1000,
+              remainingSeconds: pairRest,
+              totalSeconds: pairRest,
+              nextExerciseName: nextEx ? nextEx.name : '',
+              nextSetNum: 1
+            }
+            replace({ url: 'page/timer/index' })
+            return
+          } else {
+            // Fin del entrenamiento
+            app.finishWorkout()
+            replace({ url: 'page/summary/index' })
+            return
+          }
+        }
+      }
+    }
+
+    // FLUJO NORMAL (EJERCICIO INDIVIDUAL)
     if (app.globalData.currentSetIndex + 1 < totalSetsInSlot) {
       app.globalData.currentSetIndex += 1
       app.globalData.restTimer = {

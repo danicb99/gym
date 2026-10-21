@@ -12,14 +12,15 @@ export const ROUTINE_SLOTS = {
     dayNum: "Día A",
     shortName: "Día A (Squat + Torso)",
     program: "fullbody",
-    totalSets: 20,
+    totalSets: 23,
     slots: [
       { slotId: "fullbodyA_1", defaultExId: "squat", num: 1, sets: [["100", "8"], ["100", "8"], ["100", "7"]] },
-      { slotId: "fullbodyA_2", defaultExId: "banca", num: 2, sets: [["80", "8"], ["80", "8"], ["80", "7"], ["80", "6"]] },
-      { slotId: "fullbodyA_3", defaultExId: "jalon", num: 3, sets: [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]] },
-      { slotId: "fullbodyA_4", defaultExId: "laterales1", num: 4, sets: [["12", "15"], ["12", "14"], ["12", "12"]] },
-      { slotId: "fullbodyA_5", defaultExId: "triceps1", num: 5, sets: [["30", "12"], ["30", "11"], ["30", "10"]] },
-      { slotId: "fullbodyA_6", defaultExId: "biceps1", num: 6, sets: [["16", "12"], ["16", "10"], ["16", "10"]] }
+      { slotId: "fullbodyA_2", defaultExId: "banca", num: "2a", sets: [["80", "8"], ["80", "8"], ["80", "7"], ["80", "6"]], pairSlotId: "fullbodyA_3", pairRole: "a", pairType: "superserie", pairRest: 105, pairName: "Banca + Jalón", warmupTip: "Aprox: ~60% x 5 (45-60s)" },
+      { slotId: "fullbodyA_3", defaultExId: "jalon", num: "2b", sets: [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]], pairSlotId: "fullbodyA_2", pairRole: "b", pairType: "superserie", pairRest: 105, pairName: "Banca + Jalón" },
+      { slotId: "fullbodyA_4", defaultExId: "laterales1", num: "3a", sets: [["12", "15"], ["12", "14"], ["12", "12"]], pairSlotId: "fullbodyA_7", pairRole: "a", pairType: "superserie", pairRest: 50, pairName: "Laterales + Gemelos" },
+      { slotId: "fullbodyA_7", defaultExId: "gemelopie", num: "3b", sets: [["70", "15"], ["70", "14"], ["70", "12"]], pairSlotId: "fullbodyA_4", pairRole: "b", pairType: "superserie", pairRest: 50, pairName: "Laterales + Gemelos" },
+      { slotId: "fullbodyA_5", defaultExId: "triceps1", num: "4a", sets: [["30", "12"], ["30", "11"], ["30", "10"]], pairSlotId: "fullbodyA_6", pairRole: "a", pairType: "biserie", pairRest: 45, pairName: "Brazos", isSkippable: true },
+      { slotId: "fullbodyA_6", defaultExId: "biceps1", num: "4b", sets: [["16", "12"], ["16", "10"], ["16", "10"]], pairSlotId: "fullbodyA_5", pairRole: "b", pairType: "biserie", pairRest: 45, pairName: "Brazos", isSkippable: true }
     ]
   },
   fullbodyB: {
@@ -29,32 +30,35 @@ export const ROUTINE_SLOTS = {
     dayNum: "Día B",
     shortName: "Día B (RDL + Torso)",
     program: "fullbody",
-    totalSets: 20,
+    totalSets: 23,
     slots: [
       { slotId: "fullbodyB_1", defaultExId: "rdl", num: 1, sets: [["90", "10"], ["90", "10"], ["90", "8"]] },
-      { slotId: "fullbodyB_2", defaultExId: "inclinado", num: 2, sets: [["30", "10"], ["30", "10"], ["30", "8"], ["30", "8"]] },
-      { slotId: "fullbodyB_3", defaultExId: "remouni", num: 3, sets: [["34", "10"], ["34", "10"], ["34", "9"], ["34", "8"]] },
-      { slotId: "fullbodyB_4", defaultExId: "militar", num: 4, sets: [["24", "10"], ["24", "10"], ["24", "8"]] },
-      { slotId: "fullbodyB_5", defaultExId: "facepull", num: 5, sets: [["25", "15"], ["25", "14"], ["25", "12"]] },
-      { slotId: "fullbodyB_6", defaultExId: "plancha", num: 6, sets: [["0", "60"], ["0", "50"], ["0", "45"]] }
+      { slotId: "fullbodyB_2", defaultExId: "inclinado", num: "2a", sets: [["30", "10"], ["30", "10"], ["30", "8"], ["30", "8"]], pairSlotId: "fullbodyB_3", pairRole: "a", pairType: "superserie", pairRest: 105, pairName: "Inclinado + Remo" },
+      { slotId: "fullbodyB_3", defaultExId: "remo", num: "2b", sets: [["65", "10"], ["65", "10"], ["65", "9"], ["65", "8"]], pairSlotId: "fullbodyB_2", pairRole: "b", pairType: "superserie", pairRest: 105, pairName: "Inclinado + Remo" },
+      { slotId: "fullbodyB_4", defaultExId: "militar", num: "3a", sets: [["24", "10"], ["24", "10"], ["24", "8"]], pairSlotId: "fullbodyB_7", pairRole: "a", pairType: "superserie", pairRest: 80, pairName: "Militar + Cuádriceps" },
+      { slotId: "fullbodyB_7", defaultExId: "legext", num: "3b", sets: [["55", "15"], ["55", "14"], ["55", "12"]], pairSlotId: "fullbodyB_4", pairRole: "b", pairType: "superserie", pairRest: 80, pairName: "Militar + Cuádriceps" },
+      { slotId: "fullbodyB_5", defaultExId: "facepull", num: "4a", sets: [["25", "15"], ["25", "14"], ["25", "12"]], pairSlotId: "fullbodyB_6", pairRole: "a", pairType: "biserie", pairRest: 45, pairName: "Posterior + Core" },
+      { slotId: "fullbodyB_6", defaultExId: "plancha", num: "4b", sets: [["0", "60"], ["0", "50"], ["0", "50"]], pairSlotId: "fullbodyB_5", pairRole: "b", pairType: "biserie", pairRest: 45, pairName: "Posterior + Core", isSkippable: true }
     ]
   },
   fullbodyC: {
     id: "fullbodyC",
     title: "Día C: Full Body C",
-    subtitle: "Pierna & Brazos/Core",
+    subtitle: "Pierna & Hipertrofia",
     dayNum: "Día C",
-    shortName: "Día C (Pierna + Hipertrofia)",
+    shortName: "Día C (Prensa + Hipertrofia)",
     program: "fullbody",
-    totalSets: 22,
+    totalSets: 27,
     slots: [
-      { slotId: "fullbodyC_1", defaultExId: "prensa_45", num: 1, sets: [["140", "10"], ["140", "10"], ["140", "8"]] },
-      { slotId: "fullbodyC_2", defaultExId: "curltumbado", num: 2, sets: [["50", "12"], ["50", "11"], ["50", "10"]] },
-      { slotId: "fullbodyC_3", defaultExId: "jalonneutro", num: 3, sets: [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]] },
-      { slotId: "fullbodyC_4", defaultExId: "laterales2", num: 4, sets: [["10", "15"], ["10", "14"], ["10", "12"]] },
-      { slotId: "fullbodyC_5", defaultExId: "frances", num: 5, sets: [["32", "12"], ["32", "10"], ["32", "10"]] },
-      { slotId: "fullbodyC_6", defaultExId: "martillo", num: 6, sets: [["16", "12"], ["16", "11"], ["16", "10"]] },
-      { slotId: "fullbodyC_7", defaultExId: "crunch", num: 7, sets: [["40", "15"], ["40", "14"], ["40", "12"]] }
+      { slotId: "fullbodyC_1", defaultExId: "prensa_45", num: "1a", sets: [["140", "10"], ["140", "10"], ["140", "8"]], pairSlotId: "fullbodyC_2", pairRole: "a", pairType: "superserie", pairRest: 90, pairName: "Prensa + Isquios" },
+      { slotId: "fullbodyC_2", defaultExId: "curltumbado", num: "1b", sets: [["50", "12"], ["50", "11"], ["50", "10"]], pairSlotId: "fullbodyC_1", pairRole: "b", pairType: "superserie", pairRest: 90, pairName: "Prensa + Isquios" },
+      { slotId: "fullbodyC_3", defaultExId: "jalonneutro", num: "2a", sets: [["70", "10"], ["70", "10"], ["70", "8"]], pairSlotId: "fullbodyC_8", pairRole: "a", pairType: "superserie", pairRest: 80, pairName: "Dorsal + Pecho" },
+      { slotId: "fullbodyC_8", defaultExId: "aperturas_polea", num: "2b", sets: [["10", "15"], ["10", "14"], ["10", "12"]], pairSlotId: "fullbodyC_3", pairRole: "b", pairType: "superserie", pairRest: 80, pairName: "Dorsal + Pecho" },
+      { slotId: "fullbodyC_4", defaultExId: "laterales2", num: "3a", sets: [["10", "15"], ["10", "14"], ["10", "12"]], pairSlotId: "fullbodyC_9", pairRole: "a", pairType: "superserie", pairRest: 50, pairName: "Laterales + Gemelos" },
+      { slotId: "fullbodyC_9", defaultExId: "gemelopie", num: "3b", sets: [["70", "15"], ["70", "14"], ["70", "12"]], pairSlotId: "fullbodyC_4", pairRole: "b", pairType: "superserie", pairRest: 50, pairName: "Laterales + Gemelos" },
+      { slotId: "fullbodyC_5", defaultExId: "frances", num: "4a", sets: [["32", "12"], ["32", "10"], ["32", "10"]], pairSlotId: "fullbodyC_6", pairRole: "a", pairType: "biserie", pairRest: 45, pairName: "Brazos", isSkippable: true },
+      { slotId: "fullbodyC_6", defaultExId: "martillo", num: "4b", sets: [["16", "12"], ["16", "11"], ["16", "10"]], pairSlotId: "fullbodyC_5", pairRole: "b", pairType: "biserie", pairRest: 45, pairName: "Brazos", isSkippable: true },
+      { slotId: "fullbodyC_7", defaultExId: "crunch", num: 5, sets: [["40", "15"], ["40", "14"], ["40", "12"]], isSkippable: true }
     ]
   },
 
@@ -127,6 +131,23 @@ export const ROUTINE_SLOTS = {
 };
 
 export const EXERCISE_CATALOG = {
+  aperturas_polea: {
+    id: "aperturas_polea",
+    name: "Aperturas en Polea",
+    muscle: "Pectoral Mayor",
+    rest: 80,
+    stepKg: 2.5,
+    alternatives: ["pec_deck", "press_maq_convergente"]
+  },
+  pec_deck: {
+    id: "pec_deck",
+    name: "Pec Deck (Máquina)",
+    muscle: "Pectoral Mayor",
+    rest: 80,
+    stepKg: 5.0,
+    alternatives: ["aperturas_polea", "press_maq_convergente"]
+  },
+
   // --- TORSO A ---
   banca: {
     id: "banca",
@@ -232,7 +253,7 @@ export const EXERCISE_CATALOG = {
     muscle: "Espalda Media & Dorsal",
     rest: 120,
     stepKg: 5.0,
-    alternatives: ["remo_pecho_apoyado", "remo_mancuerna_banco", "remo_barra_t"]
+    alternatives: ["remouni", "remo_pecho_apoyado", "remo_mancuerna_banco", "remo_barra_t"]
   },
   remo_pecho_apoyado: {
     id: "remo_pecho_apoyado",
@@ -538,7 +559,7 @@ export const EXERCISE_CATALOG = {
     rest: 90,
     stepKg: 2.0,
     metricType: "unilateral",
-    alternatives: ["remo_unilateral_maquina", "remo_pecho_mancuernas", "remo_kroc"]
+    alternatives: ["remo", "remo_unilateral_maquina", "remo_pecho_mancuernas", "remo_kroc"]
   },
   remo_unilateral_maquina: {
     id: "remo_unilateral_maquina",
