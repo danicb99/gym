@@ -9906,7 +9906,7 @@
     }
 
     // Auto-save after 60 minutes without activity (does not interrupt active sessions)
-    const AUTO_SAVE_IDLE_MS = 60 * 60 * 1000;
+    const AUTO_SAVE_IDLE_MS = 30 * 60 * 1000; // 30 minutos sin actividad
 
     function checkAutoSave() {
       if (!workoutState.sessionStartTime) return;
@@ -9935,7 +9935,7 @@
         let hasInputs = false;
         inputs.forEach(inp => { if (inp.value) hasInputs = true; });
 
-        if (doneRows.length > 0 || hasInputs) {
+        if (doneRows.length > 0) {
           const durationMin = Math.max(1, Math.min(300, Math.round((lastActivity - startTime) / 60000)));
           executeDayArchive(dayId, durationMin, true, true);
         } else {
@@ -10373,14 +10373,9 @@
       const dayCards = Array.from(daySection.querySelectorAll('.exercise-card'));
       let hasData = false;
 
-      dayCards.forEach(card => {
-        const inputs = card.querySelectorAll('.set-input');
-        inputs.forEach(inp => { if (inp.value) hasData = true; });
-        if (card.querySelectorAll('.set-row.done').length > 0) hasData = true;
-      });
-
-      if (!hasData) {
-        showToast('ℹ️ Primero anota algún peso o marca series con ✓');
+      const totalDone = dayCards.reduce((acc, card) => acc + card.querySelectorAll('.set-row.done').length, 0);
+      if (totalDone === 0) {
+        showToast('ℹ️ Marca al menos una serie con ✓ antes de finalizar.');
         return;
       }
 
@@ -10447,54 +10442,59 @@
         if (!workoutState.previous[exId]) workoutState.previous[exId] = {};
 
         rows.forEach((row, sIdx) => {
+          const isDone = row.classList.contains('done');
           const kgInp = row.querySelector('.input-kg');
           const repsInp = row.querySelector('.input-reps');
-          const kg = kgInp ? (kgInp.value.trim() || kgInp.placeholder || '') : '';
-          const reps = repsInp ? (repsInp.value.trim() || repsInp.placeholder || '') : '';
 
-          if (kg || reps) {
-            const kgNum = parseFloat(kg) || 0;
-            const repsNum = parseInt(reps) || 0;
-            const isIso = exData && exData.metricType === 'isometria';
-            const isBodyweight = exData && exData.metricType === 'peso_corporal';
-            const isUni = exData && exData.metricType === 'unilateral';
-            const est1RM = (!isIso && repsNum > 0) ? calculate1RM(kgNum, repsNum) : (isIso ? 0 : kgNum);
+          if (isDone) {
+            const kg = kgInp ? (kgInp.value.trim() || kgInp.placeholder || '') : '';
+            const reps = repsInp ? (repsInp.value.trim() || repsInp.placeholder || '') : '';
 
-            let recordStr = '';
-            if (isIso) {
-              if (kgNum > 0 && repsNum > 0) recordStr = `+${kgNum}kg × ${repsNum}s`;
-              else if (repsNum > 0) recordStr = `${repsNum}s`;
-              else if (kgNum > 0) recordStr = `+${kgNum}kg`;
-            } else if (isBodyweight) {
-              if (kgNum > 0 && repsNum > 0) recordStr = `+${kgNum}kg × ${repsNum}`;
-              else if (repsNum > 0) recordStr = `${repsNum} reps`;
-              else if (kgNum > 0) recordStr = `+${kgNum}kg`;
-            } else if (isUni) {
-              if (kg && reps) recordStr = `${kg}kg × ${reps}/lado`;
-              else if (kg) recordStr = `${kg} kg`;
-              else if (reps) recordStr = `${reps}/lado`;
-            } else {
-              if (kg && reps) recordStr = `${kg}kg × ${reps}`;
-              else if (kg) recordStr = `${kg} kg`;
-              else if (reps) recordStr = `${reps} reps`;
+            if (kg || reps) {
+              const kgNum = parseFloat(kg) || 0;
+              const repsNum = parseInt(reps) || 0;
+              const isIso = exData && exData.metricType === 'isometria';
+              const isBodyweight = exData && exData.metricType === 'peso_corporal';
+              const isUni = exData && exData.metricType === 'unilateral';
+              const est1RM = (!isIso && repsNum > 0) ? calculate1RM(kgNum, repsNum) : (isIso ? 0 : kgNum);
+
+              let recordStr = '';
+              if (isIso) {
+                if (kgNum > 0 && repsNum > 0) recordStr = `+${kgNum}kg × ${repsNum}s`;
+                else if (repsNum > 0) recordStr = `${repsNum}s`;
+                else if (kgNum > 0) recordStr = `+${kgNum}kg`;
+              } else if (isBodyweight) {
+                if (kgNum > 0 && repsNum > 0) recordStr = `+${kgNum}kg × ${repsNum}`;
+                else if (repsNum > 0) recordStr = `${repsNum} reps`;
+                else if (kgNum > 0) recordStr = `+${kgNum}kg`;
+              } else if (isUni) {
+                if (kg && reps) recordStr = `${kg}kg × ${reps}/lado`;
+                else if (kg) recordStr = `${kg} kg`;
+                else if (reps) recordStr = `${reps}/lado`;
+              } else {
+                if (kg && reps) recordStr = `${kg}kg × ${reps}`;
+                else if (kg) recordStr = `${kg} kg`;
+                else if (reps) recordStr = `${reps} reps`;
+              }
+
+              if (!workoutState.previous[exId]) workoutState.previous[exId] = {};
+              workoutState.previous[exId][sIdx] = recordStr;
+
+              const prevCell = row.querySelector('.set-prev');
+              if (prevCell) {
+                prevCell.innerText = recordStr;
+                prevCell.classList.remove('empty');
+              }
+
+              exSessionLog.sets.push({ set: sIdx + 1, kg: kgNum, reps: repsNum, est1RM: est1RM });
+              if (kgNum > exSessionLog.bestKg) {
+                exSessionLog.bestKg = kgNum;
+                exSessionLog.bestReps = repsNum;
+              }
+              if (est1RM > exSessionLog.best1RM) exSessionLog.best1RM = est1RM;
+
+              countArchived++;
             }
-
-            workoutState.previous[exId][sIdx] = recordStr;
-
-            const prevCell = row.querySelector('.set-prev');
-            if (prevCell) {
-              prevCell.innerText = recordStr;
-              prevCell.classList.remove('empty');
-            }
-
-            exSessionLog.sets.push({ set: sIdx + 1, kg: kgNum, reps: repsNum, est1RM: est1RM });
-            if (kgNum > exSessionLog.bestKg) {
-              exSessionLog.bestKg = kgNum;
-              exSessionLog.bestReps = repsNum;
-            }
-            if (est1RM > exSessionLog.best1RM) exSessionLog.best1RM = est1RM;
-
-            countArchived++;
           }
 
           // Reiniciar para la próxima sesión: la marca queda en la columna "Anterior"
@@ -10549,7 +10549,25 @@
       if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[dayId];
       if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[dayId];
 
+      // Limpiar series completadas de este día en workoutState
+      const dayData = typeof ROUTINE_SLOTS !== 'undefined' && ROUTINE_SLOTS[dayId];
+      if (dayData && dayData.slots && Array.isArray(workoutState.completed)) {
+        dayData.slots.forEach(slot => {
+          workoutState.completed = workoutState.completed.filter(c => !c.startsWith(slot.slotId + '_'));
+          if (workoutState.inputs) {
+            Object.keys(workoutState.inputs).forEach(k => {
+              if (k.startsWith(slot.slotId + '_')) delete workoutState.inputs[k];
+            });
+          }
+        });
+      }
+
       saveWorkoutState();
+      if (typeof scheduleBroadcast === 'function') {
+        scheduleBroadcast(0);
+      } else if (typeof broadcastActiveWorkoutToWatch === 'function') {
+        broadcastActiveWorkoutToWatch();
+      }
       updateSessionTimerDisplay(dayId);
       updateProgress();
 
@@ -11850,6 +11868,29 @@
     function insertSessionSorted(record) {
       if (!Array.isArray(workoutState.sessions)) workoutState.sessions = [];
       const ts = new Date(record.date).getTime();
+
+      // Deduplicación por ID exacto
+      if (record.id && workoutState.sessions.some(s => s.id === record.id || s.sessionId === record.id)) return;
+      if (record.sessionId && workoutState.sessions.some(s => s.sessionId === record.sessionId || s.id === record.sessionId)) return;
+
+      // Deduplicación por ventana temporal (mismo día y < 45 min)
+      const duplicateIdx = workoutState.sessions.findIndex(s => {
+        if (s.dayId !== record.dayId) return false;
+        const diff = Math.abs(new Date(s.date).getTime() - ts);
+        return diff < 45 * 60 * 1000;
+      });
+      if (duplicateIdx !== -1) {
+        const existing = workoutState.sessions[duplicateIdx];
+        if (Array.isArray(record.exercises)) {
+          if (!Array.isArray(existing.exercises)) existing.exercises = [];
+          record.exercises.forEach(newEx => {
+            const exists = existing.exercises.find(e => e.exId === newEx.exId);
+            if (!exists) existing.exercises.push(newEx);
+          });
+        }
+        return;
+      }
+
       const idx = workoutState.sessions.findIndex(s => new Date(s.date).getTime() < ts);
       if (idx === -1) workoutState.sessions.push(record);
       else workoutState.sessions.splice(idx, 0, record);

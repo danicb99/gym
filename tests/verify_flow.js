@@ -5,16 +5,10 @@ const html = fs.readFileSync('index.html', 'utf8');
 
 console.log('Testing index.html user flow...');
 
-// 1. Verify header dropdown is hidden
-assert(html.includes('id="headerDayInfo"'), 'headerDayInfo must exist in header');
-assert(html.includes('id="headerDayTitle"'), 'headerDayTitle must exist');
-assert(html.includes('id="headerDaySub"'), 'headerDaySub must exist');
-
-// Verify old day picker is completely hidden and moved out of header
-assert(html.includes('class="header-day-picker" style="display:none !important;"'),
-  'header-day-picker must have inline display:none !important');
-assert(html.includes('.header-day-picker {\r\n      display: none !important;') || html.includes('.header-day-picker {\n      display: none !important;'),
-  'CSS must also enforce .header-day-picker display:none !important');
+// 1. Verify modern header structure
+assert(html.includes('id="headerDayChip"'), 'headerDayChip must exist in header');
+assert(html.includes('id="headerDayChipLabel"'), 'headerDayChipLabel must exist');
+assert(html.includes('id="headerRoutineSub"'), 'headerRoutineSub must exist');
 
 // 2. Verify routineDaysList container exists in routinePlanView
 assert(html.includes('id="routineDaysList"'), 'routineDaysList must exist in routinePlanView');

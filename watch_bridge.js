@@ -115,17 +115,30 @@
   function isWorkoutActive(dayId) {
     if (!dayId || typeof ROUTINE_SLOTS === 'undefined' || !ROUTINE_SLOTS[dayId]) return false;
     if (typeof workoutState === 'undefined' || !workoutState) return false;
+    const now = Date.now();
+    const MAX_AGE = 12 * 3600 * 1000; // 12 horas máximo de validez
+
     // 1. Sesión iniciada con cronómetro en las últimas 12 horas
     if (workoutState.sessionStartTime && workoutState.sessionStartTime[dayId]) {
       const sTime = workoutState.sessionStartTime[dayId];
-      if (Date.now() - sTime < 12 * 3600 * 1000) return true;
+      if (now - sTime < MAX_AGE) return true;
     }
-    // 2. Al menos una serie completada para este día
+
+    // 2. Actividad reciente en las últimas 12 horas
+    if (workoutState.lastActivityTime && workoutState.lastActivityTime[dayId]) {
+      const aTime = workoutState.lastActivityTime[dayId];
+      if (now - aTime < MAX_AGE) return true;
+    }
+
+    // 3. Comprobar series completadas con marca temporal reciente (< 12h)
     const dayData = ROUTINE_SLOTS[dayId];
     if (dayData && Array.isArray(dayData.slots) && Array.isArray(workoutState.completed)) {
-      for (const slot of dayData.slots) {
-        if (workoutState.completed.some(c => c && c.startsWith(slot.slotId + '_'))) {
-          return true;
+      if (workoutState.setTimestamps) {
+        for (const slot of dayData.slots) {
+          for (let sIdx = 0; sIdx < 10; sIdx++) {
+            const ts = workoutState.setTimestamps[`${slot.slotId}_${sIdx}`];
+            if (ts && (now - ts < MAX_AGE)) return true;
+          }
         }
       }
     }
@@ -496,6 +509,29 @@
   function insertSessionSorted(record) {
     if (!Array.isArray(workoutState.sessions)) workoutState.sessions = [];
     const ts = new Date(record.date).getTime();
+
+    // Deduplicación por ID exacto
+    if (record.id && workoutState.sessions.some(s => s.id === record.id || s.sessionId === record.id)) return;
+    if (record.sessionId && workoutState.sessions.some(s => s.sessionId === record.sessionId || s.id === record.sessionId)) return;
+
+    // Deduplicación por ventana temporal (mismo día y < 45 min)
+    const duplicateIdx = workoutState.sessions.findIndex(s => {
+      if (s.dayId !== record.dayId) return false;
+      const diff = Math.abs(new Date(s.date).getTime() - ts);
+      return diff < 45 * 60 * 1000;
+    });
+    if (duplicateIdx !== -1) {
+      const existing = workoutState.sessions[duplicateIdx];
+      if (Array.isArray(record.exercises)) {
+        if (!Array.isArray(existing.exercises)) existing.exercises = [];
+        record.exercises.forEach(newEx => {
+          const exists = existing.exercises.find(e => e.exId === newEx.exId);
+          if (!exists) existing.exercises.push(newEx);
+        });
+      }
+      return;
+    }
+
     const idx = workoutState.sessions.findIndex(s => new Date(s.date).getTime() < ts);
     if (idx === -1) workoutState.sessions.push(record);
     else workoutState.sessions.splice(idx, 0, record);
@@ -655,6 +691,10 @@
       if (dayId && (!workoutState.sessionStartTime || !workoutState.sessionStartTime[dayId])) {
         if (!workoutState.sessionStartTime) workoutState.sessionStartTime = {};
         workoutState.sessionStartTime[dayId] = completedAt || Date.now();
+      }
+      if (dayId) {
+        if (!workoutState.lastActivityTime) workoutState.lastActivityTime = {};
+        workoutState.lastActivityTime[dayId] = completedAt || Date.now();
       }
 
       // Guardar inmediatamente en localStorage

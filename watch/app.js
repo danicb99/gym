@@ -121,6 +121,7 @@ App(
       this.globalData.sessionStartTime = phoneSession.sessionStartTime || Date.now()
       this.globalData.sessionLoggedSets = phoneSession.sessionLoggedSets || {}
       this.globalData.slotExOverrides = phoneSession.slotExOverrides || {}
+      this.globalData.slotExtraSets = phoneSession.slotExtraSets || {}
       if (phoneSession.previousSets) {
         this.globalData.previousSets = phoneSession.previousSets
       }
@@ -179,6 +180,9 @@ App(
       if (phoneSession.slotExOverrides) {
         this.globalData.slotExOverrides = Object.assign({}, this.globalData.slotExOverrides, phoneSession.slotExOverrides)
       }
+      if (phoneSession.slotExtraSets) {
+        this.globalData.slotExtraSets = Object.assign({}, this.globalData.slotExtraSets, phoneSession.slotExtraSets)
+      }
       if (phoneSession.previousSets) {
         this.globalData.previousSets = Object.assign({}, this.globalData.previousSets, phoneSession.previousSets)
       }
@@ -227,7 +231,18 @@ App(
       this.globalData.currentSetIndex = 0
       this.globalData.sessionLoggedSets = {}
       this.globalData.slotExOverrides = {}
+      this.globalData.slotExtraSets = {}
+      this.globalData.phoneLiveSession = null
+      this.globalData.hrHistory = []
+      this.globalData.heartRate = 0
       this.globalData.isPhoneSynced = false
+      this.globalData.restTimer = {
+        active: false,
+        remainingSeconds: 90,
+        totalSeconds: 90,
+        nextExerciseName: '',
+        nextSetNum: 1
+      }
 
       saveActiveSession({
         activeDayId: dayId,
@@ -370,6 +385,23 @@ App(
       recordCompletedSession(sessionSummary)
       this.globalData.activeDayId = null
       this.globalData.sessionId = null
+      this.globalData.currentSlotIndex = 0
+      this.globalData.currentSetIndex = 0
+      this.globalData.sessionStartTime = null
+      this.globalData.sessionLoggedSets = {}
+      this.globalData.slotExOverrides = {}
+      this.globalData.slotExtraSets = {}
+      this.globalData.isPhoneSynced = false
+      this.globalData.phoneLiveSession = null
+      this.globalData.hrHistory = []
+      this.globalData.heartRate = 0
+      this.globalData.restTimer = {
+        active: false,
+        remainingSeconds: 90,
+        totalSeconds: 90,
+        nextExerciseName: '',
+        nextSetNum: 1
+      }
       clearActiveSession()
 
       // Encolar fin de entreno en outbox persistente y vaciar con confirmación

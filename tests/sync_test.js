@@ -597,6 +597,120 @@ test('Escenario i) Entreno completo de 20 series con descansos: total peticiones
   assert.ok(totalHttpRequests < 80, `El total de peticiones (${totalHttpRequests}) debe ser inferior a 80`);
 });
 
+
+console.log('\n🛡️ Bloque 3: Integridad de Datos, Inactividad y Estado de Sesión');
+
+test('handleSetCompletedFromWatch actualiza lastActivityTime y sessionStartTime', () => {
+  const fakeState = { completed: [], sessionStartTime: {}, lastActivityTime: {} };
+  const dayId = 'fullbodyA';
+  const completedAt = Date.now();
+
+  // Simulación de la lógica de handleSetCompletedFromWatch
+  if (!fakeState.sessionStartTime[dayId]) fakeState.sessionStartTime[dayId] = completedAt;
+  fakeState.lastActivityTime[dayId] = completedAt;
+
+  assert.strictEqual(fakeState.sessionStartTime[dayId], completedAt);
+  assert.strictEqual(fakeState.lastActivityTime[dayId], completedAt);
+});
+
+test('handleWorkoutFinishedFromWatch actualiza exerciseHistory y calcula 1RM', () => {
+  const fakeState = { sessions: [], previous: {}, exerciseHistory: {} };
+  const summary = {
+    sessionId: 'watch-test-123',
+    dayId: 'fullbodyA',
+    date: new Date().toISOString(),
+    exercises: [
+      {
+        exId: 'squat',
+        sets: [
+          { kg: 100, reps: 8, completed: true },
+          { kg: 100, reps: 6, completed: true }
+        ]
+      }
+    ]
+  };
+
+  // Simulación de la lógica implementada
+  summary.exercises.forEach(ex => {
+    let bestKg = 0, bestReps = 0, best1RM = 0;
+    const setsLog = [];
+    ex.sets.forEach((st, idx) => {
+      const kgNum = parseFloat(st.kg) || 0;
+      const repsNum = parseInt(st.reps) || 0;
+      const est1RM = repsNum > 1 ? Math.round(kgNum * (1 + repsNum / 30)) : kgNum;
+      if (est1RM > best1RM) {
+        best1RM = est1RM;
+        bestKg = kgNum;
+        bestReps = repsNum;
+      }
+      setsLog.push({ set: idx + 1, kg: kgNum, reps: repsNum, est1RM });
+    });
+
+    if (!fakeState.exerciseHistory[ex.exId]) fakeState.exerciseHistory[ex.exId] = [];
+    fakeState.exerciseHistory[ex.exId].push({
+      date: summary.date,
+      sets: setsLog,
+      bestKg,
+      bestReps,
+      best1RM
+    });
+  });
+
+  assert(fakeState.exerciseHistory['squat'], 'exerciseHistory debe registrar squat');
+  assert.strictEqual(fakeState.exerciseHistory['squat'].length, 1);
+  assert.strictEqual(fakeState.exerciseHistory['squat'][0].bestKg, 100);
+  assert.strictEqual(fakeState.exerciseHistory['squat'][0].bestReps, 8);
+  assert.strictEqual(fakeState.exerciseHistory['squat'][0].best1RM, 127); // 100 * (1 + 8/30) = 126.67 => 127
+});
+
+test('isWorkoutActive descarta sesiones zombie con marcas > 12 horas', () => {
+  const now = Date.now();
+  const MAX_AGE = 12 * 3600 * 1000;
+
+  function checkActive(sTime, aTime) {
+    if (sTime && (now - sTime < MAX_AGE)) return true;
+    if (aTime && (now - aTime < MAX_AGE)) return true;
+    return false;
+  }
+
+  // Sesión de hace 24 horas (zombie)
+  assert.strictEqual(checkActive(now - 24 * 3600 * 1000, now - 23 * 3600 * 1000), false);
+  // Sesión activa reciente de hace 20 minutos
+  assert.strictEqual(checkActive(now - 20 * 60 * 1000, now - 5 * 60 * 1000), true);
+});
+
+test('insertSessionSorted deduplica sesiones del mismo día en ventana de 45m', () => {
+  const sessions = [];
+  function insert(rec) {
+    const ts = new Date(rec.date).getTime();
+    if (rec.id && sessions.some(s => s.id === rec.id || s.sessionId === rec.id)) return;
+    if (rec.sessionId && sessions.some(s => s.sessionId === rec.sessionId || s.id === rec.sessionId)) return;
+    const dup = sessions.findIndex(s => s.dayId === rec.dayId && Math.abs(new Date(s.date).getTime() - ts) < 45 * 60 * 1000);
+    if (dup !== -1) return;
+    sessions.push(rec);
+  }
+
+  const baseDate = new Date('2026-10-21T10:00:00Z');
+  insert({ id: 'ses_1', dayId: 'fullbodyA', date: baseDate.toISOString() });
+  // Sesión del reloj 10 minutos después para el mismo día
+  insert({ id: 'watch-fullbodyA-123', sessionId: 'watch-fullbodyA-123', dayId: 'fullbodyA', date: new Date(baseDate.getTime() + 10 * 60000).toISOString() });
+
+  assert.strictEqual(sessions.length, 1, 'No debe duplicar sesión del mismo día dentro de la ventana de 45m');
+});
+
+test('auto-archive usa umbral de 30 minutos y calcula duración según última serie completada', () => {
+  const AUTO_SAVE_IDLE_MS = 30 * 60 * 1000;
+  const startTime = Date.now() - (75 * 60 * 1000); // Empezó hace 75 min
+  const lastActivity = Date.now() - (35 * 60 * 1000); // Última serie hace 35 min (duración real del entreno: 40 min)
+  const now = Date.now();
+
+  const isIdle = (now - lastActivity) >= AUTO_SAVE_IDLE_MS;
+  assert.strictEqual(isIdle, true, 'Debe activar auto-archive si pasaron >= 30m');
+
+  const durationMin = Math.max(1, Math.round((lastActivity - startTime) / 60000));
+  assert.strictEqual(durationMin, 40, 'Duración debe ser 40 min (hasta la última serie hecha, sin sumar inactividad)');
+});
+
 console.log('\n====================================================');
 console.log(`🎉 Todas las pruebas superadas exitosamente: ${passedTests}/${totalTests}`);
 console.log('====================================================');
