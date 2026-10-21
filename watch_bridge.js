@@ -1180,7 +1180,7 @@
           </div>
 
           <div style="display:flex;gap:8px;margin-top:14px;">
-            <button id="btnForceSyncNow" style="flex:1;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;border:none;padding:9px 12px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;">⚡ Forzar Sync</button>
+            <button id="btnForceSyncNow" style="flex:1;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;border:none;padding:9px 12px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;">Forzar Sync</button>
             <button id="btnReconnectSse" style="background:#334155;color:#f8fafc;border:none;padding:9px 12px;border-radius:12px;font-size:12px;font-weight:600;cursor:pointer;">🔄 Reconectar</button>
           </div>
         </div>
