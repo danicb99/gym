@@ -1,4 +1,4 @@
-# Guía Fácil de Uso y Sincronización para VigorexiApp (v1.7.1)
+# Guía Fácil de Uso y Sincronización para VigorexiApp (v1.7.2)
 
 Esta guía te explica de forma clara y sin tecnicismos cómo disfrutar de tu nueva **Rutina V2** (más volumen en pecho, cuádriceps y gemelos en 40-46 min), el **Modo Exprés** y cómo actualizar tanto tu móvil como tu reloj Amazfit Active 2.
 
@@ -13,7 +13,7 @@ Antes de actualizar nada, abre la app en tu móvil y haz una copia de seguridad 
 
 ---
 
-## 🌟 Novedades de la Versión 1.7.1 (Rutina V2)
+## 🌟 Novedades de la Versión 1.7.2 (Rutina V2)
 
 1. **⏱️ Sesiones de ~41 minutos (Más músculo en menos tiempo):**
    * Gracias a las **superseries agonista-antagonista** (emparejar pecho con espalda, o hombro con gemelos) y a un **calentamiento más rápido de 2 fases**, ahora metes más series efectivas sin que el entrenamiento se alargue.
@@ -34,7 +34,7 @@ Antes de actualizar nada, abre la app en tu móvil y haz una copia de seguridad 
    * **Aviso si vuelves tras 5 o más días sin entrenar:** Te sugiere empezar con un 5-10% menos de peso para readaptar tendones y evitar agujetas incapacitantes.
 
 5. **🔍 Comprobación de versión en el móvil:**
-   * Para asegurarte de que tu móvil cargó la versión nueva, ve a la pestaña **Rutina** (abajo): verás la etiqueta verde **v1.7.1** arriba.
+   * Para asegurarte de que tu móvil cargó la versión nueva, ve a la pestaña **Rutina** (abajo): verás la etiqueta verde **v1.7.2** arriba.
 
 ---
 
@@ -42,7 +42,7 @@ Antes de actualizar nada, abre la app en tu móvil y haz una copia de seguridad 
 
 1. Abre la web/app de VigorexiApp en tu móvil (https://danicb99.github.io/gym/).
 2. Desliza con el dedo hacia abajo en la pantalla para recargar (o cierra la aplicación por completo y vuelve a abrirla).
-3. Entra en la pestaña **Rutina**: debe poner **v1.7.1**. ¡Tu móvil ya está al día!
+3. Entra en la pestaña **Rutina**: debe poner **v1.7.2**. ¡Tu móvil ya está al día!
 
 ---
 
@@ -77,7 +77,7 @@ npx @zeppos/zeus-cli preview
 4. Toca el botón de **Escanear QR** (arriba a la derecha) y enfoca la cámara a la pantalla del ordenador donde está el QR.
 5. **En tu reloj:** sal un segundo a la esfera de la hora (donde se ven las agujas/números del reloj) para que la app no esté abierta.
 6. Pulsa **Instalar** en la pantalla del móvil.
-7. ¡Listo! En unos segundos la versión **1.7.1** estará instalada en tu muñeca con la nueva rutina idéntica al móvil.
+7. ¡Listo! En unos segundos la versión **1.7.2** estará instalada en tu muñeca con la nueva rutina idéntica al móvil.
 
 ---
 
