@@ -10235,8 +10235,10 @@
         ? `${Math.floor(durationMin / 60)}h ${durationMin % 60}m` 
         : `${durationMin} min`;
 
+      const activeSessionId = (workoutState.sessionIds && workoutState.sessionIds[dayId]) || null;
       const sessionRecord = {
         id: 'ses_' + Date.now(),
+        sessionId: activeSessionId,
         date: new Date().toISOString(),
         dayId: dayId,
         dayName: (typeof ROUTINE_SLOTS !== 'undefined' && ROUTINE_SLOTS[dayId]) ? ROUTINE_SLOTS[dayId].title : (daySection.querySelector('.day-banner-title')?.innerText || dayId),
@@ -10390,6 +10392,16 @@
               if (k.startsWith(slot.slotId + '_')) delete workoutState.inputs[k];
             });
           }
+        });
+      }
+
+      // Cerrar la sesión: no debe resucitar por eventos retrasados del reloj
+      if (workoutState.sessionIds) delete workoutState.sessionIds[dayId];
+      if (workoutState.setTimestamps && dayData && Array.isArray(dayData.slots)) {
+        dayData.slots.forEach(slot => {
+          Object.keys(workoutState.setTimestamps).forEach(k => {
+            if (k.startsWith(slot.slotId + '_')) delete workoutState.setTimestamps[k];
+          });
         });
       }
 

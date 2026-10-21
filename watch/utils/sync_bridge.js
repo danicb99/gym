@@ -122,6 +122,7 @@ export async function flushOutbox(context) {
 
   isFlushingOutbox = true
   let retryScheduled = false
+  let removedAny = false
 
   try {
     for (const item of outbox) {
@@ -136,7 +137,7 @@ export async function flushOutbox(context) {
 
         if (response && response.ok === true) {
           console.log('[SyncBridge] Evento confirmado por el servidor:', item.id)
-          removeFromOutbox(item.id)
+          if (removeFromOutbox(item.id)) removedAny = true
           if (item.type === 'WORKOUT_FINISHED') {
             const sId = (item.payload && item.payload.sessionId) || (item.payload && item.payload.summary && item.payload.summary.sessionId)
             if (sId) markSessionSynced(sId)
@@ -172,7 +173,9 @@ export async function flushOutbox(context) {
 
   // Si durante el envío se encolaron eventos nuevos (p. ej. WORKOUT_FINISHED),
   // drenar de nuevo. Si hubo fallo, respetar el backoff ya programado.
-  if (!retryScheduled && getPendingOutboxCount() > 0) {
+  // Solo re-drenar si este ciclo confirmó al menos un evento; así evitamos
+  // un bucle si el almacenamiento falla al borrar de la cola.
+  if (!retryScheduled && removedAny && getPendingOutboxCount() > 0) {
     setTimeout(() => flushOutbox(context), 0)
   }
 }

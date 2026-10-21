@@ -723,7 +723,8 @@
             const data = typeof raw.message === 'string' ? JSON.parse(raw.message) : raw.message;
             if (!data) continue;
 
-            const ts = data.ts || data.timestamp || 0;
+            const ntfyTime = raw.time ? Number(raw.time) * 1000 : 0;
+            const ts = data.ts || data.timestamp || ntfyTime || 0;
             // Descartar mensajes más viejos que 12 horas
             if (ts > 0 && Date.now() - ts > CATCHUP_MAX_AGE_MS) continue;
 
@@ -819,6 +820,7 @@
     const dayId = payload.dayId;
     const sessionId = payload.sessionId || (payload.summary && payload.summary.sessionId) || null;
     const completedAt = payload.completedAt || ts;
+    const incomingTime = completedAt || ts || Date.now();
 
     if (!slotId || setIndex === undefined) return false;
 
@@ -826,6 +828,19 @@
       // Ignorar eventos de una sesión ya archivada (catch-up/outbox antiguo)
       if (sessionId && Array.isArray(workoutState.sessions) &&
           workoutState.sessions.some(s => s && (s.sessionId === sessionId || s.id === sessionId))) {
+        markMsgProcessed(id);
+        return true;
+      }
+
+      // Evento completado antes de que el día se archivara: pertenece a la sesión cerrada
+      const archivedLater = dayId && Array.isArray(workoutState.sessions) &&
+        workoutState.sessions.some(s => {
+          if (!s || s.dayId !== dayId || !s.date) return false;
+          const archivedTs = new Date(s.date).getTime();
+          return Number.isFinite(archivedTs) && incomingTime < archivedTs - 1000;
+        });
+      if (archivedLater) {
+        console.log('[WatchBridge] Serie anterior al archivado, ignorando:', id);
         markMsgProcessed(id);
         return true;
       }
@@ -849,7 +864,6 @@
 
       const rowKey = `${slotId}_${setIndex}`;
       const existingTime = workoutState.setTimestamps[rowKey] || 0;
-      const incomingTime = completedAt || ts || Date.now();
 
       // Regla de fusión: gana el cambio más reciente según completedAt.
       // Un evento antiguo no debe resucitar un día archivado ni deshacer un cambio posterior.
@@ -1476,6 +1490,7 @@
     registerSessionHistory,
     mergeSessionSets,
     clearSetTimestampsForDay,
+    handleSetCompletedFromWatch,
     handleWorkoutFinishedFromWatch
   };
 })();

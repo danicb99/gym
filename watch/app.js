@@ -168,7 +168,9 @@ App(
     mergePhoneSession(phoneSession) {
       if (!phoneSession || !phoneSession.activeDayId) return
       if (phoneSession.activeDayId !== this.globalData.activeDayId) return
-      if (phoneSession.sessionId && !this.globalData.sessionId) {
+      // El móvil es la fuente de verdad de la sesión activa: unificar el id
+      // para que las series y el fin de entreno se archiven en la misma sesión.
+      if (phoneSession.sessionId) {
         this.globalData.sessionId = phoneSession.sessionId
       }
 

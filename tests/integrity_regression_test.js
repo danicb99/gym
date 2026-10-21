@@ -153,6 +153,23 @@ function finishMessage(sessionId, date, exercises, extra = {}) {
   };
 }
 
+function setMessage(sessionId, slotId, setIndex, kg, reps, completedAt, extra = {}) {
+  return Object.assign({
+    id: `msg-${sessionId}-${slotId}_${setIndex}-${completedAt}`,
+    type: 'SET_COMPLETED',
+    ts: completedAt,
+    payload: {
+      sessionId,
+      dayId: 'fullbodyA',
+      slotId,
+      setIndex,
+      kg,
+      reps,
+      completedAt
+    }
+  }, extra);
+}
+
 const { context, api } = loadBridge();
 assert(api, 'watch_bridge debe exponer hooks de prueba');
 
@@ -312,6 +329,102 @@ console.log('Integrity regression tests');
   assert.strictEqual(context.workoutState.exerciseHistory.squat.length, 1, 'el historial no debe duplicarse');
   assert.strictEqual(context.workoutState.exerciseHistory.squat[0].sets.length, 2, 'el historial debe fusionar series');
   console.log('  ok - fusión móvil + reloj');
+})();
+
+(function testWatchSetAdoptsSessionAndIgnoresStaleOrForeign() {
+  const now = Date.now();
+  resetState(context);
+
+  const first = setMessage('watch-s1', 'fullbodyA_1', 0, 100, 5, now);
+  assert.strictEqual(api.handleSetCompletedFromWatch(first, { silent: true }), true);
+  assert.strictEqual(context.workoutState.sessionIds.fullbodyA, 'watch-s1', 'el móvil debe adoptar el sessionId del reloj');
+  assert(context.workoutState.completed.includes('fullbodyA_1_0'), 'la serie debe quedar completada');
+  assert.strictEqual(context.workoutState.inputs.fullbodyA_1_0_kg, '100');
+
+  const stale = setMessage('watch-s1', 'fullbodyA_1', 0, 50, 2, now - 5000);
+  assert.strictEqual(api.handleSetCompletedFromWatch(stale, { silent: true }), true, 'el evento antiguo se consume sin error');
+  assert.strictEqual(context.workoutState.inputs.fullbodyA_1_0_kg, '100', 'un evento antiguo no debe sobrescribir pesos');
+  assert.strictEqual(context.workoutState.setTimestamps.fullbodyA_1_0, now, 'un evento antiguo no debe retroceder la marca');
+
+  const foreign = setMessage('watch-s2', 'fullbodyA_1', 0, 120, 8, now + 1000);
+  assert.strictEqual(api.handleSetCompletedFromWatch(foreign, { silent: true }), true, 'la sesión ajena se consume sin error');
+  assert.strictEqual(context.workoutState.inputs.fullbodyA_1_0_kg, '100', 'no debe mezclar series de otra sesión');
+  assert.strictEqual(context.workoutState.completed.length, 1, 'no debe duplicar filas completadas');
+  assert.strictEqual(context.workoutState.sessionIds.fullbodyA, 'watch-s1', 'no debe cambiar el sessionId activo');
+  console.log('  ok - sessionId del reloj, eventos antiguos y sesiones ajenas');
+})();
+
+(function testArchivedSessionEventsDoNotResurrect() {
+  const now = Date.now();
+  resetState(context, {
+    sessions: [{
+      id: 'old-session',
+      sessionId: 'old-session',
+      date: new Date(now - 3600000).toISOString(),
+      dayId: 'fullbodyA',
+      exercises: []
+    }]
+  });
+
+  const msg = setMessage('old-session', 'fullbodyA_1', 0, 90, 5, now);
+  assert.strictEqual(api.handleSetCompletedFromWatch(msg, { silent: true }), true);
+  assert.deepStrictEqual(context.workoutState.completed, [], 'un evento de sesión archivada no debe resucitar series');
+  assert.strictEqual(context.workoutState.inputs.fullbodyA_1_0_kg, undefined);
+  assert.strictEqual(context.workoutState.setTimestamps.fullbodyA_1_0, undefined);
+  console.log('  ok - no resucitar sesiones archivadas');
+})();
+
+(function testPreArchiveEventsDoNotResurrectUnknownSession() {
+  const now = Date.now();
+  resetState(context, {
+    sessions: [{
+      id: 'ses_pwa_1',
+      date: new Date(now).toISOString(),
+      dayId: 'fullbodyA',
+      exercises: []
+    }]
+  });
+
+  const delayed = setMessage('watch-unlinked', 'fullbodyA_1', 0, 100, 5, now - 5000);
+  assert.strictEqual(api.handleSetCompletedFromWatch(delayed, { silent: true }), true);
+  assert.deepStrictEqual(context.workoutState.completed, [], 'un evento anterior al archivado no debe resucitar el día');
+  assert.strictEqual(context.workoutState.sessionIds.fullbodyA, undefined);
+
+  const fresh = setMessage('watch-new', 'fullbodyA_1', 0, 100, 5, now + 5000);
+  assert.strictEqual(api.handleSetCompletedFromWatch(fresh, { silent: true }), true);
+  assert(context.workoutState.completed.includes('fullbodyA_1_0'), 'una sesión nueva posterior al archivado sí debe aplicarse');
+  assert.strictEqual(context.workoutState.sessionIds.fullbodyA, 'watch-new');
+  console.log('  ok - eventos previos al archivado no resucitan sesiones sin id');
+})();
+
+(function testFinishFromForeignSessionIsIgnored() {
+  const now = Date.now();
+  resetState(context, {
+    completed: ['fullbodyA_1_0'],
+    sessionIds: { fullbodyA: 'web-1' },
+    setTimestamps: { fullbodyA_1_0: now },
+    sessionStartTime: { fullbodyA: now },
+    lastActivityTime: { fullbodyA: now }
+  });
+
+  const foreign = finishMessage('watch-other', new Date(now).toISOString(), [{
+    exId: 'squat',
+    name: 'Sentadilla',
+    sets: [{ set: 1, kg: 100, reps: 5, completed: true }]
+  }]);
+  assert.strictEqual(api.handleWorkoutFinishedFromWatch(foreign, { silent: true }), true);
+  assert.strictEqual(context.workoutState.sessions.length, 0, 'no debe archivar una sesión de otro id');
+  assert(context.workoutState.completed.includes('fullbodyA_1_0'), 'no debe borrar el progreso de la sesión activa');
+
+  const matching = finishMessage('web-1', new Date(now + 1000).toISOString(), [{
+    exId: 'squat',
+    name: 'Sentadilla',
+    sets: [{ set: 1, kg: 100, reps: 5, completed: true }]
+  }]);
+  assert.strictEqual(api.handleWorkoutFinishedFromWatch(matching, { silent: true }), true);
+  assert.strictEqual(context.workoutState.sessions.length, 1, 'la sesión activa correcta sí debe archivarse');
+  assert.deepStrictEqual(context.workoutState.completed, [], 'al archivar la sesión correcta se limpia el progreso');
+  console.log('  ok - fin de sesión ajena ignorado');
 })();
 
 console.log('Todos los tests de integridad pasaron.');
