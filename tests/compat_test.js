@@ -2,7 +2,7 @@ const fs = require('fs');
 const assert = require('assert');
 
 console.log('====================================================');
-console.log('🧪 VigorexiApp - Verificación de Compatibilidad v1.8.2');
+console.log('🧪 VigorexiApp - Verificación de Compatibilidad v1.8.3');
 console.log('====================================================');
 
 const indexHtml = fs.readFileSync('index.html', 'utf8');
@@ -11,12 +11,12 @@ const watchAppJson = JSON.parse(fs.readFileSync('watch/app.json', 'utf8'));
 
 // 1. Verificar versiones
 console.log('\n📦 1. Verificación de Versiones:');
-assert(swJs.includes('vigorexiapp-v1.8.2'), 'sw.js debe tener la caché v1.8.2');
-console.log('  ✓ sw.js caché actualizada a v1.8.2');
+assert(swJs.includes('vigorexiapp-v1.8.3'), 'sw.js debe tener la caché v1.8.3');
+console.log('  ✓ sw.js caché actualizada a v1.8.3');
 
-assert.strictEqual(watchAppJson.app.version.code, 22, 'watch/app.json code debe ser 22');
-assert.strictEqual(watchAppJson.app.version.name, '1.8.2', 'watch/app.json name debe ser 1.8.2');
-console.log('  ✓ watch/app.json versión code=22, name=1.8.2');
+assert.strictEqual(watchAppJson.app.version.code, 23, 'watch/app.json code debe ser 23');
+assert.strictEqual(watchAppJson.app.version.name, '1.8.3', 'watch/app.json name debe ser 1.8.3');
+console.log('  ✓ watch/app.json versión code=23, name=1.8.3');
 
 // 2. Verificar componentes móviles críticos en index.html
 console.log('\n📱 2. Verificación de Componentes Móviles (PWA):');

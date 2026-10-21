@@ -2714,6 +2714,81 @@
     .session-timer-chip .clock-icon {
       font-size: 0.76rem;
     }
+    .hdr-btn-superset {
+      font-size: 0.72rem;
+      font-weight: 750;
+      color: #c084fc;
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      padding: 0 8px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      height: 34px;
+      min-height: 34px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .hdr-btn-superset.on {
+      color: #f3e8ff;
+      background: rgba(168, 85, 247, 0.25);
+      border-color: #c084fc;
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.25);
+    }
+    .hdr-btn-superset.off {
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: none;
+    }
+
+    /* Superset / Biserie Visual Group Containers */
+    .superset-pair-group {
+      background: rgba(168, 85, 247, 0.035);
+      border: 1px solid rgba(168, 85, 247, 0.22);
+      border-left: 3.5px solid #c084fc;
+      border-radius: 18px;
+      padding: 8px 8px 2px 8px;
+      margin-bottom: 14px;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+    .superset-pair-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 6px 8px 6px;
+      gap: 6px;
+    }
+    .superset-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #c084fc;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .superset-pair-desc {
+      font-size: 0.68rem;
+      color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    body.supersets-disabled .superset-pair-group {
+      background: transparent;
+      border-color: transparent;
+      border-left: none;
+      padding: 0;
+      margin-bottom: 0;
+    }
+    body.supersets-disabled .superset-pair-header {
+      display: none !important;
+    }
+
 
     .status-right {
       display: flex;
@@ -3018,11 +3093,12 @@
       </div>
     </div>
 
-    <!-- Row 2: Status & Session Info (Harmonized 34px heights) -->
+    <!-- Row 2: Status & Session Info (Harmonized 34px heights, no gap) -->
     <div class="header-status-row">
       <div class="status-left">
         <span class="status-sets-chip" id="headerSetsProgress">0/23 series · 0%</span>
         <span class="session-timer-chip" id="headerSessionTimer"><span class="clock-icon">⏱️</span> 00:00</span>
+        <button type="button" class="hdr-btn hdr-btn-superset on" id="hdrBtnSuperset" onclick="toggleSupersetsMode()" title="Alternar modo Superseries o Series Normales">⚡ Superseries</button>
       </div>
 
       <div class="status-right">
@@ -3169,6 +3245,11 @@
       <!-- Pair Group: card-fullbodyA_2 + card-fullbodyA_3 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
         <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 90-120 s tras B</div>
+        <div class="superset-pair-group">
+        <div class="superset-pair-header">
+          <span class="superset-badge-pill">⚡ SUPERSERIE 2 · Pecho + Espalda</span>
+          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        </div>
         <article class="exercise-card" id="card-fullbodyA_2" data-slot="fullbodyA_2" data-default-ex="banca" data-current-ex="banca" data-total-sets="4">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -3189,10 +3270,7 @@
         <!-- Full Collapsible Body -->
         <div class="card-body-collapsible" id="card-body-fullbodyA_2">
 
-            <div class="warmup-hint-box" style="margin: 8px 12px 10px 12px; padding: 6px 10px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; font-size: 0.72rem; color: #38bdf8; display: flex; align-items: center; gap: 6px;">
-              <span>🔥</span>
-              <span><strong>Aproximación previa:</strong> 1 serie al ~60% × 5 reps (descanso 45-60 s) antes de la Serie 1 efectiva</span>
-            </div>
+
           <div class="card-top">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyA_2" onclick="event.stopPropagation(); togglePlayer('player-fullbodyA_2', event);" title="Toca para ver Demo 3D">
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bench-press"></use></svg>
@@ -3401,6 +3479,7 @@
         </div>
       </article>
       </div>
+      </div>
 
 
       <!-- Exercise 3a: fullbodyA_4 -->
@@ -3408,6 +3487,11 @@
       <!-- Pair Group: card-fullbodyA_4 + card-fullbodyA_7 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
         <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 45-60 s tras B</div>
+        <div class="superset-pair-group">
+        <div class="superset-pair-header">
+          <span class="superset-badge-pill">⚡ SUPERSERIE 3 · Hombro + Gemelos</span>
+          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        </div>
         <article class="exercise-card" id="card-fullbodyA_4" data-slot="fullbodyA_4" data-default-ex="laterales1" data-current-ex="laterales1" data-total-sets="3">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -3621,6 +3705,7 @@
         </div>
       </article>
       </div>
+      </div>
 
 
       <!-- Exercise 4a: fullbodyA_5 -->
@@ -3628,6 +3713,11 @@
       <!-- Pair Group: card-fullbodyA_5 + card-fullbodyA_6 -->
       <div class="exercise-pair-container" data-pair-type="biserie" data-all-skippable="true">
         <div class="pair-header-label">⚡ BISERIE BRAZOS · Descanso 45 s tras cada serie</div>
+        <div class="superset-pair-group">
+        <div class="superset-pair-header">
+          <span class="superset-badge-pill">⚡ BISERIE 4 · Tríceps + Bíceps</span>
+          <span class="superset-pair-desc">45 s de descanso entre series antagónicas de brazos</span>
+        </div>
         <article class="exercise-card" id="card-fullbodyA_5" data-slot="fullbodyA_5" data-default-ex="triceps1" data-current-ex="triceps1" data-total-sets="3" data-skippable="true">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -3827,6 +3917,7 @@
         </div>
       </article>
       </div>
+      </div>
 
     </section>
     <!-- ==========================================
@@ -3955,6 +4046,11 @@
       <!-- Pair Group: card-fullbodyB_2 + card-fullbodyB_3 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
         <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 90-120 s tras B</div>
+        <div class="superset-pair-group">
+        <div class="superset-pair-header">
+          <span class="superset-badge-pill">⚡ SUPERSERIE 2 · Pecho + Espalda</span>
+          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        </div>
         <article class="exercise-card" id="card-fullbodyB_2" data-slot="fullbodyB_2" data-default-ex="inclinado" data-current-ex="inclinado" data-total-sets="4">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -4182,6 +4278,7 @@
         </div>
       </article>
       </div>
+      </div>
 
 
       <!-- Exercise 3a: fullbodyB_4 -->
@@ -4189,6 +4286,11 @@
       <!-- Pair Group: card-fullbodyB_4 + card-fullbodyB_7 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
         <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 75-90 s tras B</div>
+        <div class="superset-pair-group">
+        <div class="superset-pair-header">
+          <span class="superset-badge-pill">⚡ SUPERSERIE 3 · Hombro + Cuádriceps</span>
+          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        </div>
         <article class="exercise-card" id="card-fullbodyB_4" data-slot="fullbodyB_4" data-default-ex="militar" data-current-ex="militar" data-total-sets="3">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -4402,6 +4504,7 @@
         </div>
       </article>
       </div>
+      </div>
 
 
       <!-- Exercise 4a: fullbodyB_5 -->
@@ -4409,6 +4512,11 @@
       <!-- Pair Group: card-fullbodyB_5 + card-fullbodyB_6 -->
       <div class="exercise-pair-container" data-pair-type="biserie">
         <div class="pair-header-label">⚡ BISERIE ACCESORIOS · Descanso 45 s tras cada serie</div>
+        <div class="superset-pair-group">
+        <div class="superset-pair-header">
+          <span class="superset-badge-pill">⚡ BISERIE 4 · Deltoides Post. + Core</span>
+          <span class="superset-pair-desc">45 s de descanso entre Face Pull y Plancha</span>
+        </div>
         <article class="exercise-card" id="card-fullbodyB_5" data-slot="fullbodyB_5" data-default-ex="facepull" data-current-ex="facepull" data-total-sets="3">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -4608,6 +4716,7 @@
         </div>
       </article>
       </div>
+      </div>
 
     </section>
     <!-- ==========================================
@@ -4621,6 +4730,11 @@
       <!-- Pair Group: card-fullbodyC_1 + card-fullbodyC_2 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
         <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 90 s tras B</div>
+        <div class="superset-pair-group">
+        <div class="superset-pair-header">
+          <span class="superset-badge-pill">⚡ SUPERSERIE 1 · Cuádriceps + Isquios</span>
+          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        </div>
         <article class="exercise-card" id="card-fullbodyC_1" data-slot="fullbodyC_1" data-default-ex="prensa_45" data-current-ex="prensa_45" data-total-sets="3">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -4841,6 +4955,7 @@
         </div>
       </article>
       </div>
+      </div>
 
 
       <!-- Exercise 2a: fullbodyC_3 -->
@@ -4848,6 +4963,11 @@
       <!-- Pair Group: card-fullbodyC_3 + card-fullbodyC_8 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
         <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 75-90 s tras B</div>
+        <div class="superset-pair-group">
+        <div class="superset-pair-header">
+          <span class="superset-badge-pill">⚡ SUPERSERIE 2 · Espalda + Pecho</span>
+          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        </div>
         <article class="exercise-card" id="card-fullbodyC_3" data-slot="fullbodyC_3" data-default-ex="jalonneutro" data-current-ex="jalonneutro" data-total-sets="3">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -5061,6 +5181,7 @@
         </div>
       </article>
       </div>
+      </div>
 
 
       <!-- Exercise 3a: fullbodyC_4 -->
@@ -5068,6 +5189,11 @@
       <!-- Pair Group: card-fullbodyC_4 + card-fullbodyC_9 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
         <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 45-60 s tras B</div>
+        <div class="superset-pair-group">
+        <div class="superset-pair-header">
+          <span class="superset-badge-pill">⚡ SUPERSERIE 3 · Hombro + Gemelos</span>
+          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        </div>
         <article class="exercise-card" id="card-fullbodyC_4" data-slot="fullbodyC_4" data-default-ex="laterales2" data-current-ex="laterales2" data-total-sets="3">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -5281,6 +5407,7 @@
         </div>
       </article>
       </div>
+      </div>
 
 
       <!-- Exercise 4a: fullbodyC_5 -->
@@ -5288,6 +5415,11 @@
       <!-- Pair Group: card-fullbodyC_5 + card-fullbodyC_6 -->
       <div class="exercise-pair-container" data-pair-type="biserie" data-all-skippable="true">
         <div class="pair-header-label">⚡ BISERIE BRAZOS · Descanso 45 s tras cada serie</div>
+        <div class="superset-pair-group">
+        <div class="superset-pair-header">
+          <span class="superset-badge-pill">⚡ BISERIE 4 · Tríceps + Bíceps</span>
+          <span class="superset-pair-desc">45 s de descanso entre Francés y Martillo</span>
+        </div>
         <article class="exercise-card" id="card-fullbodyC_5" data-slot="fullbodyC_5" data-default-ex="frances" data-current-ex="frances" data-total-sets="3" data-skippable="true">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -5486,6 +5618,7 @@
           </div>
         </div>
       </article>
+      </div>
       </div>
 
 
@@ -8429,7 +8562,7 @@
       <div class="day-banner">
         <div>
           <div class="day-banner-title">📋 Rutina & Programación</div>
-          <div class="day-banner-meta"><span>Sistemas de entrenamiento</span> • <span>Reglas de sobrecarga</span> • <span class="badge-app-version" style="display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); color:#34d399; font-weight:800; font-size:0.75rem;">v1.8.2</span></div>
+          <div class="day-banner-meta"><span>Sistemas de entrenamiento</span> • <span>Reglas de sobrecarga</span> • <span class="badge-app-version" style="display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); color:#34d399; font-weight:800; font-size:0.75rem;">v1.8.3</span></div>
         </div>
       </div>
 
@@ -9478,6 +9611,165 @@
       switchMainTab('plan');
     }
 
+
+    // Control de Modo Superseries (Activadas vs Series Normales por separado)
+    function toggleSupersetsMode() {
+      if (!workoutState) workoutState = {};
+      const current = workoutState.supersetsMode || 'enabled';
+      workoutState.supersetsMode = (current === 'enabled') ? 'disabled' : 'enabled';
+      saveWorkoutState();
+      applySupersetsModeUI();
+      if (workoutState.supersetsMode === 'disabled') {
+        showToast('⏹️ Modo Normal activado: ejercicios individuales con descanso normal.');
+      } else {
+        showToast('⚡ Modo Superseries activado: ejercicios emparejados sin descanso intermedio.');
+      }
+    }
+
+    function applySupersetsModeUI() {
+      const mode = (workoutState && workoutState.supersetsMode) ? workoutState.supersetsMode : 'enabled';
+      const btn = document.getElementById('hdrBtnSuperset');
+      const isEnabled = (mode === 'enabled');
+
+      if (btn) {
+        if (isEnabled) {
+          btn.innerText = '⚡ Superseries';
+          btn.classList.add('on');
+          btn.classList.remove('off');
+          btn.title = 'Modo Superseries activado. Toca para cambiar a Series Normales.';
+        } else {
+          btn.innerText = '⏹️ Normal';
+          btn.classList.remove('on');
+          btn.classList.add('off');
+          btn.title = 'Modo Series Normales. Toca para activar Superseries.';
+        }
+      }
+
+      document.body.classList.toggle('supersets-disabled', !isEnabled);
+
+      // Mapa de títulos con numeración secuencial limpia cuando superseries está desactivado
+      const normalTitles = {
+        'fullbodyA_1': '1. Sentadilla Trasera con Barra (Back Squat)',
+        'fullbodyA_2': '2. Press de Banca Plano con Barra',
+        'fullbodyA_3': '3. Jalón al Pecho (Prono Ancho)',
+        'fullbodyA_4': '4. Elevaciones Laterales con Mancuernas',
+        'fullbodyA_7': '5. Elevación de Talones de Pie en Máquina',
+        'fullbodyA_5': '6. Extensión de Tríceps en Polea Alta',
+        'fullbodyA_6': '7. Curl de Bíceps con Mancuernas (Supinación)',
+
+        'fullbodyB_1': '1. Peso Muerto Rumano (RDL) con Barra',
+        'fullbodyB_2': '2. Press Inclinado con Mancuernas (30°)',
+        'fullbodyB_3': '3. Remo en Polea Baja (Agarre Neutro Estrecho)',
+        'fullbodyB_4': '4. Press Militar Sentado con Mancuernas (75°)',
+        'fullbodyB_7': '5. Extensiones de Cuádriceps en Máquina',
+        'fullbodyB_5': '6. Face Pull en Polea Alta',
+        'fullbodyB_6': '7. Plancha Abdominal Isométrica (o Rueda)',
+
+        'fullbodyC_1': '1. Prensa de Piernas 45°',
+        'fullbodyC_2': '2. Curl Femoral Tumbado',
+        'fullbodyC_3': '3. Jalón al Pecho con Agarre Neutro Cerrado',
+        'fullbodyC_8': '4. Aperturas en Polea (Cruces)',
+        'fullbodyC_4': '5. Elevaciones Laterales en Polea (o Mancuernas)',
+        'fullbodyC_9': '6. Elevación de Talones de Pie en Máquina',
+        'fullbodyC_5': '7. Press Francés con Barra Z o Mancuernas',
+        'fullbodyC_6': '8. Curl Martillo con Mancuernas',
+        'fullbodyC_7': '9. Crunch en Polea Alta Arrodillado'
+      };
+
+      const supersetTitles = {
+        'fullbodyA_1': '1. Sentadilla Trasera con Barra (Back Squat)',
+        'fullbodyA_2': '2a. Press de Banca Plano con Barra',
+        'fullbodyA_3': '2b. Jalón al Pecho (Prono Ancho)',
+        'fullbodyA_4': '3a. Elevaciones Laterales con Mancuernas',
+        'fullbodyA_7': '3b. Elevación de Talones de Pie en Máquina',
+        'fullbodyA_5': '4a. Extensión de Tríceps en Polea Alta',
+        'fullbodyA_6': '4b. Curl de Bíceps con Mancuernas (Supinación)',
+
+        'fullbodyB_1': '1. Peso Muerto Rumano (RDL) con Barra',
+        'fullbodyB_2': '2a. Press Inclinado con Mancuernas (30°)',
+        'fullbodyB_3': '2b. Remo en Polea Baja (Agarre Neutro Estrecho)',
+        'fullbodyB_4': '3a. Press Militar Sentado con Mancuernas (75°)',
+        'fullbodyB_7': '3b. Extensiones de Cuádriceps en Máquina',
+        'fullbodyB_5': '4a. Face Pull en Polea Alta',
+        'fullbodyB_6': '4b. Plancha Abdominal Isométrica (o Rueda)',
+
+        'fullbodyC_1': '1a. Prensa de Piernas 45°',
+        'fullbodyC_2': '1b. Curl Femoral Tumbado',
+        'fullbodyC_3': '2a. Jalón al Pecho con Agarre Neutro Cerrado',
+        'fullbodyC_8': '2b. Aperturas en Polea (Cruces)',
+        'fullbodyC_4': '3a. Elevaciones Laterales en Polea (o Mancuernas)',
+        'fullbodyC_9': '3b. Elevación de Talones de Pie en Máquina',
+        'fullbodyC_5': '4a. Press Francés con Barra Z o Mancuernas',
+        'fullbodyC_6': '4b. Curl Martillo con Mancuernas',
+        'fullbodyC_7': '5. Crunch en Polea Alta Arrodillado'
+      };
+
+      const targetTitles = isEnabled ? supersetTitles : normalTitles;
+      Object.keys(targetTitles).forEach(slotId => {
+        const titleEl = document.getElementById('title-' + slotId);
+        if (titleEl) titleEl.innerText = targetTitles[slotId];
+        const sumTitleEl = document.getElementById('summary-title-' + slotId);
+        if (sumTitleEl) sumTitleEl.innerText = targetTitles[slotId];
+      });
+
+      // Actualizar tags de descanso
+      const normalRests = {
+        'fullbodyA_2': '⏱️ 105 s',
+        'fullbodyA_3': '⏱️ 90 s',
+        'fullbodyA_4': '⏱️ 60 s',
+        'fullbodyA_7': '⏱️ 60 s',
+        'fullbodyA_5': '⏱️ 45 s',
+        'fullbodyA_6': '⏱️ 45 s',
+
+        'fullbodyB_2': '⏱️ 105 s',
+        'fullbodyB_3': '⏱️ 90 s',
+        'fullbodyB_4': '⏱️ 75 s',
+        'fullbodyB_7': '⏱️ 75 s',
+        'fullbodyB_5': '⏱️ 45 s',
+        'fullbodyB_6': '⏱️ 45 s',
+
+        'fullbodyC_1': '⏱️ 105 s',
+        'fullbodyC_2': '⏱️ 90 s',
+        'fullbodyC_3': '⏱️ 90 s',
+        'fullbodyC_8': '⏱️ 75 s',
+        'fullbodyC_4': '⏱️ 60 s',
+        'fullbodyC_9': '⏱️ 60 s',
+        'fullbodyC_5': '⏱️ 45 s',
+        'fullbodyC_6': '⏱️ 45 s'
+      };
+
+      const supersetRests = {
+        'fullbodyA_2': '⚡ Sin descanso (pasa a B)',
+        'fullbodyA_3': '⏱️ 90-120 s tras la pareja',
+        'fullbodyA_4': '⚡ Sin descanso (pasa a B)',
+        'fullbodyA_7': '⏱️ 45-60 s tras la pareja',
+        'fullbodyA_5': '⚡ 45 s (Biserie con Bíceps)',
+        'fullbodyA_6': '⚡ 45 s (Biserie con Tríceps)',
+
+        'fullbodyB_2': '⚡ Sin descanso (pasa a B)',
+        'fullbodyB_3': '⏱️ 90-120 s tras la pareja',
+        'fullbodyB_4': '⚡ Sin descanso (pasa a B)',
+        'fullbodyB_7': '⏱️ 75-90 s tras la pareja',
+        'fullbodyB_5': '⚡ 45 s (Biserie con Plancha)',
+        'fullbodyB_6': '⚡ 45 s (Biserie con Face Pull)',
+
+        'fullbodyC_1': '⚡ Sin descanso (pasa a B)',
+        'fullbodyC_2': '⏱️ 90 s tras la pareja',
+        'fullbodyC_3': '⚡ Sin descanso (pasa a B)',
+        'fullbodyC_8': '⏱️ 75-90 s tras la pareja',
+        'fullbodyC_4': '⚡ Sin descanso (pasa a B)',
+        'fullbodyC_9': '⏱️ 45-60 s tras la pareja',
+        'fullbodyC_5': '⚡ 45 s (Biserie con Martillo)',
+        'fullbodyC_6': '⚡ 45 s (Biserie con Francés)'
+      };
+
+      const targetRests = isEnabled ? supersetRests : normalRests;
+      Object.keys(targetRests).forEach(slotId => {
+        const restEl = document.getElementById('rest-' + slotId);
+        if (restEl) restEl.innerText = targetRests[slotId];
+      });
+    }
+
     function openInfoSheet() {
       const backdrop = document.getElementById('infoSheetBackdrop');
       if (backdrop) backdrop.classList.add('open');
@@ -10032,7 +10324,9 @@
         const exName = titleEl ? titleEl.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim() : '';
         const setInfo = `Serie ${sIdx + 1}`;
 
-        if (slotCfg && slotCfg.pairSlotId) {
+        const isSupersetsActive = (!workoutState || workoutState.supersetsMode !== 'disabled');
+
+        if (isSupersetsActive && slotCfg && slotCfg.pairSlotId) {
           const pairedCard = document.getElementById('card-' + slotCfg.pairSlotId);
           const pairedTitle = pairedCard ? pairedCard.querySelector('.ex-title') : null;
           const pairedName = pairedTitle ? pairedTitle.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim() : 'ejercicio complementario';
@@ -12090,6 +12384,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       loadWorkoutState();
       restoreRestTimerState();
+    applySupersetsModeUI();
       updateTimerUI();
       runSessionTimerTicker();
       if ('serviceWorker' in navigator) {
@@ -12855,7 +13150,6 @@
       </div>
       <div class="nav-timer-controls">
         <button type="button" class="nav-tbtn play" id="timerPlayBtn" onclick="togglePlayTimer()" title="Iniciar / Pausar descanso">Iniciar</button>
-        <button type="button" class="nav-tbtn plus" onclick="adjustTimer(30)" title="Añadir 30 segundos">+30</button>
         <button type="button" class="nav-tbtn audio" id="audioModeBtn" onclick="toggleAudioMode()" title="Sonido / Notificación">🔕</button>
         <button type="button" class="nav-tbtn skip" id="timerResetBtn" onclick="resetTimerDock()" title="Reiniciar / Cancelar descanso">✕</button>
       </div>
@@ -12872,6 +13166,30 @@
     <div class="header-day-picker">
       <button id="btnProgramSwitch" class="btn-program-switch" type="button">⚡ 3D ▾</button>
       <select id="daySelector" class="header-day-select" onchange="handleDaySelectChange(this.value)"></select>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet: Notas del Ejercicio -->
+  <div class="bottom-sheet-backdrop" id="notesSheetBackdrop" onclick="closeNotesSheet(event)">
+    <div class="bottom-sheet" id="notesSheet" onclick="event.stopPropagation()">
+      <div class="bottom-sheet-drag-handle"></div>
+      <div class="bottom-sheet-header">
+        <div class="bottom-sheet-title-group">
+          <span class="bottom-sheet-icon">📝</span>
+          <div>
+            <h3 class="bottom-sheet-title" id="notesSheetTitle">Notas del Ejercicio</h3>
+            <p class="bottom-sheet-sub" id="notesSheetSub">Se guardan automáticamente en tu dispositivo</p>
+          </div>
+        </div>
+        <button type="button" class="bottom-sheet-close" onclick="closeNotesSheet()">✕</button>
+      </div>
+      <div class="bottom-sheet-body">
+        <textarea id="notesSheetTextarea" class="bottom-sheet-textarea" placeholder="Sensaciones, posición de clavijas, agarre o notas personales..." oninput="handleNotesSheetInput(this)"></textarea>
+        <div class="bottom-sheet-footer">
+          <span class="auto-save-status" id="notesSaveStatus">✓ Guardado automático</span>
+          <button type="button" class="primary-btn-compact" onclick="closeNotesSheet()">Listo</button>
+        </div>
+      </div>
     </div>
   </div>
 
