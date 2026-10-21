@@ -1957,6 +1957,44 @@
       display: none !important;
     }
 
+  
+    /* Fase 2: Agrupación visual de Superseries y Biseries */
+    .exercise-pair-container {
+      margin-bottom: 14px;
+      padding: 8px 8px 4px 8px;
+      background: rgba(168, 85, 247, 0.04);
+      border: 1px solid rgba(168, 85, 247, 0.22);
+      border-left: 3px solid #a855f7;
+      border-radius: 16px;
+      transition: all 0.2s ease;
+    }
+    .pair-header-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 6px 8px 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #c084fc;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+    .exercise-pair-container .exercise-card {
+      margin-bottom: 6px !important;
+    }
+    body.express-mode .exercise-pair-container[data-all-skippable="true"] {
+      display: none !important;
+    }
+    body.express-mode .exercise-pair-container:not([data-all-skippable="true"]):has(.exercise-card[data-skippable="true"]) {
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    body.express-mode .exercise-pair-container:not([data-all-skippable="true"]):has(.exercise-card[data-skippable="true"]) .pair-header-label {
+      display: none !important;
+    }
+
   </style>
 </head>
 <body>
@@ -2185,7 +2223,11 @@
       </article>
 
       <!-- Exercise 2a: fullbodyA_2 -->
-      <article class="exercise-card" id="card-fullbodyA_2" data-slot="fullbodyA_2" data-default-ex="banca" data-current-ex="banca" data-total-sets="4" style="order: 2;">
+      
+      <!-- Pair Group: card-fullbodyA_2 + card-fullbodyA_3 -->
+      <div class="exercise-pair-container" data-pair-type="superserie">
+        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 90-120 s tras B</div>
+        <article class="exercise-card" id="card-fullbodyA_2" data-slot="fullbodyA_2" data-default-ex="banca" data-current-ex="banca" data-total-sets="4" style="order: 2;">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('fullbodyA_2')">
@@ -2214,11 +2256,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bench-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (1/2) • Alternar con Jalón al Pecho</span>
               <h2 class="ex-title" id="title-fullbodyA_2">2a. Press de Banca Plano con Barra</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_2">4 × 6-8 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyA_2" onclick="triggerRest(105)">⚡ Superserie • Pasa a Jalón</span>
+                <span class="tag tag-rest" id="rest-fullbodyA_2" onclick="triggerRest(105)">⚡ Sin descanso (pasa a B)</span>
               </div>
             </div>
           </div>
@@ -2321,11 +2362,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lat-pulldown"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (2/2) • Descanso tras la pareja</span>
               <h2 class="ex-title" id="title-fullbodyA_3">2b. Jalón al Pecho (Prono Ancho)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_3">4 × 8-10 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyA_3" onclick="triggerRest(105)">⚡ Descanso 90-120 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyA_3" onclick="triggerRest(105)">⏱️ 90-120 s tras pareja</span>
               </div>
             </div>
           </div>
@@ -2402,9 +2442,15 @@
           </div>
         </div>
       </article>
+      </div>
+
 
       <!-- Exercise 3a: fullbodyA_4 -->
-      <article class="exercise-card" id="card-fullbodyA_4" data-slot="fullbodyA_4" data-default-ex="laterales1" data-current-ex="laterales1" data-total-sets="3" style="order: 4;">
+      
+      <!-- Pair Group: card-fullbodyA_4 + card-fullbodyA_7 -->
+      <div class="exercise-pair-container" data-pair-type="superserie">
+        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 45-60 s tras B</div>
+        <article class="exercise-card" id="card-fullbodyA_4" data-slot="fullbodyA_4" data-default-ex="laterales1" data-current-ex="laterales1" data-total-sets="3" style="order: 4;">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('fullbodyA_4')">
@@ -2428,11 +2474,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lateral-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (1/2) • Alternar con Gemelos</span>
               <h2 class="ex-title" id="title-fullbodyA_4">3a. Elevaciones Laterales con Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_4">3 × 12-15 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyA_4" onclick="triggerRest(50)">⚡ Superserie • Pasa a Gemelos</span>
+                <span class="tag tag-rest" id="rest-fullbodyA_4" onclick="triggerRest(50)">⚡ Sin descanso (pasa a B)</span>
               </div>
             </div>
           </div>
@@ -2528,11 +2573,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-standing-calf-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (2/2) • Descanso tras la pareja</span>
               <h2 class="ex-title" id="title-fullbodyA_7">3b. Elevación de Talones de Pie en Máquina</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_7">3 × 12-15 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyA_7" onclick="triggerRest(50)">⚡ Descanso 45-60 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyA_7" onclick="triggerRest(50)">⏱️ 45-60 s tras pareja</span>
               </div>
             </div>
           </div>
@@ -2602,9 +2646,15 @@
           </div>
         </div>
       </article>
+      </div>
+
 
       <!-- Exercise 4a: fullbodyA_5 -->
-      <article class="exercise-card" id="card-fullbodyA_5" data-slot="fullbodyA_5" data-default-ex="triceps1" data-current-ex="triceps1" data-total-sets="3" style="order: 6;" data-skippable="true">
+      
+      <!-- Pair Group: card-fullbodyA_5 + card-fullbodyA_6 -->
+      <div class="exercise-pair-container" data-pair-type="biserie" data-all-skippable="true">
+        <div class="pair-header-label">⚡ BISERIE BRAZOS · Descanso 45 s tras cada serie</div>
+        <article class="exercise-card" id="card-fullbodyA_5" data-slot="fullbodyA_5" data-default-ex="triceps1" data-current-ex="triceps1" data-total-sets="3" style="order: 6;" data-skippable="true">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('fullbodyA_5')">
@@ -2628,11 +2678,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-tricep-pushdown"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Biserie Brazos (1/2) • Alternar con Bíceps</span>
               <h2 class="ex-title" id="title-fullbodyA_5">4a. Extensión de Tríceps en Polea Alta</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_5">3 × 10-12 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyA_5" onclick="triggerRest(45)">⚡ Biserie • ⏱️ 45 s</span>
+                <span class="tag tag-rest" id="rest-fullbodyA_5" onclick="triggerRest(45)">⏱️ 45 s</span>
               </div>
             </div>
           </div>
@@ -2728,11 +2777,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bicep-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Biserie Brazos (2/2) • Alternar con Tríceps</span>
               <h2 class="ex-title" id="title-fullbodyA_6">4b. Curl de Bíceps con Mancuernas (Supinación)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_6">3 × 10-12 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyA_6" onclick="triggerRest(45)">⚡ Biserie • ⏱️ 45 s</span>
+                <span class="tag tag-rest" id="rest-fullbodyA_6" onclick="triggerRest(45)">⏱️ 45 s</span>
               </div>
             </div>
           </div>
@@ -2802,6 +2850,8 @@
           </div>
         </div>
       </article>
+      </div>
+
     </section>
     <!-- ==========================================
          Día B: Full Body B • RDL & Torso Hipertrofia
@@ -2938,7 +2988,11 @@
       </article>
 
       <!-- Exercise 2a: fullbodyB_2 -->
-      <article class="exercise-card" id="card-fullbodyB_2" data-slot="fullbodyB_2" data-default-ex="inclinado" data-current-ex="inclinado" data-total-sets="4" style="order: 2;">
+      
+      <!-- Pair Group: card-fullbodyB_2 + card-fullbodyB_3 -->
+      <div class="exercise-pair-container" data-pair-type="superserie">
+        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 90-120 s tras B</div>
+        <article class="exercise-card" id="card-fullbodyB_2" data-slot="fullbodyB_2" data-default-ex="inclinado" data-current-ex="inclinado" data-total-sets="4" style="order: 2;">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('fullbodyB_2')">
@@ -2962,11 +3016,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-incline-dumbbell-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (1/2) • Alternar con Remo</span>
               <h2 class="ex-title" id="title-fullbodyB_2">2a. Press Inclinado con Mancuernas (30°)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_2">4 × 8-10 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyB_2" onclick="triggerRest(105)">⚡ Superserie • Pasa a Remo</span>
+                <span class="tag tag-rest" id="rest-fullbodyB_2" onclick="triggerRest(105)">⚡ Sin descanso (pasa a B)</span>
               </div>
             </div>
           </div>
@@ -3069,11 +3122,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-row"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (2/2) • Descanso tras la pareja</span>
               <h2 class="ex-title" id="title-fullbodyB_3">2b. Remo en Polea Baja (Agarre Neutro Estrecho)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_3">4 × 8-10 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyB_3" onclick="triggerRest(105)">⚡ Descanso 90-120 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyB_3" onclick="triggerRest(105)">⏱️ 90-120 s tras pareja</span>
               </div>
             </div>
           </div>
@@ -3150,9 +3202,15 @@
           </div>
         </div>
       </article>
+      </div>
+
 
       <!-- Exercise 3a: fullbodyB_4 -->
-      <article class="exercise-card" id="card-fullbodyB_4" data-slot="fullbodyB_4" data-default-ex="militar" data-current-ex="militar" data-total-sets="3" style="order: 4;">
+      
+      <!-- Pair Group: card-fullbodyB_4 + card-fullbodyB_7 -->
+      <div class="exercise-pair-container" data-pair-type="superserie">
+        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 75-90 s tras B</div>
+        <article class="exercise-card" id="card-fullbodyB_4" data-slot="fullbodyB_4" data-default-ex="militar" data-current-ex="militar" data-total-sets="3" style="order: 4;">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('fullbodyB_4')">
@@ -3176,11 +3234,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-overhead-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (1/2) • Alternar con Cuádriceps</span>
               <h2 class="ex-title" id="title-fullbodyB_4">3a. Press Militar Sentado con Mancuernas (75°)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_4">3 × 8-10 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyB_4" onclick="triggerRest(80)">⚡ Superserie • Pasa a Cuádriceps</span>
+                <span class="tag tag-rest" id="rest-fullbodyB_4" onclick="triggerRest(80)">⚡ Sin descanso (pasa a B)</span>
               </div>
             </div>
           </div>
@@ -3276,11 +3333,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-extension"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (2/2) • Descanso tras la pareja</span>
               <h2 class="ex-title" id="title-fullbodyB_7">3b. Extensiones de Cuádriceps en Máquina</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_7">3 × 12-15 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyB_7" onclick="triggerRest(80)">⚡ Descanso 75-90 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyB_7" onclick="triggerRest(80)">⏱️ 75-90 s tras pareja</span>
               </div>
             </div>
           </div>
@@ -3350,9 +3406,15 @@
           </div>
         </div>
       </article>
+      </div>
+
 
       <!-- Exercise 4a: fullbodyB_5 -->
-      <article class="exercise-card" id="card-fullbodyB_5" data-slot="fullbodyB_5" data-default-ex="facepull" data-current-ex="facepull" data-total-sets="3" style="order: 6;">
+      
+      <!-- Pair Group: card-fullbodyB_5 + card-fullbodyB_6 -->
+      <div class="exercise-pair-container" data-pair-type="biserie">
+        <div class="pair-header-label">⚡ BISERIE ACCESORIOS · Descanso 45 s tras cada serie</div>
+        <article class="exercise-card" id="card-fullbodyB_5" data-slot="fullbodyB_5" data-default-ex="facepull" data-current-ex="facepull" data-total-sets="3" style="order: 6;">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('fullbodyB_5')">
@@ -3376,11 +3438,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-rear-delt-fly"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Biserie (1/2) • Alternar con Plancha</span>
               <h2 class="ex-title" id="title-fullbodyB_5">4a. Face Pull en Polea Alta</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_5">3 × 12-15 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyB_5" onclick="triggerRest(45)">⚡ Biserie • ⏱️ 45 s</span>
+                <span class="tag tag-rest" id="rest-fullbodyB_5" onclick="triggerRest(45)">⏱️ 45 s</span>
               </div>
             </div>
           </div>
@@ -3476,11 +3537,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-plank"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Biserie (2/2) • Alternar con Face Pull</span>
               <h2 class="ex-title" id="title-fullbodyB_6">4b. Plancha Abdominal Isométrica (o Rueda)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_6">3 × 50-60 s</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyB_6" onclick="triggerRest(45)">⚡ Biserie • ⏱️ 45 s</span>
+                <span class="tag tag-rest" id="rest-fullbodyB_6" onclick="triggerRest(45)">⏱️ 45 s</span>
               </div>
             </div>
           </div>
@@ -3550,6 +3610,8 @@
           </div>
         </div>
       </article>
+      </div>
+
     </section>
     <!-- ==========================================
          Día C: Full Body C • Pierna & Brazos/Core
@@ -3586,7 +3648,11 @@
       </div>
 
             <!-- Exercise 1a: fullbodyC_1 -->
-      <article class="exercise-card" id="card-fullbodyC_1" data-slot="fullbodyC_1" data-default-ex="prensa_45" data-current-ex="prensa_45" data-total-sets="3" style="order: 1;">
+      
+      <!-- Pair Group: card-fullbodyC_1 + card-fullbodyC_2 -->
+      <div class="exercise-pair-container" data-pair-type="superserie">
+        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 90 s tras B</div>
+        <article class="exercise-card" id="card-fullbodyC_1" data-slot="fullbodyC_1" data-default-ex="prensa_45" data-current-ex="prensa_45" data-total-sets="3" style="order: 1;">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('fullbodyC_1')">
@@ -3610,11 +3676,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (1/2) • Alternar con Isquios</span>
               <h2 class="ex-title" id="title-fullbodyC_1">1a. Prensa de Piernas 45°</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_1">3 × 8-10 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyC_1" onclick="triggerRest(90)">⚡ Superserie • Pasa a Isquios</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_1" onclick="triggerRest(90)">⚡ Sin descanso (pasa a B)</span>
               </div>
             </div>
           </div>
@@ -3710,11 +3775,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (2/2) • Descanso tras la pareja</span>
               <h2 class="ex-title" id="title-fullbodyC_2">1b. Curl Femoral Tumbado</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_2">3 × 10-12 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyC_2" onclick="triggerRest(90)">⚡ Descanso 90 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_2" onclick="triggerRest(90)">⏱️ 90 s tras pareja</span>
               </div>
             </div>
           </div>
@@ -3784,9 +3848,15 @@
           </div>
         </div>
       </article>
+      </div>
+
 
       <!-- Exercise 2a: fullbodyC_3 -->
-      <article class="exercise-card" id="card-fullbodyC_3" data-slot="fullbodyC_3" data-default-ex="jalonneutro" data-current-ex="jalonneutro" data-total-sets="3" style="order: 3;">
+      
+      <!-- Pair Group: card-fullbodyC_3 + card-fullbodyC_8 -->
+      <div class="exercise-pair-container" data-pair-type="superserie">
+        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 75-90 s tras B</div>
+        <article class="exercise-card" id="card-fullbodyC_3" data-slot="fullbodyC_3" data-default-ex="jalonneutro" data-current-ex="jalonneutro" data-total-sets="3" style="order: 3;">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('fullbodyC_3')">
@@ -3810,11 +3880,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-close-grip-lat-pulldown"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (1/2) • Alternar con Aperturas</span>
               <h2 class="ex-title" id="title-fullbodyC_3">2a. Jalón al Pecho con Agarre Neutro Cerrado</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_3">3 × 8-10 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyC_3" onclick="triggerRest(80)">⚡ Superserie • Pasa a Aperturas</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_3" onclick="triggerRest(80)">⚡ Sin descanso (pasa a B)</span>
               </div>
             </div>
           </div>
@@ -3910,11 +3979,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bench-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (2/2) • Descanso tras la pareja</span>
               <h2 class="ex-title" id="title-fullbodyC_8">2b. Aperturas en Polea (Cruces)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_8">3 × 12-15 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyC_8" onclick="triggerRest(80)">⚡ Descanso 75-90 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_8" onclick="triggerRest(80)">⏱️ 75-90 s tras pareja</span>
               </div>
             </div>
           </div>
@@ -3984,9 +4052,15 @@
           </div>
         </div>
       </article>
+      </div>
+
 
       <!-- Exercise 3a: fullbodyC_4 -->
-      <article class="exercise-card" id="card-fullbodyC_4" data-slot="fullbodyC_4" data-default-ex="laterales2" data-current-ex="laterales2" data-total-sets="3" style="order: 5;">
+      
+      <!-- Pair Group: card-fullbodyC_4 + card-fullbodyC_9 -->
+      <div class="exercise-pair-container" data-pair-type="superserie">
+        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 45-60 s tras B</div>
+        <article class="exercise-card" id="card-fullbodyC_4" data-slot="fullbodyC_4" data-default-ex="laterales2" data-current-ex="laterales2" data-total-sets="3" style="order: 5;">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('fullbodyC_4')">
@@ -4010,11 +4084,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-lateral-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (1/2) • Alternar con Gemelos</span>
               <h2 class="ex-title" id="title-fullbodyC_4">3a. Elevaciones Laterales en Polea (o Mancuernas)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_4">3 × 12-15 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyC_4" onclick="triggerRest(50)">⚡ Superserie • Pasa a Gemelos</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_4" onclick="triggerRest(50)">⚡ Sin descanso (pasa a B)</span>
               </div>
             </div>
           </div>
@@ -4110,11 +4183,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-standing-calf-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Superserie (2/2) • Descanso tras la pareja</span>
               <h2 class="ex-title" id="title-fullbodyC_9">3b. Elevación de Talones de Pie en Máquina</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_9">3 × 12-15 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyC_9" onclick="triggerRest(50)">⚡ Descanso 45-60 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_9" onclick="triggerRest(50)">⏱️ 45-60 s tras pareja</span>
               </div>
             </div>
           </div>
@@ -4184,9 +4256,15 @@
           </div>
         </div>
       </article>
+      </div>
+
 
       <!-- Exercise 4a: fullbodyC_5 -->
-      <article class="exercise-card" id="card-fullbodyC_5" data-slot="fullbodyC_5" data-default-ex="frances" data-current-ex="frances" data-total-sets="3" style="order: 7;" data-skippable="true">
+      
+      <!-- Pair Group: card-fullbodyC_5 + card-fullbodyC_6 -->
+      <div class="exercise-pair-container" data-pair-type="biserie" data-all-skippable="true">
+        <div class="pair-header-label">⚡ BISERIE BRAZOS · Descanso 45 s tras cada serie</div>
+        <article class="exercise-card" id="card-fullbodyC_5" data-slot="fullbodyC_5" data-default-ex="frances" data-current-ex="frances" data-total-sets="3" style="order: 7;" data-skippable="true">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('fullbodyC_5')">
@@ -4210,11 +4288,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-skull-crusher"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Biserie Brazos (1/2) • Alternar con Martillo</span>
               <h2 class="ex-title" id="title-fullbodyC_5">4a. Press Francés con Barra Z o Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_5">3 × 10-12 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyC_5" onclick="triggerRest(45)">⚡ Biserie • ⏱️ 45 s</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_5" onclick="triggerRest(45)">⏱️ 45 s</span>
               </div>
             </div>
           </div>
@@ -4310,11 +4387,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-hammer-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Biserie Brazos (2/2) • Alternar con Francés</span>
               <h2 class="ex-title" id="title-fullbodyC_6">4b. Curl Martillo con Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_6">3 × 10-12 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-fullbodyC_6" onclick="triggerRest(45)">⚡ Biserie • ⏱️ 45 s</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_6" onclick="triggerRest(45)">⏱️ 45 s</span>
               </div>
             </div>
           </div>
@@ -4384,6 +4460,8 @@
           </div>
         </div>
       </article>
+      </div>
+
 
       <!-- Exercise 5: fullbodyC_7 -->
       <article class="exercise-card" id="card-fullbodyC_7" data-slot="fullbodyC_7" data-default-ex="crunch" data-current-ex="crunch" data-total-sets="3" style="order: 9;" data-skippable="true">
@@ -5014,7 +5092,11 @@
       </article>
 
       <!-- Exercise 6: torsoA_6 -->
-      <article class="exercise-card" id="card-torsoA_6" data-slot="torsoA_6" data-default-ex="triceps1" data-current-ex="triceps1" data-total-sets="3" style="order: 6;">
+      
+      <!-- Pair Group: card-torsoA_6 + card-torsoA_7 -->
+      <div class="exercise-pair-container" data-pair-type="biserie">
+        <div class="pair-header-label">⚡ BISERIE BRAZOS · Descanso 45 s tras cada serie</div>
+        <article class="exercise-card" id="card-torsoA_6" data-slot="torsoA_6" data-default-ex="triceps1" data-current-ex="triceps1" data-total-sets="3" style="order: 6;">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoA_6')">
@@ -5038,11 +5120,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-tricep-pushdown"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Biserie Brazos (1/2) • Alternar con Bíceps</span>
               <h2 class="ex-title" id="title-torsoA_6">6. Extensión de Tríceps en Polea Alta</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoA_6">3 × 10-12 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-torsoA_6" onclick="triggerRest(45)">⚡ Biserie • ⏱️ 45 s</span>
+                <span class="tag tag-rest" id="rest-torsoA_6" onclick="triggerRest(45)">⏱️ 45 s</span>
               </div>
             </div>
           </div>
@@ -5136,11 +5217,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bicep-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Biserie Brazos (2/2) • Alternar con Tríceps</span>
               <h2 class="ex-title" id="title-torsoA_7">7. Curl de Bíceps con Mancuernas (Supinación)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoA_7">3 × 10-12 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-torsoA_7" onclick="triggerRest(45)">⚡ Biserie • ⏱️ 45 s</span>
+                <span class="tag tag-rest" id="rest-torsoA_7" onclick="triggerRest(45)">⏱️ 45 s</span>
               </div>
             </div>
           </div>
@@ -5208,6 +5288,8 @@
           </div>
         </div>
       </article>
+      </div>
+
 
       <!-- Bottom Actions (End of routine) -->
       <div class="day-bottom-actions">
@@ -6290,7 +6372,11 @@
       </article>
 
       <!-- Exercise 6: torsoB_6 -->
-      <article class="exercise-card" id="card-torsoB_6" data-slot="torsoB_6" data-default-ex="frances" data-current-ex="frances" data-total-sets="3" style="order: 6;">
+      
+      <!-- Pair Group: card-torsoB_6 + card-torsoB_7 -->
+      <div class="exercise-pair-container" data-pair-type="biserie">
+        <div class="pair-header-label">⚡ BISERIE BRAZOS · Descanso 45 s tras cada serie</div>
+        <article class="exercise-card" id="card-torsoB_6" data-slot="torsoB_6" data-default-ex="frances" data-current-ex="frances" data-total-sets="3" style="order: 6;">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
         <div class="completed-summary-bar" onclick="toggleManualExpand('torsoB_6')">
@@ -6314,11 +6400,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-skull-crusher"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Biserie Brazos (1/2) • Alternar con Martillo</span>
               <h2 class="ex-title" id="title-torsoB_6">6. Press Francés con Barra Z o Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoB_6">3 × 10-12 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-torsoB_6" onclick="triggerRest(45)">⚡ Biserie • ⏱️ 45 s</span>
+                <span class="tag tag-rest" id="rest-torsoB_6" onclick="triggerRest(45)">⏱️ 45 s</span>
               </div>
             </div>
           </div>
@@ -6412,11 +6497,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-hammer-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <span class="biserie-pill">⚡ Biserie Brazos (2/2) • Alternar con Francés</span>
               <h2 class="ex-title" id="title-torsoB_7">7. Curl Martillo con Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoB_7">3 × 10-12 reps</span>
-                <span class="tag tag-rest tag-biserie" id="rest-torsoB_7" onclick="triggerRest(45)">⚡ Biserie • ⏱️ 45 s</span>
+                <span class="tag tag-rest" id="rest-torsoB_7" onclick="triggerRest(45)">⏱️ 45 s</span>
               </div>
             </div>
           </div>
@@ -6484,6 +6568,8 @@
           </div>
         </div>
       </article>
+      </div>
+
 
       <!-- Bottom Actions (End of routine) -->
       <div class="day-bottom-actions">
