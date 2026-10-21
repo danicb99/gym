@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vigorexiapp · Rediseño</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0f1a;--sf:#121a2a;--sf2:#1a2438;--ln:#243252;--tx:#e8eef8;--mu:#8798b5;--ac:#6b8cff;--acs:#1c2a55;--ok:#34d399;--oks:#10382d;--wa:#ffb547;--bn:"Barlow Condensed","Arial Narrow",sans-serif;--bd:"Barlow",system-ui,sans-serif}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f2f5fb;--sf:#fff;--sf2:#e9eef8;--ln:#d3dcee;--tx:#111a2e;--mu:#5b6b89;--ac:#3b5bdb;--acs:#dfe6ff;--ok:#0f9d6b;--oks:#d6f5e8;--wa:#b86e00}}
+:root[data-theme="dark"]{color-scheme:dark}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:var(--bd);display:flex;justify-content:center}
+#app{width:100%;max-width:440px;height:100%;display:flex;flex-direction:column;position:relative;padding-top:env(safe-area-inset-top,0px)}
+header{padding:14px 18px 12px;border-bottom:1px solid var(--ln)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.day{font-family:var(--bn);font-size:26px;font-weight:700;line-height:1}
+.sub{color:var(--mu);font-size:13px;margin-top:3px}
+.clock{font-family:var(--bn);font-size:22px;font-weight:600;background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:6px 12px;font-variant-numeric:tabular-nums}
+.bar{height:6px;background:var(--sf2);border-radius:6px;margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--ac);border-radius:6px;transition:width .3s}
+.prog{display:flex;justify-content:space-between;color:var(--mu);font-size:12px;margin-top:6px}
+main{flex:1;overflow-y:auto;padding:14px 14px 150px}
+.ex{background:var(--sf);border:1px solid var(--ln);border-radius:16px;margin-bottom:10px;overflow:hidden}
+.ex.done{opacity:.62}
+.eh{display:flex;align-items:center;gap:12px;padding:14px;width:100%;background:none;border:0;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.ring{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-family:var(--bn);font-size:16px;font-weight:700;background:var(--sf2);color:var(--mu)}
+.ex.open .ring{background:var(--acs);color:var(--ac)}
+.ex.done .ring{background:var(--oks);color:var(--ok)}
+.et{flex:1;min-width:0}
+.en{font-weight:600;font-size:16px;line-height:1.2}
+.em{color:var(--mu);font-size:13px;margin-top:3px}
+.chev{color:var(--mu);transition:transform .2s}
+.ex.open .chev{transform:rotate(180deg)}
+.eb{display:none;padding:0 14px 14px}
+.ex.open .eb{display:block}
+.tools{display:flex;gap:8px;margin-bottom:12px}
+.chip{flex:1;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);border-radius:10px;padding:9px;font:500 13px var(--bd);cursor:pointer}
+.tip{display:none;background:var(--sf2);border-radius:10px;padding:11px 12px;font-size:13px;line-height:1.45;color:var(--mu);margin-bottom:12px}
+.tip.on{display:block}
+.hd,.row{display:grid;grid-template-columns:30px 62px 1fr 1fr 50px;gap:8px;align-items:center}
+.hd{color:var(--mu);font-size:12px;padding:0 0 6px}
+.row{padding:5px 0}
+.sn{font-family:var(--bn);font-size:20px;font-weight:700;color:var(--mu);text-align:center}
+.pv{font-size:12px;color:var(--mu);line-height:1.2}
+.row input{width:100%;height:50px;border-radius:12px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);font:700 22px var(--bn);text-align:center;outline:0}
+.row.cur input{border-color:var(--ac);background:var(--bg)}
+.row input:focus-visible{outline:2px solid var(--ac)}
+.ck{height:50px;width:50px;border-radius:12px;border:1px solid var(--ln);background:var(--sf2);color:var(--mu);font-size:22px;cursor:pointer;display:grid;place-items:center}
+.row.cur .ck{background:var(--ac);border-color:var(--ac);color:#fff}
+.row.ok .ck{background:var(--ok);border-color:var(--ok);color:#06241a}
+.row.ok input{color:var(--mu)}
+.rest{position:absolute;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--wa);color:#2a1800;border-radius:16px;padding:12px 16px;display:none;align-items:center;gap:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.rest.on{display:flex}
+.rest b{font-family:var(--bn);font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.rest span{flex:1;font-size:13px;font-weight:600;line-height:1.25}
+.rest button{border:0;background:rgba(0,0,0,.15);color:inherit;border-radius:10px;padding:10px 14px;font:600 13px var(--bd);cursor:pointer}
+nav{position:absolute;left:0;right:0;bottom:0;display:flex;background:var(--sf);border-top:1px solid var(--ln);padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+nav button{flex:1;background:none;border:0;color:var(--mu);font:600 12px var(--bd);display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border-radius:12px;cursor:pointer}
+nav button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--ac);background:var(--acs)}
+.view{display:none}.view.on{display:block}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.st{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:12px}
+.st b{font-family:var(--bn);font-size:30px;display:block;line-height:1}
+.st span{color:var(--mu);font-size:12px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:14px;margin-bottom:12px}
+.card h3{font-family:var(--bn);font-size:20px;margin-bottom:10px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;font-size:12px;color:var(--mu)}
+.cal i{font-style:normal;aspect-ratio:1;display:grid;place-items:center;border-radius:10px;color:var(--tx);font-size:13px}
+.cal i.t{background:var(--ac);color:#fff;font-weight:700}
+.cal i.y{background:var(--oks);color:var(--ok);font-weight:700}
+.cal i.e{visibility:hidden}
+select{width:100%;height:46px;border-radius:12px;background:var(--sf2);color:var(--tx);border:1px solid var(--ln);padding:0 12px;font:500 15px var(--bd);margin-bottom:12px}
+.pr{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.pr b{font-family:var(--bn);font-size:34px}
+.pr span{color:var(--ok);font-size:13px;font-weight:600}
+.rt{display:block;width:100%;text-align:left;background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:14px;margin-bottom:10px;color:inherit;font:inherit;cursor:pointer}
+.rt.on{border-color:var(--ac);background:var(--acs)}
+.rt b{font-family:var(--bn);font-size:20px;display:flex;justify-content:space-between;align-items:center}
+.rt small{display:block;color:var(--mu);font-size:13px;margin-top:4px;line-height:1.4}
+.tag{font:600 11px var(--bd);background:var(--ac);color:#fff;border-radius:20px;padding:3px 9px}
+.sec{color:var(--mu);font-size:13px;margin:16px 2px 8px}
+.btn{width:100%;height:48px;border-radius:12px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);font:600 14px var(--bd);margin-bottom:8px;cursor:pointer}
+.btn.p{background:var(--ac);border-color:var(--ac);color:#fff}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="top">
+      <div><div class="day" id="dayT">Día A · Full Body</div><div class="sub" id="daySub">Sentadilla pesada y torso</div></div>
+      <div class="clock" id="clock">00:00</div>
+    </div>
+    <div class="bar"><i id="pb"></i></div>
+    <div class="prog"><span id="pt">0 de 20 series</span><span id="pp">0%</span></div>
+  </header>
+
+  <main>
+    <section class="view on" id="v-train"><div id="list"></div></section>
+
+    <section class="view" id="v-hist">
+      <div class="stats">
+        <div class="st"><b>12</b><span>Sesiones</span></div>
+        <div class="st"><b>58 m</b><span>Tiempo medio</span></div>
+        <div class="st"><b>41 t</b><span>Volumen</span></div>
+      </div>
+      <div class="card"><h3>Octubre 2026 · racha de 3</h3><div class="cal" id="cal"></div></div>
+      <div class="card">
+        <h3>Progresión</h3>
+        <select aria-label="Ejercicio"><option>Sentadilla trasera con barra</option><option>Press de banca plano con barra</option><option>Peso muerto rumano</option></select>
+        <div class="pr"><b>92,5 kg</b><span>+7,5 kg en 6 semanas</span></div>
+        <svg viewBox="0 0 300 90" width="100%" role="img" aria-label="Evolución del peso en sentadilla"><polyline fill="none" stroke="var(--ac)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="5,78 55,70 105,62 155,60 205,40 255,30 295,14"/><g fill="var(--ac)"><circle cx="5" cy="78" r="4"/><circle cx="55" cy="70" r="4"/><circle cx="105" cy="62" r="4"/><circle cx="155" cy="60" r="4"/><circle cx="205" cy="40" r="4"/><circle cx="255" cy="30" r="4"/><circle cx="295" cy="14" r="5"/></g></svg>
+      </div>
+      <div class="sec">Copia de seguridad</div>
+      <button class="btn p">Exportar copia</button>
+      <button class="btn">Restaurar desde archivo</button>
+    </section>
+
+    <section class="view" id="v-plan">
+      <div class="sec" style="margin-top:0">Rutina activa</div>
+      <button class="rt on"><b>Full Body rotativo · 3 días <span class="tag">Activa</span></b><small>Un solo básico de pierna por sesión. Un día de entreno, uno de descanso.</small></button>
+      <button class="rt"><b>Torso / Pierna · 4 días</b><small>Dos días de torso y dos de pierna a la semana.</small></button>
+      <div class="sec">Reglas de progresión</div>
+      <div class="card"><h3>Doble progresión</h3><p class="sub" style="line-height:1.5;margin:0">Mantén el peso hasta completar todas las series en el tope del rango. Entonces sube 2,5 o 5 kg y vuelve a la base del rango.</p></div>
+    </section>
+  </main>
+
+  <div class="rest" id="rest" role="timer"><b id="rt">02:00</b><span>Descanso<br>Siguiente serie lista</span><button id="skip">Saltar</button></div>
+
+  <nav>
+    <button class="on" data-v="train"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>Entrenar</button>
+    <button data-v="hist"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Historial</button>
+    <button data-v="plan"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>Rutina</button>
+  </nav>
+</div>
+
+<script>
+var EX=[
+ {n:"Sentadilla trasera con barra",m:"Cuádriceps y glúteo",t:"4 × 6-8 · RIR 1-2",r:180,tip:"Pies a anchura de hombros, abdomen firme, bajar al menos hasta paralelo.",s:[["80 × 7",""],["80 × 7",""],["80 × 6",""],["80 × 6",""]]},
+ {n:"Press de banca plano con barra",m:"Pectoral mayor",t:"4 × 6-8 · RIR 1-2",r:150,tip:"Escápulas retraídas, pies firmes, bajada controlada de 2 s sin rebote.",s:[["70 × 8",""],["70 × 7",""],["70 × 7",""],["70 × 6",""]]},
+ {n:"Jalón al pecho (agarre ancho)",m:"Dorsal ancho",t:"4 × 8-10 · RIR 1-2",r:120,tip:"Torso inclinado 10-15°, codos hacia los bolsillos traseros.",s:[["60 × 10",""],["60 × 9",""],["60 × 9",""],["60 × 8",""]]},
+ {n:"Elevaciones laterales con mancuernas",m:"Deltoides lateral",t:"4 × 12-15 · RIR 0-1",r:75,tip:"Inclinación leve hacia delante y pausa de 1 s arriba.",s:[["10 × 15",""],["10 × 14",""],["10 × 13",""]]},
+ {n:"Extensión de tríceps en polea alta",m:"Tríceps",t:"3 × 10-12 · RIR 0-1",r:45,tip:"Codos pegados al costado, bloqueo de 1 s abajo.",s:[["25 × 12",""],["25 × 11",""],["25 × 10",""]]},
+ {n:"Curl de bíceps con mancuernas",m:"Bíceps braquial",t:"3 × 10-12 · RIR 0-1",r:45,tip:"Arranca en neutro y supina la muñeca a mitad de subida.",s:[["14 × 12",""],["14 × 11",""],["14 × 10",""]]}
+];
+var open=0,restT=null,secs=0;
+EX.forEach(function(e){e.rows=e.s.map(function(p){var w=p[0].split(" × ");return{pv:p[0],kg:w[0],rp:w[1],ok:false}})});
+function fmt(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function cur(e){for(var i=0;i<e.rows.length;i++)if(!e.rows[i].ok)return i;return -1}
+function render(){
+ var L=document.getElementById("list"),tot=0,dn=0,h="";
+ EX.forEach(function(e,i){
+  var d=e.rows.filter(function(r){return r.ok}).length;tot+=e.rows.length;dn+=d;
+  var fin=d===e.rows.length,c=cur(e);
+  h+='<div class="ex'+(i===open?" open":"")+(fin?" done":"")+'"><button class="eh" data-e="'+i+'"><span class="ring">'+(fin?"✓":d+"/"+e.rows.length)+'</span><span class="et"><div class="en">'+e.n+'</div><div class="em">'+e.t+' · '+e.r+' s</div></span><svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button><div class="eb"><div class="tools"><button class="chip" data-tip="'+i+'">Técnica</button><button class="chip">Ver vídeo</button><button class="chip">Alternativa</button></div><div class="tip" id="tip'+i+'">'+e.tip+'</div><div class="hd"><span></span><span>Anterior</span><span style="text-align:center">Kg</span><span style="text-align:center">Reps</span><span></span></div>';
+  e.rows.forEach(function(r,j){
+   h+='<div class="row'+(r.ok?" ok":"")+(j===c?" cur":"")+'"><span class="sn">'+(j+1)+'</span><span class="pv">'+r.pv+'</span><input inputmode="decimal" value="'+r.kg+'" data-k="'+i+","+j+'" aria-label="Kilos serie '+(j+1)+'"><input inputmode="numeric" value="'+r.rp+'" data-r="'+i+","+j+'" aria-label="Repeticiones serie '+(j+1)+'"><button class="ck" data-c="'+i+","+j+'" aria-label="Completar serie '+(j+1)+'">✓</button></div>';
+  });
+  h+='</div></div>';
+ });
+ L.innerHTML=h;
+ var p=Math.round(dn/tot*100);
+ document.getElementById("pb").style.width=p+"%";
+ document.getElementById("pt").textContent=dn+" de "+tot+" series";
+ document.getElementById("pp").textContent=p+"%";
+}
+function rest(s){var el=document.getElementById("rest"),t=s;clearInterval(restT);el.classList.add("on");document.getElementById("rt").textContent=fmt(t);restT=setInterval(function(){t--;document.getElementById("rt").textContent=fmt(Math.max(t,0));if(t<=0){clearInterval(restT);el.classList.remove("on")}},1000)}
+document.getElementById("skip").onclick=function(){clearInterval(restT);document.getElementById("rest").classList.remove("on")};
+document.getElementById("list").addEventListener("click",function(ev){
+ var b=ev.target.closest("button");if(!b)return;
+ if(b.dataset.e!==undefined){var i=+b.dataset.e;open=open===i?-1:i;render()}
+ else if(b.dataset.tip!==undefined){document.getElementById("tip"+b.dataset.tip).classList.toggle("on")}
+ else if(b.dataset.c){var a=b.dataset.c.split(","),e=EX[a[0]],r=e.rows[a[1]];r.ok=!r.ok;
+  if(r.ok){if(cur(e)===-1&&EX[+a[0]+1])open=+a[0]+1;rest(e.r)}render()}
+});
+document.getElementById("list").addEventListener("input",function(ev){
+ var t=ev.target;if(t.dataset.k){var a=t.dataset.k.split(",");EX[a[0]].rows[a[1]].kg=t.value}
+ if(t.dataset.r){var a2=t.dataset.r.split(",");EX[a2[0]].rows[a2[1]].rp=t.value}
+});
+document.querySelectorAll("nav button").forEach(function(b){b.onclick=function(){
+ document.querySelectorAll("nav button").forEach(function(x){x.classList.remove("on")});b.classList.add("on");
+ document.querySelectorAll(".view").forEach(function(v){v.classList.remove("on")});
+ document.getElementById("v-"+b.dataset.v).classList.add("on");
+ var T={train:["Día A · Full Body","Sentadilla pesada y torso"],hist:["Historial","Tu progreso y constancia"],plan:["Rutina","Elige tu sistema de entreno"]}[b.dataset.v];
+ document.getElementById("dayT").textContent=T[0];document.getElementById("daySub").textContent=T[1];
+ document.getElementById("rest").style.display=b.dataset.v==="train"?"":"none";
+}});
+setInterval(function(){secs++;document.getElementById("clock").textContent=fmt(secs)},1000);
+(function(){var c=document.getElementById("cal"),h="L M X J V S D".split(" ").map(function(d){return"<span>"+d+"</span>"}).join("");
+ for(var i=0;i<3;i++)h+='<i class="e"></i>';
+ for(var d=1;d<=31;d++){var k=[2,5,7,9,12,14,16,19].indexOf(d)>-1?"y":d===20?"t":"";h+='<i class="'+k+'">'+d+'</i>'}
+ c.innerHTML=h})();
+render();
+</script>
+</body>
+</html>

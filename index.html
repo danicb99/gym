@@ -989,7 +989,9 @@
     
     .sessions-timeline { margin-top: 20px; }
     .timeline-title { font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
-    .session-item { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 10px; }
+    .session-item { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 10px; transition: border-color 0.15s, background 0.15s; }
+    .session-item.clickable { cursor: pointer; }
+    .session-item.clickable:hover { border-color: rgba(56, 189, 248, 0.45); background: rgba(14, 23, 42, 0.85); }
     .session-item-header { display: flex; justify-content: space-between; align-items: center; }
     .session-item-name { font-size: 0.88rem; font-weight: 700; color: #fff; }
     .session-item-date { font-size: 0.70rem; color: var(--text-muted); }
@@ -1581,6 +1583,31 @@
     }
 
   
+        .session-ex-note {
+      margin-top: 8px;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.22);
+      border-radius: 8px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      font-size: 0.72rem;
+      color: var(--text-main);
+      line-height: 1.35;
+    }
+    .session-ex-note .note-icon {
+      font-size: 0.76rem;
+      flex-shrink: 0;
+      line-height: 1;
+      margin-top: 1px;
+    }
+    .session-ex-note .note-text {
+      color: #f1f5f9;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
     /* Header Progress Information Bar - Hidden to slim down top sticky header */
     .prog-text-row {
       display: none !important;
@@ -7186,6 +7213,7 @@
 
     let workoutState = {
       inputs: {},
+      notes: {},
       completed: [],
       previous: {},           // Keyed by exId -> array of string records or by rowId
       exerciseHistory: {},    // exId -> [ { date, sets: [{kg, reps, est1RM}], bestKg, bestReps, best1RM } ]
@@ -7903,6 +7931,20 @@
       saveWorkoutState();
     }
 
+    function handleNoteChange(slotId, val) {
+      if (!workoutState.notes) workoutState.notes = {};
+      const trimmed = (val || '').trim();
+      if (trimmed) {
+        workoutState.notes[slotId] = trimmed;
+      } else {
+        delete workoutState.notes[slotId];
+      }
+      const notesEl = document.getElementById('notes-' + slotId);
+      const section = notesEl ? notesEl.closest('.day-content') : null;
+      if (section) startSessionTimerIfNeeded(section.id);
+      saveWorkoutState();
+    }
+
     // Cascada desactivada: cada serie mantiene de forma independiente los datos de la sesión anterior
     function cascadeForwardValues(card, triggerSetIdx) {
       // Intencionalmente no propaga valores hacia series posteriores
@@ -8337,6 +8379,9 @@
         const exData = EXERCISE_CATALOG[exId] || { name: exId };
         const rows = Array.from(card.querySelectorAll('.set-row'));
 
+        const notesInp = card.querySelector('.notes-input') || document.getElementById('notes-' + slotId);
+        const noteVal = (notesInp && notesInp.value.trim()) || (workoutState.notes && workoutState.notes[slotId] ? workoutState.notes[slotId].trim() : '');
+
         const exSessionLog = {
           slotId: slotId,
           exId: exId,
@@ -8346,6 +8391,9 @@
           bestReps: 0,
           best1RM: 0
         };
+        if (noteVal) {
+          exSessionLog.notes = noteVal;
+        }
 
         if (!workoutState.previous[exId]) workoutState.previous[exId] = {};
 
@@ -8427,8 +8475,15 @@
             sets: exSessionLog.sets,
             bestKg: exSessionLog.bestKg,
             bestReps: exSessionLog.bestReps,
-            best1RM: exSessionLog.best1RM
+            best1RM: exSessionLog.best1RM,
+            notes: exSessionLog.notes || ''
           });
+        }
+
+        // Limpiar nota para la siguiente sesión
+        if (notesInp) notesInp.value = '';
+        if (workoutState.notes && workoutState.notes[slotId]) {
+          delete workoutState.notes[slotId];
         }
       });
 
@@ -8801,11 +8856,15 @@
       history.slice().reverse().forEach(s => {
         const dateStr = new Date(s.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' });
         const setsSummary = s.sets.map(st => `${escapeHtml(st.kg)}kg × ${escapeHtml(st.reps)}`).join(' • ');
+        const noteHTML = s.notes ? `<div class="session-ex-note" style="margin-top:4px;"><span class="note-icon">📝</span><span class="note-text">${escapeHtml(s.notes)}</span></div>` : '';
         tableRows += `
           <tr>
-            <td style="color:var(--text-main); font-weight:700;">${dateStr}</td>
-            <td style="color:var(--cyan); font-weight:600;">${setsSummary}</td>
-            <td style="color:var(--amber); font-weight:700; text-align:right;">${s.best1RM} kg</td>
+            <td style="color:var(--text-main); font-weight:700; vertical-align:top;">${dateStr}</td>
+            <td style="color:var(--cyan); font-weight:600; vertical-align:top;">
+              <div>${setsSummary}</div>
+              ${noteHTML}
+            </td>
+            <td style="color:var(--amber); font-weight:700; text-align:right; vertical-align:top;">${s.best1RM} kg</td>
           </tr>
         `;
       });
@@ -8989,24 +9048,42 @@
           const dateStr = new Date(s.date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
           const exCount = s.exercises ? s.exercises.length : 0;
           let totalSets = 0;
+          let notesCount = 0;
           if (s.exercises) {
-            s.exercises.forEach(e => { totalSets += e.sets ? e.sets.length : 0; });
+            s.exercises.forEach(e => {
+              totalSets += e.sets ? e.sets.length : 0;
+              if (e.notes && e.notes.trim()) notesCount++;
+            });
           }
           const durDisplay = s.durationFormatted || (s.durationMinutes ? `${s.durationMinutes} min` : '45 min');
+          const notesBadge = notesCount > 0 
+            ? `<span style="background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.3); color:var(--amber); border-radius:6px; padding:1px 6px; font-size:0.68rem; font-weight:700;">📝 ${notesCount} ${notesCount === 1 ? 'nota' : 'notas'}</span>` 
+            : '';
           timelineHTML += `
-            <div class="session-item">
+            <div class="session-item clickable" onclick="openSessionDetailById('${s.id}')" title="Toca para ver el desglose completo y notas de la sesión">
               <div class="session-item-header">
                 <div class="session-item-name">${escapeHtml(s.dayName || s.dayId)}</div>
                 <div class="session-item-date">${dateStr}</div>
               </div>
-              <div class="session-item-meta">
-                <span>⏱️ Duración: <strong style="color:var(--amber); font-weight:800;">${durDisplay}</strong></span>
-                <span>${exCount} ejercicios (${totalSets} series)</span>
+              <div class="session-item-meta" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                  <span>⏱️ Duración: <strong style="color:var(--amber); font-weight:800;">${durDisplay}</strong></span>
+                  <span>${exCount} ejercicios (${totalSets} series)</span>
+                  ${notesBadge}
+                </div>
+                <span style="font-size:0.72rem; color:var(--cyan); font-weight:700;">Ver detalle ❯</span>
               </div>
             </div>
           `;
         });
         timelineList.innerHTML = timelineHTML;
+      }
+    }
+
+    function openSessionDetailById(sessionId) {
+      const s = (workoutState.sessions || []).find(item => item.id === sessionId);
+      if (s) {
+        openSessionDetailModal([s], s.date);
       }
     }
 
@@ -9065,7 +9142,7 @@
       }
 
       let csv = "\uFEFF"; // UTF-8 BOM for Excel
-      csv += "Fecha,Dia,Duracion_Min,Ejercicio,Serie,KG,Reps,1RM_Estimado\n";
+      csv += "Fecha,Dia,Duracion_Min,Ejercicio,Serie,KG,Reps,1RM_Estimado,Notas\n";
 
       sessions.forEach(s => {
         const dateStr = (s.date || '').slice(0, 10);
@@ -9075,9 +9152,10 @@
         if (s.exercises) {
           s.exercises.forEach(ex => {
             const exName = csvCell(ex.name || '');
+            const exNote = csvCell(ex.notes || '');
             if (ex.sets) {
               ex.sets.forEach(st => {
-                csv += `${csvCell(dateStr)},${day},${csvCell(dur)},${exName},${csvCell(st.set)},${csvCell(st.kg)},${csvCell(st.reps)},${csvCell(st.est1RM)}\n`;
+                csv += `${csvCell(dateStr)},${day},${csvCell(dur)},${exName},${csvCell(st.set)},${csvCell(st.kg)},${csvCell(st.reps)},${csvCell(st.est1RM)},${exNote}\n`;
               });
             }
           });
@@ -9124,6 +9202,7 @@
 
       return {
         inputs: obj(parsed.inputs),
+        notes: obj(parsed.notes),
         completed: arr(parsed.completed).filter(v => typeof v === 'string'),
         previous: obj(parsed.previous),
         exerciseHistory: obj(parsed.exerciseHistory),
@@ -9724,6 +9803,7 @@
     function saveWorkoutState() {
       workoutState.inputs = {};
       workoutState.completed = [];
+      if (!workoutState.notes) workoutState.notes = {};
 
       document.querySelectorAll('.exercise-card').forEach(card => {
         const slotId = card.getAttribute('data-slot');
@@ -9735,6 +9815,15 @@
           if (repsInp && repsInp.value) workoutState.inputs[`${slotId}_${sIdx}_reps`] = repsInp.value;
           if (row.classList.contains('done')) workoutState.completed.push(`${slotId}_${sIdx}`);
         });
+
+        const notesInp = card.querySelector('.notes-input') || document.getElementById('notes-' + slotId);
+        if (notesInp && notesInp.value.trim()) {
+          workoutState.notes[slotId] = notesInp.value.trim();
+        } else if (workoutState.notes && workoutState.notes[slotId] && !notesInp) {
+          // Mantener si la card no está montada en el DOM
+        } else if (workoutState.notes && workoutState.notes[slotId]) {
+          delete workoutState.notes[slotId];
+        }
       });
 
       persistStateRaw();
@@ -9754,6 +9843,7 @@
           const loaded = JSON.parse(saved);
           workoutState = Object.assign({
             inputs: {},
+            notes: {},
             completed: [],
             previous: {},
             exerciseHistory: {},
@@ -9764,6 +9854,7 @@
             lastActivityTime: {},
             overloadSuggestions: {}
           }, loaded);
+          if (!workoutState.notes || typeof workoutState.notes !== 'object') workoutState.notes = {};
         } catch (e) {
           console.error(e);
         }
@@ -9888,8 +9979,31 @@
           }
         });
 
+        const notesInp = card.querySelector('.notes-input') || document.getElementById('notes-' + slotId);
+        if (notesInp) {
+          notesInp.value = (workoutState.notes && workoutState.notes[slotId]) ? workoutState.notes[slotId] : '';
+          notesInp.oninput = function() {
+            handleNoteChange(slotId, this.value);
+          };
+        }
+
         checkExerciseCardCompletion(card);
       });
+
+      // Retrocompatibilidad: vincular notas de sesiones archivadas a exerciseHistory si faltaban
+      if (Array.isArray(workoutState.sessions) && workoutState.exerciseHistory) {
+        workoutState.sessions.forEach(s => {
+          if (!s || !s.exercises) return;
+          s.exercises.forEach(ex => {
+            if (ex.exId && ex.notes && workoutState.exerciseHistory[ex.exId]) {
+              const histEntry = workoutState.exerciseHistory[ex.exId].find(h => h.date === s.date);
+              if (histEntry && !histEntry.notes) {
+                histEntry.notes = ex.notes;
+              }
+            }
+          });
+        });
+      }
 
       // Update Audio Mode UI
       updateAudioModeUI();
@@ -10334,6 +10448,16 @@
             }
             html += `
                 </div>
+            `;
+            if (ex.notes && ex.notes.trim()) {
+              html += `
+                <div class="session-ex-note">
+                  <span class="note-icon">📝</span>
+                  <span class="note-text">${escapeHtml(ex.notes.trim())}</span>
+                </div>
+              `;
+            }
+            html += `
               </div>
             `;
           });
