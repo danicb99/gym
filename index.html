@@ -511,11 +511,12 @@
       min-width: 0;
     }
     .summary-check-icon {
-      width: 26px;
-      height: 26px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-muted);
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.04);
+      color: transparent;
       font-weight: 800;
       font-size: 0.75rem;
       display: flex;
@@ -586,10 +587,9 @@
 
     /* Accordion collapsed & completed (green success accent) */
     .exercise-card.exercise-completed .summary-check-icon {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #fff;
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
-      font-size: 0.88rem;
+      background: var(--success);
+      border-color: var(--success);
+      color: #000;
     }
     .exercise-card.collapsed.exercise-completed {
       background: rgba(16, 185, 129, 0.04);
@@ -2459,7 +2459,7 @@
     .app-brand-title {
       font-size: 1.02rem;
       font-weight: 800;
-      color: #fff;
+      color: var(--primary);
       letter-spacing: -0.02em;
       line-height: 1.1;
     }
@@ -3098,13 +3098,12 @@
       <div class="status-left">
         <span class="status-sets-chip" id="headerSetsProgress">0/23 series · 0%</span>
         <span class="session-timer-chip" id="headerSessionTimer"><span class="clock-icon">⏱️</span> 00:00</span>
-        <button type="button" class="hdr-btn hdr-btn-superset on" id="hdrBtnSuperset" onclick="toggleSupersetsMode()" title="Alternar modo Superseries o Series Normales">⚡ Superseries</button>
       </div>
 
       <div class="status-right">
-        <button type="button" class="hdr-btn hdr-btn-info" onclick="openInfoSheet()" title="Información RIR y Superseries">ⓘ</button>
+        <button type="button" class="hdr-btn hdr-btn-info" id="hdrBtnInfo" onclick="openInfoSheet()" title="Información RIR y Superseries">ⓘ</button>
         <button type="button" class="hdr-btn hdr-btn-express" id="hdrBtnExpress" onclick="toggleExpressMode()" title="Modo Exprés (omite accesorios)">⚡ Exprés</button>
-        <button type="button" class="hdr-btn hdr-btn-reset" onclick="confirmResetCurrentDay()" title="Reiniciar series de hoy">↺</button>
+        <button type="button" class="hdr-btn hdr-btn-reset" id="hdrBtnReset" onclick="confirmResetCurrentDay()" title="Reiniciar series de hoy">↺</button>
       </div>
     </div>
 
@@ -3136,7 +3135,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-squat"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyA_1">1. Sentadilla Trasera con Barra (Back Squat)</span>
+              <span class="summary-title" id="summary-title-fullbodyA_1">Sentadilla Trasera con Barra (Back Squat)</span>
               <span class="summary-sub" id="summary-sub-fullbodyA_1">3/3 series completadas</span>
             </div>
           </div>
@@ -3151,7 +3150,7 @@
             </div>
             <div class="ex-meta">
               
-              <h2 class="ex-title" id="title-fullbodyA_1">1. Sentadilla Trasera con Barra (Back Squat)</h2>
+              <h2 class="ex-title" id="title-fullbodyA_1">Sentadilla Trasera con Barra (Back Squat)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_1">3 × 6-8 reps</span>
                 <span class="tag tag-rest" id="rest-fullbodyA_1" onclick="triggerRest(150)">⏱️ 150 s</span>
@@ -3260,7 +3259,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bench-press"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyA_2">2a. Press de Banca Plano con Barra</span>
+              <span class="summary-title" id="summary-title-fullbodyA_2">Press de Banca Plano con Barra</span>
               <span class="summary-sub" id="summary-sub-fullbodyA_2">4/4 series completadas</span>
             </div>
           </div>
@@ -3276,10 +3275,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bench-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyA_2">2a. Press de Banca Plano con Barra</h2>
+              <h2 class="ex-title" id="title-fullbodyA_2">Press de Banca Plano con Barra</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_2">4 × 6-8 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyA_2" onclick="triggerRest(105)">⚡ Sin descanso (pasa a B)</span>
+                <span class="tag tag-rest" id="rest-fullbodyA_2" onclick="triggerRest(105)">⏱️ 105 s</span>
               </div>
             </div>
           </div>
@@ -3376,7 +3375,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lat-pulldown"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyA_3">2b. Jalón al Pecho (Prono Ancho)</span>
+              <span class="summary-title" id="summary-title-fullbodyA_3">Jalón al Pecho (Prono Ancho)</span>
               <span class="summary-sub" id="summary-sub-fullbodyA_3">4/4 series completadas</span>
             </div>
           </div>
@@ -3390,10 +3389,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lat-pulldown"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyA_3">2b. Jalón al Pecho (Prono Ancho)</h2>
+              <h2 class="ex-title" id="title-fullbodyA_3">Jalón al Pecho (Prono Ancho)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_3">4 × 8-10 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyA_3" onclick="triggerRest(105)">⏱️ 90-120 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyA_3" onclick="triggerRest(90)">⏱️ 90 s</span>
               </div>
             </div>
           </div>
@@ -3502,7 +3501,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lateral-raise"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyA_4">3a. Elevaciones Laterales con Mancuernas</span>
+              <span class="summary-title" id="summary-title-fullbodyA_4">Elevaciones Laterales con Mancuernas</span>
               <span class="summary-sub" id="summary-sub-fullbodyA_4">3/3 series completadas</span>
             </div>
           </div>
@@ -3516,10 +3515,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lateral-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyA_4">3a. Elevaciones Laterales con Mancuernas</h2>
+              <h2 class="ex-title" id="title-fullbodyA_4">Elevaciones Laterales con Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_4">3 × 12-15 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyA_4" onclick="triggerRest(50)">⚡ Sin descanso (pasa a B)</span>
+                <span class="tag tag-rest" id="rest-fullbodyA_4" onclick="triggerRest(60)">⏱️ 60 s</span>
               </div>
             </div>
           </div>
@@ -3609,7 +3608,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-standing-calf-raise"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyA_7">3b. Elevación de Talones de Pie en Máquina</span>
+              <span class="summary-title" id="summary-title-fullbodyA_7">Elevación de Talones de Pie en Máquina</span>
               <span class="summary-sub" id="summary-sub-fullbodyA_7">3/3 series completadas</span>
             </div>
           </div>
@@ -3623,10 +3622,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-standing-calf-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyA_7">3b. Elevación de Talones de Pie en Máquina</h2>
+              <h2 class="ex-title" id="title-fullbodyA_7">Elevación de Talones de Pie en Máquina</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_7">3 × 12-15 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyA_7" onclick="triggerRest(50)">⏱️ 45-60 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyA_7" onclick="triggerRest(60)">⏱️ 60 s</span>
               </div>
             </div>
           </div>
@@ -3728,7 +3727,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-tricep-pushdown"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyA_5">4a. Extensión de Tríceps en Polea Alta</span>
+              <span class="summary-title" id="summary-title-fullbodyA_5">Extensión de Tríceps en Polea Alta</span>
               <span class="summary-sub" id="summary-sub-fullbodyA_5">3/3 series completadas</span>
             </div>
           </div>
@@ -3742,7 +3741,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-tricep-pushdown"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyA_5">4a. Extensión de Tríceps en Polea Alta</h2>
+              <h2 class="ex-title" id="title-fullbodyA_5">Extensión de Tríceps en Polea Alta</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_5">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-fullbodyA_5" onclick="triggerRest(45)">⏱️ 45 s</span>
@@ -3828,7 +3827,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bicep-curl"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyA_6">4b. Curl de Bíceps con Mancuernas (Supinación)</span>
+              <span class="summary-title" id="summary-title-fullbodyA_6">Curl de Bíceps con Mancuernas (Supinación)</span>
               <span class="summary-sub" id="summary-sub-fullbodyA_6">3/3 series completadas</span>
             </div>
           </div>
@@ -3842,7 +3841,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bicep-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyA_6">4b. Curl de Bíceps con Mancuernas (Supinación)</h2>
+              <h2 class="ex-title" id="title-fullbodyA_6">Curl de Bíceps con Mancuernas (Supinación)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyA_6">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-fullbodyA_6" onclick="triggerRest(45)">⏱️ 45 s</span>
@@ -3937,7 +3936,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-romanian-deadlift"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyB_1">1. Peso Muerto Rumano (RDL) con Barra</span>
+              <span class="summary-title" id="summary-title-fullbodyB_1">Peso Muerto Rumano (RDL) con Barra</span>
               <span class="summary-sub" id="summary-sub-fullbodyB_1">3/3 series completadas</span>
             </div>
           </div>
@@ -3952,7 +3951,7 @@
             </div>
             <div class="ex-meta">
               
-              <h2 class="ex-title" id="title-fullbodyB_1">1. Peso Muerto Rumano (RDL) con Barra</h2>
+              <h2 class="ex-title" id="title-fullbodyB_1">Peso Muerto Rumano (RDL) con Barra</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_1">3 × 8-10 reps</span>
                 <span class="tag tag-rest" id="rest-fullbodyB_1" onclick="triggerRest(150)">⏱️ 150 s</span>
@@ -4061,7 +4060,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-incline-dumbbell-press"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyB_2">2a. Press Inclinado con Mancuernas (30°)</span>
+              <span class="summary-title" id="summary-title-fullbodyB_2">Press Inclinado con Mancuernas (30°)</span>
               <span class="summary-sub" id="summary-sub-fullbodyB_2">4/4 series completadas</span>
             </div>
           </div>
@@ -4075,10 +4074,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-incline-dumbbell-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyB_2">2a. Press Inclinado con Mancuernas (30°)</h2>
+              <h2 class="ex-title" id="title-fullbodyB_2">Press Inclinado con Mancuernas (30°)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_2">4 × 8-10 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyB_2" onclick="triggerRest(105)">⚡ Sin descanso (pasa a B)</span>
+                <span class="tag tag-rest" id="rest-fullbodyB_2" onclick="triggerRest(105)">⏱️ 105 s</span>
               </div>
             </div>
           </div>
@@ -4175,7 +4174,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-row"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyB_3">2b. Remo en Polea Baja (Agarre Neutro Estrecho)</span>
+              <span class="summary-title" id="summary-title-fullbodyB_3">Remo en Polea Baja (Agarre Neutro Estrecho)</span>
               <span class="summary-sub" id="summary-sub-fullbodyB_3">4/4 series completadas</span>
             </div>
           </div>
@@ -4189,10 +4188,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-row"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyB_3">2b. Remo en Polea Baja (Agarre Neutro Estrecho)</h2>
+              <h2 class="ex-title" id="title-fullbodyB_3">Remo en Polea Baja (Agarre Neutro Estrecho)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_3">4 × 8-10 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyB_3" onclick="triggerRest(105)">⏱️ 90-120 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyB_3" onclick="triggerRest(90)">⏱️ 90 s</span>
               </div>
             </div>
           </div>
@@ -4301,7 +4300,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-overhead-press"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyB_4">3a. Press Militar Sentado con Mancuernas (75°)</span>
+              <span class="summary-title" id="summary-title-fullbodyB_4">Press Militar Sentado con Mancuernas (75°)</span>
               <span class="summary-sub" id="summary-sub-fullbodyB_4">3/3 series completadas</span>
             </div>
           </div>
@@ -4315,10 +4314,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-overhead-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyB_4">3a. Press Militar Sentado con Mancuernas (75°)</h2>
+              <h2 class="ex-title" id="title-fullbodyB_4">Press Militar Sentado con Mancuernas (75°)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_4">3 × 8-10 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyB_4" onclick="triggerRest(80)">⚡ Sin descanso (pasa a B)</span>
+                <span class="tag tag-rest" id="rest-fullbodyB_4" onclick="triggerRest(75)">⏱️ 75 s</span>
               </div>
             </div>
           </div>
@@ -4408,7 +4407,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-extension"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyB_7">3b. Extensiones de Cuádriceps en Máquina</span>
+              <span class="summary-title" id="summary-title-fullbodyB_7">Extensiones de Cuádriceps en Máquina</span>
               <span class="summary-sub" id="summary-sub-fullbodyB_7">3/3 series completadas</span>
             </div>
           </div>
@@ -4422,10 +4421,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-extension"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyB_7">3b. Extensiones de Cuádriceps en Máquina</h2>
+              <h2 class="ex-title" id="title-fullbodyB_7">Extensiones de Cuádriceps en Máquina</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_7">3 × 12-15 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyB_7" onclick="triggerRest(80)">⏱️ 75-90 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyB_7" onclick="triggerRest(75)">⏱️ 75 s</span>
               </div>
             </div>
           </div>
@@ -4524,10 +4523,10 @@
           <div class="summary-left">
             <span class="summary-check-icon">✓</span>
             <span class="summary-icon-badge" id="summary-icon-fullbodyB_5">
-              <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-rear-delt-fly"></use></svg>
+              <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-face-pull"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyB_5">4a. Face Pull en Polea Alta</span>
+              <span class="summary-title" id="summary-title-fullbodyB_5">Face Pull en Polea Alta</span>
               <span class="summary-sub" id="summary-sub-fullbodyB_5">3/3 series completadas</span>
             </div>
           </div>
@@ -4538,10 +4537,10 @@
         <div class="card-body-collapsible" id="card-body-fullbodyB_5">
           <div class="card-top">
             <div class="ex-icon-avatar" id="icon-badge-fullbodyB_5" onclick="event.stopPropagation(); togglePlayer('player-fullbodyB_5', event);" title="Toca para ver Demo 3D">
-              <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-rear-delt-fly"></use></svg>
+              <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-face-pull"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyB_5">4a. Face Pull en Polea Alta</h2>
+              <h2 class="ex-title" id="title-fullbodyB_5">Face Pull en Polea Alta</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_5">3 × 12-15 reps</span>
                 <span class="tag tag-rest" id="rest-fullbodyB_5" onclick="triggerRest(45)">⏱️ 45 s</span>
@@ -4627,7 +4626,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-plank"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyB_6">4b. Plancha Abdominal Isométrica (o Rueda)</span>
+              <span class="summary-title" id="summary-title-fullbodyB_6">Plancha Abdominal Isométrica (o Rueda)</span>
               <span class="summary-sub" id="summary-sub-fullbodyB_6">3/3 series completadas</span>
             </div>
           </div>
@@ -4641,7 +4640,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-plank"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyB_6">4b. Plancha Abdominal Isométrica (o Rueda)</h2>
+              <h2 class="ex-title" id="title-fullbodyB_6">Plancha Abdominal Isométrica (o Rueda)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyB_6">3 × 50-60 s</span>
                 <span class="tag tag-rest" id="rest-fullbodyB_6" onclick="triggerRest(45)">⏱️ 45 s</span>
@@ -4745,7 +4744,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-press"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyC_1">1a. Prensa de Piernas 45°</span>
+              <span class="summary-title" id="summary-title-fullbodyC_1">Prensa de Piernas 45°</span>
               <span class="summary-sub" id="summary-sub-fullbodyC_1">3/3 series completadas</span>
             </div>
           </div>
@@ -4759,10 +4758,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyC_1">1a. Prensa de Piernas 45°</h2>
+              <h2 class="ex-title" id="title-fullbodyC_1">Prensa de Piernas 45°</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_1">3 × 8-10 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyC_1" onclick="triggerRest(90)">⚡ Sin descanso (pasa a B)</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_1" onclick="triggerRest(105)">⏱️ 105 s</span>
               </div>
             </div>
           </div>
@@ -4859,7 +4858,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-curl"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyC_2">1b. Curl Femoral Tumbado</span>
+              <span class="summary-title" id="summary-title-fullbodyC_2">Curl Femoral Tumbado</span>
               <span class="summary-sub" id="summary-sub-fullbodyC_2">3/3 series completadas</span>
             </div>
           </div>
@@ -4873,10 +4872,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyC_2">1b. Curl Femoral Tumbado</h2>
+              <h2 class="ex-title" id="title-fullbodyC_2">Curl Femoral Tumbado</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_2">3 × 10-12 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyC_2" onclick="triggerRest(90)">⏱️ 90 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_2" onclick="triggerRest(90)">⏱️ 90 s</span>
               </div>
             </div>
           </div>
@@ -4978,7 +4977,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-close-grip-lat-pulldown"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyC_3">2a. Jalón al Pecho con Agarre Neutro Cerrado</span>
+              <span class="summary-title" id="summary-title-fullbodyC_3">Jalón al Pecho con Agarre Neutro Cerrado</span>
               <span class="summary-sub" id="summary-sub-fullbodyC_3">3/3 series completadas</span>
             </div>
           </div>
@@ -4992,10 +4991,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-close-grip-lat-pulldown"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyC_3">2a. Jalón al Pecho con Agarre Neutro Cerrado</h2>
+              <h2 class="ex-title" id="title-fullbodyC_3">Jalón al Pecho con Agarre Neutro Cerrado</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_3">3 × 8-10 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyC_3" onclick="triggerRest(80)">⚡ Sin descanso (pasa a B)</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_3" onclick="triggerRest(90)">⏱️ 90 s</span>
               </div>
             </div>
           </div>
@@ -5085,7 +5084,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bench-press"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyC_8">2b. Aperturas en Polea (Cruces)</span>
+              <span class="summary-title" id="summary-title-fullbodyC_8">Aperturas en Polea (Cruces)</span>
               <span class="summary-sub" id="summary-sub-fullbodyC_8">3/3 series completadas</span>
             </div>
           </div>
@@ -5099,10 +5098,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bench-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyC_8">2b. Aperturas en Polea (Cruces)</h2>
+              <h2 class="ex-title" id="title-fullbodyC_8">Aperturas en Polea (Cruces)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_8">3 × 12-15 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyC_8" onclick="triggerRest(80)">⏱️ 75-90 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_8" onclick="triggerRest(75)">⏱️ 75 s</span>
               </div>
             </div>
           </div>
@@ -5204,7 +5203,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-lateral-raise"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyC_4">3a. Elevaciones Laterales en Polea (o Mancuernas)</span>
+              <span class="summary-title" id="summary-title-fullbodyC_4">Elevaciones Laterales en Polea (o Mancuernas)</span>
               <span class="summary-sub" id="summary-sub-fullbodyC_4">3/3 series completadas</span>
             </div>
           </div>
@@ -5218,10 +5217,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-lateral-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyC_4">3a. Elevaciones Laterales en Polea (o Mancuernas)</h2>
+              <h2 class="ex-title" id="title-fullbodyC_4">Elevaciones Laterales en Polea (o Mancuernas)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_4">3 × 12-15 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyC_4" onclick="triggerRest(50)">⚡ Sin descanso (pasa a B)</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_4" onclick="triggerRest(60)">⏱️ 60 s</span>
               </div>
             </div>
           </div>
@@ -5311,7 +5310,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-standing-calf-raise"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyC_9">3b. Elevación de Talones de Pie en Máquina</span>
+              <span class="summary-title" id="summary-title-fullbodyC_9">Elevación de Talones de Pie en Máquina</span>
               <span class="summary-sub" id="summary-sub-fullbodyC_9">3/3 series completadas</span>
             </div>
           </div>
@@ -5325,10 +5324,10 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-standing-calf-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyC_9">3b. Elevación de Talones de Pie en Máquina</h2>
+              <h2 class="ex-title" id="title-fullbodyC_9">Elevación de Talones de Pie en Máquina</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_9">3 × 12-15 reps</span>
-                <span class="tag tag-rest" id="rest-fullbodyC_9" onclick="triggerRest(50)">⏱️ 45-60 s tras pareja</span>
+                <span class="tag tag-rest" id="rest-fullbodyC_9" onclick="triggerRest(60)">⏱️ 60 s</span>
               </div>
             </div>
           </div>
@@ -5430,7 +5429,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-skull-crusher"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyC_5">4a. Press Francés con Barra Z o Mancuernas</span>
+              <span class="summary-title" id="summary-title-fullbodyC_5">Press Francés con Barra Z o Mancuernas</span>
               <span class="summary-sub" id="summary-sub-fullbodyC_5">3/3 series completadas</span>
             </div>
           </div>
@@ -5444,7 +5443,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-skull-crusher"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyC_5">4a. Press Francés con Barra Z o Mancuernas</h2>
+              <h2 class="ex-title" id="title-fullbodyC_5">Press Francés con Barra Z o Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_5">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-fullbodyC_5" onclick="triggerRest(45)">⏱️ 45 s</span>
@@ -5530,7 +5529,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-hammer-curl"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyC_6">4b. Curl Martillo con Mancuernas</span>
+              <span class="summary-title" id="summary-title-fullbodyC_6">Curl Martillo con Mancuernas</span>
               <span class="summary-sub" id="summary-sub-fullbodyC_6">3/3 series completadas</span>
             </div>
           </div>
@@ -5544,7 +5543,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-hammer-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-fullbodyC_6">4b. Curl Martillo con Mancuernas</h2>
+              <h2 class="ex-title" id="title-fullbodyC_6">Curl Martillo con Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_6">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-fullbodyC_6" onclick="triggerRest(45)">⏱️ 45 s</span>
@@ -5633,7 +5632,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-crunch"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-fullbodyC_7">5. Crunch en Polea Alta Arrodillado</span>
+              <span class="summary-title" id="summary-title-fullbodyC_7">Crunch en Polea Alta Arrodillado</span>
               <span class="summary-sub" id="summary-sub-fullbodyC_7">3/3 series completadas</span>
             </div>
           </div>
@@ -5648,7 +5647,7 @@
             </div>
             <div class="ex-meta">
               
-              <h2 class="ex-title" id="title-fullbodyC_7">5. Crunch en Polea Alta Arrodillado</h2>
+              <h2 class="ex-title" id="title-fullbodyC_7">Crunch en Polea Alta Arrodillado</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-fullbodyC_7">3 × 12-15 reps</span>
                 <span class="tag tag-rest" id="rest-fullbodyC_7" onclick="triggerRest(60)">⏱️ 60 s</span>
@@ -5738,7 +5737,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bench-press"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoA_1">1. Press de Banca Plano con Barra</span>
+              <span class="summary-title" id="summary-title-torsoA_1">Press de Banca Plano con Barra</span>
               <span class="summary-sub" id="summary-sub-torsoA_1">4/4 series completadas</span>
             </div>
           </div>
@@ -5752,7 +5751,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bench-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoA_1">1. Press de Banca Plano con Barra</h2>
+              <h2 class="ex-title" id="title-torsoA_1">Press de Banca Plano con Barra</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoA_1">4 × 6-8 reps</span>
                 <span class="tag tag-rest" id="rest-torsoA_1" onclick="triggerRest(150)">⏱️ 150 s</span>
@@ -5856,7 +5855,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lat-pulldown"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoA_2">2. Jalón al Pecho (Prono Ancho)</span>
+              <span class="summary-title" id="summary-title-torsoA_2">Jalón al Pecho (Prono Ancho)</span>
               <span class="summary-sub" id="summary-sub-torsoA_2">4/4 series completadas</span>
             </div>
           </div>
@@ -5870,7 +5869,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lat-pulldown"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoA_2">2. Jalón al Pecho (Prono Ancho)</h2>
+              <h2 class="ex-title" id="title-torsoA_2">Jalón al Pecho (Prono Ancho)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoA_2">4 × 8-10 reps</span>
                 <span class="tag tag-rest" id="rest-torsoA_2" onclick="triggerRest(120)">⏱️ 120 s</span>
@@ -5960,7 +5959,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-overhead-press"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoA_3">3. Press Militar Sentado con Mancuernas (75°)</span>
+              <span class="summary-title" id="summary-title-torsoA_3">Press Militar Sentado con Mancuernas (75°)</span>
               <span class="summary-sub" id="summary-sub-torsoA_3">3/3 series completadas</span>
             </div>
           </div>
@@ -5974,7 +5973,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-overhead-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoA_3">3. Press Militar Sentado con Mancuernas (75°)</h2>
+              <h2 class="ex-title" id="title-torsoA_3">Press Militar Sentado con Mancuernas (75°)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoA_3">3 × 8-10 reps</span>
                 <span class="tag tag-rest" id="rest-torsoA_3" onclick="triggerRest(120)">⏱️ 120 s</span>
@@ -6058,7 +6057,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-row"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoA_4">4. Remo en Polea Baja (Agarre Neutro Estrecho)</span>
+              <span class="summary-title" id="summary-title-torsoA_4">Remo en Polea Baja (Agarre Neutro Estrecho)</span>
               <span class="summary-sub" id="summary-sub-torsoA_4">3/3 series completadas</span>
             </div>
           </div>
@@ -6072,7 +6071,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-row"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoA_4">4. Remo en Polea Baja (Agarre Neutro Estrecho)</h2>
+              <h2 class="ex-title" id="title-torsoA_4">Remo en Polea Baja (Agarre Neutro Estrecho)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoA_4">3 × 8-10 reps</span>
                 <span class="tag tag-rest" id="rest-torsoA_4" onclick="triggerRest(120)">⏱️ 120 s</span>
@@ -6156,7 +6155,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lateral-raise"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoA_5">5. Elevaciones Laterales con Mancuernas</span>
+              <span class="summary-title" id="summary-title-torsoA_5">Elevaciones Laterales con Mancuernas</span>
               <span class="summary-sub" id="summary-sub-torsoA_5">3/3 series completadas</span>
             </div>
           </div>
@@ -6170,7 +6169,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-lateral-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoA_5">5. Elevaciones Laterales con Mancuernas</h2>
+              <h2 class="ex-title" id="title-torsoA_5">Elevaciones Laterales con Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoA_5">3 × 12-15 reps</span>
                 <span class="tag tag-rest" id="rest-torsoA_5" onclick="triggerRest(75)">⏱️ 75 s</span>
@@ -6258,7 +6257,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-tricep-pushdown"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoA_6">6. Extensión de Tríceps en Polea Alta</span>
+              <span class="summary-title" id="summary-title-torsoA_6">Extensión de Tríceps en Polea Alta</span>
               <span class="summary-sub" id="summary-sub-torsoA_6">3/3 series completadas</span>
             </div>
           </div>
@@ -6272,7 +6271,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-tricep-pushdown"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoA_6">6. Extensión de Tríceps en Polea Alta</h2>
+              <h2 class="ex-title" id="title-torsoA_6">Extensión de Tríceps en Polea Alta</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoA_6">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-torsoA_6" onclick="triggerRest(45)">⏱️ 45 s</span>
@@ -6356,7 +6355,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bicep-curl"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoA_7">7. Curl de Bíceps con Mancuernas (Supinación)</span>
+              <span class="summary-title" id="summary-title-torsoA_7">Curl de Bíceps con Mancuernas (Supinación)</span>
               <span class="summary-sub" id="summary-sub-torsoA_7">3/3 series completadas</span>
             </div>
           </div>
@@ -6370,7 +6369,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bicep-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoA_7">7. Curl de Bíceps con Mancuernas (Supinación)</h2>
+              <h2 class="ex-title" id="title-torsoA_7">Curl de Bíceps con Mancuernas (Supinación)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoA_7">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-torsoA_7" onclick="triggerRest(45)">⏱️ 45 s</span>
@@ -6475,7 +6474,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-squat"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-piernaA_1">1. Sentadilla Trasera con Barra (Back Squat)</span>
+              <span class="summary-title" id="summary-title-piernaA_1">Sentadilla Trasera con Barra (Back Squat)</span>
               <span class="summary-sub" id="summary-sub-piernaA_1">3/3 series completadas</span>
             </div>
           </div>
@@ -6489,7 +6488,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-squat"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-piernaA_1">1. Sentadilla Trasera con Barra (Back Squat)</h2>
+              <h2 class="ex-title" id="title-piernaA_1">Sentadilla Trasera con Barra (Back Squat)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-piernaA_1">3 × 6-8 reps</span>
                 <span class="tag tag-rest" id="rest-piernaA_1" onclick="triggerRest(180)">⏱️ 180 s</span>
@@ -6587,7 +6586,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-extension"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-piernaA_2">2. Extensiones de Cuádriceps en Máquina</span>
+              <span class="summary-title" id="summary-title-piernaA_2">Extensiones de Cuádriceps en Máquina</span>
               <span class="summary-sub" id="summary-sub-piernaA_2">3/3 series completadas</span>
             </div>
           </div>
@@ -6601,7 +6600,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-extension"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-piernaA_2">2. Extensiones de Cuádriceps en Máquina</h2>
+              <h2 class="ex-title" id="title-piernaA_2">Extensiones de Cuádriceps en Máquina</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-piernaA_2">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-piernaA_2" onclick="triggerRest(90)">⏱️ 90 s</span>
@@ -6685,7 +6684,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-curl"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-piernaA_3">3. Curl Femoral Tumbado</span>
+              <span class="summary-title" id="summary-title-piernaA_3">Curl Femoral Tumbado</span>
               <span class="summary-sub" id="summary-sub-piernaA_3">3/3 series completadas</span>
             </div>
           </div>
@@ -6699,7 +6698,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-piernaA_3">3. Curl Femoral Tumbado</h2>
+              <h2 class="ex-title" id="title-piernaA_3">Curl Femoral Tumbado</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-piernaA_3">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-piernaA_3" onclick="triggerRest(90)">⏱️ 90 s</span>
@@ -6783,7 +6782,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-standing-calf-raise"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-piernaA_4">4. Elevación de Talones de Pie en Máquina</span>
+              <span class="summary-title" id="summary-title-piernaA_4">Elevación de Talones de Pie en Máquina</span>
               <span class="summary-sub" id="summary-sub-piernaA_4">3/3 series completadas</span>
             </div>
           </div>
@@ -6797,7 +6796,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-standing-calf-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-piernaA_4">4. Elevación de Talones de Pie en Máquina</h2>
+              <h2 class="ex-title" id="title-piernaA_4">Elevación de Talones de Pie en Máquina</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-piernaA_4">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-piernaA_4" onclick="triggerRest(60)">⏱️ 60 s</span>
@@ -6881,7 +6880,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-plank"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-piernaA_5">5. Plancha Abdominal Isométrica (o Rueda)</span>
+              <span class="summary-title" id="summary-title-piernaA_5">Plancha Abdominal Isométrica (o Rueda)</span>
               <span class="summary-sub" id="summary-sub-piernaA_5">3/3 series completadas</span>
             </div>
           </div>
@@ -6895,7 +6894,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-plank"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-piernaA_5">5. Plancha Abdominal Isométrica (o Rueda)</h2>
+              <h2 class="ex-title" id="title-piernaA_5">Plancha Abdominal Isométrica (o Rueda)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-piernaA_5">3 × 45-60 s</span>
                 <span class="tag tag-rest" id="rest-piernaA_5" onclick="triggerRest(45)">⏱️ 45 s</span>
@@ -6998,7 +6997,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-dumbbell-bent-over-row"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoB_1">1. Remo Unilateral con Mancuerna</span>
+              <span class="summary-title" id="summary-title-torsoB_1">Remo Unilateral con Mancuerna</span>
               <span class="summary-sub" id="summary-sub-torsoB_1">4/4 series completadas</span>
             </div>
           </div>
@@ -7012,7 +7011,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-dumbbell-bent-over-row"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoB_1">1. Remo Unilateral con Mancuerna</h2>
+              <h2 class="ex-title" id="title-torsoB_1">Remo Unilateral con Mancuerna</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoB_1">4 × 8-10 reps</span>
                 <span class="tag tag-rest" id="rest-torsoB_1" onclick="triggerRest(90)">⏱️ 90 s</span>
@@ -7116,7 +7115,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-incline-dumbbell-press"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoB_2">2. Press Inclinado con Mancuernas (30°)</span>
+              <span class="summary-title" id="summary-title-torsoB_2">Press Inclinado con Mancuernas (30°)</span>
               <span class="summary-sub" id="summary-sub-torsoB_2">4/4 series completadas</span>
             </div>
           </div>
@@ -7130,7 +7129,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-incline-dumbbell-press"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoB_2">2. Press Inclinado con Mancuernas (30°)</h2>
+              <h2 class="ex-title" id="title-torsoB_2">Press Inclinado con Mancuernas (30°)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoB_2">4 × 8-10 reps</span>
                 <span class="tag tag-rest" id="rest-torsoB_2" onclick="triggerRest(120)">⏱️ 120 s</span>
@@ -7220,7 +7219,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-close-grip-lat-pulldown"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoB_3">3. Jalón al Pecho con Agarre Neutro Cerrado</span>
+              <span class="summary-title" id="summary-title-torsoB_3">Jalón al Pecho con Agarre Neutro Cerrado</span>
               <span class="summary-sub" id="summary-sub-torsoB_3">4/4 series completadas</span>
             </div>
           </div>
@@ -7234,7 +7233,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-close-grip-lat-pulldown"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoB_3">3. Jalón al Pecho con Agarre Neutro Cerrado</h2>
+              <h2 class="ex-title" id="title-torsoB_3">Jalón al Pecho con Agarre Neutro Cerrado</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoB_3">4 × 8-10 reps</span>
                 <span class="tag tag-rest" id="rest-torsoB_3" onclick="triggerRest(120)">⏱️ 120 s</span>
@@ -7324,7 +7323,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-lateral-raise"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoB_4">4. Elevaciones Laterales en Polea (o Mancuernas)</span>
+              <span class="summary-title" id="summary-title-torsoB_4">Elevaciones Laterales en Polea (o Mancuernas)</span>
               <span class="summary-sub" id="summary-sub-torsoB_4">3/3 series completadas</span>
             </div>
           </div>
@@ -7338,7 +7337,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-lateral-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoB_4">4. Elevaciones Laterales en Polea (o Mancuernas)</h2>
+              <h2 class="ex-title" id="title-torsoB_4">Elevaciones Laterales en Polea (o Mancuernas)</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoB_4">3 × 12-15 reps</span>
                 <span class="tag tag-rest" id="rest-torsoB_4" onclick="triggerRest(75)">⏱️ 75 s</span>
@@ -7422,7 +7421,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-face-pull"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoB_5">5. Face Pull en Polea Alta</span>
+              <span class="summary-title" id="summary-title-torsoB_5">Face Pull en Polea Alta</span>
               <span class="summary-sub" id="summary-sub-torsoB_5">3/3 series completadas</span>
             </div>
           </div>
@@ -7436,7 +7435,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-face-pull"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoB_5">5. Face Pull en Polea Alta</h2>
+              <h2 class="ex-title" id="title-torsoB_5">Face Pull en Polea Alta</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoB_5">3 × 12-15 reps</span>
                 <span class="tag tag-rest" id="rest-torsoB_5" onclick="triggerRest(75)">⏱️ 75 s</span>
@@ -7524,7 +7523,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-skull-crusher"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoB_6">6. Press Francés con Barra Z o Mancuernas</span>
+              <span class="summary-title" id="summary-title-torsoB_6">Press Francés con Barra Z o Mancuernas</span>
               <span class="summary-sub" id="summary-sub-torsoB_6">3/3 series completadas</span>
             </div>
           </div>
@@ -7538,7 +7537,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-skull-crusher"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoB_6">6. Press Francés con Barra Z o Mancuernas</h2>
+              <h2 class="ex-title" id="title-torsoB_6">Press Francés con Barra Z o Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoB_6">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-torsoB_6" onclick="triggerRest(45)">⏱️ 45 s</span>
@@ -7622,7 +7621,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-hammer-curl"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-torsoB_7">7. Curl Martillo con Mancuernas</span>
+              <span class="summary-title" id="summary-title-torsoB_7">Curl Martillo con Mancuernas</span>
               <span class="summary-sub" id="summary-sub-torsoB_7">3/3 series completadas</span>
             </div>
           </div>
@@ -7636,7 +7635,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-hammer-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-torsoB_7">7. Curl Martillo con Mancuernas</h2>
+              <h2 class="ex-title" id="title-torsoB_7">Curl Martillo con Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-torsoB_7">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-torsoB_7" onclick="triggerRest(45)">⏱️ 45 s</span>
@@ -7741,7 +7740,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-romanian-deadlift"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-piernaB_1">1. Peso Muerto Rumano (RDL) con Barra</span>
+              <span class="summary-title" id="summary-title-piernaB_1">Peso Muerto Rumano (RDL) con Barra</span>
               <span class="summary-sub" id="summary-sub-piernaB_1">3/3 series completadas</span>
             </div>
           </div>
@@ -7755,7 +7754,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-romanian-deadlift"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-piernaB_1">1. Peso Muerto Rumano (RDL) con Barra</h2>
+              <h2 class="ex-title" id="title-piernaB_1">Peso Muerto Rumano (RDL) con Barra</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-piernaB_1">3 × 8-10 reps</span>
                 <span class="tag tag-rest" id="rest-piernaB_1" onclick="triggerRest(150)">⏱️ 150 s</span>
@@ -7853,7 +7852,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bulgarian-split-squat"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-piernaB_2">2. Sentadilla Búlgara con Mancuernas</span>
+              <span class="summary-title" id="summary-title-piernaB_2">Sentadilla Búlgara con Mancuernas</span>
               <span class="summary-sub" id="summary-sub-piernaB_2">3/3 series completadas</span>
             </div>
           </div>
@@ -7867,7 +7866,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-bulgarian-split-squat"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-piernaB_2">2. Sentadilla Búlgara con Mancuernas</h2>
+              <h2 class="ex-title" id="title-piernaB_2">Sentadilla Búlgara con Mancuernas</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-piernaB_2">3 × 8-10 reps/pierna</span>
                 <span class="tag tag-rest" id="rest-piernaB_2" onclick="triggerRest(90)">⏱️ 90 s</span>
@@ -7951,7 +7950,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-leg-curl"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-piernaB_3">3. Curl Femoral Sentado</span>
+              <span class="summary-title" id="summary-title-piernaB_3">Curl Femoral Sentado</span>
               <span class="summary-sub" id="summary-sub-piernaB_3">3/3 series completadas</span>
             </div>
           </div>
@@ -7965,7 +7964,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-leg-curl"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-piernaB_3">3. Curl Femoral Sentado</h2>
+              <h2 class="ex-title" id="title-piernaB_3">Curl Femoral Sentado</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-piernaB_3">3 × 10-12 reps</span>
                 <span class="tag tag-rest" id="rest-piernaB_3" onclick="triggerRest(90)">⏱️ 90 s</span>
@@ -8049,7 +8048,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-extension"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-piernaB_4">4. Extensiones de Cuádriceps en Máquina</span>
+              <span class="summary-title" id="summary-title-piernaB_4">Extensiones de Cuádriceps en Máquina</span>
               <span class="summary-sub" id="summary-sub-piernaB_4">3/3 series completadas</span>
             </div>
           </div>
@@ -8063,7 +8062,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-leg-extension"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-piernaB_4">4. Extensiones de Cuádriceps en Máquina</h2>
+              <h2 class="ex-title" id="title-piernaB_4">Extensiones de Cuádriceps en Máquina</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-piernaB_4">3 × 12-15 reps</span>
                 <span class="tag tag-rest" id="rest-piernaB_4" onclick="triggerRest(75)">⏱️ 75 s</span>
@@ -8147,7 +8146,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-calf-raise"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-piernaB_5">5. Elevación de Talones Sentado en Máquina</span>
+              <span class="summary-title" id="summary-title-piernaB_5">Elevación de Talones Sentado en Máquina</span>
               <span class="summary-sub" id="summary-sub-piernaB_5">3/3 series completadas</span>
             </div>
           </div>
@@ -8161,7 +8160,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-seated-calf-raise"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-piernaB_5">5. Elevación de Talones Sentado en Máquina</h2>
+              <h2 class="ex-title" id="title-piernaB_5">Elevación de Talones Sentado en Máquina</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-piernaB_5">3 × 12-15 reps</span>
                 <span class="tag tag-rest" id="rest-piernaB_5" onclick="triggerRest(60)">⏱️ 60 s</span>
@@ -8245,7 +8244,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-crunch"></use></svg>
             </span>
             <div class="summary-text-wrap">
-              <span class="summary-title" id="summary-title-piernaB_6">6. Crunch en Polea Alta Arrodillado</span>
+              <span class="summary-title" id="summary-title-piernaB_6">Crunch en Polea Alta Arrodillado</span>
               <span class="summary-sub" id="summary-sub-piernaB_6">3/3 series completadas</span>
             </div>
           </div>
@@ -8259,7 +8258,7 @@
               <svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-cable-crunch"></use></svg>
             </div>
             <div class="ex-meta">
-              <h2 class="ex-title" id="title-piernaB_6">6. Crunch en Polea Alta Arrodillado</h2>
+              <h2 class="ex-title" id="title-piernaB_6">Crunch en Polea Alta Arrodillado</h2>
               <div class="tag-row">
                 <span class="tag tag-dose" id="dose-piernaB_6">3 × 12-15 reps</span>
                 <span class="tag tag-rest" id="rest-piernaB_6" onclick="triggerRest(60)">⏱️ 60 s</span>
@@ -8562,7 +8561,7 @@
       <div class="day-banner">
         <div>
           <div class="day-banner-title">📋 Rutina & Programación</div>
-          <div class="day-banner-meta"><span>Sistemas de entrenamiento</span> • <span>Reglas de sobrecarga</span> • <span class="badge-app-version" style="display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); color:#34d399; font-weight:800; font-size:0.75rem;">v1.8.3</span></div>
+          <div class="day-banner-meta"><span>Sistemas de entrenamiento</span> • <span>Reglas de sobrecarga</span> • <span class="badge-app-version" style="display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); color:#34d399; font-weight:800; font-size:0.75rem;">v1.8.4</span></div>
         </div>
       </div>
 
@@ -9374,75 +9373,18 @@
     
     /* Fase 3: Numeración dinámica de ejercicios para superseries y modo exprés */
     function updateExerciseCardNumbering(dayId) {
-      if (!dayId || !dayId.startsWith('fullbody')) return;
       const daySection = document.getElementById(dayId);
       if (!daySection) return;
-
-      const PAIR_MAP = {
-        fullbodyA_2: { pairSlotId: 'fullbodyA_3', pairRole: 'a' },
-        fullbodyA_3: { pairSlotId: 'fullbodyA_2', pairRole: 'b' },
-        fullbodyA_4: { pairSlotId: 'fullbodyA_7', pairRole: 'a' },
-        fullbodyA_7: { pairSlotId: 'fullbodyA_4', pairRole: 'b' },
-        fullbodyA_5: { pairSlotId: 'fullbodyA_6', pairRole: 'a' },
-        fullbodyA_6: { pairSlotId: 'fullbodyA_5', pairRole: 'b' },
-
-        fullbodyB_2: { pairSlotId: 'fullbodyB_3', pairRole: 'a' },
-        fullbodyB_3: { pairSlotId: 'fullbodyB_2', pairRole: 'b' },
-        fullbodyB_4: { pairSlotId: 'fullbodyB_7', pairRole: 'a' },
-        fullbodyB_7: { pairSlotId: 'fullbodyB_4', pairRole: 'b' },
-        fullbodyB_5: { pairSlotId: 'fullbodyB_6', pairRole: 'a' },
-        fullbodyB_6: { pairSlotId: 'fullbodyB_5', pairRole: 'b' },
-
-        fullbodyC_1: { pairSlotId: 'fullbodyC_2', pairRole: 'a' },
-        fullbodyC_2: { pairSlotId: 'fullbodyC_1', pairRole: 'b' },
-        fullbodyC_3: { pairSlotId: 'fullbodyC_8', pairRole: 'a' },
-        fullbodyC_8: { pairSlotId: 'fullbodyC_3', pairRole: 'b' },
-        fullbodyC_4: { pairSlotId: 'fullbodyC_9', pairRole: 'a' },
-        fullbodyC_9: { pairSlotId: 'fullbodyC_4', pairRole: 'b' },
-        fullbodyC_5: { pairSlotId: 'fullbodyC_6', pairRole: 'a' },
-        fullbodyC_6: { pairSlotId: 'fullbodyC_5', pairRole: 'b' }
-      };
-
-      const isExpress = document.body.classList.contains('express-mode');
-      let cards = Array.from(daySection.querySelectorAll('.exercise-card'));
-      if (isExpress) {
-        cards = cards.filter(c => c.getAttribute('data-skippable') !== 'true');
-      }
-
-      const visibleSlotIds = new Set(cards.map(c => c.getAttribute('data-slot')));
-      let groupNum = 0;
-      const pairAssignedNum = {};
-
+      const cards = Array.from(daySection.querySelectorAll('.exercise-card'));
       cards.forEach(card => {
         const slotId = card.getAttribute('data-slot');
-        const pairInfo = PAIR_MAP[slotId];
-        let prefix = '';
-
-        if (pairInfo && visibleSlotIds.has(pairInfo.pairSlotId)) {
-          if (pairInfo.pairRole === 'a') {
-            groupNum++;
-            pairAssignedNum[slotId] = groupNum;
-            pairAssignedNum[pairInfo.pairSlotId] = groupNum;
-            prefix = groupNum + 'a.';
-          } else {
-            const num = pairAssignedNum[slotId] || groupNum;
-            prefix = num + 'b.';
-          }
-        } else {
-          groupNum++;
-          prefix = groupNum + '.';
-        }
-
         const titleEl = document.getElementById('title-' + slotId);
         if (titleEl) {
-          const cleanName = titleEl.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim();
-          titleEl.innerText = prefix + ' ' + cleanName;
+          titleEl.innerText = titleEl.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim();
         }
-
         const sumTitleEl = document.getElementById('summary-title-' + slotId);
         if (sumTitleEl) {
-          const cleanName = sumTitleEl.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim();
-          sumTitleEl.innerText = prefix + ' ' + cleanName;
+          sumTitleEl.innerText = sumTitleEl.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim();
         }
       });
     }
@@ -9627,147 +9569,7 @@
     }
 
     function applySupersetsModeUI() {
-      const mode = (workoutState && workoutState.supersetsMode) ? workoutState.supersetsMode : 'enabled';
-      const btn = document.getElementById('hdrBtnSuperset');
-      const isEnabled = (mode === 'enabled');
-
-      if (btn) {
-        if (isEnabled) {
-          btn.innerText = '⚡ Superseries';
-          btn.classList.add('on');
-          btn.classList.remove('off');
-          btn.title = 'Modo Superseries activado. Toca para cambiar a Series Normales.';
-        } else {
-          btn.innerText = '⏹️ Normal';
-          btn.classList.remove('on');
-          btn.classList.add('off');
-          btn.title = 'Modo Series Normales. Toca para activar Superseries.';
-        }
-      }
-
-      document.body.classList.toggle('supersets-disabled', !isEnabled);
-
-      // Mapa de títulos con numeración secuencial limpia cuando superseries está desactivado
-      const normalTitles = {
-        'fullbodyA_1': '1. Sentadilla Trasera con Barra (Back Squat)',
-        'fullbodyA_2': '2. Press de Banca Plano con Barra',
-        'fullbodyA_3': '3. Jalón al Pecho (Prono Ancho)',
-        'fullbodyA_4': '4. Elevaciones Laterales con Mancuernas',
-        'fullbodyA_7': '5. Elevación de Talones de Pie en Máquina',
-        'fullbodyA_5': '6. Extensión de Tríceps en Polea Alta',
-        'fullbodyA_6': '7. Curl de Bíceps con Mancuernas (Supinación)',
-
-        'fullbodyB_1': '1. Peso Muerto Rumano (RDL) con Barra',
-        'fullbodyB_2': '2. Press Inclinado con Mancuernas (30°)',
-        'fullbodyB_3': '3. Remo en Polea Baja (Agarre Neutro Estrecho)',
-        'fullbodyB_4': '4. Press Militar Sentado con Mancuernas (75°)',
-        'fullbodyB_7': '5. Extensiones de Cuádriceps en Máquina',
-        'fullbodyB_5': '6. Face Pull en Polea Alta',
-        'fullbodyB_6': '7. Plancha Abdominal Isométrica (o Rueda)',
-
-        'fullbodyC_1': '1. Prensa de Piernas 45°',
-        'fullbodyC_2': '2. Curl Femoral Tumbado',
-        'fullbodyC_3': '3. Jalón al Pecho con Agarre Neutro Cerrado',
-        'fullbodyC_8': '4. Aperturas en Polea (Cruces)',
-        'fullbodyC_4': '5. Elevaciones Laterales en Polea (o Mancuernas)',
-        'fullbodyC_9': '6. Elevación de Talones de Pie en Máquina',
-        'fullbodyC_5': '7. Press Francés con Barra Z o Mancuernas',
-        'fullbodyC_6': '8. Curl Martillo con Mancuernas',
-        'fullbodyC_7': '9. Crunch en Polea Alta Arrodillado'
-      };
-
-      const supersetTitles = {
-        'fullbodyA_1': '1. Sentadilla Trasera con Barra (Back Squat)',
-        'fullbodyA_2': '2a. Press de Banca Plano con Barra',
-        'fullbodyA_3': '2b. Jalón al Pecho (Prono Ancho)',
-        'fullbodyA_4': '3a. Elevaciones Laterales con Mancuernas',
-        'fullbodyA_7': '3b. Elevación de Talones de Pie en Máquina',
-        'fullbodyA_5': '4a. Extensión de Tríceps en Polea Alta',
-        'fullbodyA_6': '4b. Curl de Bíceps con Mancuernas (Supinación)',
-
-        'fullbodyB_1': '1. Peso Muerto Rumano (RDL) con Barra',
-        'fullbodyB_2': '2a. Press Inclinado con Mancuernas (30°)',
-        'fullbodyB_3': '2b. Remo en Polea Baja (Agarre Neutro Estrecho)',
-        'fullbodyB_4': '3a. Press Militar Sentado con Mancuernas (75°)',
-        'fullbodyB_7': '3b. Extensiones de Cuádriceps en Máquina',
-        'fullbodyB_5': '4a. Face Pull en Polea Alta',
-        'fullbodyB_6': '4b. Plancha Abdominal Isométrica (o Rueda)',
-
-        'fullbodyC_1': '1a. Prensa de Piernas 45°',
-        'fullbodyC_2': '1b. Curl Femoral Tumbado',
-        'fullbodyC_3': '2a. Jalón al Pecho con Agarre Neutro Cerrado',
-        'fullbodyC_8': '2b. Aperturas en Polea (Cruces)',
-        'fullbodyC_4': '3a. Elevaciones Laterales en Polea (o Mancuernas)',
-        'fullbodyC_9': '3b. Elevación de Talones de Pie en Máquina',
-        'fullbodyC_5': '4a. Press Francés con Barra Z o Mancuernas',
-        'fullbodyC_6': '4b. Curl Martillo con Mancuernas',
-        'fullbodyC_7': '5. Crunch en Polea Alta Arrodillado'
-      };
-
-      const targetTitles = isEnabled ? supersetTitles : normalTitles;
-      Object.keys(targetTitles).forEach(slotId => {
-        const titleEl = document.getElementById('title-' + slotId);
-        if (titleEl) titleEl.innerText = targetTitles[slotId];
-        const sumTitleEl = document.getElementById('summary-title-' + slotId);
-        if (sumTitleEl) sumTitleEl.innerText = targetTitles[slotId];
-      });
-
-      // Actualizar tags de descanso
-      const normalRests = {
-        'fullbodyA_2': '⏱️ 105 s',
-        'fullbodyA_3': '⏱️ 90 s',
-        'fullbodyA_4': '⏱️ 60 s',
-        'fullbodyA_7': '⏱️ 60 s',
-        'fullbodyA_5': '⏱️ 45 s',
-        'fullbodyA_6': '⏱️ 45 s',
-
-        'fullbodyB_2': '⏱️ 105 s',
-        'fullbodyB_3': '⏱️ 90 s',
-        'fullbodyB_4': '⏱️ 75 s',
-        'fullbodyB_7': '⏱️ 75 s',
-        'fullbodyB_5': '⏱️ 45 s',
-        'fullbodyB_6': '⏱️ 45 s',
-
-        'fullbodyC_1': '⏱️ 105 s',
-        'fullbodyC_2': '⏱️ 90 s',
-        'fullbodyC_3': '⏱️ 90 s',
-        'fullbodyC_8': '⏱️ 75 s',
-        'fullbodyC_4': '⏱️ 60 s',
-        'fullbodyC_9': '⏱️ 60 s',
-        'fullbodyC_5': '⏱️ 45 s',
-        'fullbodyC_6': '⏱️ 45 s'
-      };
-
-      const supersetRests = {
-        'fullbodyA_2': '⚡ Sin descanso (pasa a B)',
-        'fullbodyA_3': '⏱️ 90-120 s tras la pareja',
-        'fullbodyA_4': '⚡ Sin descanso (pasa a B)',
-        'fullbodyA_7': '⏱️ 45-60 s tras la pareja',
-        'fullbodyA_5': '⚡ 45 s (Biserie con Bíceps)',
-        'fullbodyA_6': '⚡ 45 s (Biserie con Tríceps)',
-
-        'fullbodyB_2': '⚡ Sin descanso (pasa a B)',
-        'fullbodyB_3': '⏱️ 90-120 s tras la pareja',
-        'fullbodyB_4': '⚡ Sin descanso (pasa a B)',
-        'fullbodyB_7': '⏱️ 75-90 s tras la pareja',
-        'fullbodyB_5': '⚡ 45 s (Biserie con Plancha)',
-        'fullbodyB_6': '⚡ 45 s (Biserie con Face Pull)',
-
-        'fullbodyC_1': '⚡ Sin descanso (pasa a B)',
-        'fullbodyC_2': '⏱️ 90 s tras la pareja',
-        'fullbodyC_3': '⚡ Sin descanso (pasa a B)',
-        'fullbodyC_8': '⏱️ 75-90 s tras la pareja',
-        'fullbodyC_4': '⚡ Sin descanso (pasa a B)',
-        'fullbodyC_9': '⏱️ 45-60 s tras la pareja',
-        'fullbodyC_5': '⚡ 45 s (Biserie con Martillo)',
-        'fullbodyC_6': '⚡ 45 s (Biserie con Francés)'
-      };
-
-      const targetRests = isEnabled ? supersetRests : normalRests;
-      Object.keys(targetRests).forEach(slotId => {
-        const restEl = document.getElementById('rest-' + slotId);
-        if (restEl) restEl.innerText = targetRests[slotId];
-      });
+      // Simplificado: cada ejercicio tiene su descanso individual y no hay alternancia de modo
     }
 
     function openInfoSheet() {
@@ -10324,47 +10126,8 @@
         const exName = titleEl ? titleEl.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim() : '';
         const setInfo = `Serie ${sIdx + 1}`;
 
-        const isSupersetsActive = (!workoutState || workoutState.supersetsMode !== 'disabled');
-
-        if (isSupersetsActive && slotCfg && slotCfg.pairSlotId) {
-          const pairedCard = document.getElementById('card-' + slotCfg.pairSlotId);
-          const pairedTitle = pairedCard ? pairedCard.querySelector('.ex-title') : null;
-          const pairedName = pairedTitle ? pairedTitle.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim() : 'ejercicio complementario';
-          const pairType = slotCfg.pairType || 'superserie';
-          const pairRole = slotCfg.pairRole || 'a';
-          const pairRest = slotCfg.pairRest || restSeconds || 90;
-
-          if (pairType === 'superserie') {
-            if (pairRole === 'a') {
-              // 1er ejercicio de la superserie: SIN descanso, pasar inmediatamente a la pareja
-              showToast(`⚡ Superserie: Sin descanso, pasa directo a ${pairedName} (Serie ${sIdx + 1})`);
-              if (pairedCard) {
-                pairedCard.classList.remove('collapsed');
-                pairedCard.classList.add('manually-expanded');
-                setTimeout(() => {
-                  pairedCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }, 200);
-              }
-            } else {
-              // 2do ejercicio de la pareja: DESCANSO TRAS LA PAREJA
-              triggerRest(pairRest, `Superserie: ${exName}`, `Descanso tras pareja (Ronda ${sIdx + 1})`);
-              showToast(`⏱️ Descanso de superserie: ${pairRest}s tras la pareja. Siguiente ronda: ${pairedName}`);
-              if (pairedCard) {
-                pairedCard.classList.remove('collapsed');
-                pairedCard.classList.add('manually-expanded');
-              }
-            }
-          } else {
-            // Biserie tradicional (descanso de 45s tras cada serie)
-            triggerRest(pairRest, exName, setInfo);
-            showToast(`⚡ Biserie: ${pairRest}s de descanso - Toca ${pairedName}`);
-            if (pairedCard) {
-              pairedCard.classList.remove('collapsed');
-              pairedCard.classList.add('manually-expanded');
-            }
-          }
-        } else if (restSeconds) {
-          // SERIE NORMAL: Iniciar temporizador de descanso normal
+        if (restSeconds) {
+          // Iniciar temporizador de descanso estándar del ejercicio
           triggerRest(restSeconds, exName, setInfo);
           if (curSlotId === 'torsoA_6') {
             showToast('Biserie: 45s de descanso - Toca Bíceps');
@@ -10499,12 +10262,7 @@
 
       const checkIcon = card.querySelector('.summary-check-icon');
       if (checkIcon) {
-        if (isComplete) {
-          checkIcon.innerText = '✓';
-        } else {
-          const slotNum = slotId ? slotId.split('_')[1] : '';
-          checkIcon.innerText = slotNum || '•';
-        }
+        checkIcon.innerText = isComplete ? '✓' : '';
       }
 
       const subLabel = document.getElementById('summary-sub-' + slotId);
