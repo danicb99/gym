@@ -607,11 +607,42 @@
     .ex-title { font-size: 1.05rem; font-weight: 800; color: #fff; letter-spacing: -0.2px; line-height: 1.25; }
 
     .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-    .tag { font-size: 0.70rem; font-weight: 700; padding: 4px 9px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; font-variant-numeric: tabular-nums; }
-    .tag-dose { background: rgba(56, 189, 248, 0.12); color: var(--cyan); border: 1px solid rgba(56, 189, 248, 0.25); }
-    .tag-rir { background: var(--gold-subtle); color: var(--amber); border: 1px solid var(--border-gold); }
-    .tag-rest { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); cursor: pointer; transition: all 0.15s; }
-    .tag-rest:active { transform: scale(0.94); background: rgba(16, 185, 129, 0.25); }
+    .tag {
+      font-size: 0.70rem;
+      font-weight: 650;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-variant-numeric: tabular-nums;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      color: #cbd5e1;
+    }
+    .tag-dose {
+      background: rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+    .tag-rir {
+      background: rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+    .tag-rest {
+      background: rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tag-rest:hover, .tag-rest:active {
+      transform: scale(0.96);
+      background: rgba(16, 185, 129, 0.10);
+      border-color: rgba(16, 185, 129, 0.30);
+      color: #34d399;
+    }
     .tag-equip { display: none !important; }
 
     /* Action bar for Exercise Card (Compact Icon-Only) */
@@ -756,9 +787,9 @@
     .check-btn {
       width: 38px;
       height: 38px;
-      border-radius: 9px;
-      border: 1.5px solid var(--border);
-      background: var(--surface-elevated);
+      border-radius: var(--radius-ctrl);
+      border: 1.5px solid rgba(255, 255, 255, 0.10);
+      background: rgba(255, 255, 255, 0.04);
       color: var(--text-dim);
       display: flex;
       align-items: center;
@@ -2182,21 +2213,21 @@
     }
     .action-btn {
       flex: 1;
-      background: var(--surface-elevated);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      border-radius: 10px;
-      min-height: 44px;
-      padding: 6px 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      border-radius: var(--radius-ctrl);
+      height: 38px;
+      min-height: 38px;
+      padding: 0 4px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 5px;
-      font-size: 0.74rem;
-      font-weight: 700;
+      font-size: 0.72rem;
+      font-weight: 650;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.15s ease;
       white-space: nowrap;
       position: relative;
     }
@@ -2683,11 +2714,11 @@
     .status-sets-chip {
       font-size: 0.74rem;
       font-weight: 700;
-      color: #10b981;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      padding: 0 8px;
-      border-radius: 10px;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      padding: 0 12px;
+      border-radius: var(--radius-pill);
       height: 34px;
       min-height: 34px;
       display: inline-flex;
@@ -2698,18 +2729,20 @@
     .session-timer-chip {
       font-size: 0.74rem;
       font-weight: 700;
-      color: #38bdf8;
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      padding: 0 8px;
-      border-radius: 10px;
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      padding: 0 12px;
+      border-radius: var(--radius-pill);
       height: 34px;
       min-height: 34px;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       box-sizing: border-box;
       white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
     .session-timer-chip .clock-icon {
       font-size: 0.76rem;
@@ -2797,19 +2830,19 @@
       flex-shrink: 0;
     }
     .hdr-btn {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #e2e8f0;
-      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      color: #cbd5e1;
+      border-radius: var(--radius-ctrl);
       height: 34px;
       min-height: 34px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 700;
       cursor: pointer;
-      padding: 0 8px;
+      padding: 0 10px;
       box-sizing: border-box;
       transition: all 0.15s ease;
     }
@@ -2820,9 +2853,9 @@
       width: 34px;
       padding: 0;
       font-size: 0.98rem;
-      color: #c084fc;
-      background: rgba(168, 85, 247, 0.12);
-      border-color: rgba(168, 85, 247, 0.3);
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.10);
     }
     .hdr-btn-express {
       color: #fbbf24;
@@ -2841,6 +2874,8 @@
       padding: 0;
       font-size: 1.05rem;
       color: #94a3b8;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.10);
     }
 
     /* Row 3: Thin Horizontal Progress Bar */
@@ -3232,21 +3267,16 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 2a: fullbodyA_2 -->
       
       <!-- Pair Group: card-fullbodyA_2 + card-fullbodyA_3 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
-        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 01:30-02:00 tras B</div>
-        <div class="superset-pair-group">
-        <div class="superset-pair-header">
-          <span class="superset-badge-pill">⚡ SUPERSERIE 2 · Pecho + Espalda</span>
-          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Superserie · Pecho + Espalda</span>
+          <span class="pair-rest-pill">⏱️ Descanso 01:30-02:00 tras B</span>
         </div>
         <article class="exercise-card" id="card-fullbodyA_2" data-slot="fullbodyA_2" data-default-ex="banca" data-current-ex="banca" data-total-sets="4">
         
@@ -3356,10 +3386,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 2b: fullbodyA_3 -->
@@ -3469,12 +3496,8 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
-      </div>
       </div>
 
 
@@ -3482,11 +3505,9 @@
       
       <!-- Pair Group: card-fullbodyA_4 + card-fullbodyA_7 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
-        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 00:45-01:00 tras B</div>
-        <div class="superset-pair-group">
-        <div class="superset-pair-header">
-          <span class="superset-badge-pill">⚡ SUPERSERIE 3 · Hombro + Gemelos</span>
-          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Superserie · Hombro + Gemelos</span>
+          <span class="pair-rest-pill">⏱️ Descanso 00:45-01:00 tras B</span>
         </div>
         <article class="exercise-card" id="card-fullbodyA_4" data-slot="fullbodyA_4" data-default-ex="laterales1" data-current-ex="laterales1" data-total-sets="3">
         
@@ -3587,10 +3608,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 3b: fullbodyA_7 -->
@@ -3693,12 +3711,8 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
-      </div>
       </div>
 
 
@@ -3706,11 +3720,9 @@
       
       <!-- Pair Group: card-fullbodyA_5 + card-fullbodyA_6 -->
       <div class="exercise-pair-container" data-pair-type="biserie" data-all-skippable="true">
-        <div class="pair-header-label">⚡ BISERIE BRAZOS · Descanso 00:45 tras cada serie</div>
-        <div class="superset-pair-group">
-        <div class="superset-pair-header">
-          <span class="superset-badge-pill">⚡ BISERIE 4 · Tríceps + Bíceps</span>
-          <span class="superset-pair-desc">45 s de descanso entre series antagónicas de brazos</span>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Biserie · Tríceps + Bíceps</span>
+          <span class="pair-rest-pill">⏱️ Descanso 00:45 tras cada serie</span>
         </div>
         <article class="exercise-card" id="card-fullbodyA_5" data-slot="fullbodyA_5" data-default-ex="triceps1" data-current-ex="triceps1" data-total-sets="3" data-skippable="true">
         
@@ -3804,10 +3816,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 4b: fullbodyA_6 -->
@@ -3903,12 +3912,8 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
-      </div>
       </div>
 
     </section>
@@ -4026,21 +4031,16 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 2a: fullbodyB_2 -->
       
       <!-- Pair Group: card-fullbodyB_2 + card-fullbodyB_3 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
-        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 01:30-02:00 tras B</div>
-        <div class="superset-pair-group">
-        <div class="superset-pair-header">
-          <span class="superset-badge-pill">⚡ SUPERSERIE 2 · Pecho + Espalda</span>
-          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Superserie · Pecho + Espalda</span>
+          <span class="pair-rest-pill">⏱️ Descanso 01:30-02:00 tras B</span>
         </div>
         <article class="exercise-card" id="card-fullbodyB_2" data-slot="fullbodyB_2" data-default-ex="inclinado" data-current-ex="inclinado" data-total-sets="4">
         
@@ -4148,10 +4148,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 2b: fullbodyB_3 -->
@@ -4261,12 +4258,8 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
-      </div>
       </div>
 
 
@@ -4274,11 +4267,9 @@
       
       <!-- Pair Group: card-fullbodyB_4 + card-fullbodyB_7 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
-        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 01:15-01:30 tras B</div>
-        <div class="superset-pair-group">
-        <div class="superset-pair-header">
-          <span class="superset-badge-pill">⚡ SUPERSERIE 3 · Hombro + Cuádriceps</span>
-          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Superserie · Hombro + Cuádriceps</span>
+          <span class="pair-rest-pill">⏱️ Descanso 01:15-01:30 tras B</span>
         </div>
         <article class="exercise-card" id="card-fullbodyB_4" data-slot="fullbodyB_4" data-default-ex="militar" data-current-ex="militar" data-total-sets="3">
         
@@ -4379,10 +4370,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 3b: fullbodyB_7 -->
@@ -4485,12 +4473,8 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
-      </div>
       </div>
 
 
@@ -4498,11 +4482,9 @@
       
       <!-- Pair Group: card-fullbodyB_5 + card-fullbodyB_6 -->
       <div class="exercise-pair-container" data-pair-type="biserie">
-        <div class="pair-header-label">⚡ BISERIE ACCESORIOS · Descanso 00:45 tras cada serie</div>
-        <div class="superset-pair-group">
-        <div class="superset-pair-header">
-          <span class="superset-badge-pill">⚡ BISERIE 4 · Deltoides Post. + Core</span>
-          <span class="superset-pair-desc">45 s de descanso entre Face Pull y Plancha</span>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Biserie · Deltoides Post. + Core</span>
+          <span class="pair-rest-pill">⏱️ Descanso 00:45 tras cada serie</span>
         </div>
         <article class="exercise-card" id="card-fullbodyB_5" data-slot="fullbodyB_5" data-default-ex="facepull" data-current-ex="facepull" data-total-sets="3">
         
@@ -4596,10 +4578,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 4b: fullbodyB_6 -->
@@ -4695,12 +4674,8 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
-      </div>
       </div>
 
     </section>
@@ -4714,11 +4689,9 @@
       
       <!-- Pair Group: card-fullbodyC_1 + card-fullbodyC_2 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
-        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 01:30 tras B</div>
-        <div class="superset-pair-group">
-        <div class="superset-pair-header">
-          <span class="superset-badge-pill">⚡ SUPERSERIE 1 · Cuádriceps + Isquios</span>
-          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Superserie · Cuádriceps + Isquios</span>
+          <span class="pair-rest-pill">⏱️ Descanso 01:30 tras B</span>
         </div>
         <article class="exercise-card" id="card-fullbodyC_1" data-slot="fullbodyC_1" data-default-ex="prensa_45" data-current-ex="prensa_45" data-total-sets="3">
         
@@ -4826,10 +4799,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 1b: fullbodyC_2 -->
@@ -4932,12 +4902,8 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
-      </div>
       </div>
 
 
@@ -4945,11 +4911,9 @@
       
       <!-- Pair Group: card-fullbodyC_3 + card-fullbodyC_8 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
-        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 01:15-01:30 tras B</div>
-        <div class="superset-pair-group">
-        <div class="superset-pair-header">
-          <span class="superset-badge-pill">⚡ SUPERSERIE 2 · Espalda + Pecho</span>
-          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Superserie · Espalda + Pecho</span>
+          <span class="pair-rest-pill">⏱️ Descanso 01:15-01:30 tras B</span>
         </div>
         <article class="exercise-card" id="card-fullbodyC_3" data-slot="fullbodyC_3" data-default-ex="jalonneutro" data-current-ex="jalonneutro" data-total-sets="3">
         
@@ -5050,10 +5014,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 2b: fullbodyC_8 -->
@@ -5156,12 +5117,8 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
-      </div>
       </div>
 
 
@@ -5169,11 +5126,9 @@
       
       <!-- Pair Group: card-fullbodyC_4 + card-fullbodyC_9 -->
       <div class="exercise-pair-container" data-pair-type="superserie">
-        <div class="pair-header-label">⚡ SUPERSERIE · Sin descanso entre A y B · Descanso 00:45-01:00 tras B</div>
-        <div class="superset-pair-group">
-        <div class="superset-pair-header">
-          <span class="superset-badge-pill">⚡ SUPERSERIE 3 · Hombro + Gemelos</span>
-          <span class="superset-pair-desc">Alterna 1 serie de cada ejercicio sin descanso intermedio</span>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Superserie · Hombro + Gemelos</span>
+          <span class="pair-rest-pill">⏱️ Descanso 00:45-01:00 tras B</span>
         </div>
         <article class="exercise-card" id="card-fullbodyC_4" data-slot="fullbodyC_4" data-default-ex="laterales2" data-current-ex="laterales2" data-total-sets="3">
         
@@ -5274,10 +5229,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 3b: fullbodyC_9 -->
@@ -5380,12 +5332,8 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
-      </div>
       </div>
 
 
@@ -5393,11 +5341,9 @@
       
       <!-- Pair Group: card-fullbodyC_5 + card-fullbodyC_6 -->
       <div class="exercise-pair-container" data-pair-type="biserie" data-all-skippable="true">
-        <div class="pair-header-label">⚡ BISERIE BRAZOS · Descanso 00:45 tras cada serie</div>
-        <div class="superset-pair-group">
-        <div class="superset-pair-header">
-          <span class="superset-badge-pill">⚡ BISERIE 4 · Tríceps + Bíceps</span>
-          <span class="superset-pair-desc">45 s de descanso entre Francés y Martillo</span>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Biserie · Tríceps + Bíceps</span>
+          <span class="pair-rest-pill">⏱️ Descanso 00:45 tras cada serie</span>
         </div>
         <article class="exercise-card" id="card-fullbodyC_5" data-slot="fullbodyC_5" data-default-ex="frances" data-current-ex="frances" data-total-sets="3" data-skippable="true">
         
@@ -5491,10 +5437,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 4b: fullbodyC_6 -->
@@ -5590,12 +5533,8 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
-      </div>
       </div>
 
 
@@ -5693,10 +5632,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
     </section>
 
@@ -5814,10 +5750,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 2: torsoA_2 -->
@@ -5917,10 +5850,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 3: torsoA_3 -->
@@ -6014,10 +5944,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 4: torsoA_4 -->
@@ -6111,10 +6038,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 5: torsoA_5 -->
@@ -6208,17 +6132,17 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 6: torsoA_6 -->
       
       <!-- Pair Group: card-torsoA_6 + card-torsoA_7 -->
       <div class="exercise-pair-container" data-pair-type="biserie">
-        <div class="pair-header-label">⚡ BISERIE BRAZOS · Descanso 00:45 tras cada serie</div>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Biserie · Tríceps + Bíceps</span>
+          <span class="pair-rest-pill">⏱️ Descanso 00:45 tras cada serie</span>
+        </div>
         <article class="exercise-card" id="card-torsoA_6" data-slot="torsoA_6" data-default-ex="triceps1" data-current-ex="triceps1" data-total-sets="3">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -6309,10 +6233,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 7: torsoA_7 -->
@@ -6406,10 +6327,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
       </div>
 
@@ -6538,10 +6456,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 2: piernaA_2 -->
@@ -6635,10 +6550,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 3: piernaA_3 -->
@@ -6732,10 +6644,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 4: piernaA_4 -->
@@ -6829,10 +6738,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 5: piernaA_5 -->
@@ -6926,10 +6832,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Bottom Actions (End of routine) -->
@@ -7062,10 +6965,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 2: torsoB_2 -->
@@ -7165,10 +7065,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 3: torsoB_3 -->
@@ -7268,10 +7165,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 4: torsoB_4 -->
@@ -7365,10 +7259,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 5: torsoB_5 -->
@@ -7462,17 +7353,17 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 6: torsoB_6 -->
       
       <!-- Pair Group: card-torsoB_6 + card-torsoB_7 -->
       <div class="exercise-pair-container" data-pair-type="biserie">
-        <div class="pair-header-label">⚡ BISERIE BRAZOS · Descanso 00:45 tras cada serie</div>
+        <div class="pair-header-label">
+          <span class="pair-title-pill">⚡ Biserie · Tríceps + Bíceps</span>
+          <span class="pair-rest-pill">⏱️ Descanso 00:45 tras cada serie</span>
+        </div>
         <article class="exercise-card" id="card-torsoB_6" data-slot="torsoB_6" data-default-ex="frances" data-current-ex="frances" data-total-sets="3">
         
         <!-- Collapsed Summary Bar (Visible only when exercise is completed) -->
@@ -7563,10 +7454,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 7: torsoB_7 -->
@@ -7660,10 +7548,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
       </div>
 
@@ -7792,10 +7677,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 2: piernaB_2 -->
@@ -7889,10 +7771,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 3: piernaB_3 -->
@@ -7986,10 +7865,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 4: piernaB_4 -->
@@ -8083,10 +7959,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 5: piernaB_5 -->
@@ -8180,10 +8053,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Exercise 6: piernaB_6 -->
@@ -8277,10 +8147,7 @@
             </tbody>
           </table>
 
-          <!-- Sleek Notes Capsule -->
-            </details>
           </div>
-        </div>
       </article>
 
       <!-- Bottom Actions (End of routine) -->

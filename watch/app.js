@@ -121,7 +121,9 @@ App(
       this.globalData.sessionStartTime = phoneSession.sessionStartTime || Date.now()
       this.globalData.sessionLoggedSets = phoneSession.sessionLoggedSets || {}
       this.globalData.slotExOverrides = phoneSession.slotExOverrides || {}
-      this.globalData.slotExtraSets = phoneSession.slotExtraSets || {}
+      if (phoneSession.slotExtraSets) {
+        this.globalData.slotExtraSets = Object.assign({}, this.globalData.slotExtraSets, phoneSession.slotExtraSets)
+      }
       if (phoneSession.previousSets) {
         this.globalData.previousSets = phoneSession.previousSets
       }
@@ -234,6 +236,7 @@ App(
       this.globalData.slotExtraSets = {}
       this.globalData.phoneLiveSession = null
       this.globalData.hrHistory = []
+      this.globalData.hrMax = 0
       this.globalData.heartRate = 0
       this.globalData.isPhoneSynced = false
       this.globalData.restTimer = {
@@ -362,11 +365,14 @@ App(
           const exId = this.globalData.slotExOverrides[slot.slotId] || slot.defaultExId
           const ex = EXERCISE_CATALOG[exId]
           const sets = this.globalData.sessionLoggedSets[slot.slotId] || []
-          if (sets.length > 0) {
+          const completedSets = sets
+            .map((s, idx) => (s && s.completed) ? Object.assign({}, s, { set: idx + 1 }) : null)
+            .filter(Boolean)
+          if (completedSets.length > 0) {
             sessionSummary.exercises.push({
               exId: exId,
               name: ex ? ex.name : slot.defaultExId,
-              sets: sets.filter(s => s && s.completed)
+              sets: completedSets
             })
           }
         })
@@ -394,6 +400,7 @@ App(
       this.globalData.isPhoneSynced = false
       this.globalData.phoneLiveSession = null
       this.globalData.hrHistory = []
+      this.globalData.hrMax = 0
       this.globalData.heartRate = 0
       this.globalData.restTimer = {
         active: false,

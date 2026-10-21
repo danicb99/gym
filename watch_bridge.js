@@ -118,29 +118,20 @@
     const now = Date.now();
     const MAX_AGE = 12 * 3600 * 1000; // 12 horas máximo de validez
 
-    // 1. Sesión iniciada con cronómetro en las últimas 12 horas
-    if (workoutState.sessionStartTime && workoutState.sessionStartTime[dayId]) {
-      const sTime = workoutState.sessionStartTime[dayId];
-      if (now - sTime < MAX_AGE) return true;
-    }
+    // Solo hay entreno activo si queda alguna serie completada de ese día.
+    // sessionStartTime/lastActivityTime por sí solos no bastan: tras archivar
+    // el día pueden quedar restos y generar una sesión fantasma en el reloj.
+    const completed = new Set(Array.isArray(workoutState.completed) ? workoutState.completed : []);
+    if (completed.size === 0 || !workoutState.setTimestamps) return false;
 
-    // 2. Actividad reciente en las últimas 12 horas
-    if (workoutState.lastActivityTime && workoutState.lastActivityTime[dayId]) {
-      const aTime = workoutState.lastActivityTime[dayId];
-      if (now - aTime < MAX_AGE) return true;
-    }
+    // Solo cuentan las filas de los slots de este día, no las de otro entreno.
+    const daySlots = Array.isArray(ROUTINE_SLOTS[dayId].slots) ? ROUTINE_SLOTS[dayId].slots : [];
+    const prefixes = daySlots.map(slot => slot && slot.slotId).filter(Boolean).map(slotId => slotId + '_');
 
-    // 3. Comprobar series completadas con marca temporal reciente (< 12h)
-    const dayData = ROUTINE_SLOTS[dayId];
-    if (dayData && Array.isArray(dayData.slots) && Array.isArray(workoutState.completed)) {
-      if (workoutState.setTimestamps) {
-        for (const slot of dayData.slots) {
-          for (let sIdx = 0; sIdx < 10; sIdx++) {
-            const ts = workoutState.setTimestamps[`${slot.slotId}_${sIdx}`];
-            if (ts && (now - ts < MAX_AGE)) return true;
-          }
-        }
-      }
+    for (const rowId of completed) {
+      if (prefixes.length > 0 && !prefixes.some(prefix => rowId.startsWith(prefix))) continue;
+      const ts = workoutState.setTimestamps[rowId];
+      if (ts && (now - ts < MAX_AGE)) return true;
     }
     return false;
   }
@@ -154,7 +145,7 @@
       let latestTime = 0;
       let foundDay = null;
       for (const [dayId, sTime] of Object.entries(workoutState.sessionStartTime)) {
-        if (sTime && ROUTINE_SLOTS[dayId] && (Date.now() - sTime < 12 * 3600 * 1000)) {
+        if (sTime && ROUTINE_SLOTS[dayId] && isWorkoutActive(dayId) && (Date.now() - sTime < 12 * 3600 * 1000)) {
           if (sTime > latestTime) {
             latestTime = sTime;
             foundDay = dayId;
@@ -506,6 +497,66 @@
     };
   }
 
+  function mergeSessionSets(existingSets, incomingSets) {
+    const bySet = new Map();
+    const addSets = (sets) => {
+      if (!Array.isArray(sets)) return;
+      sets.forEach((st, idx) => {
+        if (!st || typeof st !== 'object') return;
+        const setNum = Number.isFinite(Number(st.set)) ? Number(st.set) : idx + 1;
+        const prev = bySet.get(setNum);
+        if (!prev) {
+          bySet.set(setNum, Object.assign({}, st, { set: setNum }));
+          return;
+        }
+        const prevCompleted = prev.completed === true;
+        const stCompleted = st.completed === true;
+        const prevTs = Number(prev.completedAt || prev.timestamp || 0);
+        const stTs = Number(st.completedAt || st.timestamp || 0);
+        let chosen;
+        if (prevCompleted && !stCompleted) chosen = prev;
+        else if (stCompleted && !prevCompleted) chosen = st;
+        else if (stTs > prevTs) chosen = st;
+        else if (prevTs > stTs) chosen = prev;
+        else chosen = st;
+        const merged = Object.assign({}, prev, chosen, { set: setNum });
+        const other = chosen === st ? prev : st;
+        if ((merged.kg === undefined || merged.kg === null || merged.kg === '') && other.kg !== undefined) merged.kg = other.kg;
+        if ((merged.reps === undefined || merged.reps === null || merged.reps === '') && other.reps !== undefined) merged.reps = other.reps;
+        if (!merged.notes && other.notes) merged.notes = other.notes;
+        merged.completed = prevCompleted || stCompleted;
+        if (prevTs || stTs) merged.timestamp = Math.max(prevTs, stTs);
+        bySet.set(setNum, merged);
+      });
+    };
+    addSets(existingSets);
+    addSets(incomingSets);
+    return Array.from(bySet.values()).sort((a, b) => a.set - b.set);
+  }
+
+  function mergeSessionExercises(existingExercises, incomingExercises) {
+    const merged = Array.isArray(existingExercises)
+      ? existingExercises.map(ex => Object.assign({}, ex, { sets: mergeSessionSets([], ex && ex.sets) }))
+      : [];
+    (Array.isArray(incomingExercises) ? incomingExercises : []).forEach(inEx => {
+      if (!inEx || !inEx.exId) return;
+      const target = merged.find(ex => ex && ex.exId === inEx.exId && (!inEx.slotId || ex.slotId === inEx.slotId))
+        || merged.find(ex => ex && ex.exId === inEx.exId);
+      if (!target) {
+        merged.push(Object.assign({}, inEx, { sets: mergeSessionSets([], inEx.sets) }));
+        return;
+      }
+      if (!target.name && inEx.name) target.name = inEx.name;
+      if (!target.slotId && inEx.slotId) target.slotId = inEx.slotId;
+      if (inEx.notes && !target.notes) target.notes = inEx.notes;
+      target.sets = mergeSessionSets(target.sets, inEx.sets);
+      target.bestKg = Math.max(Number(target.bestKg) || 0, Number(inEx.bestKg) || 0);
+      target.bestReps = Math.max(Number(target.bestReps) || 0, Number(inEx.bestReps) || 0);
+      target.best1RM = Math.max(Number(target.best1RM) || 0, Number(inEx.best1RM) || 0);
+    });
+    return merged;
+  }
+
   function insertSessionSorted(record) {
     if (!Array.isArray(workoutState.sessions)) workoutState.sessions = [];
     const ts = new Date(record.date).getTime();
@@ -522,19 +573,103 @@
     });
     if (duplicateIdx !== -1) {
       const existing = workoutState.sessions[duplicateIdx];
-      if (Array.isArray(record.exercises)) {
-        if (!Array.isArray(existing.exercises)) existing.exercises = [];
-        record.exercises.forEach(newEx => {
-          const exists = existing.exercises.find(e => e.exId === newEx.exId);
-          if (!exists) existing.exercises.push(newEx);
-        });
-      }
-      return;
+      existing.exercises = mergeSessionExercises(existing.exercises, record.exercises);
+      existing.durationMinutes = Math.max(Number(existing.durationMinutes) || 0, Number(record.durationMinutes) || 0);
+      if (!existing.dayName && record.dayName) existing.dayName = record.dayName;
+      if (!existing.durationFormatted && record.durationFormatted) existing.durationFormatted = record.durationFormatted;
+      if (record.sessionId && !existing.sessionId) existing.sessionId = record.sessionId;
+      if (record.id && !existing.id) existing.id = record.id;
+      const existingTs = new Date(existing.date).getTime();
+      if (Number.isFinite(ts) && (!Number.isFinite(existingTs) || ts > existingTs)) existing.date = record.date;
+      return existing;
     }
 
     const idx = workoutState.sessions.findIndex(s => new Date(s.date).getTime() < ts);
     if (idx === -1) workoutState.sessions.push(record);
     else workoutState.sessions.splice(idx, 0, record);
+    return record;
+  }
+
+  function registerSessionHistory(record) {
+    if (!record || !Array.isArray(record.exercises)) return;
+    if (!workoutState.exerciseHistory || typeof workoutState.exerciseHistory !== 'object' || Array.isArray(workoutState.exerciseHistory)) {
+      workoutState.exerciseHistory = {};
+    }
+    const recordTs = new Date(record.date).getTime();
+    const recordIds = [record.sessionId, record.id].filter(Boolean);
+
+    record.exercises.forEach(ex => {
+      if (!ex || !ex.exId || !Array.isArray(ex.sets)) return;
+      const setsLog = [];
+      let bestKg = 0;
+      let bestReps = 0;
+      let best1RM = 0;
+      ex.sets.forEach((st, idx) => {
+        if (!st || st.completed === false) return;
+        const kgNum = parseFloat(st.kg) || 0;
+        const repsNum = parseInt(st.reps, 10) || 0;
+        if (kgNum === 0 && repsNum === 0) return;
+        const exData = typeof EXERCISE_CATALOG !== 'undefined' ? EXERCISE_CATALOG[ex.exId] : null;
+        const isIso = exData && exData.metricType === 'isometria';
+        const est1RM = (!isIso && repsNum > 0)
+          ? (typeof calculate1RM === 'function' ? calculate1RM(kgNum, repsNum) : Math.round(kgNum * (1 + repsNum / 30) * 10) / 10)
+          : (isIso ? 0 : kgNum);
+        const setNum = Number.isFinite(Number(st.set)) ? Number(st.set) : idx + 1;
+        setsLog.push({ set: setNum, kg: kgNum, reps: repsNum, est1RM: est1RM });
+        if (kgNum > bestKg) {
+          bestKg = kgNum;
+          bestReps = repsNum;
+        }
+        if (est1RM > best1RM) best1RM = est1RM;
+      });
+      if (!setsLog.length) return;
+
+      if (!workoutState.exerciseHistory[ex.exId]) workoutState.exerciseHistory[ex.exId] = [];
+      const history = workoutState.exerciseHistory[ex.exId];
+      let target = recordIds.length
+        ? history.find(h => h && recordIds.includes(h.sessionId))
+        : null;
+      if (!target && Number.isFinite(recordTs)) {
+        target = history.find(h => {
+          if (!h || !h.date) return false;
+          const hTs = new Date(h.date).getTime();
+          return Number.isFinite(hTs) && Math.abs(hTs - recordTs) < 45 * 60 * 1000;
+        });
+      }
+
+      if (target) {
+        target.sets = mergeSessionSets(target.sets, setsLog);
+        target.bestKg = Math.max(Number(target.bestKg) || 0, bestKg);
+        target.bestReps = Math.max(Number(target.bestReps) || 0, bestReps);
+        target.best1RM = Math.max(Number(target.best1RM) || 0, best1RM);
+        if (!target.sessionId && recordIds.length) target.sessionId = recordIds[0];
+        if (ex.notes && !target.notes) target.notes = ex.notes;
+        if (!target.date) target.date = record.date;
+        return;
+      }
+
+      history.push({
+        date: record.date,
+        sessionId: recordIds[0] || '',
+        sets: setsLog,
+        bestKg: bestKg,
+        bestReps: bestReps,
+        best1RM: best1RM,
+        notes: ex.notes || ''
+      });
+    });
+  }
+
+  function clearSetTimestampsForDay(dayId) {
+    if (typeof workoutState === 'undefined' || !workoutState || !workoutState.setTimestamps) return;
+    const dayData = typeof ROUTINE_SLOTS !== 'undefined' ? ROUTINE_SLOTS[dayId] : null;
+    if (!dayData || !Array.isArray(dayData.slots)) return;
+    dayData.slots.forEach(slot => {
+      const prefix = slot.slotId + '_';
+      Object.keys(workoutState.setTimestamps).forEach(key => {
+        if (key.startsWith(prefix)) delete workoutState.setTimestamps[key];
+      });
+    });
   }
 
   async function catchUpFromWatch() {
@@ -792,6 +927,7 @@
       };
 
       insertSessionSorted(record);
+      registerSessionHistory(record);
 
       if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[summary.dayId];
       if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[summary.dayId];
@@ -837,6 +973,7 @@
           }
         });
       }
+      clearSetTimestampsForDay(summary.dayId);
 
       // Cancelar temporizador de descanso si estaba activo
       if (typeof finishTimer === 'function' && typeof isTimerActive !== 'undefined' && isTimerActive) {
@@ -1262,5 +1399,16 @@
     getConfig: getSyncConfig,
     generateCode: generateSecureSyncCode,
     deriveTopicHash: deriveTopicHash
+  };
+
+  // Hooks internos para pruebas de regresión (no usados por la app)
+  window.__vigorexiWatchTest = {
+    isWorkoutActive,
+    getActiveWorkoutDay,
+    insertSessionSorted,
+    registerSessionHistory,
+    mergeSessionSets,
+    clearSetTimestampsForDay,
+    handleWorkoutFinishedFromWatch
   };
 })();
