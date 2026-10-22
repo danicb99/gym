@@ -3449,28 +3449,21 @@
             <span class="day-chip-arrow">▾</span>
           </button>
           <!-- Dropdown Menu -->
-          <div class="day-picker-dropdown" id="dayPickerDropdown">
-            <div class="dropdown-header">Elegir Día de Entrenamiento</div>
-            <div class="dropdown-item" onclick="selectDayFromDropdown('fullbodyA', event)">
-              <span class="item-title">Día A · Full Body</span>
-              <span class="item-sub">Squat Pesado & Torso</span>
-            </div>
-            <div class="dropdown-item" onclick="selectDayFromDropdown('fullbodyB', event)">
-              <span class="item-title">Día B · Full Body</span>
-              <span class="item-sub">RDL & Torso Inclinado</span>
-            </div>
-            <div class="dropdown-item" onclick="selectDayFromDropdown('fullbodyC', event)">
-              <span class="item-title">Día C · Full Body</span>
-              <span class="item-sub">Prensa & Aislamiento</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" onclick="openProgramSwitchModal()">
-              <span class="item-title">🔄 Cambiar a Torso/Pierna (4 días)</span>
-            </div>
-            <div class="dropdown-item highlight" onclick="goToRoutinePlanTab(event)">
-              <span class="item-title">📋 Ver Rutina Completa</span>
-            </div>
-          </div>
+          <div class="day-picker-dropdown" id="dayPickerDropdown"></div>
+          <script>
+            (function() {
+              try {
+                var prog = localStorage.getItem('vigorexiapp_program') || 'fullbody';
+                var lastDay = localStorage.getItem('vigorexiapp_last_day');
+                var chip = document.getElementById('headerDayChipLabel');
+                var sub = document.getElementById('headerRoutineSub');
+                if (prog === 'torso_pierna') {
+                  if (chip) chip.innerText = lastDay === 'piernaA' ? 'Pierna A' : lastDay === 'torsoB' ? 'Torso B' : lastDay === 'piernaB' ? 'Pierna B' : 'Torso A';
+                  if (sub) sub.innerHTML = 'Torso/Pierna · 4 días · <span id="headerEstDuration">~45 min</span>';
+                }
+              } catch(e) {}
+            })();
+          </script>
         </div>
       </div>
 
@@ -9188,8 +9181,11 @@
       if (btn) btn.classList.add('on');
 
       if (tabName === 'train') {
+        const progDays = (currentProgram === 'fullbody')
+          ? ['fullbodyA', 'fullbodyB', 'fullbodyC']
+          : ['torsoA', 'piernaA', 'torsoB', 'piernaB'];
         const fallback = (currentProgram === 'fullbody' ? 'fullbodyA' : 'torsoA');
-        const targetDay = (WORKOUT_DAYS.includes(lastActiveWorkoutDay)) ? lastActiveWorkoutDay : fallback;
+        const targetDay = (progDays.includes(lastActiveWorkoutDay)) ? lastActiveWorkoutDay : fallback;
         selectDay(targetDay);
       } else if (tabName === 'hist') {
         selectDay('historialView');
@@ -9218,8 +9214,11 @@
         { id: 'piernaB', label: 'Día 4: Pierna B • Isquios & Búlgaras', subtitle: 'Peso muerto rumano, Búlgaras, Curl femoral sentado, Abdomen' }
       ];
 
+      const progDays = (prog === 'fullbody')
+        ? ['fullbodyA', 'fullbodyB', 'fullbodyC']
+        : ['torsoA', 'piernaA', 'torsoB', 'piernaB'];
       const nextRec = (typeof getNextRecommendedDay === 'function') ? getNextRecommendedDay(prog) : (prog === 'fullbody' ? 'fullbodyA' : 'torsoA');
-      const activeDay = (WORKOUT_DAYS.includes(lastActiveWorkoutDay)) ? lastActiveWorkoutDay : (prog === 'fullbody' ? 'fullbodyA' : 'torsoA');
+      const activeDay = (progDays.includes(lastActiveWorkoutDay)) ? lastActiveWorkoutDay : (prog === 'fullbody' ? 'fullbodyA' : 'torsoA');
 
       let html = '';
       days.forEach(d => {
@@ -9393,9 +9392,9 @@
       const sequence = (prog === 'fullbody') ? seqFB : seqTP;
       const now = Date.now();
 
-      // 1. Ongoing workout (session not archived yet)
+      // 1. Ongoing workout in active program (session not archived yet)
       if (workoutState.sessionStartTime) {
-        for (const dayId of [...seqFB, ...seqTP]) {
+        for (const dayId of sequence) {
           const sTime = workoutState.sessionStartTime[dayId];
           if (sTime && (now - sTime < 12 * 3600 * 1000)) {
             selectDay(dayId);
@@ -9415,6 +9414,13 @@
           selectDay(nextDayId);
           return;
         }
+      }
+
+      // 3. Fallback to saved last active day if in sequence, else default
+      const savedLast = localStorage.getItem('vigorexiapp_last_day');
+      if (savedLast && sequence.includes(savedLast)) {
+        selectDay(savedLast);
+        return;
       }
       selectDay(prog === 'fullbody' ? 'fullbodyA' : 'torsoA');
     }
@@ -9720,11 +9726,70 @@
 
     
     /* Fase 6 & 8: Lógica de cabecera fija, selector de día en chip y navegación */
+    function renderDayPickerDropdown() {
+      const dd = document.getElementById('dayPickerDropdown');
+      if (!dd) return;
+      const prog = localStorage.getItem('vigorexiapp_program') || currentProgram || 'fullbody';
+      const days = (prog === 'fullbody') ? [
+        { id: 'fullbodyA', title: 'Día A · Full Body', sub: 'Squat Pesado & Torso' },
+        { id: 'fullbodyB', title: 'Día B · Full Body', sub: 'RDL & Torso Inclinado' },
+        { id: 'fullbodyC', title: 'Día C · Full Body', sub: 'Prensa & Aislamiento' }
+      ] : [
+        { id: 'torsoA', title: 'Día 1 · Torso A', sub: 'Fuerza & Empuje' },
+        { id: 'piernaA', title: 'Día 2 · Pierna A', sub: 'Sentadilla & Cuádriceps' },
+        { id: 'torsoB', title: 'Día 3 · Torso B', sub: 'Tracción & Hipertrofia' },
+        { id: 'piernaB', title: 'Día 4 · Pierna B', sub: 'Isquios & Búlgaras' }
+      ];
+
+      const nextRec = (typeof getNextRecommendedDay === 'function') ? getNextRecommendedDay(prog) : days[0].id;
+      const activeContent = document.querySelector('.day-content.active');
+      const activeDayId = (activeContent && activeContent.id !== 'historialView' && activeContent.id !== 'routinePlanView')
+        ? activeContent.id
+        : lastActiveWorkoutDay;
+
+      let html = `<div class="dropdown-header">Elegir Día (${prog === 'fullbody' ? 'Full Body · 3D' : 'Torso/Pierna · 4D'})</div>`;
+      days.forEach(d => {
+        const isAct = (d.id === activeDayId);
+        const isRec = (d.id === nextRec);
+        const lastInfo = (typeof getDayLastDoneInfo === 'function') ? getDayLastDoneInfo(d.id) : null;
+        let badge = '';
+        if (isAct) {
+          badge = ' • Activo';
+        } else if (isRec) {
+          badge = ' • Toca hoy';
+        }
+        const lastText = lastInfo ? ` (Último: ${lastInfo.relative})` : '';
+        html += `
+          <div class="dropdown-item ${isAct ? 'highlight' : ''}" onclick="selectDayFromDropdown('${d.id}', event)">
+            <span class="item-title">${d.title}${badge}</span>
+            <span class="item-sub">${d.sub}${lastText}</span>
+          </div>
+        `;
+      });
+
+      const switchText = (prog === 'fullbody')
+        ? '🔄 Cambiar a Torso/Pierna (4 días)'
+        : '🔄 Cambiar a Full Body (3 días)';
+
+      html += `
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item" onclick="openProgramSwitchModal()">
+          <span class="item-title">${switchText}</span>
+        </div>
+        <div class="dropdown-item highlight" onclick="goToRoutinePlanTab(event)">
+          <span class="item-title">📋 Ver Rutina Completa</span>
+        </div>
+      `;
+
+      dd.innerHTML = html;
+    }
+
     function toggleDayPickerDropdown(event) {
       if (event) {
         if (event.stopPropagation) event.stopPropagation();
         if (event.preventDefault) event.preventDefault();
       }
+      renderDayPickerDropdown();
       const dd = document.getElementById('dayPickerDropdown');
       if (dd) dd.classList.toggle('open');
     }
@@ -9737,12 +9802,20 @@
       switchMainTab('train');
     }
 
+    function openProgramSwitchModal() {
+      const dd = document.getElementById('dayPickerDropdown');
+      if (dd) dd.classList.remove('open');
+      toggleProgramModal();
+    }
+
     function goToRoutinePlanTab(event) {
       if (event && event.stopPropagation) event.stopPropagation();
       const dd = document.getElementById('dayPickerDropdown');
       if (dd) dd.classList.remove('open');
       switchMainTab('plan');
     }
+
+    try { renderDayPickerDropdown(); } catch(e) {}
 
 
     // Control de Modo Superseries (Activadas vs Series Normales por separado)
@@ -12572,12 +12645,15 @@
     }
 
     // Initialize on load
-    window.addEventListener('DOMContentLoaded', () => {
+    function initApp() {
       loadWorkoutState();
       restoreRestTimerState();
-    applySupersetsModeUI();
+      applySupersetsModeUI();
       updateTimerUI();
       runSessionTimerTicker();
+      if (typeof renderDayPickerDropdown === 'function') {
+        renderDayPickerDropdown();
+      }
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', (event) => {
           if (event.data && (event.data.type === 'FORCE_UPDATE' || event.data.type === 'SW_ACTIVATED')) {
@@ -12585,7 +12661,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=design23').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev12').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -12610,7 +12686,13 @@
           });
         }
       });
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
 
     // ==========================================
     // SUITE DE MEJORAS: 1RM EN VIVO, SELECTOR DINÁMICO, 
@@ -12668,6 +12750,9 @@
     }
 
     function renderDaySelectorOptions() {
+      if (typeof renderDayPickerDropdown === 'function') {
+        renderDayPickerDropdown();
+      }
       const sel = document.getElementById('daySelector');
       if (!sel) return;
       const prog = currentProgram || 'fullbody';
@@ -12749,6 +12834,15 @@
     function switchRoutineProgram(newProg) {
       currentProgram = newProg;
       localStorage.setItem('vigorexiapp_program', newProg);
+
+      // Limpiar sessionStartTime de días del programa anterior para evitar sesiones zombi
+      const oldProgDays = (newProg === 'fullbody')
+        ? ['torsoA', 'piernaA', 'torsoB', 'piernaB']
+        : ['fullbodyA', 'fullbodyB', 'fullbodyC'];
+      if (workoutState && workoutState.sessionStartTime) {
+        oldProgDays.forEach(d => { delete workoutState.sessionStartTime[d]; });
+      }
+
       closeProgramModal();
       renderDaySelectorOptions();
       updateRoutinePlanViewCards();
@@ -12760,6 +12854,24 @@
       const isRoutineTab = document.getElementById('routinePlanView')?.classList.contains('active');
       if (!isRoutineTab) {
         selectDay(defaultDay);
+      } else {
+        updateHeaderDayDisplay('routinePlanView');
+        const chipLabel = document.getElementById('headerDayChipLabel');
+        if (chipLabel) {
+          const dayNames = {
+            fullbodyA: 'Día A', fullbodyB: 'Día B', fullbodyC: 'Día C',
+            torsoA: 'Torso A', piernaA: 'Pierna A', torsoB: 'Torso B', piernaB: 'Pierna B'
+          };
+          chipLabel.innerText = dayNames[defaultDay] || defaultDay;
+        }
+        const routineSub = document.getElementById('headerRoutineSub');
+        if (routineSub) {
+          const durEst = calculateDayEstimatedDuration(defaultDay, isExpressMode);
+          routineSub.innerHTML = (newProg === 'fullbody') ? `Full Body · 3 días · <span id="headerEstDuration">~${durEst} min</span>` : `Torso/Pierna · 4 días · <span id="headerEstDuration">~${durEst} min</span>`;
+        }
+        if (typeof renderDayPickerDropdown === 'function') {
+          renderDayPickerDropdown();
+        }
       }
       showToast(`Rutina activa: ${newProg === 'fullbody' ? 'Full Body (3 Días)' : 'Torso / Pierna (4 Días)'}`);
     }
