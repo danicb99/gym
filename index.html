@@ -605,7 +605,7 @@
       border-color: rgba(255, 255, 255, 0.08);
     }
 
-    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; cursor: pointer; }
     .ex-meta { display: flex; flex-direction: column; gap: 3px; }
     .ex-muscle { font-size: 0.66rem; font-weight: 850; text-transform: uppercase; letter-spacing: 0.8px; color: var(--primary); }
     .ex-title { font-size: 1.05rem; font-weight: 800; color: #fff; letter-spacing: -0.2px; line-height: 1.25; }
@@ -11288,27 +11288,73 @@
       refreshMascotBadge();
     }
 
-    // Accordion Manager: Single active exercise mode
+    function getSlotPairId(slotId) {
+      if (!slotId) return null;
+      const cfg = getSlotConfig(slotId);
+      if (cfg && cfg.pairSlotId) return cfg.pairSlotId;
+      if (slotId === 'torsoA_6') return 'torsoA_7';
+      if (slotId === 'torsoA_7') return 'torsoA_6';
+      if (slotId === 'torsoB_6') return 'torsoB_7';
+      if (slotId === 'torsoB_7') return 'torsoB_6';
+      return null;
+    }
+
+    // Accordion Manager: 1 ejercicio desplegado por defecto, permitiendo tener desplegados los 2 ejercicios de una superserie a la vez
     function toggleCardAccordion(slotId) {
       const card = document.getElementById('card-' + slotId);
       if (!card) return;
       const daySection = card.closest('.day-content');
       if (!daySection) return;
 
+      const pairSlotId = getSlotPairId(slotId);
       const isCollapsed = card.classList.contains('collapsed');
+
       if (isCollapsed) {
-        // Colapsar todos los demás ejercicios de este día
-        daySection.querySelectorAll('.exercise-card').forEach(c => {
-          c.classList.add('collapsed');
-          c.classList.remove('manually-expanded');
-        });
         // Desplegar este ejercicio
+        // Si pertenece a una superserie y su pareja ya está abierta, la dejamos abierta también.
+        // Colapsamos cualquier otro ejercicio que no sea esta tarjeta ni su pareja de superserie.
+        daySection.querySelectorAll('.exercise-card').forEach(c => {
+          const cSlot = c.getAttribute('data-slot');
+          if (c !== card && (!pairSlotId || cSlot !== pairSlotId)) {
+            c.classList.add('collapsed');
+            c.classList.remove('manually-expanded');
+          }
+        });
         card.classList.remove('collapsed');
         card.classList.add('manually-expanded');
+      } else {
+        // Si ya está desplegado:
+        // Si pertenece a una superserie y su pareja TAMBIÉN está desplegada en pantalla,
+        // permitimos replegar este para volver a tener exactamente 1 solo desplegado (el estado por defecto).
+        if (pairSlotId) {
+          const partnerCard = document.getElementById('card-' + pairSlotId);
+          if (partnerCard && !partnerCard.classList.contains('collapsed')) {
+            card.classList.add('collapsed');
+            card.classList.remove('manually-expanded');
+          }
+        }
       }
-      // REGLA INNEGOCIABLE: Si ya está desplegado, NUNCA se repliega.
-      // Siempre debe haber exactamente un ejercicio visible en pantalla.
     }
+
+    // Soporte para compactar tarjeta abierta al pulsar la cabecera cuando ambos ejercicios de la superserie están desplegados
+    document.addEventListener('click', (e) => {
+      const cardTop = e.target.closest('.card-top');
+      if (!cardTop) return;
+      if (e.target.closest('.ex-icon-avatar') || e.target.closest('.tag-rest') || e.target.closest('button') || e.target.closest('a') || e.target.closest('input')) return;
+      const card = cardTop.closest('.exercise-card');
+      if (!card) return;
+      const slotId = card.getAttribute('data-slot');
+      if (slotId) {
+        const pairSlotId = getSlotPairId(slotId);
+        if (pairSlotId) {
+          const partnerCard = document.getElementById('card-' + pairSlotId);
+          if (partnerCard && !partnerCard.classList.contains('collapsed')) {
+            card.classList.add('collapsed');
+            card.classList.remove('manually-expanded');
+          }
+        }
+      }
+    });
 
     // Keep toggleManualExpand backward compatible with existing onclick handlers
     function toggleManualExpand(slotId) {
@@ -13946,7 +13992,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev22').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev23').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
