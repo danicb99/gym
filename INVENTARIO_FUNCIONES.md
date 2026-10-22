@@ -96,6 +96,7 @@ Los mockups de referencia (`diseno_referencia/`) emplean una paleta azulada gen�
 1. **Pruebas Automatizadas (tests/sync_test.js):** 22/22 superadas (100% éxito) cubriendo convergencia de datos, orden de llegada por `completedAt`, límite de tráfico de red y recuperación de sesiones.
 2. **Pruebas de Compatibilidad (tests/compat_test.js):** 5/5 bloques aprobados (IDs estructurales, funciones JavaScript, paleta AMOLED y widgets nativos del reloj).
 3. **Pruebas Coach Mascota (tests/coach_mascot_test.js):** 24/24 superadas, incluyendo globo contextual, PR, isometría, peso corporal, personalidades, alertas, fechas relativas, doble progresión, modo cansado, Gym SOS, hora estimada de salida y sello Flex Card.
-4. **Compilación de Zepp OS:** Compilado exitosamente a v1.6.0 (`code: 16`) con QuickJS y empaquetado para Amazfit Active 2 (pantalla redonda de 466 px y cuadrada de 390 px).
-5. **Formato de Datos Persistentes:** Claves de `localStorage` (`gym_workout_state`, `gym_poderoso_history`, `gym_sessions_v1`, `vigorexiapp_program`) y formato JSON de copias de seguridad 100% compatibles.
-6. **Estado Global del Inventario:** 51/51 funcionalidades (31 móvil + 20 reloj) verificadas y **CONSERVADAS**.
+4. **Pruebas de Reinicio de Día (tests/reset_day_test.js):** 3/3 superadas, verificando limpieza de series, entradas, calentamientos, cronómetro y sesión activa sin afectar a otros días.
+5. **Compilación de Zepp OS:** Compilado exitosamente a v1.6.0 (`code: 16`) con QuickJS y empaquetado para Amazfit Active 2 (pantalla redonda de 466 px y cuadrada de 390 px).
+6. **Formato de Datos Persistentes:** Claves de `localStorage` (`gym_workout_state`, `gym_poderoso_history`, `gym_sessions_v1`, `vigorexiapp_program`) y formato JSON de copias de seguridad 100% compatibles.
+7. **Estado Global del Inventario:** 51/51 funcionalidades (31 móvil + 20 reloj) verificadas y **CONSERVADAS**.

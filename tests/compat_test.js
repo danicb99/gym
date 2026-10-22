@@ -51,7 +51,7 @@ console.log('\n⚙️ 3. Verificación de Funciones JavaScript:');
 const requiredFunctions = [
   'switchMainTab', 'updateRoutinePlanViewCards', 'selectDay', 'handleDaySelectChange',
   'switchRoutineProgram', 'completeSet', 'updateProgress', 'updateTimerUI',
-  'triggerRest', 'resetTimerDock', 'finishDaySession', 'downloadBackupJSON',
+  'triggerRest', 'resetTimerDock', 'resetDayWorkout', 'finishDaySession', 'downloadBackupJSON',
   'shareBackup', 'restoreBackupFromFile', 'copyBackupToClipboard', 'pasteBackupFromClipboard'
 ];
 

@@ -2,7 +2,7 @@
 
 > Estado: **Tanda 1 (rev14), Tanda 1.5 (rev15) y Tanda 2 (rev16) completadas.**
 > Base: commit `edda61e` (`fix: corregir fecha relativa y voseo del coach`).
-> Versión actual del Service Worker: `rev16`.
+> Versión actual del Service Worker: `rev17`.
 
 ## Hoja de ruta
 

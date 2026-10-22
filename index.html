@@ -10405,9 +10405,71 @@
       }
     }
 
+    function resetDayWorkout(dayId) {
+      if (!dayId || dayId === 'historialView' || dayId === 'routinePlanView') return false;
+
+      const daySection = document.getElementById(dayId);
+      const dayData = typeof ROUTINE_SLOTS !== 'undefined' ? ROUTINE_SLOTS[dayId] : null;
+      const slotIds = new Set();
+
+      if (dayData && Array.isArray(dayData.slots)) {
+        dayData.slots.forEach(slot => {
+          if (slot && slot.slotId) slotIds.add(slot.slotId);
+        });
+      }
+
+      if (daySection) {
+        daySection.querySelectorAll('.exercise-card').forEach(card => {
+          const slotId = card.getAttribute('data-slot');
+          if (slotId) slotIds.add(slotId);
+          card.classList.remove('exercise-completed', 'manually-expanded');
+          card.querySelectorAll('.set-row, .warmup-row').forEach(row => {
+            row.classList.remove('done');
+          });
+          card.querySelectorAll('.set-input, .input-warmup-kg, .input-warmup-reps').forEach(inp => {
+            inp.value = '';
+          });
+        });
+      }
+
+      const slotPrefixes = Array.from(slotIds).map(slotId => slotId + '_');
+      const belongsToDay = key => slotPrefixes.some(prefix => key.startsWith(prefix));
+
+      if (Array.isArray(workoutState.completed)) {
+        workoutState.completed = workoutState.completed.filter(key => !belongsToDay(key));
+      }
+      ['inputs', 'setTimestamps', 'warmupChecks', 'warmupInputs'].forEach(prop => {
+        if (!workoutState[prop] || typeof workoutState[prop] !== 'object') return;
+        Object.keys(workoutState[prop]).forEach(key => {
+          if (belongsToDay(key)) delete workoutState[prop][key];
+        });
+      });
+
+      if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[dayId];
+      if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[dayId];
+      if (workoutState.sessionIds) delete workoutState.sessionIds[dayId];
+      _hasShown42MinAlert[dayId] = false;
+
+      resetTimerDock();
+      saveWorkoutState();
+      if (typeof scheduleBroadcast === 'function') {
+        scheduleBroadcast(0);
+      } else if (typeof broadcastActiveWorkoutToWatch === 'function') {
+        broadcastActiveWorkoutToWatch();
+      }
+      updateSessionTimerDisplay(dayId);
+      updateProgress();
+      updateDayExerciseAccordion(dayId);
+      resetSessionPR();
+      resetCoachBubbleState();
+      refreshMascotBadge();
+      showToast('Series y tiempos de hoy reiniciados');
+      return true;
+    }
+
     function confirmResetCurrentDay() {
       const activeSection = document.querySelector('.day-content.active');
-      const dayId = (activeSection && activeSection.id !== 'historialView') ? activeSection.id : lastActiveWorkoutDay;
+      const dayId = (activeSection && WORKOUT_DAYS.includes(activeSection.id)) ? activeSection.id : lastActiveWorkoutDay;
       if (confirm('¿Reiniciar las series y tiempos del día de hoy? No afectará a sesiones ya guardadas.')) {
         resetDayWorkout(dayId);
       }
@@ -13701,7 +13763,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev16').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev17').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
