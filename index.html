@@ -3139,7 +3139,7 @@
       right: 0;
       bottom: 0;
       left: 0;
-      z-index: 3;
+      z-index: 10;
       display: flex;
       align-items: flex-start;
       justify-content: center;
@@ -3153,13 +3153,13 @@
       border: 1px solid rgba(251, 191, 36, 0.42);
       border-left: 3px solid var(--primary);
       border-radius: 12px 4px 12px 12px;
-      background: rgba(15, 23, 42, 0.98);
+      background: #0b1120 !important;
       color: #f8fafc;
       font-size: 0.72rem;
       font-weight: 600;
       line-height: 1.35;
       text-align: left;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.48);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
       opacity: 0;
       transform: translateY(-4px) scale(0.97);
       transition: opacity 0.18s ease, transform 0.18s ease;
@@ -3170,6 +3170,12 @@
       transform: none;
       pointer-events: auto;
       cursor: pointer;
+    }
+    .app-header-fixed.has-coach-bubble .header-brand-wrap,
+    .app-header-fixed:has(.coach-bubble.show) .header-brand-wrap {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
     }
     @media (prefers-reduced-motion: reduce) {
       .coach-bubble {
@@ -10133,9 +10139,7 @@
           fullbodyA: 'Día A', fullbodyB: 'Día B', fullbodyC: 'Día C',
           torsoA: 'Torso A', piernaA: 'Pierna A', torsoB: 'Torso B', piernaB: 'Pierna B'
         };
-        const todayDone = (typeof getTodayCompletedSession === 'function') ? getTodayCompletedSession() : null;
-        const isDone = todayDone && todayDone.dayId === dayId;
-        chipLabel.innerText = isDone ? `${dayNames[dayId] || dayId} (Hecho)` : (dayNames[dayId] || dayId);
+        chipLabel.innerText = dayNames[dayId] || dayId;
       }
       updateHeaderEstimatedDuration(dayId);
 
@@ -13869,6 +13873,8 @@
       coachBubblePriority = 0;
       const bubble = document.getElementById('coachBubble');
       if (bubble) bubble.classList.remove('show');
+      const hdr = document.getElementById('appHeaderFixed');
+      if (hdr) hdr.classList.remove('has-coach-bubble');
     }
 
     function showCoachBubble(text, key, priority) {
@@ -13885,6 +13891,8 @@
 
       bubble.textContent = text;
       bubble.classList.add('show');
+      const hdr = document.getElementById('appHeaderFixed');
+      if (hdr) hdr.classList.add('has-coach-bubble');
       bubbleShown.add(key);
       coachBubbleKey = key;
       coachBubblePriority = priority;
@@ -13903,6 +13911,8 @@
 
     function resetCoachBubbleState() {
       hideCoachBubble();
+      const hdr = document.getElementById('appHeaderFixed');
+      if (hdr) hdr.classList.remove('has-coach-bubble');
       bubbleShown = new Set();
       bubbleDismissed = new Set();
     }
@@ -14192,7 +14202,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev24').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev25').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
