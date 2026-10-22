@@ -1,17 +1,16 @@
 # Plan Definitivo: Coach Mascota v1.8.4
 
-> Estado: **Aprobada y en ejecución — Tanda 1 (rev13)**
-> Base: commit `37cc69a` (`fix: sincronizar selector de dias y cambio de rutina 3D a 4D`), árbol limpio.
-> Versión actual del Service Worker: `rev12`.
+> Estado: **Tanda 1 completada (rev14) y Tanda 1.5 implementada (rev15).**
+> Base: commit `edda61e` (`fix: corregir fecha relativa y voseo del coach`).
+> Versión actual del Service Worker: `rev15`.
 
 ## Hoja de ruta
 
 | Fase | Contenido | Caché | Estado |
 | :--- | :--- | :--- | :--- |
-| **TANDA 1** | Mascota interactiva (`#mascotBtn`), modal Coach Vigorex, badge PR/Fatiga/Inactividad, personalidad, asistente de sobrecarga de solo lectura, `getWeightStep` y tests. | **rev13** | **En ejecución** |
-| **PARADA** | Validación real en gimnasio por el usuario. | — | — |
-| **TANDA 1.5** | Globo contextual sobre la cabecera (auto-cierre 5 s). | rev14 | Aprobada en diseño; no implementar aún. |
-| **TANDA 2** | Modo cansado, Gym SOS, hora estimada de salida y sello en Flex Card. | rev15 | Congelada. |
+| **TANDA 1** | Mascota interactiva (`#mascotBtn`), modal Coach Vigorex, badge PR/Fatiga/Inactividad, personalidad, asistente de sobrecarga de solo lectura, `getWeightStep` y tests. | **rev13/rev14** | **Completada** |
+| **TANDA 1.5** | Globo contextual sobre la cabecera (auto-cierre 5 s, pausa y prioridades). | **rev15** | **Completada** |
+| **TANDA 2** | Modo cansado, Gym SOS, hora estimada de salida y sello en Flex Card. | rev16 | Congelada. |
 
 ---
 
@@ -133,41 +132,50 @@ Punto único: `completeSet()` cuando la serie pasa a `done`.
 ### 7. Tests (`tests/coach_mascot_test.js`)
 
 1. `#mascotBtn` es un `<button>` accesible, sin `onclick` y con badge `aria-hidden`.
-2. Cache `rev14` y registro `sw.js?v=1.8.4-rev14`.
+2. Cache `rev15` y registro `sw.js?v=1.8.4-rev15`.
 3. Personalidad válida e inválida en la whitelist.
 4. `getConsecutiveTrainingAlert` devuelve `inactivity`, `fatigue` y `yesterday`.
-5. PR de 1RM.
-6. PR de isometría.
-7. PR de peso corporal (ignora entradas con lastre).
-8. PR una sola vez por ejercicio y reset de sesión.
-9. Rampa `70/75/80` → 80 × 6.
-10. Rampa `70/80/80` al techo → 82.5.
-11. `pec_deck` → +5 kg.
-12. Precedencia de `getFreshOverload`.
-13. Sin ejercicio activo / sin historial.
-14. Paridad de `getWeightStep` en los 101 ejercicios del catálogo.
+5. Fecha relativa por día natural (`Hoy`, `Ayer`, `Hace 5 días`).
+6. Globo: markup accesible, capa absoluta y estilos de cabecera.
+7. Globo: textos de PR (1RM, segundos) y sobrecarga.
+8. Globo: prioridad, auto-cierre, pausa, cierre manual y supresión por input.
+9. Globo: hooks de PR, sobrecarga, briefing y resets.
+10. Briefing: último entreno usa la sesión más reciente, no el día activo.
+11. PR de 1RM.
+12. PR de isometría.
+13. PR de peso corporal (ignora entradas con lastre).
+14. PR una sola vez por ejercicio y reset de sesión.
+15. Rampa `70/75/80` → 80 × 6.
+16. Rampa `70/80/80` al techo → 82.5.
+17. `pec_deck` → +5 kg.
+18. Precedencia de `getFreshOverload`.
+19. Sin ejercicio activo / sin historial.
+20. Paridad de `getWeightStep` en los 101 ejercicios del catálogo.
 
-### 8. Cierre de Tanda 1
+### 8. Cierre de Tanda 1 (histórico)
 
 - `sw.js`: `CACHE_NAME = 'vigorexiapp-v1.8.4-rev14'`.
 - Registro del Service Worker en `index.html` con `?v=1.8.4-rev14`.
 - Sección “Coach Mascota” en `INVENTARIO_FUNCIONES.md`.
 - Toda la suite de `tests/*.js` en verde.
-- **PARADA**: esperar la prueba real en gimnasio antes de la Tanda 1.5.
+- La **PARADA** de prueba real en gimnasio quedó cancelada por decisión del usuario; no bloquea la Tanda 1.5.
 
 ---
 
-## Tanda 1.5 (diseño aprobado, no implementar)
+## Tanda 1.5 (implementada en rev15)
 
-- Capa absoluta en `.app-header`: `top: var(--safe-top); right: 0; bottom: 0; left: 0; z-index: 2`.
-- `<span>` de texto con `role="status" aria-live="polite"`.
-- Prioridad: PR > sobrecarga > briefing.
-- Auto-cierre a los 5 s con pausa real (hover/foco).
-- Supresión si hay un input enfocado, el modal está abierto o el globo ya se mostró para ese ejercicio.
-- Sets `bubbleShown` / `bubbleDismissed` con clave `` `${dayId}:${exId}` ``.
-- Reset en `selectDay` y al archivar.
+- Capa absoluta en `.app-header-fixed`: `top: var(--safe-top); right: 0; bottom: 0; left: 0; z-index: 2`.
+- `<span class="coach-bubble" role="status" aria-live="polite" aria-atomic="true">`.
+- Prioridad: PR (`3`) > sobrecarga (`2`) > briefing (`1`).
+- Auto-cierre a los 5 s con pausa real en `pointerenter`/`focusin` y reanudación en `pointerleave`/`focusout`.
+- Clic/tap cierra el globo y registra la clave en `bubbleDismissed`.
+- Supresión si el modal está abierto, hay un input enfocado o el globo ya se mostró para esa clave. El PR es la excepción para inputs enfocados y nunca llama a `blur()`.
+- Sets `bubbleShown` / `bubbleDismissed` con clave `` `${dayId}:${exId}` `` y `` `${dayId}:briefing` ``.
+- Reset en `selectDay` y en `executeDayArchive`.
+- Briefing tras 350 ms al abrir un día de entrenamiento.
+- Sobrecarga solo desde `completeSet` (`announce=true`); la carga inicial y `watch_bridge.js` no muestran globo.
 - Sin persistencia, TTS ni vibración.
-- Preguntas abiertas: `blur()` al detectar PR, auto-avance sin globo, briefing al abrir día y equivalencia “globo == autorrelleno”.
+- El globo no dispara el auto-avance del acordeón ni modifica el estado del entreno.
 
 ## Tanda 2 (congelada)
 

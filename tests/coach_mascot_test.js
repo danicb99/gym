@@ -115,7 +115,7 @@ function daysAgo(n) {
   return d.toISOString();
 }
 
-console.log('Coach Mascota (rev14)');
+console.log('Coach Mascota (rev15)');
 
 test('Cabecera: mascota es un boton accesible sin onclick inline', () => {
   const tag = html.match(/<button[^>]*id="mascotBtn"[^>]*>/);
@@ -126,9 +126,19 @@ test('Cabecera: mascota es un boton accesible sin onclick inline', () => {
   assert(/<span class="mascot-badge" id="mascotBadge" aria-hidden="true"><\/span>/.test(html), 'Falta badge aria-hidden');
 });
 
-test('Cache rev14 en sw.js y en el registro', () => {
-  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev14'/.test(sw), 'CACHE_NAME no es rev14');
-  assert(/sw\.js\?v=1\.8\.4-rev14/.test(html), 'El registro no apunta a rev14');
+test('Globo contextual: markup accesible y estilos de cabecera', () => {
+  assert(/<div class="coach-bubble-layer" id="coachBubbleLayer">\s*<span class="coach-bubble" id="coachBubble" role="status" aria-live="polite" aria-atomic="true"><\/span>\s*<\/div>/.test(html), 'Falta el globo accesible');
+  const layer = html.match(/\.coach-bubble-layer\s*\{[\s\S]*?\}/);
+  const bubble = html.match(/\.coach-bubble\s*\{[\s\S]*?\}/);
+  assert(layer && /position:\s*absolute/.test(layer[0]), 'La capa no es absoluta');
+  assert(layer && /pointer-events:\s*none/.test(layer[0]), 'La capa debe dejar pasar el tacto');
+  assert(bubble && /max-width:\s*min\(270px/.test(bubble[0]), 'Falta el ancho maximo del globo');
+  assert(/\.coach-bubble\.show\s*\{[\s\S]*?pointer-events:\s*auto/.test(html), 'El globo visible debe ser interactivo');
+});
+
+test('Cache rev15 en sw.js y en el registro', () => {
+  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev15'/.test(sw), 'CACHE_NAME no es rev15');
+  assert(/sw\.js\?v=1\.8\.4-rev15/.test(html), 'El registro no apunta a rev15');
 });
 
 test('Personalidad: whitelist y fallback a gymbro', () => {
@@ -172,6 +182,46 @@ test('Fecha relativa: hoy, ayer y hace 2 dias por dia natural', () => {
   assert.strictEqual(ctx.getRelativeWorkoutInfo(new Date(2026, 9, 21, 23, 0, 0), now).relative, 'Ayer');
   assert.strictEqual(ctx.getRelativeWorkoutInfo(new Date(2026, 9, 20, 23, 0, 0), now).relative, 'Hace 2 días');
   assert.strictEqual(ctx.getRelativeWorkoutInfo(new Date(2026, 9, 17, 23, 0, 0), now).relative, 'Hace 5 días');
+});
+
+test('Globo: textos de PR y sobrecarga con datos concretos', () => {
+  const ctx = { Number: Number };
+  vm.createContext(ctx);
+  vm.runInContext(extractFunction('formatCoachBubblePR') + '\n' + extractFunction('formatCoachBubbleOverload'), ctx);
+  assert.strictEqual(ctx.formatCoachBubblePR({ exId: 'squat', kind: '1rm', value: 112.5 }, 'Sentadilla'), 'Sentadilla: 112.5 kg de 1RM estimado, nuevo récord.');
+  assert.strictEqual(ctx.formatCoachBubblePR({ exId: 'plank', kind: 'seconds', value: 75 }, 'Plancha'), 'Plancha: 75 s, nuevo récord de tiempo.');
+  assert.strictEqual(ctx.formatCoachBubbleOverload('Press banca', 82.5, 6), 'Press banca: sube a 82.5 kg × 6 reps en la próxima sesión.');
+});
+
+test('Globo: prioridad, cierre, pausa y supresion por input', () => {
+  assert(/const COACH_BUBBLE_MS = 5000/.test(html), 'Falta el auto-cierre de 5 s');
+  assert(/COACH_BUBBLE_PRIORITY = \{ briefing: 1, overload: 2, pr: 3 \}/.test(html), 'Prioridad incorrecta');
+  assert(/let bubbleShown = new Set\(\)/.test(html) && /let bubbleDismissed = new Set\(\)/.test(html), 'Faltan los sets de estado');
+  const show = extractFunction('showCoachBubble');
+  assert(/priority < COACH_BUBBLE_PRIORITY\.pr && isCoachBubbleInputFocused\(\)/.test(show), 'El PR debe poder mostrarse con un input enfocado');
+  assert(/bubbleDismissed\.has\(key\)/.test(show), 'Falta respetar el cierre manual');
+  assert(/bubbleShown\.add\(key\)/.test(show), 'Falta marcar el globo como mostrado');
+  const pause = extractFunction('pauseCoachBubble');
+  const resume = extractFunction('resumeCoachBubble');
+  assert(/Date\.now\(\) - coachBubbleStartedAt/.test(pause), 'La pausa no descuenta el tiempo transcurrido');
+  assert(/startCoachBubbleTimer\(coachBubbleRemaining/.test(resume), 'La reanudacion no conserva el tiempo restante');
+  const dismiss = extractFunction('dismissCoachBubble');
+  assert(/bubbleDismissed\.add\(coachBubbleKey\)/.test(dismiss), 'El clic no registra el cierre');
+});
+
+test('Globo: hooks de PR, sobrecarga, briefing y resets', () => {
+  const mark = extractFunction('markExercisePR');
+  assert(/typeof showCoachPRBubble === 'function'/.test(mark), 'Falta el guard de PR');
+  assert(/showCoachPRBubble\(lastPRInfo\)/.test(mark), 'El PR no dispara el globo');
+  const check = extractFunction('checkExerciseCardCompletion');
+  assert(/function checkExerciseCardCompletion\(card, announce\)/.test(check), 'Falta el flag announce');
+  assert(/announce && typeof showCoachOverloadBubble === 'function'/.test(check), 'La sobrecarga no dispara el globo');
+  assert(/checkExerciseCardCompletion\(card, isDone\)/.test(html), 'completeSet no anuncia la serie completada');
+  const select = extractFunction('selectDay');
+  assert(/resetCoachBubbleState\(\)/.test(select), 'selectDay no reinicia el globo');
+  assert(/showCoachBriefingBubble\(dayId\)/.test(select), 'selectDay no muestra el briefing');
+  const archive = extractFunction('executeDayArchive');
+  assert(/resetCoachBubbleState\(\)/.test(archive), 'El archivo no reinicia el globo');
 });
 
 test('Briefing: ultimo entreno usa la sesion mas reciente, no el dia activo', () => {

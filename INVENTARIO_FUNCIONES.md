@@ -61,7 +61,7 @@ Los mockups de referencia (`diseno_referencia/`) emplean una paleta azulada gen�
 | **M28** | **Píldora de sincronización en vivo con el reloj** | `#watchSyncPill` (Sincronizado / Pendiente / Sin móvil) | Píldora de estado en cabecera vinculada a `watch_bridge.js` | **Conservada** |
 | **M29** | **Modal de configuración del código de sincronización** | `#watchSyncModal` (Código secreto, servidor, reintento) | Modal modal completo invocado al pulsar la píldora de sincronización | **Conservada** |
 | **M30** | **Página de instalación para el reloj (`reloj.html`)** | `reloj.html` con QR dinámico y estado de versión | Página web optimizada para emparejamiento por código QR local | **Conservada** |
-| **M31** | **Coach Mascota interactivo (rev13)** | `#mascotBtn`, `#mascotBadge`, `#coachModal` | Mascota de cabecera con saludo, briefing, personalidad, alertas PR/fatiga/inactividad y asistente de doble progresión de solo lectura | **Nueva** |
+| **M31** | **Coach Mascota interactivo (rev15)** | `#mascotBtn`, `#mascotBadge`, `#coachModal`, `#coachBubble` | Mascota de cabecera con globo contextual (briefing/PR/sobrecarga), briefing, personalidad, alertas PR/fatiga/inactividad y asistente de doble progresión de solo lectura | **Nueva** |
 
 ---
 
@@ -95,7 +95,7 @@ Los mockups de referencia (`diseno_referencia/`) emplean una paleta azulada gen�
 ## 🔒 Compromiso de Integridad de Datos y Certificación de Pruebas
 1. **Pruebas Automatizadas (tests/sync_test.js):** 22/22 superadas (100% éxito) cubriendo convergencia de datos, orden de llegada por `completedAt`, límite de tráfico de red y recuperación de sesiones.
 2. **Pruebas de Compatibilidad (tests/compat_test.js):** 5/5 bloques aprobados (IDs estructurales, funciones JavaScript, paleta AMOLED y widgets nativos del reloj).
-3. **Pruebas Coach Mascota (tests/coach_mascot_test.js):** 16/16 superadas, incluyendo PR, isometría, peso corporal, personalidades, alertas, fechas relativas y doble progresión.
+3. **Pruebas Coach Mascota (tests/coach_mascot_test.js):** 20/20 superadas, incluyendo globo contextual, PR, isometría, peso corporal, personalidades, alertas, fechas relativas y doble progresión.
 4. **Compilación de Zepp OS:** Compilado exitosamente a v1.6.0 (`code: 16`) con QuickJS y empaquetado para Amazfit Active 2 (pantalla redonda de 466 px y cuadrada de 390 px).
 5. **Formato de Datos Persistentes:** Claves de `localStorage` (`gym_workout_state`, `gym_poderoso_history`, `gym_sessions_v1`, `vigorexiapp_program`) y formato JSON de copias de seguridad 100% compatibles.
 6. **Estado Global del Inventario:** 51/51 funcionalidades (31 móvil + 20 reloj) verificadas y **CONSERVADAS**.

@@ -2933,6 +2933,49 @@
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.16); }
     }
+    .coach-bubble-layer {
+      position: absolute;
+      top: var(--safe-top);
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 2;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 40px 10px 0;
+      pointer-events: none;
+    }
+    .coach-bubble {
+      display: block;
+      max-width: min(270px, calc(100% - 16px));
+      padding: 7px 10px;
+      border: 1px solid rgba(251, 191, 36, 0.42);
+      border-left: 3px solid var(--primary);
+      border-radius: 12px 4px 12px 12px;
+      background: rgba(15, 23, 42, 0.98);
+      color: #f8fafc;
+      font-size: 0.72rem;
+      font-weight: 600;
+      line-height: 1.35;
+      text-align: left;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.48);
+      opacity: 0;
+      transform: translateY(-4px) scale(0.97);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      pointer-events: none;
+    }
+    .coach-bubble.show {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .coach-bubble {
+        transition: none;
+      }
+    }
 
     /* Central Watch Sync Pill */
     .header-center-watch {
@@ -3646,6 +3689,10 @@
           <span class="mascot-badge" id="mascotBadge" aria-hidden="true"></span>
         </button>
       </div>
+    </div>
+
+    <div class="coach-bubble-layer" id="coachBubbleLayer">
+      <span class="coach-bubble" id="coachBubble" role="status" aria-live="polite" aria-atomic="true"></span>
     </div>
 
     <!-- Row 2: Status & Session Info (Harmonized 34px heights, no gap) -->
@@ -9247,6 +9294,7 @@
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
         navigator.vibrate([40, 60, 40]);
       }
+      if (typeof showCoachPRBubble === 'function') showCoachPRBubble(lastPRInfo);
       return true;
     }
 
@@ -9659,6 +9707,7 @@
     function selectDay(dayId) {
       if (WORKOUT_DAYS.includes(dayId) && dayId !== lastCoachDayId) {
         resetSessionPR();
+        resetCoachBubbleState();
         lastCoachDayId = dayId;
       }
       // Ocultar selector de día en la cabecera si estamos en Historial o Rutina
@@ -9751,6 +9800,13 @@
         updateDayExerciseAccordion(dayId);
       }
       refreshMascotBadge();
+      if (dayId === 'historialView' || dayId === 'routinePlanView') {
+        hideCoachBubble();
+      } else {
+        setTimeout(() => {
+          if (getCoachBubbleDayId() === dayId) showCoachBriefingBubble(dayId);
+        }, 350);
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -10716,7 +10772,7 @@
       }
 
       // Check if all sets of this card are completed
-      checkExerciseCardCompletion(card);
+      checkExerciseCardCompletion(card, isDone);
       updateCardSummaryStatus(card);
 
       // Auto-accordion: if this card is now complete, collapse it and auto-expand next!
@@ -10802,7 +10858,7 @@
       }
     }
 
-    function checkExerciseCardCompletion(card) {
+    function checkExerciseCardCompletion(card, announce) {
       if (!card) return;
       const slotId = card.getAttribute('data-slot');
       const exId = card.getAttribute('data-current-ex');
@@ -10870,6 +10926,9 @@
             }
             if (!workoutState.overloadSuggestions) workoutState.overloadSuggestions = {};
             workoutState.overloadSuggestions[exId] = { nextKg: nextKg, baseReps: target.min, date: Date.now() };
+            if (announce && typeof showCoachOverloadBubble === 'function') {
+              showCoachOverloadBubble(exId, nextKg, target.min);
+            }
           } else if (existingBadge) {
             existingBadge.remove();
           }
@@ -11268,6 +11327,7 @@
       updateSessionTimerDisplay(dayId);
       updateProgress();
       resetSessionPR();
+      resetCoachBubbleState();
       refreshMascotBadge();
 
       if (isAutoSave) {
@@ -13064,6 +13124,17 @@
     let mascotPressTimer = null;
     let mascotSuppressClick = false;
 
+    const COACH_BUBBLE_MS = 5000;
+    const COACH_BUBBLE_PRIORITY = { briefing: 1, overload: 2, pr: 3 };
+    let bubbleShown = new Set();
+    let bubbleDismissed = new Set();
+    let coachBubbleTimer = null;
+    let coachBubbleStartedAt = 0;
+    let coachBubbleRemaining = 0;
+    let coachBubblePaused = false;
+    let coachBubbleKey = '';
+    let coachBubblePriority = 0;
+
     function getCoachPersonality() {
       return COACH_PERSONALITIES.includes(workoutState.coachPersonality) ? workoutState.coachPersonality : 'gymbro';
     }
@@ -13085,6 +13156,142 @@
         { label: 'Último entreno', value: lastInfo ? lastInfo.relative : 'Sin registros' },
         { label: 'Siguiente', value: nextName || '—' }
       ];
+    }
+
+    function getCoachBubbleDayId() {
+      const active = document.querySelector('.day-content.active');
+      if (active && WORKOUT_DAYS.includes(active.id)) return active.id;
+      return '';
+    }
+
+    function formatCoachBubblePR(info, exName) {
+      if (!info) return '';
+      const name = exName || info.exId || 'Ejercicio';
+      if (info.kind === 'seconds') return `${name}: ${info.value} s, nuevo récord de tiempo.`;
+      if (info.kind === 'reps') return `${name}: ${info.value} reps, nuevo récord.`;
+      return `${name}: ${info.value} kg de 1RM estimado, nuevo récord.`;
+    }
+
+    function formatCoachBubbleOverload(exName, nextKg, baseReps) {
+      if (!nextKg) return '';
+      const name = exName || 'Ejercicio';
+      const reps = Number(baseReps) > 0 ? ` × ${baseReps} reps` : '';
+      return `${name}: sube a ${nextKg} kg${reps} en la próxima sesión.`;
+    }
+
+    function isCoachBubbleInputFocused() {
+      const el = document.activeElement;
+      if (!el || el === document.body) return false;
+      if (el.matches && el.matches('input, textarea, select, [contenteditable="true"]')) return true;
+      return false;
+    }
+
+    function startCoachBubbleTimer(ms) {
+      clearTimeout(coachBubbleTimer);
+      coachBubblePaused = false;
+      coachBubbleRemaining = ms;
+      coachBubbleStartedAt = Date.now();
+      coachBubbleTimer = setTimeout(hideCoachBubble, ms);
+    }
+
+    function pauseCoachBubble() {
+      if (!coachBubbleTimer || coachBubblePaused) return;
+      coachBubbleRemaining = Math.max(250, coachBubbleRemaining - (Date.now() - coachBubbleStartedAt));
+      clearTimeout(coachBubbleTimer);
+      coachBubbleTimer = null;
+      coachBubblePaused = true;
+    }
+
+    function resumeCoachBubble() {
+      if (!coachBubblePaused) return;
+      startCoachBubbleTimer(coachBubbleRemaining || COACH_BUBBLE_MS);
+    }
+
+    function hideCoachBubble() {
+      clearTimeout(coachBubbleTimer);
+      coachBubbleTimer = null;
+      coachBubblePaused = false;
+      coachBubbleRemaining = 0;
+      coachBubbleKey = '';
+      coachBubblePriority = 0;
+      const bubble = document.getElementById('coachBubble');
+      if (bubble) bubble.classList.remove('show');
+    }
+
+    function showCoachBubble(text, key, priority) {
+      if (!text || !key) return false;
+      const bubble = document.getElementById('coachBubble');
+      if (!bubble) return false;
+      if (bubbleDismissed.has(key)) return false;
+      if (document.body.classList.contains('modal-open')) return false;
+      if (priority < COACH_BUBBLE_PRIORITY.pr && isCoachBubbleInputFocused()) return false;
+
+      const isVisible = bubble.classList.contains('show') && coachBubbleTimer !== null;
+      if (bubbleShown.has(key) && !(isVisible && coachBubbleKey === key)) return false;
+      if (isVisible && priority < coachBubblePriority) return false;
+
+      bubble.textContent = text;
+      bubble.classList.add('show');
+      bubbleShown.add(key);
+      coachBubbleKey = key;
+      coachBubblePriority = priority;
+      startCoachBubbleTimer(COACH_BUBBLE_MS);
+      return true;
+    }
+
+    function dismissCoachBubble(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      if (coachBubbleKey) bubbleDismissed.add(coachBubbleKey);
+      hideCoachBubble();
+    }
+
+    function resetCoachBubbleState() {
+      hideCoachBubble();
+      bubbleShown = new Set();
+      bubbleDismissed = new Set();
+    }
+
+    function showCoachBriefingBubble(dayId) {
+      if (!dayId || !WORKOUT_DAYS.includes(dayId)) return false;
+      const active = document.querySelector('.day-content.active');
+      if (!active || active.id !== dayId) return false;
+      const text = getCoachBriefing()
+        .map(row => `${row.label}: ${row.value}`)
+        .join(' · ');
+      return showCoachBubble(text, `${dayId}:briefing`, COACH_BUBBLE_PRIORITY.briefing);
+    }
+
+    function showCoachPRBubble(info) {
+      if (!info) return false;
+      const dayId = getCoachBubbleDayId();
+      if (!dayId) return false;
+      const ex = EXERCISE_CATALOG[info.exId];
+      const exName = (ex && ex.name) || info.exId;
+      const text = `${getCoachLine('pr')} ${formatCoachBubblePR(info, exName)}`;
+      return showCoachBubble(text, `${dayId}:${info.exId}`, COACH_BUBBLE_PRIORITY.pr);
+    }
+
+    function showCoachOverloadBubble(exId, nextKg, baseReps) {
+      const dayId = getCoachBubbleDayId();
+      if (!dayId) return false;
+      const ex = EXERCISE_CATALOG[exId];
+      const exName = (ex && ex.name) || exId;
+      const text = formatCoachBubbleOverload(exName, nextKg, baseReps);
+      return showCoachBubble(text, `${dayId}:${exId}`, COACH_BUBBLE_PRIORITY.overload);
+    }
+
+    function initCoachBubble() {
+      const bubble = document.getElementById('coachBubble');
+      if (!bubble || bubble.dataset.bubbleBound === '1') return;
+      bubble.dataset.bubbleBound = '1';
+      bubble.addEventListener('click', dismissCoachBubble);
+      bubble.addEventListener('pointerenter', pauseCoachBubble);
+      bubble.addEventListener('pointerleave', resumeCoachBubble);
+      bubble.addEventListener('focusin', pauseCoachBubble);
+      bubble.addEventListener('focusout', resumeCoachBubble);
     }
 
     function getActiveExerciseContext() {
@@ -13187,6 +13394,7 @@
     function openCoachModal() {
       const overlay = document.getElementById('coachModal');
       if (!overlay || overlay.classList.contains('open')) return;
+      hideCoachBubble();
       renderCoachModal();
       overlay.classList.add('open');
       document.body.classList.add('modal-open');
@@ -13254,6 +13462,7 @@
 
     // Initialize on load
     function initApp() {
+      initCoachBubble();
       loadWorkoutState();
       initMascotGestures();
       restoreRestTimerState();
@@ -13270,7 +13479,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev14').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev15').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
