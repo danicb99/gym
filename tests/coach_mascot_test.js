@@ -115,7 +115,7 @@ function daysAgo(n) {
   return d.toISOString();
 }
 
-console.log('Coach Mascota (rev13)');
+console.log('Coach Mascota (rev14)');
 
 test('Cabecera: mascota es un boton accesible sin onclick inline', () => {
   const tag = html.match(/<button[^>]*id="mascotBtn"[^>]*>/);
@@ -126,9 +126,9 @@ test('Cabecera: mascota es un boton accesible sin onclick inline', () => {
   assert(/<span class="mascot-badge" id="mascotBadge" aria-hidden="true"><\/span>/.test(html), 'Falta badge aria-hidden');
 });
 
-test('Cache rev13 en sw.js y en el registro', () => {
-  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev13'/.test(sw), 'CACHE_NAME no es rev13');
-  assert(/sw\.js\?v=1\.8\.4-rev13/.test(html), 'El registro no apunta a rev13');
+test('Cache rev14 en sw.js y en el registro', () => {
+  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev14'/.test(sw), 'CACHE_NAME no es rev14');
+  assert(/sw\.js\?v=1\.8\.4-rev14/.test(html), 'El registro no apunta a rev14');
 });
 
 test('Personalidad: whitelist y fallback a gymbro', () => {
@@ -161,6 +161,35 @@ test('Alertas: inactivity, fatigue y yesterday con type', () => {
 
   ctx.workoutState.sessions = [{ date: daysAgo(1), dayId: 'torsoA', dayName: 'Torso A' }];
   assert.strictEqual(ctx.getConsecutiveTrainingAlert().type, 'yesterday');
+});
+
+test('Fecha relativa: hoy, ayer y hace 2 dias por dia natural', () => {
+  const ctx = { Date: Date, Number: Number, Math: Math };
+  vm.createContext(ctx);
+  vm.runInContext(extractFunction('getRelativeWorkoutInfo'), ctx);
+  const now = new Date(2026, 9, 22, 8, 0, 0);
+  assert.strictEqual(ctx.getRelativeWorkoutInfo(new Date(2026, 9, 22, 23, 0, 0), now).relative, 'Hoy');
+  assert.strictEqual(ctx.getRelativeWorkoutInfo(new Date(2026, 9, 21, 23, 0, 0), now).relative, 'Ayer');
+  assert.strictEqual(ctx.getRelativeWorkoutInfo(new Date(2026, 9, 20, 23, 0, 0), now).relative, 'Hace 2 días');
+  assert.strictEqual(ctx.getRelativeWorkoutInfo(new Date(2026, 9, 17, 23, 0, 0), now).relative, 'Hace 5 días');
+});
+
+test('Briefing: ultimo entreno usa la sesion mas reciente, no el dia activo', () => {
+  const latest = { date: '2026-10-20T18:00:00', dayId: 'fullbodyB' };
+  const ctx = {
+    workoutState: { sessions: [latest, { date: '2026-10-17T18:00:00', dayId: 'fullbodyA' }] },
+    currentProgram: 'fullbody',
+    lastActiveWorkoutDay: 'fullbodyA',
+    getLastSession: () => latest,
+    getRelativeWorkoutInfo: value => ({ relative: value === latest.date ? 'Hace 2 días' : 'Hace 5 días' }),
+    calculateStreak: () => 1,
+    getNextRecommendedDay: () => 'fullbodyC',
+    ROUTINE_SLOTS: { fullbodyC: { shortName: 'Día C' } }
+  };
+  vm.createContext(ctx);
+  vm.runInContext(extractFunction('getCoachBriefing'), ctx);
+  const rows = ctx.getCoachBriefing();
+  assert.strictEqual(rows.find(r => r.label === 'Último entreno').value, 'Hace 2 días');
 });
 
 test('PR 1RM supera el mejor historico', () => {

@@ -133,7 +133,7 @@ Punto único: `completeSet()` cuando la serie pasa a `done`.
 ### 7. Tests (`tests/coach_mascot_test.js`)
 
 1. `#mascotBtn` es un `<button>` accesible, sin `onclick` y con badge `aria-hidden`.
-2. Cache `rev13` y registro `sw.js?v=1.8.4-rev13`.
+2. Cache `rev14` y registro `sw.js?v=1.8.4-rev14`.
 3. Personalidad válida e inválida en la whitelist.
 4. `getConsecutiveTrainingAlert` devuelve `inactivity`, `fatigue` y `yesterday`.
 5. PR de 1RM.
@@ -149,8 +149,8 @@ Punto único: `completeSet()` cuando la serie pasa a `done`.
 
 ### 8. Cierre de Tanda 1
 
-- `sw.js`: `CACHE_NAME = 'vigorexiapp-v1.8.4-rev13'`.
-- Registro del Service Worker en `index.html` con `?v=1.8.4-rev13`.
+- `sw.js`: `CACHE_NAME = 'vigorexiapp-v1.8.4-rev14'`.
+- Registro del Service Worker en `index.html` con `?v=1.8.4-rev14`.
 - Sección “Coach Mascota” en `INVENTARIO_FUNCIONES.md`.
 - Toda la suite de `tests/*.js` en verde.
 - **PARADA**: esperar la prueba real en gimnasio antes de la Tanda 1.5.

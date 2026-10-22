@@ -9279,9 +9279,9 @@
 
       if (!supportsLoadProgression(ex)) {
         if (ex.metricType === 'isometria') {
-          return { source: 'isometric', kg: 0, reps: 0, text: 'Isometría: progresá por segundos, no por kg. Sumá 5-10 s cuando llegues al techo.' };
+          return { source: 'isometric', kg: 0, reps: 0, text: 'Isometría: progresa por segundos, no por kg. Suma 5-10 s cuando llegues al techo.' };
         }
-        return { source: 'none', kg: 0, reps: 0, text: 'Este ejercicio no usa progresión por kg. Registrá reps o tiempo para ver una recomendación.' };
+        return { source: 'none', kg: 0, reps: 0, text: 'Este ejercicio no usa progresión por kg. Registra reps o tiempo para ver una recomendación.' };
       }
 
       let sourceSets = Array.isArray(sets) ? sets : [];
@@ -9308,8 +9308,8 @@
           kg: 0,
           reps: nextReps,
           text: atBodyweightCeiling
-            ? `Peso corporal: todas las series en el techo (${target.max}). Sumá lastre o subí a <strong>${target.max + 2} reps</strong>.`
-            : `Peso corporal: buscá <strong>${nextReps} reps</strong> en la próxima serie (mínimo actual: ${weakest}).`
+            ? `Peso corporal: todas las series en el techo (${target.max}). Suma lastre o sube a <strong>${target.max + 2} reps</strong>.`
+            : `Peso corporal: busca <strong>${nextReps} reps</strong> en la próxima serie (mínimo actual: ${weakest}).`
         };
       }
 
@@ -9325,7 +9325,7 @@
           source: 'ceiling',
           kg: nextKg,
           reps: target.min,
-          text: `Todas las series al techo. Subí a <strong>${nextKg} kg × ${target.min} reps</strong> y reiniciá la rampa.`
+          text: `Todas las series al techo. Sube a <strong>${nextKg} kg × ${target.min} reps</strong> y reinicia la rampa.`
         };
       }
 
@@ -9334,7 +9334,7 @@
         source: 'volume',
         kg: lastKg,
         reps: nextReps,
-        text: `Mantené <strong>${lastKg} kg</strong> y buscá <strong>${nextReps} reps</strong> (mínimo actual: ${weakest}).`
+        text: `Mantén <strong>${lastKg} kg</strong> y busca <strong>${nextReps} reps</strong> (mínimo actual: ${weakest}).`
       };
     }
     // COACH:HELPERS:END
@@ -13038,25 +13038,25 @@
         subtitle: 'Aquí no se negocia el esfuerzo',
         greeting: ['¡Arriba! El hierro no se levanta solo.', 'Hoy se entrena. Sin excusas.', 'Cada serie cuenta. ¡Vamos!'],
         pr: ['¡Récord! Así se hace.', 'Nuevo PR. El trabajo paga.', 'Impecable. A por el siguiente.'],
-        fatigue: ['Llevas 3 días. Baja el volumen hoy.', 'Descansá o entrená suave. El cuerpo no es de acero.'],
-        inactivity: ['Volviste. Empezá con 5-10% menos.', 'La constancia se reconstruye. Hoy suave.'],
-        tip: 'La doble progresión manda: primero sumá reps al mismo peso y después subí el disco.'
+        fatigue: ['Llevas 3 días. Baja el volumen hoy.', 'Descansa o entrena suave. El cuerpo no es de acero.'],
+        inactivity: ['Has vuelto. Empieza con un 5-10% menos.', 'La constancia se reconstruye. Hoy suave.'],
+        tip: 'La doble progresión manda: primero suma reps al mismo peso y después sube el disco.'
       },
       ciencia: {
         subtitle: 'Datos, técnica y progresión',
-        greeting: ['La adaptación ocurre cuando el estímulo es medible.', 'Registrá cada serie: sin datos no hay progreso.', 'Tensión mecánica y sobrecarga progresiva. Simple.'],
-        pr: ['Nuevo máximo estimado. La curva sube.', 'PR registrado. Buen estímulo.', 'Progreso objetivo. Seguí así.'],
-        fatigue: ['3 días consecutivos: hoy conviene bajar el volumen.', 'La fatiga acumulada reduce la calidad. Autorregulá.'],
-        inactivity: ['Tras 5 días, reaparecer con 5-10% menos es lo fisiológico.', 'Readaptá tendones: empezá suave.'],
+        greeting: ['La adaptación ocurre cuando el estímulo es medible.', 'Registra cada serie: sin datos no hay progreso.', 'Tensión mecánica y sobrecarga progresiva. Simple.'],
+        pr: ['Nuevo máximo estimado. La curva sube.', 'PR registrado. Buen estímulo.', 'Progreso objetivo. Sigue así.'],
+        fatigue: ['3 días consecutivos: hoy conviene bajar el volumen.', 'La fatiga acumulada reduce la calidad. Autorregula.'],
+        inactivity: ['Tras 5 días, reaparecer con un 5-10% menos es lo fisiológico.', 'Readaptación de tendones: empieza suave.'],
         tip: 'El rango de 6-12 reps cerca del fallo es un estímulo eficiente para hipertrofia.'
       },
       gymbro: {
         subtitle: 'Tu colega de entrenamiento',
-        greeting: ['¡Vamos que se puede!', 'Hoy toca darle. Yo te banco.', 'Un set más, una excusa menos.'],
+        greeting: ['¡Vamos que se puede!', 'Hoy toca darlo todo. Yo te apoyo.', 'Un set más, una excusa menos.'],
         pr: ['¡Bum! Nuevo PR.', '¡Récord! Eso se celebra.', 'Estás fuerte. Se nota.'],
-        fatigue: ['Tres días seguidos, colega. Hoy aflojá un poco.', 'Descansá. Mañana volvés con todo.'],
-        inactivity: ['Volviste. Arrancá tranqui.', 'Cinco días fuera: hoy menos peso y buena técnica.'],
-        tip: 'Si dudás, anotá la serie. Ver el progreso en papel engancha.'
+        fatigue: ['Tres días seguidos, colega. Hoy afloja un poco.', 'Descansa. Mañana vuelves con todo.'],
+        inactivity: ['Has vuelto. Empieza tranquilo.', 'Cinco días fuera: hoy menos peso y buena técnica.'],
+        tip: 'Si dudas, anota la serie. Ver el progreso en papel engancha.'
       }
     };
 
@@ -13076,7 +13076,8 @@
 
     function getCoachBriefing() {
       const streak = calculateStreak(workoutState.sessions || []);
-      const lastInfo = lastActiveWorkoutDay ? getDayLastDoneInfo(lastActiveWorkoutDay) : null;
+      const lastSession = getLastSession();
+      const lastInfo = lastSession ? getRelativeWorkoutInfo(lastSession.date) : null;
       const nextId = getNextRecommendedDay(currentProgram);
       const nextName = (typeof ROUTINE_SLOTS !== 'undefined' && ROUTINE_SLOTS[nextId]) ? ROUTINE_SLOTS[nextId].shortName : nextId;
       return [
@@ -13269,7 +13270,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev13').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev14').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -13319,26 +13320,34 @@
     }
 
     // 2. Dynamic Day Selector & Routine Switching
-    function getDayLastDoneInfo(dayId) {
-      const found = getLastSessionForDay(dayId);
-      if (!found || !found.date) return null;
-      const dateObj = new Date(found.date);
-      const today = new Date();
-      const diffMs = today.getTime() - dateObj.getTime();
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    function getRelativeWorkoutInfo(dateValue, now) {
+      const dateObj = new Date(dateValue);
+      if (!Number.isFinite(dateObj.getTime())) return null;
+      const today = now ? new Date(now) : new Date();
+      const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+      const dateMidnight = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()).getTime();
+      const diffDays = Math.round((todayMidnight - dateMidnight) / (1000 * 60 * 60 * 24));
       let relative = '';
       if (diffDays === 0) relative = 'Hoy';
       else if (diffDays === 1) relative = 'Ayer';
-      else if (diffDays < 7) relative = `Hace ${diffDays}d`;
+      else if (diffDays > 1 && diffDays < 7) relative = `Hace ${diffDays} días`;
       else relative = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 
       return {
         date: dateObj,
         dateFormatted: dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
         relative: relative,
-        diffDays: diffDays,
-        raw: found
+        diffDays: diffDays
       };
+    }
+
+    function getDayLastDoneInfo(dayId) {
+      const found = getLastSessionForDay(dayId);
+      if (!found || !found.date) return null;
+      const info = getRelativeWorkoutInfo(found.date);
+      if (!info) return null;
+      info.raw = found;
+      return info;
     }
 
     function getNextRecommendedDay(program) {
