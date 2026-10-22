@@ -780,11 +780,164 @@
       font-variant-numeric: tabular-nums;
       transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+      touch-action: pan-y;
     }
     .set-input:focus {
       border-color: var(--border-focus);
       background: rgba(251, 191, 36, 0.08);
       box-shadow: 0 0 10px rgba(251, 191, 36, 0.25);
+    }
+    .set-input.scrubbing-active {
+      border-color: var(--primary) !important;
+      background: rgba(251, 191, 36, 0.16) !important;
+      box-shadow: 0 0 14px var(--primary-glow), inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+    }
+
+    /* ========================================================
+       SCRUBBER HUD: SELECTOR POR DESPLAZAMIENTO TÁCTIL HÁPTICO
+       ======================================================== */
+    .scrubber-hud {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100000;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translate(-50%, -100%) scale(0.88);
+      transform-origin: bottom center;
+      transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.15s;
+      will-change: transform, opacity, left, top;
+    }
+    .scrubber-hud.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -100%) scale(1);
+    }
+    .scrubber-hud-card {
+      background: rgba(11, 19, 34, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid var(--border-focus);
+      border-radius: 14px;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.85), 0 0 24px var(--primary-glow);
+      padding: 9px 16px 11px;
+      min-width: 144px;
+      text-align: center;
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .scrubber-hud-card::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 7px solid var(--border-focus);
+    }
+    .scrubber-hud-badge {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .scrubber-hud-value-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 5px;
+      line-height: 1;
+      margin: 2px 0 4px;
+    }
+    .scrubber-hud-val {
+      font-family: var(--bn);
+      font-size: 36px;
+      font-weight: 800;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+      min-width: 48px;
+    }
+    .scrubber-hud-unit {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .scrubber-hud-delta {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+    }
+    .scrubber-hud-delta.pos {
+      background: rgba(16, 185, 129, 0.22);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .scrubber-hud-delta.neg {
+      background: rgba(244, 63, 94, 0.22);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.35);
+    }
+    .scrubber-ruler-track {
+      position: relative;
+      height: 12px;
+      overflow: hidden;
+      margin-top: 2px;
+      border-radius: 5px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .scrubber-ruler-center-marker {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--primary);
+      transform: translateX(-50%);
+      z-index: 2;
+      box-shadow: 0 0 6px var(--primary);
+    }
+    .scrubber-ruler-ticks {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 480px;
+      transform: translateX(-50%);
+      background-image: repeating-linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.22) 0px,
+        rgba(255, 255, 255, 0.22) 1px,
+        transparent 1px,
+        transparent 8px,
+        rgba(251, 191, 36, 0.65) 8px,
+        rgba(251, 191, 36, 0.65) 2px,
+        transparent 10px,
+        transparent 16px
+      );
+      will-change: transform;
     }
 
     /* Set Check Button: Compact 38x38px */
@@ -14321,6 +14474,7 @@
         renderDayPickerDropdown();
       }
       initAudioDeviceDetection();
+      initScrubberController();
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', (event) => {
           if (event.data && (event.data.type === 'FORCE_UPDATE' || event.data.type === 'SW_ACTIVATED')) {
@@ -14328,7 +14482,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev28').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev29').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -15395,6 +15549,207 @@
       }
     }
 
+    // ==========================================
+    // 5. SELECTOR TÁCTIL HÁPTICO POR DESPLAZAMIENTO (SCRUBBER WHEEL)
+    // ==========================================
+    let scrubberState = {
+      activeInput: null,
+      pointerId: null,
+      startX: 0,
+      startY: 0,
+      initialVal: 0,
+      lastEmittedVal: 0,
+      isKg: false,
+      isScrubbing: false,
+      gestureDecided: false,
+      suppressClick: false
+    };
+
+    function updateScrubberHud(clientX, clientY, currentVal, origVal, isKgMetric, dx) {
+      const hud = document.getElementById('scrubber-hud');
+      if (!hud) return;
+
+      const hudWidth = 148;
+      const clampedX = Math.max(hudWidth / 2 + 10, Math.min(window.innerWidth - (hudWidth / 2 + 10), clientX));
+      const hudY = Math.max(80, clientY - 55);
+
+      hud.style.left = `${clampedX}px`;
+      hud.style.top = `${hudY}px`;
+
+      const valEl = document.getElementById('scrubberHudVal');
+      const unitEl = document.getElementById('scrubberHudUnit');
+      const badgeTextEl = document.getElementById('scrubberHudBadgeText');
+      const deltaEl = document.getElementById('scrubberHudDelta');
+      const ticksEl = document.getElementById('scrubberRulerTicks');
+
+      if (valEl) valEl.textContent = currentVal;
+      if (unitEl) unitEl.textContent = isKgMetric ? 'kg' : 'reps';
+      if (badgeTextEl) badgeTextEl.textContent = isKgMetric ? 'PESO (KG)' : 'REPETICIONES';
+
+      if (deltaEl) {
+        const diff = Math.round((currentVal - origVal) * 10) / 10;
+        deltaEl.className = 'scrubber-hud-delta';
+        if (diff > 0) {
+          deltaEl.classList.add('pos');
+          deltaEl.textContent = `+${diff} ${isKgMetric ? 'kg' : 'reps'}`;
+        } else if (diff < 0) {
+          deltaEl.classList.add('neg');
+          deltaEl.textContent = `${diff} ${isKgMetric ? 'kg' : 'reps'}`;
+        } else {
+          deltaEl.textContent = '±0 (Sugerido)';
+        }
+      }
+
+      if (ticksEl) {
+        const rulerOffset = -(dx % 160);
+        ticksEl.style.transform = `translateX(calc(-50% + ${rulerOffset}px))`;
+      }
+    }
+
+    function showScrubberHud(input, isKgMetric, origVal, clientX, clientY) {
+      const hud = document.getElementById('scrubber-hud');
+      if (!hud) return;
+      updateScrubberHud(clientX, clientY, origVal, origVal, isKgMetric, 0);
+      hud.classList.add('active');
+    }
+
+    function hideScrubberHud() {
+      const hud = document.getElementById('scrubber-hud');
+      if (hud) hud.classList.remove('active');
+    }
+
+    function initScrubberController() {
+      document.addEventListener('pointerdown', (e) => {
+        if (e.button !== undefined && e.button !== 0) return;
+        const input = e.target.closest('.set-input.input-kg, .set-input.input-reps');
+        if (!input) return;
+        if (scrubberState.isScrubbing) return;
+
+        const isKg = input.classList.contains('input-kg');
+        const rawVal = (input.value || '').trim();
+        const placeholderVal = input.getAttribute('placeholder') || '0';
+        let baseVal = 0;
+        if (rawVal !== '') {
+          baseVal = parseFloat(rawVal.replace(',', '.')) || 0;
+        } else {
+          baseVal = parseFloat(placeholderVal.replace(',', '.')) || 0;
+        }
+
+        scrubberState.activeInput = input;
+        scrubberState.pointerId = e.pointerId;
+        scrubberState.startX = e.clientX;
+        scrubberState.startY = e.clientY;
+        scrubberState.initialVal = baseVal;
+        scrubberState.lastEmittedVal = baseVal;
+        scrubberState.isKg = isKg;
+        scrubberState.isScrubbing = false;
+        scrubberState.gestureDecided = false;
+        scrubberState.suppressClick = false;
+      }, { passive: true });
+
+      document.addEventListener('pointermove', (e) => {
+        if (!scrubberState.activeInput || e.pointerId !== scrubberState.pointerId) return;
+
+        const dx = e.clientX - scrubberState.startX;
+        const dy = e.clientY - scrubberState.startY;
+
+        if (!scrubberState.gestureDecided) {
+          // Discriminador de gestos:
+          // Movimiento vertical dominante -> Ceder al scroll nativo
+          if (Math.abs(dy) > 7 && Math.abs(dy) > Math.abs(dx)) {
+            scrubberState.gestureDecided = true;
+            scrubberState.activeInput = null;
+            return;
+          }
+          // Movimiento horizontal dominante -> Activar Scrubber
+          if (Math.abs(dx) > 6 && Math.abs(dx) >= Math.abs(dy)) {
+            scrubberState.gestureDecided = true;
+            scrubberState.isScrubbing = true;
+            scrubberState.suppressClick = true;
+            try {
+              scrubberState.activeInput.setPointerCapture(scrubberState.pointerId);
+            } catch (err) {}
+            // Evitar que el teclado virtual se abra al arrastrar
+            scrubberState.activeInput.blur();
+            scrubberState.activeInput.classList.add('scrubbing-active');
+            showScrubberHud(scrubberState.activeInput, scrubberState.isKg, scrubberState.initialVal, e.clientX, e.clientY);
+          }
+        }
+
+        if (scrubberState.isScrubbing) {
+          if (e.cancelable) e.preventDefault();
+
+          let newVal;
+          if (!scrubberState.isKg) {
+            // Repeticiones: 1 repetición por cada 14px
+            const deltaReps = Math.round(dx / 14);
+            newVal = Math.max(0, Math.min(99, Math.round(scrubberState.initialVal + deltaReps)));
+          } else {
+            // Peso: saltos de 1 kg con aceleración progresiva
+            const sign = dx >= 0 ? 1 : -1;
+            const absDx = Math.abs(dx);
+            let deltaKg;
+            if (absDx <= 36) {
+              deltaKg = Math.round(absDx / 12);
+            } else {
+              deltaKg = Math.round(36 / 12 + Math.pow((absDx - 36) / 13, 1.25));
+            }
+            newVal = Math.max(0, Math.min(999, Math.round(scrubberState.initialVal + sign * deltaKg)));
+          }
+
+          if (newVal !== scrubberState.lastEmittedVal) {
+            scrubberState.lastEmittedVal = newVal;
+            scrubberState.activeInput.value = newVal;
+            // Micro-háptica táctil
+            try {
+              if (navigator.vibrate) navigator.vibrate(8);
+            } catch (err) {}
+            // Disparar lógica de serie (actualizar 1RM, temporizador si aplica)
+            handleSetInput(scrubberState.activeInput);
+          }
+
+          updateScrubberHud(e.clientX, e.clientY, newVal, scrubberState.initialVal, scrubberState.isKg, dx);
+        }
+      }, { passive: false });
+
+      function endScrubber(e) {
+        if (!scrubberState.activeInput) return;
+        if (e && scrubberState.pointerId !== null && e.pointerId !== scrubberState.pointerId) return;
+
+        if (scrubberState.isScrubbing) {
+          try {
+            scrubberState.activeInput.releasePointerCapture(scrubberState.pointerId);
+          } catch (err) {}
+          scrubberState.activeInput.classList.remove('scrubbing-active');
+          hideScrubberHud();
+          scheduleSaveWorkoutState();
+          setTimeout(() => {
+            scrubberState.suppressClick = false;
+          }, 250);
+        }
+
+        scrubberState.activeInput = null;
+        scrubberState.isScrubbing = false;
+        scrubberState.gestureDecided = false;
+        scrubberState.pointerId = null;
+      }
+
+      document.addEventListener('pointerup', endScrubber);
+      document.addEventListener('pointercancel', endScrubber);
+
+      // Suprimir el evento click que se dispara al soltar el dedo tras el arrastre
+      document.addEventListener('click', (e) => {
+        if (scrubberState.suppressClick) {
+          const input = e.target.closest('.set-input.input-kg, .set-input.input-reps');
+          if (input) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+        }
+      }, true);
+    }
+
   </script>
   <script src="./watch_bridge.js"></script>
   <!-- ==========================================
@@ -15559,6 +15914,27 @@
         </div>
       </div>
     </div>
+
+  <!-- ==========================================
+       HUD FLOTANTE: SELECTOR POR DESPLAZAMIENTO (SCRUBBER)
+       ========================================== -->
+  <div id="scrubber-hud" class="scrubber-hud" aria-hidden="true">
+    <div class="scrubber-hud-card">
+      <div class="scrubber-hud-badge" id="scrubberHudBadge">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h16M12 4v16"/></svg>
+        <span id="scrubberHudBadgeText">REPETICIONES</span>
+      </div>
+      <div class="scrubber-hud-value-row">
+        <span class="scrubber-hud-val" id="scrubberHudVal">8</span>
+        <span class="scrubber-hud-unit" id="scrubberHudUnit">reps</span>
+      </div>
+      <div class="scrubber-hud-delta" id="scrubberHudDelta">±0</div>
+      <div class="scrubber-ruler-track">
+        <div class="scrubber-ruler-center-marker"></div>
+        <div class="scrubber-ruler-ticks" id="scrubberRulerTicks"></div>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
