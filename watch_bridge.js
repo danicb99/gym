@@ -1101,7 +1101,7 @@
     if (!toast) {
       toast = document.createElement('div');
       toast.id = 'watchSyncToast';
-      toast.style.cssText = 'position:fixed;bottom:85px;left:50%;transform:translateX(-50%);background:#0f172a;color:#38bdf8;padding:10px 18px;border-radius:24px;border:1px solid #0284c7;font-size:14px;font-weight:600;z-index:999999;box-shadow:0 8px 24px rgba(0,0,0,0.5);display:flex;align-items:center;gap:8px;transition:opacity 0.3s;pointer-events:none;';
+      toast.style.cssText = 'position:fixed;bottom:85px;left:50%;transform:translateX(-50%);background:#0f172a;color:#38bdf8;padding:10px 18px;border-radius:10px;border:1px solid #0284c7;font-size:14px;font-weight:600;z-index:999999;box-shadow:0 8px 24px rgba(0,0,0,0.5);display:flex;align-items:center;gap:8px;transition:opacity 0.3s;pointer-events:none;';
       document.body.appendChild(toast);
     }
     toast.innerText = text;
@@ -1145,7 +1145,7 @@
       if (headerContainer) {
         pill = document.createElement('div');
         pill.id = 'watchSyncPill';
-        pill.style.cssText = 'display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:5px 10px;border-radius:14px;background:rgba(15,23,42,0.9);border:1px solid rgba(56,189,248,0.4);color:#94a3b8;cursor:pointer;white-space:nowrap;user-select:none;margin-left:auto;transition:all 0.2s ease;';
+        pill.style.cssText = 'display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:5px 10px;border-radius:10px;background:rgba(15,23,42,0.9);border:1px solid rgba(56,189,248,0.4);color:#94a3b8;cursor:pointer;white-space:nowrap;user-select:none;margin-left:auto;transition:all 0.2s ease;';
         pill.onclick = () => {
           openWatchSyncModal();
         };
@@ -1239,14 +1239,14 @@
               <div style="font-size:12px;color:#94a3b8;">Amazfit Active 2 • VigorexiApp v1.5.0</div>
             </div>
           </div>
-          <button onclick="window.VigorexiWatchSync.closeModal()" style="background:#1e293b;border:none;color:#94a3b8;font-size:18px;width:32px;height:32px;border-radius:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+          <button onclick="window.VigorexiWatchSync.closeModal()" style="background:#1e293b;border:none;color:#94a3b8;font-size:18px;width:32px;height:32px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
         </div>
 
         <!-- Estado en tiempo real -->
         <div style="background:#1e293b;border-radius:16px;padding:14px;margin-bottom:16px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
             <span style="font-size:13px;color:#94a3b8;">Estado del enlace:</span>
-            <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px;background:${statusBg};color:${statusBadgeColor};border:1px solid ${statusBadgeColor}44;">
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:8px;background:${statusBg};color:${statusBadgeColor};border:1px solid ${statusBadgeColor}44;">
               <span style="width:7px;height:7px;border-radius:50%;background:${statusBadgeColor};"></span>
               ${statusLabel}
             </span>
@@ -1259,8 +1259,8 @@
           </div>
 
           <div style="display:flex;gap:8px;margin-top:14px;">
-            <button id="btnForceSyncNow" style="flex:1;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;border:none;padding:9px 12px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;">Forzar Sync</button>
-            <button id="btnReconnectSse" style="background:#334155;color:#f8fafc;border:none;padding:9px 12px;border-radius:12px;font-size:12px;font-weight:600;cursor:pointer;">🔄 Reconectar</button>
+            <button id="btnForceSyncNow" style="flex:1;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;border:none;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">Forzar Sync</button>
+            <button id="btnReconnectSse" style="background:#334155;color:#f8fafc;border:none;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">🔄 Reconectar</button>
           </div>
         </div>
 
@@ -1310,7 +1310,7 @@
               <label style="color:#cbd5e1;display:block;margin-bottom:4px;font-size:11px;">Token de Autorización Bearer (Opcional):</label>
               <input type="password" id="syncTokenInput" value="${cfg.token}" placeholder="Token para servidor privado" style="width:100%;box-sizing:border-box;background:#090d16;border:1px solid #334155;border-radius:8px;padding:6px 10px;color:#f8fafc;font-size:12px;">
             </div>
-            <button id="btnSaveAdvanced" style="align-self:flex-end;background:#38bdf8;color:#090d16;border:none;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;margin-top:4px;">Guardar servidor</button>
+            <button id="btnSaveAdvanced" style="align-self:flex-end;background:#38bdf8;color:#090d16;border:none;padding:6px 14px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;margin-top:4px;">Guardar servidor</button>
           </div>
         </details>
       </div>
