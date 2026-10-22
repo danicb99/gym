@@ -7,14 +7,20 @@ const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
 
 console.log('====================================================');
-console.log('🧪 VigorexiApp - Test de Marcado y Auto-Colapso (rev21)');
+console.log('🧪 VigorexiApp - Test de Marcado y Auto-Colapso (rev22)');
 console.log('====================================================\n');
 
 // 1. Verificación de versiones
 console.log('📦 1. Verificación de Versiones de Caché:');
-assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev21'/.test(sw), 'sw.js no tiene rev21');
-assert(/sw\.js\?v=1\.8\.4-rev21/.test(html), 'index.html no registra rev21');
-console.log('  ✓ Cache rev21 sincronizada en index.html y sw.js');
+assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev22'/.test(sw), 'sw.js no tiene rev22');
+assert(/sw\.js\?v=1\.8\.4-rev22/.test(html), 'index.html no registra rev22');
+console.log('  ✓ Cache rev22 sincronizada en index.html y sw.js');
+
+// 2. Verificación de colores amarillos en checks de serie
+console.log('\n💛 2. Verificación de Check Buttons Amarillos:');
+assert(/\.set-row\.done\s*\.check-btn\s*\{[\s\S]*?#fbbf24/.test(html), 'El botón de serie completada no tiene amarillo #fbbf24');
+assert(/\.set-row\.done\s*\{[\s\S]*?rgba\(251,\s*191,\s*36/.test(html), 'La fila de serie completada no tiene tinte dorado');
+console.log('  ✓ Botones de serie completada estilizados en degradado dorado (#fbbf24 / #d97706) con stroke oscuro');
 
 // 2. Verificación de auto-colapso al completar ejercicio
 console.log('\n🗂️ 2. Verificación de Auto-Colapso al Completar Todas las Series:');

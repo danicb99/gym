@@ -717,7 +717,7 @@
       background: rgba(255, 255, 255, 0.045);
     }
     .set-row.done {
-      background: rgba(16, 185, 129, 0.08);
+      background: rgba(251, 191, 36, 0.08);
     }
     .set-row.active-row {
       background: rgba(56, 189, 248, 0.12) !important;
@@ -815,15 +815,15 @@
       transform: scale(0.90);
     }
     .set-row.done .check-btn {
-      background: linear-gradient(135deg, #10b981, #059669);
-      border-color: #34d399;
-      color: #ffffff;
+      background: linear-gradient(135deg, #fbbf24, #d97706);
+      border-color: #fbbf24;
+      color: #060a13;
       border-radius: 10px;
-      box-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+      box-shadow: 0 0 14px rgba(251, 191, 36, 0.45);
     }
     .set-row.done .check-btn svg {
       transform: scale(1.12);
-      stroke: #ffffff;
+      stroke: #060a13;
     }
 
     /* Active Row & Quick Stepper Bar */
@@ -895,9 +895,9 @@
       color: #060a12;
     }
     .btn-step-check {
-      background: linear-gradient(135deg, #10b981, #059669);
-      border: 1px solid #34d399;
-      color: #fff;
+      background: linear-gradient(135deg, #fbbf24, #d97706);
+      border: 1px solid #fbbf24;
+      color: #060a13;
       border-radius: 10px;
       width: 50px;
       height: 48px;
@@ -2565,18 +2565,18 @@
       border-radius: 8px;
     }
     .warmup-row.done {
-      background: rgba(16, 185, 129, 0.04);
+      background: rgba(251, 191, 36, 0.04);
       opacity: 0.65;
     }
     .warmup-row.done .warmup-label {
-      color: #10b981;
-      background: rgba(16, 185, 129, 0.15);
-      border-color: rgba(16, 185, 129, 0.3);
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.15);
+      border-color: rgba(251, 191, 36, 0.3);
     }
     .warmup-row.done .warmup-check-btn {
-      background: rgba(16, 185, 129, 0.2);
-      border-color: rgba(16, 185, 129, 0.4);
-      color: #10b981;
+      background: rgba(251, 191, 36, 0.2);
+      border-color: rgba(251, 191, 36, 0.4);
+      color: #fbbf24;
     }
     .warmup-skip-hint {
       font-size: 0.68rem;
@@ -13946,7 +13946,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev21').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev22').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
