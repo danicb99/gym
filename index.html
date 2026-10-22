@@ -2923,6 +2923,22 @@
       text-align: center;
       white-space: nowrap;
     }
+    .header-est-noss {
+      color: #64748b;
+      font-weight: 500;
+      margin-left: 2px;
+      opacity: 0.9;
+    }
+    @media (max-width: 390px) {
+      .app-brand-sub {
+        font-size: 0.60rem;
+      }
+    }
+    @media (max-width: 345px) {
+      .app-brand-sub {
+        font-size: 0.54rem;
+      }
+    }
     .header-top-right {
       display: flex;
       align-items: center;
@@ -3769,7 +3785,7 @@
 
       <div class="header-brand-wrap" onclick="switchMainTab('train')" title="Ir a Entrenamiento">
         <span class="app-brand-title">VigorexiApp</span>
-        <span class="app-brand-sub" id="headerRoutineSub">Full Body · 3 días · <span id="headerEstDuration">~42 min</span></span>
+        <span class="app-brand-sub" id="headerRoutineSub">Full Body · 3 días · <span id="headerEstDuration">~42 min</span> <span id="headerEstDurationNoSS" class="header-est-noss" title="Tiempo estimado sin superseries (series lineales individuales)">(sin SS: ~57 min)</span></span>
       </div>
 
       <div class="header-top-right">
@@ -9945,12 +9961,7 @@
         };
         chipLabel.innerText = dayNames[dayId] || dayId;
       }
-      const routineSub = document.getElementById('headerRoutineSub');
-      if (routineSub) {
-        const isFB = dayId.startsWith('fullbody');
-        const durEst = calculateDayEstimatedDuration(dayId, isExpressMode);
-        routineSub.innerHTML = isFB ? `Full Body · 3 días · <span id="headerEstDuration">~${durEst} min</span>` : `Torso/Pierna · 4 días · <span id="headerEstDuration">~${durEst} min</span>`;
-      }
+      updateHeaderEstimatedDuration(dayId);
 
       if (WORKOUT_DAYS.includes(dayId)) {
         lastActiveWorkoutDay = dayId;
@@ -10634,7 +10645,7 @@
       });
     }
 
-    function calculateDayEstimatedDuration(dayId, isExpress = false) {
+    function calculateDayEstimatedDuration(dayId, isExpress = false, withoutSupersets = false) {
       const day = ROUTINE_SLOTS[dayId];
       if (!day || !day.slots) return isExpress ? 33 : 43;
 
@@ -10646,7 +10657,7 @@
       day.slots.forEach(slot => {
         if (isExpress && slot.isSkippable) return;
 
-        if (slot.pairSlotId) {
+        if (!withoutSupersets && slot.pairSlotId) {
           if (processedPairs.has(slot.slotId)) return;
           processedPairs.add(slot.slotId);
           processedPairs.add(slot.pairSlotId);
@@ -10674,18 +10685,37 @@
             totalSeconds += numSets * (40 + pairRest + 40 + pairRest) - pairRest + transitionTime;
           }
         } else {
-          // Ejercicio individual (Sentadilla, RDL, Crunch)
+          // Ejercicio individual (Sentadilla, RDL, Crunch, o si se calcula sin superseries)
           const numSets = (slot.sets || []).length;
           const isIso = slot.defaultExId === 'plancha';
           const workSec = isIso ? 50 : 40;
           let exRest = 120;
-          if (slot.defaultExId === 'squat' || slot.defaultExId === 'rdl') exRest = 135;
-          else if (slot.defaultExId === 'crunch') exRest = 60;
+          const catEx = (typeof EXERCISE_CATALOG !== 'undefined') && EXERCISE_CATALOG[slot.defaultExId];
+          if (withoutSupersets && catEx && catEx.rest) {
+            exRest = catEx.rest;
+          } else {
+            if (slot.defaultExId === 'squat' || slot.defaultExId === 'rdl') exRest = 135;
+            else if (slot.defaultExId === 'crunch') exRest = 60;
+          }
           totalSeconds += numSets * workSec + (numSets - 1) * exRest + transitionTime;
         }
       });
 
       return Math.round(totalSeconds / 60);
+    }
+
+    function updateHeaderEstimatedDuration(dayId) {
+      const routineSub = document.getElementById('headerRoutineSub');
+      if (!routineSub) return;
+      const targetDay = dayId || (typeof lastActiveWorkoutDay !== 'undefined' && lastActiveWorkoutDay) || (currentProgram === 'fullbody' ? 'fullbodyA' : 'torsoA');
+      const isFB = targetDay.startsWith('fullbody');
+      const durEst = calculateDayEstimatedDuration(targetDay, isExpressMode, false);
+      if (isFB) {
+        const durNoSS = calculateDayEstimatedDuration(targetDay, isExpressMode, true);
+        routineSub.innerHTML = `Full Body · 3 días · <span id="headerEstDuration">~${durEst} min</span> <span id="headerEstDurationNoSS" class="header-est-noss" title="Tiempo estimado sin superseries (series lineales individuales)">(sin SS: ~${durNoSS} min)</span>`;
+      } else {
+        routineSub.innerHTML = `Torso/Pierna · 4 días · <span id="headerEstDuration">~${durEst} min</span>`;
+      }
     }
 
     function updateAllEstimatedDurations() {
@@ -10697,6 +10727,7 @@
           chip.textContent = isExpressMode ? `⏱️ ~${estMin}m (Exprés)` : `⏱️ ~${estMin} min`;
         }
       });
+      updateHeaderEstimatedDuration();
     }
 
     function getConsecutiveTrainingAlert(currentDayId) {
@@ -10854,6 +10885,8 @@
         }
       }
 
+      if (!chip) return;
+
       const timerSvg = '<svg class="timer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/><path d="M12 2v3"/></svg>';
       if (!startTime) {
         const lastSes = getLastSessionForDay(dayId);
@@ -10993,144 +11026,178 @@
 
     // Set Completion Logic + Auto-collapse finished exercise + Overload & PR Engine
     function completeSet(btn, restSeconds) {
+      if (!btn) return;
       const row = btn.closest('.set-row');
+      if (!row) return;
       const card = btn.closest('.exercise-card');
       const section = btn.closest('.day-content');
       const slotId = card ? card.getAttribute('data-slot') : '';
       const exId = card ? card.getAttribute('data-current-ex') : '';
       const sIdx = parseInt(row.getAttribute('data-set-num')) - 1;
 
-      if (section) startSessionTimerIfNeeded(section.id);
+      // Iniciar temporizador de sesión de forma segura
+      try {
+        if (section) startSessionTimerIfNeeded(section.id);
+      } catch (e) {
+        console.error('[SessionTimer] Error al iniciar temporizador:', e);
+      }
 
+      // Marcar/desmarcar inmediatamente la fila
       const isDone = row.classList.toggle('done');
       
       // Haptic feedback
-      if (navigator.vibrate) {
-        navigator.vibrate(isDone ? [35] : [15]);
-      }
+      try {
+        if (navigator.vibrate) {
+          navigator.vibrate(isDone ? [35] : [15]);
+        }
+      } catch (e) {}
 
       const kgInp = row.querySelector('.input-kg');
       const repsInp = row.querySelector('.input-reps');
+
+      if (!workoutState.inputs) workoutState.inputs = {};
+      if (!workoutState.setTimestamps) workoutState.setTimestamps = {};
 
       if (isDone) {
         // Asegurar que si el input tiene valor pre-cargado (o placeholder), quede guardado formalmente
         if (kgInp) {
           if (!kgInp.value && kgInp.placeholder) kgInp.value = kgInp.placeholder;
-          workoutState.inputs[`${slotId}_${sIdx}_kg`] = kgInp.value.trim();
+          workoutState.inputs[`${slotId}_${sIdx}_kg`] = (kgInp.value || '').trim();
         }
         if (repsInp) {
           if (!repsInp.value && repsInp.placeholder) repsInp.value = repsInp.placeholder;
-          workoutState.inputs[`${slotId}_${sIdx}_reps`] = repsInp.value.trim();
-          if (!workoutState.setTimestamps) workoutState.setTimestamps = {};
+          workoutState.inputs[`${slotId}_${sIdx}_reps`] = (repsInp.value || '').trim();
           workoutState.setTimestamps[`${slotId}_${sIdx}`] = Date.now();
         }
 
         // 1RM Estimado y detección de nuevo Récord Personal (PR)
-        const curKg = parseFloat(kgInp?.value) || 0;
-        const curReps = parseInt(repsInp?.value, 10) || 0;
-        const curEx = EXERCISE_CATALOG[exId];
-        const historyLogs = (workoutState.exerciseHistory && workoutState.exerciseHistory[exId]) ? workoutState.exerciseHistory[exId] : [];
-        const prResult = evaluatePR(curEx, curKg, curReps, historyLogs);
-        if (prResult.isPR && prResult.kind === '1rm') {
-          markExercisePR(exId, '1rm', prResult.value, prResult.prev);
-        } else if (prResult.isPR && prResult.kind === 'seconds') {
-          if (markExercisePR(exId, 'seconds', prResult.value, prResult.prev)) {
-            showToast(`🏆 ¡Nuevo Récord de Tiempo! ${curReps} s (+${curReps - prResult.prev}s)`);
+        try {
+          const rawKg = (kgInp && kgInp.value) ? String(kgInp.value).replace(',', '.') : '0';
+          const curKg = parseFloat(rawKg) || 0;
+          const curReps = parseInt(repsInp?.value, 10) || 0;
+          const curEx = EXERCISE_CATALOG[exId];
+          const historyLogs = (workoutState.exerciseHistory && workoutState.exerciseHistory[exId]) ? workoutState.exerciseHistory[exId] : [];
+          const prResult = evaluatePR(curEx, curKg, curReps, historyLogs);
+          if (prResult.isPR && prResult.kind === '1rm') {
+            markExercisePR(exId, '1rm', prResult.value, prResult.prev);
+          } else if (prResult.isPR && prResult.kind === 'seconds') {
+            if (markExercisePR(exId, 'seconds', prResult.value, prResult.prev)) {
+              showToast(`🏆 ¡Nuevo Récord de Tiempo! ${curReps} s (+${curReps - prResult.prev}s)`);
+            }
+          } else if (prResult.isPR && prResult.kind === 'reps') {
+            markExercisePR(exId, 'reps', prResult.value, prResult.prev);
           }
-        } else if (prResult.isPR && prResult.kind === 'reps') {
-          markExercisePR(exId, 'reps', prResult.value, prResult.prev);
+          refreshMascotBadge();
+        } catch (e) {
+          console.error('[PR] Error al evaluar récord personal:', e);
         }
-        refreshMascotBadge();
       }
 
-      if (isDone) {
-        updateRow1RMBadge(row);
-      }
+      try {
+        if (isDone) {
+          updateRow1RMBadge(row);
+        }
+      } catch (e) {}
 
       // Check if all sets of this card are completed
-      checkExerciseCardCompletion(card, isDone);
-      updateCardSummaryStatus(card);
+      try {
+        checkExerciseCardCompletion(card, isDone);
+        updateCardSummaryStatus(card);
+      } catch (e) {
+        console.error('[CardCompletion] Error:', e);
+      }
 
       // Auto-accordion: if this card is now complete, collapse it and auto-expand next!
-      const cardRows = card.querySelectorAll('.set-row');
-      const cardDone = card.querySelectorAll('.set-row.done');
-      if (cardRows.length > 0 && cardDone.length >= cardRows.length) {
-        // card collapse moved inside if (nextPending)
-        
+      try {
+        if (card && section) {
+          const cardRows = card.querySelectorAll('.set-row');
+          const cardDone = card.querySelectorAll('.set-row.done');
+          if (cardRows.length > 0 && cardDone.length >= cardRows.length) {
+            let allCards = Array.from(section.querySelectorAll('.exercise-card'));
+            if (document.body.classList.contains('express-mode')) {
+              allCards = allCards.filter(c => c.getAttribute('data-skippable') !== 'true');
+            }
+            const nextPending = allCards.find(c => {
+              const cDone = c.querySelectorAll('.set-row.done').length;
+              const cTot = c.querySelectorAll('.set-row').length;
+              return cTot > 0 && cDone < cTot;
+            });
 
-        let allCards = Array.from(section.querySelectorAll('.exercise-card'));
-        if (document.body.classList.contains('express-mode')) {
-          allCards = allCards.filter(c => c.getAttribute('data-skippable') !== 'true');
-        }
-        const nextPending = allCards.find(c => {
-          const cDone = c.querySelectorAll('.set-row.done').length;
-          const cTot = c.querySelectorAll('.set-row').length;
-          return cTot > 0 && cDone < cTot;
-        });
-
-        if (nextPending) {
-          nextPending.classList.remove('collapsed');
-          nextPending.classList.add('manually-expanded');
-          setTimeout(() => {
-            nextPending.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          }, 200);
-        }
-      }
-
-      updateProgress();
-      saveWorkoutState();
-
-      // Check if ALL sets in the entire day are now completed!
-      let allRowsInDay = section ? Array.from(section.querySelectorAll('.set-row')) : [];
-      if (document.body.classList.contains('express-mode')) {
-        allRowsInDay = allRowsInDay.filter(r => !r.closest('.exercise-card[data-skippable="true"]'));
-      }
-      const isDayFullyFinished = (allRowsInDay.length > 0) && allRowsInDay.every(r => r.classList.contains('done'));
-
-      if (isDone && isDayFullyFinished) {
-        // ULTIMA SERIE DEL ENTRENAMIENTO COMPLETO:
-        // 1. NO iniciar contador de descanso y detenerlo si estuviera activo
-        resetTimerDock();
-
-        // 2. Feedback háptico y celebración
-        if (navigator.vibrate) {
-          navigator.vibrate([70, 50, 70, 50, 150]);
-        }
-        showToast('¡Entrenamiento completado al 100%! Guardando marcas...');
-
-        // 3. Ejecutar archivo de sesión automático
-        const startTime = workoutState.sessionStartTime ? workoutState.sessionStartTime[section.id] : null;
-        let durationMin = 45;
-        if (startTime) {
-          durationMin = Math.max(1, Math.round((Date.now() - startTime) / 60000));
-        }
-        const sessionRecord = executeDayArchive(section.id, durationMin, false, true);
-
-        // 4. Mostrar la tarjeta de fin de entreno ("Flex Card")
-        setTimeout(() => {
-          openWorkoutSummaryModal(sessionRecord || getLastSession());
-        }, 350);
-
-      } else if (isDone) {
-        const curSlotId = card ? card.getAttribute('data-slot') : '';
-        const slotCfg = getSlotConfig(curSlotId);
-        const titleEl = card ? card.querySelector('.ex-title') : null;
-        const exName = titleEl ? titleEl.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim() : '';
-        const setInfo = `Serie ${sIdx + 1}`;
-
-        if (restSeconds) {
-          // Iniciar temporizador de descanso estándar del ejercicio
-          triggerRest(restSeconds, exName, setInfo);
-          if (curSlotId === 'torsoA_6') {
-            showToast('Biserie: 45s de descanso - Toca Bíceps');
-          } else if (curSlotId === 'torsoA_7') {
-            showToast('Biserie: 45s de descanso - Toca Tríceps');
-          } else if (curSlotId === 'torsoB_6') {
-            showToast('Biserie: 45s de descanso - Toca Curl Martillo');
-          } else if (curSlotId === 'torsoB_7') {
-            showToast('Biserie: 45s de descanso - Toca Press Francés');
+            if (nextPending) {
+              nextPending.classList.remove('collapsed');
+              nextPending.classList.add('manually-expanded');
+              setTimeout(() => {
+                nextPending.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }, 200);
+            }
           }
         }
+      } catch (e) {
+        console.error('[Accordion] Error:', e);
+      }
+
+      try {
+        updateProgress();
+        saveWorkoutState();
+      } catch (e) {
+        console.error('[Save] Error al guardar progreso:', e);
+      }
+
+      // Check if ALL sets in the entire day are now completed!
+      try {
+        let allRowsInDay = section ? Array.from(section.querySelectorAll('.set-row')) : [];
+        if (document.body.classList.contains('express-mode')) {
+          allRowsInDay = allRowsInDay.filter(r => !r.closest('.exercise-card[data-skippable="true"]'));
+        }
+        const isDayFullyFinished = (allRowsInDay.length > 0) && allRowsInDay.every(r => r.classList.contains('done'));
+
+        if (isDone && isDayFullyFinished) {
+          // ULTIMA SERIE DEL ENTRENAMIENTO COMPLETO:
+          // 1. NO iniciar contador de descanso y detenerlo si estuviera activo
+          resetTimerDock();
+
+          // 2. Feedback háptico y celebración
+          if (navigator.vibrate) {
+            navigator.vibrate([70, 50, 70, 50, 150]);
+          }
+          showToast('¡Entrenamiento completado al 100%! Guardando marcas...');
+
+          // 3. Ejecutar archivo de sesión automático
+          const startTime = workoutState.sessionStartTime ? workoutState.sessionStartTime[section.id] : null;
+          let durationMin = 45;
+          if (startTime) {
+            durationMin = Math.max(1, Math.round((Date.now() - startTime) / 60000));
+          }
+          const sessionRecord = executeDayArchive(section.id, durationMin, false, true);
+
+          // 4. Mostrar la tarjeta de fin de entreno ("Flex Card")
+          setTimeout(() => {
+            openWorkoutSummaryModal(sessionRecord || getLastSession());
+          }, 350);
+
+        } else if (isDone) {
+          const curSlotId = card ? card.getAttribute('data-slot') : '';
+          const slotCfg = getSlotConfig(curSlotId);
+          const titleEl = card ? card.querySelector('.ex-title') : null;
+          const exName = titleEl ? titleEl.innerText.replace(/^\d+[a-z]?\.\s*/i, '').trim() : '';
+          const setInfo = `Serie ${sIdx + 1}`;
+
+          if (restSeconds) {
+            // Iniciar temporizador de descanso estándar del ejercicio
+            triggerRest(restSeconds, exName, setInfo);
+            if (curSlotId === 'torsoA_6') {
+              showToast('Biserie: 45s de descanso - Toca Bíceps');
+            } else if (curSlotId === 'torsoA_7') {
+              showToast('Biserie: 45s de descanso - Toca Tríceps');
+            } else if (curSlotId === 'torsoB_6') {
+              showToast('Biserie: 45s de descanso - Toca Curl Martillo');
+            } else if (curSlotId === 'torsoB_7') {
+              showToast('Biserie: 45s de descanso - Toca Press Francés');
+            }
+          }
+        }
+      } catch (e) {
+        console.error('[Finish/Rest] Error:', e);
       }
     }
 
@@ -13107,6 +13174,7 @@
       workoutState.inputs = {};
       workoutState.completed = [];
       if (!workoutState.notes) workoutState.notes = {};
+      if (!workoutState.setTimestamps) workoutState.setTimestamps = {};
 
       document.querySelectorAll('.exercise-card').forEach(card => {
         const slotId = card.getAttribute('data-slot');
@@ -13160,6 +13228,8 @@
             coachTiredMode: false
           }, loaded);
           if (!workoutState.notes || typeof workoutState.notes !== 'object') workoutState.notes = {};
+          if (!workoutState.inputs || typeof workoutState.inputs !== 'object') workoutState.inputs = {};
+          if (!workoutState.setTimestamps || typeof workoutState.setTimestamps !== 'object') workoutState.setTimestamps = {};
           if (!COACH_PERSONALITIES.includes(workoutState.coachPersonality)) workoutState.coachPersonality = 'gymbro';
           workoutState.coachTiredMode = workoutState.coachTiredMode === true;
         } catch (e) {
@@ -13872,7 +13942,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev18').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev20').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -14083,11 +14153,7 @@
           };
           chipLabel.innerText = dayNames[defaultDay] || defaultDay;
         }
-        const routineSub = document.getElementById('headerRoutineSub');
-        if (routineSub) {
-          const durEst = calculateDayEstimatedDuration(defaultDay, isExpressMode);
-          routineSub.innerHTML = (newProg === 'fullbody') ? `Full Body · 3 días · <span id="headerEstDuration">~${durEst} min</span>` : `Torso/Pierna · 4 días · <span id="headerEstDuration">~${durEst} min</span>`;
-        }
+        updateHeaderEstimatedDuration(defaultDay);
         if (typeof renderDayPickerDropdown === 'function') {
           renderDayPickerDropdown();
         }
