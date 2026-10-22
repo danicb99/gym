@@ -28,6 +28,7 @@
       --primary: #fbbf24;
       --primary-dark: #d97706;
       --primary-glow: rgba(251, 191, 36, 0.28);
+      --gold: #fbbf24;
       --gold-subtle: rgba(245, 158, 11, 0.10);
       --emerald: #10b981;
       --emerald-glow: rgba(16, 185, 129, 0.35);
@@ -2732,9 +2733,10 @@
     }
     .technique-heading {
       margin: 0 0 6px 0;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
+      font-weight: 800;
       letter-spacing: 0.06em;
-      color: #c084fc;
+      color: var(--amber, #fbbf24);
     }
     .technique-cues-text {
       margin: 0;
@@ -2935,15 +2937,15 @@
     }
     .coach-bubble-layer {
       position: absolute;
-      top: var(--safe-top);
+      top: 0;
       right: 0;
       bottom: 0;
       left: 0;
-      z-index: 2;
+      z-index: 3;
       display: flex;
       align-items: flex-start;
-      justify-content: flex-end;
-      padding: 40px 10px 0;
+      justify-content: center;
+      padding: 4px 12px 0;
       pointer-events: none;
     }
     .coach-bubble {
@@ -3478,8 +3480,11 @@
       background: #11141c;
       border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 20px;
-      max-width: 420px;
+      max-width: 440px;
       width: 100%;
+      max-height: 86vh;
+      display: flex;
+      flex-direction: column;
       padding: 20px 20px 18px 20px;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
       box-sizing: border-box;
@@ -3494,6 +3499,7 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 14px;
+      flex-shrink: 0;
     }
     .info-modal-title {
       font-size: 1.05rem;
@@ -3516,10 +3522,29 @@
       justify-content: center;
       cursor: pointer;
       transition: all 0.15s ease;
+      flex-shrink: 0;
     }
     .info-modal-close:active {
       transform: scale(0.92);
       background: rgba(255, 255, 255, 0.15);
+    }
+    .info-modal-body {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 4px;
+    }
+    .info-modal-body::-webkit-scrollbar {
+      width: 4px;
+    }
+    .info-modal-body::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 4px;
+    }
+    .info-modal-card .technique-heading {
+      color: var(--amber, #fbbf24) !important;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
     }
 
     /* Warmup Rows: Narrow, Compact & Purely Informative (No inputs, no checks) */

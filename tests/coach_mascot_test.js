@@ -132,6 +132,8 @@ test('Globo contextual: markup accesible y estilos de cabecera', () => {
   const bubble = html.match(/\.coach-bubble\s*\{[\s\S]*?\}/);
   assert(layer && /position:\s*absolute/.test(layer[0]), 'La capa no es absoluta');
   assert(layer && /pointer-events:\s*none/.test(layer[0]), 'La capa debe dejar pasar el tacto');
+  assert(layer && /justify-content:\s*center/.test(layer[0]), 'El globo debe centrarse sobre la marca');
+  assert(layer && /padding:\s*4px 12px 0/.test(layer[0]), 'El globo debe quedar en la fila de marca');
   assert(bubble && /max-width:\s*min\(270px/.test(bubble[0]), 'Falta el ancho maximo del globo');
   assert(/\.coach-bubble\.show\s*\{[\s\S]*?pointer-events:\s*auto/.test(html), 'El globo visible debe ser interactivo');
 });
