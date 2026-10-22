@@ -1024,6 +1024,126 @@
       background: rgba(255, 255, 255, 0.15);
     }
 
+    /* Coach Mascota */
+    .coach-avatar {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+    }
+    .coach-briefing {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .coach-brief-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 11px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+    }
+    .coach-brief-row span:first-child {
+      color: var(--text-muted);
+    }
+    .coach-brief-row strong {
+      color: var(--primary);
+    }
+    .coach-section-label {
+      margin: 14px 0 8px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .coach-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .coach-chip {
+      flex: 1 1 0;
+      min-height: 44px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .coach-chip[aria-pressed="true"] {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(251, 191, 36, 0.10);
+    }
+    .coach-overload {
+      margin-top: 14px;
+      border-color: rgba(56, 189, 248, 0.28);
+    }
+    .coach-overload-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--cyan);
+      margin-bottom: 6px;
+    }
+    .coach-ex-name {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 8px;
+    }
+    .coach-advice {
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: #cbd5e1;
+    }
+    .coach-advice strong {
+      color: var(--primary);
+    }
+    .coach-tip {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px dashed rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+    .coach-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 14px;
+    }
+    .coach-done-btn {
+      min-height: 44px;
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      background: rgba(251, 191, 36, 0.12);
+      color: var(--primary);
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .coach-done-btn:active {
+      transform: scale(0.97);
+    }
+
     /* Alternativas Cards in Modal */
     .alt-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 12px; transition: all 0.2s; }
     .alt-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
@@ -2744,18 +2864,33 @@
       justify-self: end;
     }
     .header-mascot-wrap {
-      width: 34px;
-      height: 34px;
+      position: relative;
+      width: 44px;
+      height: 44px;
+      margin: -3px 0;
+      padding: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      background: transparent;
+      border: 0;
+      border-radius: 50%;
+      color: inherit;
+      font: inherit;
       cursor: pointer;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
       transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .header-mascot-wrap:active {
       transform: scale(1.18) rotate(6deg);
+    }
+    .header-mascot-wrap:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
     }
     .header-mascot-img {
       width: 32px;
@@ -2764,6 +2899,39 @@
       filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
       display: block;
       pointer-events: none;
+      -webkit-user-drag: none;
+    }
+    .mascot-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      display: none;
+      pointer-events: none;
+      font-size: 14px;
+      line-height: 1;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+    }
+    .mascot-badge.on {
+      display: block;
+    }
+    .mascot-badge.fatigue {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid var(--bg);
+      box-sizing: content-box;
+      font-size: 0;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .mascot-badge.pr,
+      .mascot-badge.inactive {
+        animation: mascotPulse 1.6s ease-in-out infinite;
+      }
+    }
+    @keyframes mascotPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.16); }
     }
 
     /* Central Watch Sync Pill */
@@ -3473,9 +3641,10 @@
       </div>
 
       <div class="header-top-right">
-        <div class="header-mascot-wrap" title="VigorexiApp" onclick="showToast('💪 ¡A darle duro al entreno!')">
-          <img src="./mascot.png" alt="VigorexiApp Mascot" class="header-mascot-img" width="34" height="34">
-        </div>
+        <button type="button" id="mascotBtn" class="header-mascot-wrap" aria-haspopup="dialog" aria-label="Abrir coach">
+          <img src="./mascot.png" alt="" class="header-mascot-img" width="32" height="32" draggable="false">
+          <span class="mascot-badge" id="mascotBadge" aria-hidden="true"></span>
+        </button>
       </div>
     </div>
 
@@ -8776,6 +8945,41 @@
   </div>
 
   <!-- ==========================================
+       MODAL COACH MASCOTA (Popup Centrado)
+       ========================================== -->
+  <div class="modal-overlay" id="coachModal" onclick="closeCoachModal(event)">
+    <div class="modal-sheet coach-sheet" role="dialog" aria-modal="true" aria-labelledby="coachModalTitle" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <img src="./mascot.png" alt="" class="coach-avatar" width="36" height="36">
+          <div>
+            <div class="modal-title" id="coachModalTitle">Coach Vigorex</div>
+            <div class="modal-subtitle" id="coachSubtitle">Tu colega de entrenamiento</div>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" id="coachCloseBtn" onclick="closeCoachModal()" aria-label="Cerrar coach">✕</button>
+      </div>
+
+      <div class="coach-briefing" id="coachBriefing"></div>
+
+      <div class="coach-section-label">Personalidad</div>
+      <div class="coach-chips" role="group" aria-label="Elegir personalidad del coach">
+        <button type="button" class="coach-chip" data-personality="sargento" aria-pressed="false" onclick="selectCoachPersonality('sargento')">🎖️ Sargento</button>
+        <button type="button" class="coach-chip" data-personality="ciencia" aria-pressed="false" onclick="selectCoachPersonality('ciencia')">🔬 Ciencia</button>
+        <button type="button" class="coach-chip" data-personality="gymbro" aria-pressed="false" onclick="selectCoachPersonality('gymbro')">🤝 Colega</button>
+      </div>
+
+      <div class="guide-card coach-overload" id="coachOverloadCard" style="display: none;"></div>
+
+      <div class="coach-tip" id="coachTip"></div>
+
+      <div class="coach-footer">
+        <button type="button" class="coach-done-btn" onclick="closeCoachModal()">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
        MODAL DE ALTERNATIVAS (Popup Centrado)
        ========================================== -->
   <div class="modal-overlay" id="swapModal" onclick="closeSwapModal(event)">
@@ -8961,8 +9165,179 @@
       customSlots: {},        // slotId -> exId (permanent user swaps)
       tempSlots: {},          // slotId -> exId (temporary for current workout)
       sessionStartTime: {},   // dayId -> timestamp (Date.now())
-      lastActivityTime: {}    // dayId -> timestamp of last input/set marked
+      lastActivityTime: {},   // dayId -> timestamp of last input/set marked
+      coachPersonality: 'gymbro' // 'sargento' | 'ciencia' | 'gymbro' (etiqueta visual: Colega)
     };
+
+    // ==========================================
+    // COACH MASCOTA — HELPERS PUROS (rev13)
+    // ==========================================
+    const COACH_PERSONALITIES = ['sargento', 'ciencia', 'gymbro'];
+
+    // COACH:HELPERS:START
+    let sessionPRSet = new Set();
+    let lastPRInfo = null;
+    let lastCoachDayId = null;
+
+    function resetSessionPR() {
+      sessionPRSet = new Set();
+      lastPRInfo = null;
+    }
+
+    function hasSessionPR() {
+      return sessionPRSet.size > 0;
+    }
+
+    function getLastPRInfo() {
+      return lastPRInfo;
+    }
+
+    function getWeightStep(ex) {
+      return Number(ex && ex.stepKg) || 2.5;
+    }
+
+    function supportsLoadProgression(ex) {
+      if (!ex || ex.metricType === 'isometria') return false;
+      const dose = String(ex.dose || '');
+      if (!/reps?/i.test(dose)) return false;
+      return getExerciseTargetReps(dose).max > 0;
+    }
+
+    function evaluatePR(ex, curKg, curReps, historyLogs) {
+      const logs = Array.isArray(historyLogs) ? historyLogs : [];
+      const kg = Number(curKg) || 0;
+      const reps = Number(curReps) || 0;
+      if (reps <= 0) return { isPR: false, kind: null, value: 0, prev: 0 };
+
+      const isIso = !!(ex && ex.metricType === 'isometria');
+      if (isIso) {
+        let prev = 0;
+        logs.forEach(h => {
+          const v = Number(h && h.bestReps) || 0;
+          if (v > prev) prev = v;
+        });
+        return { isPR: prev > 0 && reps > prev, kind: 'seconds', value: reps, prev };
+      }
+
+      if (kg > 0) {
+        const value = calculate1RM(kg, reps);
+        let prev = 0;
+        logs.forEach(h => {
+          const v = Number(h && h.best1RM) || 0;
+          if (v > prev) prev = v;
+        });
+        return { isPR: prev > 0 && value > prev, kind: '1rm', value, prev };
+      }
+
+      let prev = 0;
+      logs.forEach(h => {
+        if (!h) return;
+        const bestKg = Number(h.bestKg) || 0;
+        if (bestKg > 0) return;
+        const v = Number(h.bestReps) || 0;
+        if (v > prev) prev = v;
+      });
+      return { isPR: prev > 0 && reps > prev, kind: 'reps', value: reps, prev };
+    }
+
+    function markExercisePR(exId, kind, value, prev) {
+      if (!exId || sessionPRSet.has(exId)) return false;
+      sessionPRSet.add(exId);
+      lastPRInfo = { exId: exId, kind: kind, value: value, prev: prev };
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([40, 60, 40]);
+      }
+      return true;
+    }
+
+    function getLastHistorySets(exId) {
+      const hist = workoutState.exerciseHistory && workoutState.exerciseHistory[exId];
+      if (!Array.isArray(hist) || hist.length === 0) return [];
+      const last = hist[hist.length - 1];
+      if (!last || !Array.isArray(last.sets)) return [];
+      return last.sets
+        .map(s => ({ kg: Number(s && s.kg) || 0, reps: Number(s && s.reps) || 0 }))
+        .filter(s => s.reps > 0);
+    }
+
+    function computeDoubleProgression(exId, ex, sets) {
+      const fresh = typeof getFreshOverload === 'function' ? getFreshOverload(exId) : null;
+      if (fresh && Number(fresh.nextKg) > 0) {
+        const kg = Number(fresh.nextKg);
+        const reps = Number(fresh.baseReps) > 0 ? Number(fresh.baseReps) : null;
+        return {
+          source: 'overload',
+          kg: kg,
+          reps: reps,
+          text: `Sugerencia guardada: <strong>${kg} kg${reps ? ` × ${reps} reps` : ''}</strong>. La marcaste al superar el techo.`
+        };
+      }
+
+      if (!ex) {
+        return { source: 'none', kg: 0, reps: 0, text: 'No hay un ejercicio activo para analizar.' };
+      }
+
+      if (!supportsLoadProgression(ex)) {
+        if (ex.metricType === 'isometria') {
+          return { source: 'isometric', kg: 0, reps: 0, text: 'Isometría: progresá por segundos, no por kg. Sumá 5-10 s cuando llegues al techo.' };
+        }
+        return { source: 'none', kg: 0, reps: 0, text: 'Este ejercicio no usa progresión por kg. Registrá reps o tiempo para ver una recomendación.' };
+      }
+
+      let sourceSets = Array.isArray(sets) ? sets : [];
+      if (!sourceSets.some(s => Number(s && s.reps) > 0)) {
+        sourceSets = getLastHistorySets(exId);
+      }
+      const valid = sourceSets
+        .map(s => ({ kg: Number(s && s.kg) || 0, reps: Number(s && s.reps) || 0 }))
+        .filter(s => s.reps > 0);
+
+      if (valid.length === 0) {
+        return { source: 'none', kg: 0, reps: 0, text: 'Sin historial: registra una sesión para calcular la progresión.' };
+      }
+
+      const target = getExerciseTargetReps(ex.dose || '');
+      const work = valid.filter(s => s.kg > 0);
+
+      if (work.length === 0) {
+        const weakest = Math.min(...valid.map(s => s.reps));
+        const atBodyweightCeiling = target.max > 0 && weakest >= target.max;
+        const nextReps = atBodyweightCeiling ? target.max + 2 : Math.min(target.max, Math.max(target.min, weakest + 1));
+        return {
+          source: 'bodyweight',
+          kg: 0,
+          reps: nextReps,
+          text: atBodyweightCeiling
+            ? `Peso corporal: todas las series en el techo (${target.max}). Sumá lastre o subí a <strong>${target.max + 2} reps</strong>.`
+            : `Peso corporal: buscá <strong>${nextReps} reps</strong> en la próxima serie (mínimo actual: ${weakest}).`
+        };
+      }
+
+      const lastKg = Math.max(...work.map(s => s.kg));
+      const atLastKg = work.filter(s => Math.abs(s.kg - lastKg) < 0.0001);
+      const evaluated = atLastKg.length >= 2 ? atLastKg : work;
+      const weakest = Math.min(...evaluated.map(s => s.reps));
+      const allAtCeiling = evaluated.every(s => s.reps >= target.max);
+
+      if (allAtCeiling) {
+        const nextKg = Math.round((lastKg + getWeightStep(ex)) * 10) / 10;
+        return {
+          source: 'ceiling',
+          kg: nextKg,
+          reps: target.min,
+          text: `Todas las series al techo. Subí a <strong>${nextKg} kg × ${target.min} reps</strong> y reiniciá la rampa.`
+        };
+      }
+
+      const nextReps = Math.min(target.max, Math.max(target.min, weakest + 1));
+      return {
+        source: 'volume',
+        kg: lastKg,
+        reps: nextReps,
+        text: `Mantené <strong>${lastKg} kg</strong> y buscá <strong>${nextReps} reps</strong> (mínimo actual: ${weakest}).`
+      };
+    }
+    // COACH:HELPERS:END
 
     // Active session live ticker interval
     let sessionTickerInterval = null;
@@ -9282,6 +9657,10 @@
     }
 
     function selectDay(dayId) {
+      if (WORKOUT_DAYS.includes(dayId) && dayId !== lastCoachDayId) {
+        resetSessionPR();
+        lastCoachDayId = dayId;
+      }
       // Ocultar selector de día en la cabecera si estamos en Historial o Rutina
       const topLeft = document.getElementById('headerTopLeft');
       if (topLeft && topLeft.style) {
@@ -9371,6 +9750,7 @@
         updateProgress();
         updateDayExerciseAccordion(dayId);
       }
+      refreshMascotBadge();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -10019,6 +10399,7 @@
       // 1. Si pasaron 5 días o más sin entrenar
       if (diffFromToday >= 5) {
         return {
+          type: 'inactivity',
           text: `Vuelves tras ${diffFromToday} días: empieza con 5-10% menos de peso para readaptar tendones y evitar fatiga excesiva.`
         };
       }
@@ -10039,6 +10420,7 @@
 
         if (streak >= 3) {
           return {
+            type: 'fatigue',
             text: 'Llevas 3 días seguidos: hoy en pierna y bisagra de cadera deja 2-3 en reserva y mañana descansa.'
           };
         }
@@ -10046,6 +10428,7 @@
         if (diffFromToday === 1) {
           const lastDayTitle = latest.session.dayName || latest.session.dayId || 'ayer';
           return {
+            type: 'yesterday',
             text: `Ayer entrenaste ${lastDayTitle}: hoy en pierna y bisagra de cadera deja 2-3 repeticiones en reserva.`
           };
         }
@@ -10314,22 +10697,18 @@
         const curKg = parseFloat(kgInp?.value) || 0;
         const curReps = parseInt(repsInp?.value, 10) || 0;
         const curEx = EXERCISE_CATALOG[exId];
-        const isCurIso = curEx && curEx.metricType === 'isometria';
-        if (!isCurIso && curKg > 0 && curReps > 0 && exId) {
-          const est1RM = calculate1RM(curKg, curReps);
-          const historyLogs = (workoutState.exerciseHistory && workoutState.exerciseHistory[exId]) ? workoutState.exerciseHistory[exId] : [];
-          let prevBest1RM = 0;
-          historyLogs.forEach(h => { if (h.best1RM && h.best1RM > prevBest1RM) prevBest1RM = h.best1RM; });
-          
-          // 1RM record toast omitted per user request
-        } else if (isCurIso && curReps > 0 && exId) {
-          const historyLogs = (workoutState.exerciseHistory && workoutState.exerciseHistory[exId]) ? workoutState.exerciseHistory[exId] : [];
-          let prevBestSecs = 0;
-          historyLogs.forEach(h => { if (h.bestReps && h.bestReps > prevBestSecs) prevBestSecs = h.bestReps; });
-          if (curReps > prevBestSecs && prevBestSecs > 0) {
-            showToast(`🏆 ¡Nuevo Récord de Tiempo! ${curReps} s (+${curReps - prevBestSecs}s)`);
+        const historyLogs = (workoutState.exerciseHistory && workoutState.exerciseHistory[exId]) ? workoutState.exerciseHistory[exId] : [];
+        const prResult = evaluatePR(curEx, curKg, curReps, historyLogs);
+        if (prResult.isPR && prResult.kind === '1rm') {
+          markExercisePR(exId, '1rm', prResult.value, prResult.prev);
+        } else if (prResult.isPR && prResult.kind === 'seconds') {
+          if (markExercisePR(exId, 'seconds', prResult.value, prResult.prev)) {
+            showToast(`🏆 ¡Nuevo Récord de Tiempo! ${curReps} s (+${curReps - prResult.prev}s)`);
           }
+        } else if (prResult.isPR && prResult.kind === 'reps') {
+          markExercisePR(exId, 'reps', prResult.value, prResult.prev);
         }
+        refreshMascotBadge();
       }
 
       if (isDone) {
@@ -10500,6 +10879,7 @@
         card.classList.remove('manually-expanded');
         if (existingBadge) existingBadge.remove();
       }
+      refreshMascotBadge();
     }
 
     // Accordion Manager: Single active exercise mode
@@ -10887,6 +11267,8 @@
       }
       updateSessionTimerDisplay(dayId);
       updateProgress();
+      resetSessionPR();
+      refreshMascotBadge();
 
       if (isAutoSave) {
         showToast(`Guardado automático: ${sessionRecord.dayName} (${durationFormatted})`);
@@ -11746,7 +12128,8 @@
         tempSlots: obj(parsed.tempSlots),
         sessionStartTime: numMap(parsed.sessionStartTime),
         lastActivityTime: numMap(parsed.lastActivityTime),
-        overloadSuggestions: obj(parsed.overloadSuggestions)
+        overloadSuggestions: obj(parsed.overloadSuggestions),
+        coachPersonality: COACH_PERSONALITIES.includes(parsed.coachPersonality) ? parsed.coachPersonality : 'gymbro'
       };
     }
 
@@ -12435,9 +12818,11 @@
             tempSlots: {},
             sessionStartTime: {},
             lastActivityTime: {},
-            overloadSuggestions: {}
+            overloadSuggestions: {},
+            coachPersonality: 'gymbro'
           }, loaded);
           if (!workoutState.notes || typeof workoutState.notes !== 'object') workoutState.notes = {};
+          if (!COACH_PERSONALITIES.includes(workoutState.coachPersonality)) workoutState.coachPersonality = 'gymbro';
         } catch (e) {
           console.error(e);
         }
@@ -12625,6 +13010,7 @@
       if (activeSec && activeSec.id !== 'historialView' && activeSec.id !== 'routinePlanView') {
         updateDayExerciseAccordion(activeSec.id);
       }
+      refreshMascotBadge();
     }
 
     function clearAppCacheAndReload() {
@@ -12644,9 +13030,231 @@
       }
     }
 
+    // ==========================================
+    // COACH MASCOTA — UI, BRIEFING Y GESTOS (rev13)
+    // ==========================================
+    const COACH_COPY = {
+      sargento: {
+        subtitle: 'Aquí no se negocia el esfuerzo',
+        greeting: ['¡Arriba! El hierro no se levanta solo.', 'Hoy se entrena. Sin excusas.', 'Cada serie cuenta. ¡Vamos!'],
+        pr: ['¡Récord! Así se hace.', 'Nuevo PR. El trabajo paga.', 'Impecable. A por el siguiente.'],
+        fatigue: ['Llevas 3 días. Baja el volumen hoy.', 'Descansá o entrená suave. El cuerpo no es de acero.'],
+        inactivity: ['Volviste. Empezá con 5-10% menos.', 'La constancia se reconstruye. Hoy suave.'],
+        tip: 'La doble progresión manda: primero sumá reps al mismo peso y después subí el disco.'
+      },
+      ciencia: {
+        subtitle: 'Datos, técnica y progresión',
+        greeting: ['La adaptación ocurre cuando el estímulo es medible.', 'Registrá cada serie: sin datos no hay progreso.', 'Tensión mecánica y sobrecarga progresiva. Simple.'],
+        pr: ['Nuevo máximo estimado. La curva sube.', 'PR registrado. Buen estímulo.', 'Progreso objetivo. Seguí así.'],
+        fatigue: ['3 días consecutivos: hoy conviene bajar el volumen.', 'La fatiga acumulada reduce la calidad. Autorregulá.'],
+        inactivity: ['Tras 5 días, reaparecer con 5-10% menos es lo fisiológico.', 'Readaptá tendones: empezá suave.'],
+        tip: 'El rango de 6-12 reps cerca del fallo es un estímulo eficiente para hipertrofia.'
+      },
+      gymbro: {
+        subtitle: 'Tu colega de entrenamiento',
+        greeting: ['¡Vamos que se puede!', 'Hoy toca darle. Yo te banco.', 'Un set más, una excusa menos.'],
+        pr: ['¡Bum! Nuevo PR.', '¡Récord! Eso se celebra.', 'Estás fuerte. Se nota.'],
+        fatigue: ['Tres días seguidos, colega. Hoy aflojá un poco.', 'Descansá. Mañana volvés con todo.'],
+        inactivity: ['Volviste. Arrancá tranqui.', 'Cinco días fuera: hoy menos peso y buena técnica.'],
+        tip: 'Si dudás, anotá la serie. Ver el progreso en papel engancha.'
+      }
+    };
+
+    let coachLastFocused = null;
+    let mascotPressTimer = null;
+    let mascotSuppressClick = false;
+
+    function getCoachPersonality() {
+      return COACH_PERSONALITIES.includes(workoutState.coachPersonality) ? workoutState.coachPersonality : 'gymbro';
+    }
+
+    function getCoachLine(kind) {
+      const copy = COACH_COPY[getCoachPersonality()] || COACH_COPY.gymbro;
+      const lines = copy[kind] || copy.greeting;
+      return lines[Math.floor(Math.random() * lines.length)];
+    }
+
+    function getCoachBriefing() {
+      const streak = calculateStreak(workoutState.sessions || []);
+      const lastInfo = lastActiveWorkoutDay ? getDayLastDoneInfo(lastActiveWorkoutDay) : null;
+      const nextId = getNextRecommendedDay(currentProgram);
+      const nextName = (typeof ROUTINE_SLOTS !== 'undefined' && ROUTINE_SLOTS[nextId]) ? ROUTINE_SLOTS[nextId].shortName : nextId;
+      return [
+        { label: 'Racha', value: streak > 0 ? `${streak} día${streak === 1 ? '' : 's'}` : 'Sin racha' },
+        { label: 'Último entreno', value: lastInfo ? lastInfo.relative : 'Sin registros' },
+        { label: 'Siguiente', value: nextName || '—' }
+      ];
+    }
+
+    function getActiveExerciseContext() {
+      const active = document.querySelector('.day-content.active');
+      if (!active || active.id === 'historialView' || active.id === 'routinePlanView') return null;
+      const card = active.querySelector('.exercise-card.manually-expanded') || active.querySelector('.exercise-card:not(.collapsed)');
+      if (!card) return null;
+      const exId = card.getAttribute('data-current-ex');
+      const ex = EXERCISE_CATALOG[exId];
+      if (!ex) return null;
+      const sets = Array.from(card.querySelectorAll('.set-row')).map(row => ({
+        kg: parseFloat(row.querySelector('.input-kg')?.value) || 0,
+        reps: parseInt(row.querySelector('.input-reps')?.value, 10) || 0
+      }));
+      return { exId: exId, ex: ex, sets: sets };
+    }
+
+    function renderCoachModal() {
+      const copy = COACH_COPY[getCoachPersonality()] || COACH_COPY.gymbro;
+      const subtitle = document.getElementById('coachSubtitle');
+      if (subtitle) subtitle.textContent = copy.subtitle;
+
+      const briefing = document.getElementById('coachBriefing');
+      if (briefing) {
+        briefing.innerHTML = getCoachBriefing().map(row =>
+          `<div class="coach-brief-row"><span>${escapeHtml(row.label)}</span><strong>${escapeHtml(row.value)}</strong></div>`
+        ).join('');
+      }
+
+      document.querySelectorAll('#coachModal .coach-chip').forEach(chip => {
+        chip.setAttribute('aria-pressed', String(chip.getAttribute('data-personality') === getCoachPersonality()));
+      });
+
+      const card = document.getElementById('coachOverloadCard');
+      if (card) {
+        const ctx = getActiveExerciseContext();
+        if (ctx) {
+          const res = computeDoubleProgression(ctx.exId, ctx.ex, ctx.sets);
+          card.innerHTML = `<div class="coach-overload-title">📈 Próxima sesión</div><div class="coach-ex-name">${escapeHtml(ctx.ex.name || ctx.exId)}</div><div class="coach-advice">${res.text}</div>`;
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      }
+
+      const tip = document.getElementById('coachTip');
+      if (tip) tip.textContent = '💡 ' + copy.tip;
+    }
+
+    function refreshMascotBadge() {
+      const btn = document.getElementById('mascotBtn');
+      const badge = document.getElementById('mascotBadge');
+      if (!btn || !badge) return;
+      const alert = (typeof getConsecutiveTrainingAlert === 'function') ? getConsecutiveTrainingAlert() : null;
+      let state = 'normal';
+      if (hasSessionPR()) state = 'pr';
+      else if (alert && alert.type === 'fatigue') state = 'fatigue';
+      else if (alert && alert.type === 'inactivity') state = 'inactive';
+
+      badge.className = 'mascot-badge';
+      badge.textContent = '';
+      let label = 'Abrir coach';
+      if (state === 'pr') {
+        badge.classList.add('on', 'pr');
+        badge.textContent = '🔥';
+        label = 'Abrir coach. Nuevo récord personal';
+      } else if (state === 'fatigue') {
+        badge.classList.add('on', 'fatigue');
+        label = 'Abrir coach. Aviso de fatiga';
+      } else if (state === 'inactive') {
+        badge.classList.add('on', 'inactive');
+        badge.textContent = '💤';
+        label = 'Abrir coach. Días sin entrenar';
+      }
+      btn.setAttribute('aria-label', label);
+    }
+
+    function handleCoachKeydown(event) {
+      const overlay = document.getElementById('coachModal');
+      if (!overlay || !overlay.classList.contains('open')) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeCoachModal();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusables = overlay.querySelectorAll('button:not([disabled])');
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    function openCoachModal() {
+      const overlay = document.getElementById('coachModal');
+      if (!overlay || overlay.classList.contains('open')) return;
+      renderCoachModal();
+      overlay.classList.add('open');
+      document.body.classList.add('modal-open');
+      coachLastFocused = document.activeElement;
+      const closeBtn = document.getElementById('coachCloseBtn');
+      if (closeBtn) closeBtn.focus();
+      document.addEventListener('keydown', handleCoachKeydown);
+    }
+
+    function closeCoachModal(event) {
+      const overlay = document.getElementById('coachModal');
+      if (!overlay) return;
+      if (event && event.target && event.target !== overlay) return;
+      overlay.classList.remove('open');
+      document.body.classList.remove('modal-open');
+      document.removeEventListener('keydown', handleCoachKeydown);
+      if (coachLastFocused && typeof coachLastFocused.focus === 'function') coachLastFocused.focus();
+      coachLastFocused = null;
+    }
+
+    function selectCoachPersonality(personality) {
+      if (!COACH_PERSONALITIES.includes(personality)) return;
+      workoutState.coachPersonality = personality;
+      saveWorkoutState();
+      renderCoachModal();
+      refreshMascotBadge();
+    }
+
+    function initMascotGestures() {
+      const btn = document.getElementById('mascotBtn');
+      if (!btn || btn.dataset.gesturesBound === '1') return;
+      btn.dataset.gesturesBound = '1';
+
+      const cancelPress = () => {
+        if (mascotPressTimer) {
+          clearTimeout(mascotPressTimer);
+          mascotPressTimer = null;
+        }
+      };
+
+      btn.addEventListener('pointerdown', (event) => {
+        if (event.button !== undefined && event.button !== 0) return;
+        mascotSuppressClick = false;
+        cancelPress();
+        mascotPressTimer = setTimeout(() => {
+          mascotPressTimer = null;
+          mascotSuppressClick = true;
+          if (navigator.vibrate) navigator.vibrate(30);
+          showToast(getCoachLine('greeting'));
+        }, 450);
+      });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(evt => btn.addEventListener(evt, cancelPress));
+      btn.addEventListener('click', (event) => {
+        if (mascotSuppressClick) {
+          event.preventDefault();
+          event.stopPropagation();
+          mascotSuppressClick = false;
+          return;
+        }
+        openCoachModal();
+      });
+      btn.addEventListener('contextmenu', e => e.preventDefault());
+      btn.addEventListener('dragstart', e => e.preventDefault());
+    }
+
     // Initialize on load
     function initApp() {
       loadWorkoutState();
+      initMascotGestures();
       restoreRestTimerState();
       applySupersetsModeUI();
       updateTimerUI();
@@ -12661,7 +13269,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev12').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev13').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
