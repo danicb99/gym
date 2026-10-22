@@ -1141,48 +1141,63 @@
   function renderSyncPill(extra) {
     let pill = document.getElementById('watchSyncPill');
     if (!pill) {
-      const headerContainer = document.getElementById('headerCenterWatch') || document.querySelector('.header-center-watch, .header-content, .app-header-fixed, .app-header');
+      const headerContainer = document.querySelector('.status-right, .header-status-row, .app-header-fixed, .app-header');
       if (headerContainer) {
-        pill = document.createElement('div');
+        pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'hdr-btn hdr-btn-watch';
         pill.id = 'watchSyncPill';
-        pill.style.cssText = 'display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:5px 10px;border-radius:10px;background:rgba(15,23,42,0.9);border:1px solid rgba(56,189,248,0.4);color:#94a3b8;cursor:pointer;white-space:nowrap;user-select:none;margin-left:auto;transition:all 0.2s ease;';
         pill.onclick = () => {
           openWatchSyncModal();
         };
-        headerContainer.appendChild(pill);
+        headerContainer.insertBefore(pill, headerContainer.firstChild);
       }
     }
     if (!pill) return;
 
+    if (!pill.querySelector('.watch-icon-svg')) {
+      pill.innerHTML = '<svg class="watch-icon-svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="7" width="12" height="10" rx="2.5"></rect><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path><path d="M9 17v3a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-3"></path><circle cx="12" cy="12" r="1.5" fill="currentColor"></circle></svg>';
+    }
+
     const { status, extra: calcExtra } = determineCurrentSyncStatus();
     const valExtra = extra !== undefined ? extra : calcExtra;
+
+    pill.classList.remove('status-synced', 'status-pending', 'status-ratelimited', 'status-disconnected');
 
     if (status === 'synced') {
       const ageSec = lastSuccessfulSyncTime > 0 ? Math.round((Date.now() - lastSuccessfulSyncTime) / 1000) : 0;
       const isFresh = ageSec < 60;
-      const dotColor = isFresh ? '#10b981' : '#38bdf8';
-      pill.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${dotColor};box-shadow:0 0 8px ${dotColor};"></span> Sincronizado`;
-      pill.style.color = '#38bdf8';
-      pill.style.borderColor = 'rgba(16,185,129,0.4)';
+      const color = isFresh ? '#10b981' : '#38bdf8';
+      pill.style.color = color;
+      pill.style.borderColor = isFresh ? 'rgba(16,185,129,0.45)' : 'rgba(56,189,248,0.45)';
+      pill.style.background = isFresh ? 'rgba(16,185,129,0.12)' : 'rgba(56,189,248,0.10)';
+      pill.style.boxShadow = isFresh ? '0 0 10px rgba(16,185,129,0.22)' : 'none';
       const ageText = lastSuccessfulSyncTime > 0 ? `hace ${ageSec < 60 ? ageSec + 's' : Math.round(ageSec / 60) + 'm'}` : 'listo';
-      pill.title = `Sincronización activa con Amazfit Active 2 (${ageText}). Toca para ver detalles o configurar.`;
+      pill.title = `Amazfit Active 2: Sincronizado (${ageText}). Toca para ver detalles o configurar.`;
+      pill.classList.add('status-synced');
     } else if (status === 'pending') {
       const count = valExtra || 1;
-      pill.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:#fbbf24;box-shadow:0 0 8px #fbbf24;"></span> Pendiente (${count})`;
       pill.style.color = '#fbbf24';
-      pill.style.borderColor = 'rgba(251,191,36,0.4)';
-      pill.title = `Hay cambios locales pendientes de sincronizar con el reloj.`;
+      pill.style.borderColor = 'rgba(251,191,36,0.50)';
+      pill.style.background = 'rgba(251,191,36,0.12)';
+      pill.style.boxShadow = '0 0 10px rgba(251,191,36,0.25)';
+      pill.title = `Amazfit Active 2: ${count} cambio(s) pendiente(s). Toca para ver detalles.`;
+      pill.classList.add('status-pending');
     } else if (status === 'rate_limited') {
       const sec = valExtra || 60;
-      pill.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px #f59e0b;"></span> Límite alcanzado (${sec}s)`;
       pill.style.color = '#f59e0b';
-      pill.style.borderColor = 'rgba(245,158,11,0.5)';
-      pill.title = `Límite de peticiones alcanzado en ntfy.sh. Reintento en ${sec} segundos.`;
+      pill.style.borderColor = 'rgba(245,158,11,0.50)';
+      pill.style.background = 'rgba(245,158,11,0.12)';
+      pill.style.boxShadow = 'none';
+      pill.title = `Amazfit Active 2: Límite de peticiones alcanzado (${sec}s de espera). Toca para ver detalles.`;
+      pill.classList.add('status-ratelimited');
     } else {
-      pill.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;"></span> Sin conexión';
-      pill.style.color = '#f87171';
-      pill.style.borderColor = 'rgba(239,68,68,0.4)';
-      pill.title = 'Canal SSE desconectado o reconectando. Toca para detalles y reconexión.';
+      pill.style.color = '#ef4444';
+      pill.style.borderColor = 'rgba(239,68,68,0.45)';
+      pill.style.background = 'rgba(239,68,68,0.10)';
+      pill.style.boxShadow = 'none';
+      pill.title = 'Amazfit Active 2: Sin conexión o reconectando. Toca para reconectar.';
+      pill.classList.add('status-disconnected');
     }
   }
 

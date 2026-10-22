@@ -2876,6 +2876,47 @@
     .hdr-btn:active {
       transform: scale(0.94);
     }
+    .hdr-btn-watch {
+      width: 34px;
+      padding: 0;
+      color: #10b981;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .hdr-btn-watch.status-synced {
+      color: #10b981;
+      border-color: rgba(16, 185, 129, 0.45);
+      background: rgba(16, 185, 129, 0.12);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.22);
+    }
+    .hdr-btn-watch.status-pending {
+      color: #fbbf24;
+      border-color: rgba(251, 191, 36, 0.50);
+      background: rgba(251, 191, 36, 0.12);
+      box-shadow: 0 0 10px rgba(251, 191, 36, 0.25);
+    }
+    .hdr-btn-watch.status-ratelimited {
+      color: #f59e0b;
+      border-color: rgba(245, 158, 11, 0.50);
+      background: rgba(245, 158, 11, 0.12);
+      box-shadow: none;
+    }
+    .hdr-btn-watch.status-disconnected {
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.45);
+      background: rgba(239, 68, 68, 0.10);
+      box-shadow: none;
+    }
+    .hdr-btn-watch svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      transition: stroke 0.2s ease, transform 0.2s ease;
+    }
     .hdr-btn-info {
       width: 34px;
       padding: 0;
@@ -3121,13 +3162,6 @@
         <span class="app-brand-sub" id="headerRoutineSub">Full Body · 3 días · <span id="headerEstDuration">~42 min</span></span>
       </div>
 
-      <div class="header-center-watch" id="headerCenterWatch">
-        <div id="watchSyncPill" class="watch-sync-pill" onclick="openWatchSyncModal()" title="Estado de sincronización con Amazfit Active 2">
-          <span class="watch-sync-dot"></span>
-          <span class="watch-sync-text">⌚ Reloj</span>
-        </div>
-      </div>
-
       <div class="header-day-chip-wrap">
         <button type="button" class="header-day-chip" id="headerDayChip" onclick="toggleDayPickerDropdown(event)">
           <span id="headerDayChipLabel">Día A</span>
@@ -3167,6 +3201,14 @@
       </div>
 
       <div class="status-right">
+        <button type="button" class="hdr-btn hdr-btn-watch status-synced" id="watchSyncPill" onclick="openWatchSyncModal()" title="Amazfit Active 2: Conectando...">
+          <svg class="watch-icon-svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="6" y="7" width="12" height="10" rx="2.5"></rect>
+            <path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path>
+            <path d="M9 17v3a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-3"></path>
+            <circle cx="12" cy="12" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </button>
         <button type="button" class="hdr-btn hdr-btn-info" id="hdrBtnInfo" onclick="openInfoSheet()" title="Información RIR y Superseries">ⓘ</button>
         <button type="button" class="hdr-btn hdr-btn-express" id="hdrBtnExpress" onclick="toggleExpressMode()" title="Modo Exprés (omite accesorios)">Exprés</button>
         <button type="button" class="hdr-btn hdr-btn-reset" id="hdrBtnReset" onclick="confirmResetCurrentDay()" title="Reiniciar series de hoy">↺</button>
@@ -12074,7 +12116,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=design16').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=design17').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
