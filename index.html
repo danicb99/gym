@@ -3148,22 +3148,25 @@
     }
     .coach-bubble {
       display: block;
-      max-width: min(270px, calc(100% - 16px));
-      padding: 7px 10px;
+      max-width: min(270px, calc(100vw - 125px));
+      margin-left: auto;
+      margin-right: 36px;
+      padding: 6px 10px;
       border: 1px solid rgba(251, 191, 36, 0.42);
       border-left: 3px solid var(--primary);
       border-radius: 12px 4px 12px 12px;
       background: #0b1120 !important;
       color: #f8fafc;
-      font-size: 0.72rem;
+      font-size: 0.70rem;
       font-weight: 600;
-      line-height: 1.35;
+      line-height: 1.32;
       text-align: left;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
       opacity: 0;
       transform: translateY(-4px) scale(0.97);
       transition: opacity 0.18s ease, transform 0.18s ease;
       pointer-events: none;
+      z-index: 10;
     }
     .coach-bubble.show {
       opacity: 1;
@@ -13802,7 +13805,7 @@
       const lastSession = getLastSession();
       const lastInfo = lastSession ? getRelativeWorkoutInfo(lastSession.date) : null;
       const nextId = getNextRecommendedDay(currentProgram);
-      const nextName = (typeof ROUTINE_SLOTS !== 'undefined' && ROUTINE_SLOTS[nextId]) ? ROUTINE_SLOTS[nextId].shortName : nextId;
+      const nextName = (typeof ROUTINE_SLOTS !== 'undefined' && ROUTINE_SLOTS[nextId]) ? (ROUTINE_SLOTS[nextId].dayNum || ROUTINE_SLOTS[nextId].shortName) : nextId;
       const activeDay = dayId || (typeof getCoachBubbleDayId === 'function' ? getCoachBubbleDayId() : '');
       const exitInfo = activeDay ? getEstimatedExitTime(activeDay) : null;
       const rows = [
@@ -14202,7 +14205,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev25').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev26').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
