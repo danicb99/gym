@@ -942,37 +942,87 @@
     .toast-msg { position: fixed; top: 72px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(15, 23, 40, 0.95); border: 1px solid var(--primary); box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 16px var(--primary-glow); color: #fff; padding: 10px 18px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 8px; max-width: 90vw; text-align: center; }
     .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* Bottom-sheet Modals (Alternativas, Historial & Guía) */
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3, 7, 18, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
-    .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease-out; }
+    /* Floating Popup Modals (Alternativas, Historial & Guía) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    .modal-overlay.open {
+      display: flex;
+      animation: fadeIn 0.2s ease-out;
+    }
     .modal-drag-handle {
-      width: 40px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.25);
-      border-radius: 3px;
-      margin: 0 auto 14px;
-      cursor: pointer;
+      display: none !important;
     }
     .modal-sheet {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px 24px 0 0;
+      background: #11141c;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
       width: 100%;
-      max-width: 650px;
+      max-width: 440px;
       max-height: 85vh;
       overflow-y: auto;
-      padding: 12px 18px 34px;
-      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7);
-      animation: sheetSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 20px 20px 18px 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      box-sizing: border-box;
+      animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
     @keyframes sheetSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     
-    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-    .modal-title { font-size: 1.1rem; font-weight: 800; color: #fff; }
-    .modal-subtitle { font-size: 0.74rem; color: var(--text-muted); margin-top: 3px; }
-    .modal-close-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); color: var(--text-muted); width: 32px; height: 32px; border-radius: 10px; font-size: 1.1rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; }
-    .modal-close-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.15); }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 12px;
+    }
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-subtitle {
+      font-size: 0.74rem;
+      color: #94a3b8;
+      margin-top: 3px;
+    }
+    .modal-close-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .modal-close-btn:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.15);
+    }
 
     /* Alternativas Cards in Modal */
     .alt-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 12px; transition: all 0.2s; }
@@ -2332,19 +2382,21 @@
       color: var(--gold);
     }
 
-    /* Bottom Sheets */
+    /* Popup Modals (Notas & Técnica) */
     .bottom-sheet-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.72);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       z-index: 9999;
       display: none;
-      align-items: flex-end;
+      align-items: center;
       justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
       opacity: 0;
-      transition: opacity 0.24s ease;
+      transition: opacity 0.2s ease;
     }
     .bottom-sheet-backdrop.open {
       display: flex;
@@ -2352,35 +2404,34 @@
     }
     .bottom-sheet {
       background: #11141c;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-bottom: none;
-      border-top-left-radius: 24px;
-      border-top-right-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
       width: 100%;
-      max-width: 520px;
+      max-width: 440px;
       max-height: 85vh;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      padding: 12px 18px 24px 18px;
-      transform: translateY(100%);
-      transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+      padding: 20px 20px 18px 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      box-sizing: border-box;
+      animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: none;
+      transition: none;
     }
     .bottom-sheet-backdrop.open .bottom-sheet {
-      transform: translateY(0);
+      transform: none;
     }
     .bottom-sheet-drag-handle {
-      width: 42px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.25);
-      border-radius: 2px;
-      margin: 0 auto 12px auto;
+      display: none !important;
     }
     .bottom-sheet-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 12px;
     }
     .bottom-sheet-title-group {
       display: flex;
@@ -2388,12 +2439,12 @@
       gap: 10px;
     }
     .bottom-sheet-icon {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
     }
     .bottom-sheet-title {
       margin: 0;
-      font-size: 1.02rem;
-      font-weight: 700;
+      font-size: 1.05rem;
+      font-weight: 800;
       color: #fff;
     }
     .bottom-sheet-sub {
@@ -2405,8 +2456,8 @@
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.12);
       color: #94a3b8;
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       border-radius: 10px;
       font-size: 1.1rem;
       display: flex;
@@ -2414,6 +2465,7 @@
       justify-content: center;
       cursor: pointer;
       transition: all 0.15s ease;
+      flex-shrink: 0;
     }
     .bottom-sheet-close:active {
       transform: scale(0.92);
@@ -8687,17 +8739,19 @@
   </div>
 
   <!-- ==========================================
-       MODAL DE ALTERNATIVAS (Bottom Sheet)
+       MODAL DE ALTERNATIVAS (Popup Centrado)
        ========================================== -->
   <div class="modal-overlay" id="swapModal" onclick="closeSwapModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="modal-drag-handle"></div>
       <div class="modal-header">
-        <div>
-          <div class="modal-title" id="swapModalTitle">Alternativas del Ejercicio</div>
-          <div class="modal-subtitle" id="swapModalSubtitle">Selecciona una alternativa si la máquina está ocupada</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">🔄</span>
+          <div>
+            <div class="modal-title" id="swapModalTitle">Alternativas del Ejercicio</div>
+            <div class="modal-subtitle" id="swapModalSubtitle">Selecciona una alternativa si la máquina está ocupada</div>
+          </div>
         </div>
-        <button class="modal-close-btn" onclick="closeSwapModal()">✕</button>
+        <button type="button" class="modal-close-btn" onclick="closeSwapModal()">✕</button>
       </div>
       <div id="swapModalList">
         <!-- Rendered dynamically -->
@@ -8706,17 +8760,19 @@
   </div>
 
   <!-- ==========================================
-       MODAL DE HISTORIAL DEL EJERCICIO (Bottom Sheet)
+       MODAL DE HISTORIAL DEL EJERCICIO (Popup Centrado)
        ========================================== -->
   <div class="modal-overlay" id="historyModal" onclick="closeHistoryModal(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="modal-drag-handle"></div>
       <div class="modal-header">
-        <div>
-          <div class="modal-title" id="historyModalTitle">Historial de Progresión</div>
-          <div class="modal-subtitle" id="historyModalSubtitle">Récords y evolución de fuerza</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">📊</span>
+          <div>
+            <div class="modal-title" id="historyModalTitle">Historial de Progresión</div>
+            <div class="modal-subtitle" id="historyModalSubtitle">Récords y evolución de fuerza</div>
+          </div>
         </div>
-        <button class="modal-close-btn" onclick="closeHistoryModal()">✕</button>
+        <button type="button" class="modal-close-btn" onclick="closeHistoryModal()">✕</button>
       </div>
       <div id="historyModalBody">
         <!-- Rendered dynamically -->
@@ -12285,7 +12341,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=design19').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=design20').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -13075,10 +13131,9 @@
     </div>
   </div>
 
-  <!-- Bottom Sheet: Notas del Ejercicio -->
+  <!-- Modal Popup: Notas del Ejercicio -->
   <div class="bottom-sheet-backdrop" id="notesSheetBackdrop" onclick="closeNotesSheet(event)">
     <div class="bottom-sheet" id="notesSheet" onclick="event.stopPropagation()">
-      <div class="bottom-sheet-drag-handle"></div>
       <div class="bottom-sheet-header">
         <div class="bottom-sheet-title-group">
           <span class="bottom-sheet-icon">📝</span>
@@ -13099,10 +13154,9 @@
     </div>
   </div>
 
-  <!-- Bottom Sheet: Técnica Clave -->
+  <!-- Modal Popup: Técnica Clave -->
   <div class="bottom-sheet-backdrop" id="techniqueSheetBackdrop" onclick="closeTechniqueSheet(event)">
     <div class="bottom-sheet" id="techniqueSheet" onclick="event.stopPropagation()">
-      <div class="bottom-sheet-drag-handle"></div>
       <div class="bottom-sheet-header">
         <div class="bottom-sheet-title-group">
           <span class="bottom-sheet-icon">💡</span>
