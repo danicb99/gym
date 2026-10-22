@@ -8528,11 +8528,8 @@
          PESTAÑA: HISTORIAL & BACKUP
          ========================================== -->
     <section id="historialView" class="day-content">
-      <div class="day-banner">
-        <div>
-          <div class="day-banner-title">📊 Historial & Backup</div>
-          <div class="day-banner-meta"><span>Progreso de Fuerza</span> • <span>Copias de Seguridad</span></div>
-        </div>
+      <div class="day-banner" style="justify-content: center; text-align: center; padding: 10px 14px;">
+        <div class="day-banner-title" style="color: var(--gold); text-align: center; font-size: 1.05rem; font-weight: 800; letter-spacing: -0.01em;">Historial & Backup</div>
       </div>
 
       <!-- Global Stats Dashboard (Preservado oculto para compatibilidad con tests) -->
@@ -8551,24 +8548,32 @@
         </div>
       </div>
 
-      <!-- 1. Tarjeta: Calendario de Entrenamientos -->
+      <!-- 1. Tarjeta: Calendario -->
       <div class="calendar-card history-card" id="streakCalendarCard">
         <div class="history-card-header">
           <div class="history-card-title-group">
-            <span class="history-card-icon">📅</span>
-            <div>
-              <h3 class="history-card-title">Calendario de Entrenamientos</h3>
-              <p class="history-card-sub">Registro mensual de sesiones completadas</p>
-            </div>
+            <span class="history-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </span>
+            <h3 class="history-card-title">Calendario</h3>
           </div>
           <span class="cal-month-badge" id="calMonthTotalSessions">0 entrenos</span>
           <span id="streakBadge" style="display:none !important;" aria-hidden="true"></span>
         </div>
         <div class="calendar-header" style="justify-content: center; margin-bottom: 12px;">
           <div class="calendar-nav">
-            <button type="button" class="cal-nav-btn" onclick="changeCalendarMonth(-1)" title="Mes anterior">◀</button>
+            <button type="button" class="cal-nav-btn" onclick="changeCalendarMonth(-1)" title="Mes anterior">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
             <span class="cal-month-label" id="calMonthLabel">Octubre 2026</span>
-            <button type="button" class="cal-nav-btn" onclick="changeCalendarMonth(1)" title="Mes siguiente">▶</button>
+            <button type="button" class="cal-nav-btn" onclick="changeCalendarMonth(1)" title="Mes siguiente">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
           </div>
         </div>
         <div class="calendar-weekdays">
@@ -8583,11 +8588,13 @@
       <div class="history-card" id="timelineCard">
         <div class="history-card-header">
           <div class="history-card-title-group">
-            <span class="history-card-icon">⏱️</span>
-            <div>
-              <h3 class="history-card-title">Línea de Tiempo</h3>
-              <p class="history-card-sub">Últimos entrenamientos completados</p>
-            </div>
+            <span class="history-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </span>
+            <h3 class="history-card-title">Línea de Tiempo</h3>
           </div>
         </div>
         <div id="sessionsTimelineList">
@@ -8602,11 +8609,13 @@
       <div class="history-card" id="progressionCard">
         <div class="history-card-header">
           <div class="history-card-title-group">
-            <span class="history-card-icon">📈</span>
-            <div>
-              <h3 class="history-card-title">Progresión por Ejercicio</h3>
-              <p class="history-card-sub">Evolución de fuerza, cargas y récords</p>
-            </div>
+            <span class="history-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+            </span>
+            <h3 class="history-card-title">Progresión por Ejercicio</h3>
           </div>
         </div>
         <div class="ex-picker-wrap" style="margin-bottom: 12px;">
@@ -8624,33 +8633,42 @@
       <div class="backup-card history-card" id="backupCard">
         <div class="history-card-header">
           <div class="history-card-title-group">
-            <span class="history-card-icon">💾</span>
-            <div>
-              <h3 class="history-card-title">Copias de Seguridad</h3>
-              <p class="history-card-sub">Exporta o restaura tus datos en tu dispositivo</p>
-            </div>
+            <span class="history-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+            </span>
+            <h3 class="history-card-title">Copias de Seguridad</h3>
           </div>
         </div>
         <p class="backup-card-desc" style="margin-top: 0;">Tus datos se guardan de forma privada en tu dispositivo. Descarga una copia de seguridad o compártela a tu Google Drive o WhatsApp para no perder nunca tus récords si cambias de móvil.</p>
         
         <div class="backup-btn-grid">
           <button class="btn-backup primary" onclick="downloadBackupJSON()">
-            <span>💾 Descargar JSON</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Descargar JSON</span>
           </button>
           <button class="btn-backup" onclick="copyBackupToClipboard()">
-            <span>📋 Copiar JSON</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copiar JSON</span>
           </button>
           <button class="btn-backup share" onclick="shareBackup()">
-            <span>📤 Compartir Drive / WA</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span>Compartir Drive / WA</span>
           </button>
           <button class="btn-backup" onclick="document.getElementById('restoreFileInput').click()">
-            <span>📁 Seleccionar Archivo</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>Seleccionar Archivo</span>
           </button>
           <button class="btn-backup primary" onclick="pasteBackupFromClipboard()" style="grid-column: span 2; background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(16, 185, 129, 0.2)); border-color: rgba(56, 189, 248, 0.4); color: var(--cyan);">
-            <span>📥 Restaurar desde Portapapeles o Texto</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            <span>Restaurar desde Portapapeles o Texto</span>
           </button>
           <button class="btn-backup" onclick="exportCSV()" style="grid-column: span 2;">
-            <span>📊 Exportar Historial a Excel</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span>Exportar Historial a Excel</span>
           </button>
         </div>
         <input type="file" id="restoreFileInput" accept=".json,application/json,text/plain,*/*" style="display:none" onchange="restoreBackupFromFile(this)">
@@ -8792,7 +8810,12 @@
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.3rem;">📊</span>
+          <span style="display: inline-flex; align-items: center; justify-content: center; color: var(--gold);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+          </span>
           <div>
             <div class="modal-title" id="historyModalTitle">Historial de Progresión</div>
             <div class="modal-subtitle" id="historyModalSubtitle">Récords y evolución de fuerza</div>
@@ -8813,7 +8836,12 @@
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.3rem;">📜</span>
+          <span style="display: inline-flex; align-items: center; justify-content: center; color: var(--gold);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </span>
           <div>
             <div class="modal-title">Todos los Entrenamientos</div>
             <div class="modal-subtitle" id="allSessionsSubtitle">Histórico de sesiones guardadas</div>
@@ -8903,9 +8931,20 @@
     <div class="modal-sheet" onclick="event.stopPropagation()" style="max-width:540px;">
       <div class="modal-drag-handle"></div>
       <div class="modal-header">
-        <div>
-          <div class="modal-title">📋 Detalle de la Sesión</div>
-          <div class="modal-subtitle">Desglose completo de ejercicios y cargas</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; color: var(--gold);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </span>
+          <div>
+            <div class="modal-title">Detalle de la Sesión</div>
+            <div class="modal-subtitle">Desglose completo de ejercicios y cargas</div>
+          </div>
         </div>
         <button class="modal-close-btn" onclick="closeSessionDetailModal()">✕</button>
       </div>
@@ -11326,7 +11365,7 @@
           }
           const durDisplay = s.durationFormatted || (s.durationMinutes ? `${s.durationMinutes} min` : '45 min');
           const notesBadge = notesCount > 0 
-            ? `<span style="background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.3); color:var(--amber); border-radius:6px; padding:1px 6px; font-size:0.68rem; font-weight:700;">📝 ${notesCount} ${notesCount === 1 ? 'nota' : 'notas'}</span>` 
+            ? `<span style="display:inline-flex; align-items:center; gap:3px; background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.3); color:var(--amber); border-radius:6px; padding:1px 6px; font-size:0.68rem; font-weight:700;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>${notesCount} ${notesCount === 1 ? 'nota' : 'notas'}</span>` 
             : '';
           timelineHTML += `
             <div class="session-item clickable" onclick="openSessionDetailById('${s.id}')" title="Toca para ver el desglose completo y notas de la sesión">
@@ -11336,7 +11375,7 @@
               </div>
               <div class="session-item-meta" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
                 <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                  <span>⏱️ Duración: <strong style="color:var(--amber); font-weight:800;">${durDisplay}</strong></span>
+                  <span style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Duración: <strong style="color:var(--amber); font-weight:800;">${durDisplay}</strong></span>
                   <span>${exCount} ejercicios (${totalSets} series)</span>
                   ${notesBadge}
                 </div>
@@ -11352,7 +11391,10 @@
             moreContainer.innerHTML = `
               <button type="button" class="btn-timeline-more" onclick="openAllSessionsModal()">
                 <span style="display:flex; align-items:center; gap:8px;">
-                  <span>📜</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
                   <span>Ver todos los entrenamientos (${sessions.length})</span>
                 </span>
                 <span style="color:var(--cyan); font-size:1.1rem; line-height:1;">❯</span>
@@ -11402,7 +11444,7 @@
             }
             const durDisplay = s.durationFormatted || (s.durationMinutes ? `${s.durationMinutes} min` : '45 min');
             const notesBadge = notesCount > 0 
-              ? `<span style="background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.3); color:var(--amber); border-radius:6px; padding:1px 6px; font-size:0.68rem; font-weight:700;">📝 ${notesCount} ${notesCount === 1 ? 'nota' : 'notas'}</span>` 
+              ? `<span style="display:inline-flex; align-items:center; gap:3px; background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.3); color:var(--amber); border-radius:6px; padding:1px 6px; font-size:0.68rem; font-weight:700;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>${notesCount} ${notesCount === 1 ? 'nota' : 'notas'}</span>` 
               : '';
             html += `
               <div class="session-item clickable" onclick="closeAllSessionsModal(); openSessionDetailById('${s.id}')" title="Toca para ver el desglose completo y notas de la sesión">
@@ -11412,7 +11454,7 @@
                 </div>
                 <div class="session-item-meta" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
                   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                    <span>⏱️ Duración: <strong style="color:var(--amber); font-weight:800;">${durDisplay}</strong></span>
+                    <span style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Duración: <strong style="color:var(--amber); font-weight:800;">${durDisplay}</strong></span>
                     <span>${exCount} ej. (${totalSets} series)</span>
                     ${notesBadge}
                   </div>
@@ -11499,7 +11541,12 @@
       if (!exId) {
         container.innerHTML = `
           <div class="history-empty" style="padding: 24px 16px; text-align: center;">
-            <span style="font-size: 2rem; display: block; margin-bottom: 8px;">📈</span>
+            <span style="display: flex; justify-content: center; margin-bottom: 8px; color: var(--gold); opacity: 0.7;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+            </span>
             <div style="font-weight: 700; color: #fff; margin-bottom: 4px;">Sin progresión registrada aún</div>
             <div style="color: var(--text-muted); font-size: 0.8rem;">Completa tu primer entrenamiento y aquí podrás consultar la evolución de tus cargas y récords (PR).</div>
           </div>
@@ -12538,7 +12585,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=design22').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=design23').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -12904,12 +12951,16 @@
         html += `
           <div class="session-detail-card" style="margin-bottom: ${sIdx < sessions.length - 1 ? '16px' : '0'};">
             <div style="font-size: 1.05rem; font-weight: 800; color: #fff;">${escapeHtml(s.dayName || s.dayId)}</div>
-            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 3px; text-transform: capitalize;">
-              📅 ${dateFormatted} a las ${timeFormatted}
+            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 3px; text-transform: capitalize; display: flex; align-items: center; gap: 5px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <span>${dateFormatted} a las ${timeFormatted}</span>
             </div>
 
             <div class="session-detail-header-meta">
-              <span class="session-detail-tag">⏱️ ${s.durationFormatted || (s.durationMinutes ? s.durationMinutes + ' min' : '45 min')}</span>
+              <span class="session-detail-tag" style="display: inline-flex; align-items: center; gap: 4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span>${s.durationFormatted || (s.durationMinutes ? s.durationMinutes + ' min' : '45 min')}</span>
+              </span>
               <span class="session-detail-tag">${totalSets} series</span>
               <span class="session-detail-tag">${volDisplay}</span>
             </div>
@@ -12940,7 +12991,9 @@
             if (ex.notes && ex.notes.trim()) {
               html += `
                 <div class="session-ex-note">
-                  <span class="note-icon">📝</span>
+                  <span class="note-icon" style="display:inline-flex; align-items:center;">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </span>
                   <span class="note-text">${escapeHtml(ex.notes.trim())}</span>
                 </div>
               `;
