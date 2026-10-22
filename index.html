@@ -1641,6 +1641,112 @@
     }
     .btn-flex-share:active { transform: scale(0.97); }
 
+    /* Modal de Felicitación Post-Entrenamiento */
+    .congrats-modal-sheet {
+      max-width: 440px;
+      padding: 20px 18px 24px;
+    }
+    .congrats-metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 14px 0;
+    }
+    .congrats-metric-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 10px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .congrats-metric-box .metric-icon {
+      font-size: 1.15rem;
+      margin-bottom: 2px;
+    }
+    .congrats-metric-box .metric-val {
+      font-size: 1.05rem;
+      font-weight: 850;
+      color: #fff;
+    }
+    .congrats-metric-box .metric-lbl {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .congrats-info-card {
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      text-align: left;
+    }
+    .congrats-pr-card {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(14, 24, 44, 0.7));
+      border: 1px solid rgba(251, 191, 36, 0.4);
+    }
+    .congrats-tip-card {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(14, 24, 44, 0.7));
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .congrats-next-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .congrats-card-icon {
+      font-size: 1.4rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .congrats-card-title {
+      font-size: 0.88rem;
+      font-weight: 850;
+      color: #fff;
+      margin-bottom: 3px;
+    }
+    .congrats-card-body {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+    .btn-congrats-rest {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fbbf24, #d97706);
+      color: #060a13;
+      border: none;
+      font-size: 1rem;
+      font-weight: 850;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 18px var(--primary-glow);
+      transition: all 0.15s;
+    }
+    .btn-congrats-rest:active {
+      transform: scale(0.98);
+    }
+    .btn-toggle-share-card {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 6px;
+    }
+
     /* Unified History Cards System */
     .history-card {
       background: var(--surface-card);
@@ -1834,7 +1940,19 @@
       pointer-events: none;
     }
     .cal-day-cell.today {
-      border-color: var(--cyan);
+      border: 1.5px solid var(--cyan);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+    .cal-day-cell.today .cal-day-num {
+      font-weight: 900 !important;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .cal-day-cell.today.has-workout .cal-day-num {
+      color: #fbbf24;
+      font-weight: 900 !important;
     }
     .cal-day-cell.has-workout {
       background: rgba(245, 158, 11, 0.12);
@@ -9223,32 +9341,83 @@
        ========================================== -->
 
   <!-- ==========================================
-       MODAL TARJETA VISUAL DE FIN DE ENTRENO (Flex Card)
+       MODAL TARJETA DE FELICITACIÓN Y FIN DE ENTRENO
        ========================================== -->
   <div class="modal-overlay" id="workoutSummaryModal" onclick="closeWorkoutSummaryModal(event)">
-    <div class="modal-sheet flex-card-sheet" onclick="event.stopPropagation()">
+    <div class="modal-sheet congrats-modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-drag-handle"></div>
-      <div class="modal-header">
-        <div>
-          <div class="modal-title">🎉 ¡ENTRENAMIENTO COMPLETADO!</div>
-          <div class="modal-subtitle" id="flexCardSubtitle">Sesión archivada automáticamente en tu historial</div>
+      <div class="modal-header" style="margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.4rem; line-height: 1;">🎉</span>
+          <div>
+            <div class="modal-title" style="font-size: 1.12rem; font-weight: 850; color: #fff;">¡Entrenamiento Completado!</div>
+            <div class="modal-subtitle" id="flexCardSubtitle">Sesión archivada con éxito en tu historial</div>
+          </div>
         </div>
         <button class="modal-close-btn" onclick="closeWorkoutSummaryModal()">✕</button>
       </div>
 
-      <div class="flex-canvas-wrap">
-        <canvas id="workoutShareCanvas" width="1080" height="1350"></canvas>
+      <!-- Métricas Clave de la Sesión -->
+      <div class="congrats-metrics-row" id="congratsMetricsRow">
+        <div class="congrats-metric-box">
+          <span class="metric-icon">⏱️</span>
+          <span class="metric-val" id="congratsDuration">45 min</span>
+          <span class="metric-lbl">Duración</span>
+        </div>
+        <div class="congrats-metric-box">
+          <span class="metric-icon">📊</span>
+          <span class="metric-val" id="congratsVolume">0 t</span>
+          <span class="metric-lbl">Volumen</span>
+        </div>
+        <div class="congrats-metric-box">
+          <span class="metric-icon">✓</span>
+          <span class="metric-val" id="congratsSets">0</span>
+          <span class="metric-lbl">Series</span>
+        </div>
       </div>
 
-      <div class="flex-actions-bar">
-        <button class="btn-flex-download" onclick="downloadFlexCard()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>Descargar Imagen</span>
+      <!-- Tarjeta 1: Logro / Récord de la Sesión -->
+      <div class="congrats-info-card congrats-pr-card" id="congratsPRCard">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Tarjeta 2: Indicación para la Próxima Sesión / Sobrecarga -->
+      <div class="congrats-info-card congrats-tip-card" id="congratsTipCard">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Tarjeta 3: Descanso y Previsión de Mañana -->
+      <div class="congrats-info-card congrats-next-card" id="congratsNextCard">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Botón Principal: A descansar -->
+      <div style="margin-top: 14px;">
+        <button type="button" class="btn-congrats-rest" onclick="closeWorkoutSummaryModal()">
+          <span>¡A descansar! 💪</span>
         </button>
-        <button class="btn-flex-share" onclick="shareFlexCard()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          <span>Compartir</span>
+      </div>
+
+      <!-- Sección Secundaria Desplegable para ver la Tarjeta Gráfica / Compartir -->
+      <div class="congrats-share-toggle" style="margin-top: 10px; text-align: center;">
+        <button type="button" class="btn-toggle-share-card" onclick="toggleFlexCardPreview(event)">
+          <span id="toggleShareCardText">Ver tarjeta gráfica para compartir ▾</span>
         </button>
+        <div id="flexCardCanvasContainer" style="display: none; margin-top: 10px;">
+          <div class="flex-canvas-wrap">
+            <canvas id="workoutShareCanvas" width="1080" height="1350"></canvas>
+          </div>
+          <div class="flex-actions-bar">
+            <button class="btn-flex-download" onclick="downloadFlexCard()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Descargar Imagen</span>
+            </button>
+            <button class="btn-flex-share" onclick="shareFlexCard()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              <span>Compartir</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -9870,20 +10039,25 @@
         : ['torsoA', 'piernaA', 'torsoB', 'piernaB'];
       const nextRec = (typeof getNextRecommendedDay === 'function') ? getNextRecommendedDay(prog) : (prog === 'fullbody' ? 'fullbodyA' : 'torsoA');
       const activeDay = (progDays.includes(lastActiveWorkoutDay)) ? lastActiveWorkoutDay : (prog === 'fullbody' ? 'fullbodyA' : 'torsoA');
+      const todaySession = (typeof getTodayCompletedSession === 'function') ? getTodayCompletedSession() : null;
 
       let html = '';
       days.forEach(d => {
         const isSelected = (d.id === activeDay);
         const isNext = (d.id === nextRec);
+        const isTodayDone = todaySession && (todaySession.dayId === d.id);
         const lastInfo = (typeof getDayLastDoneInfo === 'function') ? getDayLastDoneInfo(d.id) : null;
         
         let badgeText = '';
         let badgeClass = '';
-        if (isSelected) {
+        if (isTodayDone) {
+          badgeText = '✅ Hecho hoy';
+          badgeClass = 'badge-active-day';
+        } else if (isSelected) {
           badgeText = 'Seleccionado';
           badgeClass = 'badge-active-day';
         } else if (isNext) {
-          badgeText = 'Toca hoy';
+          badgeText = todaySession ? 'Mañana toca' : 'Toca hoy';
           badgeClass = 'badge-next-day';
         }
 
@@ -9959,7 +10133,9 @@
           fullbodyA: 'Día A', fullbodyB: 'Día B', fullbodyC: 'Día C',
           torsoA: 'Torso A', piernaA: 'Pierna A', torsoB: 'Torso B', piernaB: 'Pierna B'
         };
-        chipLabel.innerText = dayNames[dayId] || dayId;
+        const todayDone = (typeof getTodayCompletedSession === 'function') ? getTodayCompletedSession() : null;
+        const isDone = todayDone && todayDone.dayId === dayId;
+        chipLabel.innerText = isDone ? `${dayNames[dayId] || dayId} (Hecho)` : (dayNames[dayId] || dayId);
       }
       updateHeaderEstimatedDuration(dayId);
 
@@ -10021,6 +10197,9 @@
         updateDayBannerLastDone(dayId);
         updateProgress();
         updateDayExerciseAccordion(dayId);
+        if (typeof updateRestWarningBanner === 'function') {
+          updateRestWarningBanner(dayId);
+        }
       }
       refreshMascotBadge();
       if (dayId === 'historialView' || dayId === 'routinePlanView') {
@@ -10062,12 +10241,17 @@
         }
       }
 
-      // 2. Next day in rotation
+      // 2. Next day in rotation (o permanecer en el completado hoy si ya entrenó hoy)
       const sessions = workoutState.sessions || [];
       if (sessions.length > 0) {
         const lastSession = getLastSession() || sessions[0];
         const lastDayId = lastSession.dayId;
         if (sequence.includes(lastDayId)) {
+          if (typeof isDateToday === 'function' && isDateToday(lastSession.date)) {
+            // Ya ha entrenado hoy: abrir en el día completado hoy mostrando su estado finalizado
+            selectDay(lastDayId);
+            return;
+          }
           const lastIdx = sequence.indexOf(lastDayId);
           const nextDayId = sequence[(lastIdx + 1) % sequence.length];
           selectDay(nextDayId);
@@ -10406,16 +10590,20 @@
         ? activeContent.id
         : lastActiveWorkoutDay;
 
+      const todaySession = (typeof getTodayCompletedSession === 'function') ? getTodayCompletedSession() : null;
       let html = `<div class="dropdown-header">Elegir Día (${prog === 'fullbody' ? 'Full Body · 3D' : 'Torso/Pierna · 4D'})</div>`;
       days.forEach(d => {
         const isAct = (d.id === activeDayId);
         const isRec = (d.id === nextRec);
+        const isTodayDone = todaySession && (todaySession.dayId === d.id);
         const lastInfo = (typeof getDayLastDoneInfo === 'function') ? getDayLastDoneInfo(d.id) : null;
         let badge = '';
-        if (isAct) {
+        if (isTodayDone) {
+          badge = ' • ✅ Hecho hoy';
+        } else if (isAct) {
           badge = ' • Activo';
         } else if (isRec) {
-          badge = ' • Toca hoy';
+          badge = todaySession ? ' • 📅 Mañana toca' : ' • Toca hoy';
         }
         const lastText = lastInfo ? ` (Último: ${lastInfo.relative})` : '';
         html += `
@@ -11530,10 +11718,13 @@
         return;
       }
 
-      executeDayArchive(dayId, durationMin, false);
+      const sessionRecord = executeDayArchive(dayId, durationMin, false, true);
+      setTimeout(() => {
+        openWorkoutSummaryModal(sessionRecord || getLastSession());
+      }, 350);
     }
 
-    function executeDayArchive(dayId, durationMin, isAutoSave, skipSwitchDay = false) {
+    function executeDayArchive(dayId, durationMin, isAutoSave, skipSwitchDay = true) {
       const daySection = document.getElementById(dayId);
       if (!daySection) return;
 
@@ -11739,6 +11930,9 @@
 
       renderDaySelectorOptions();
       updateDayBannerLastDone(dayId);
+      if (typeof updateRestWarningBanner === 'function') {
+        updateRestWarningBanner(dayId);
+      }
 
       if (!skipSwitchDay) {
         selectDay(nextDayId);
@@ -12261,7 +12455,10 @@
       } else {
         let timelineHTML = ongoingHTML;
         sessions.slice(0, 3).forEach(s => {
-          const dateStr = new Date(s.date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+          const isTodaySession = (typeof isDateToday === 'function') && isDateToday(s.date);
+          const dateStr = isTodaySession
+            ? `<strong style="font-weight: 900; color: #fbbf24; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.35); border-radius: 6px; padding: 2px 7px; display: inline-flex; align-items: center; gap: 4px;">Hoy • ${new Date(s.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</strong>`
+            : new Date(s.date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
           const exCount = s.exercises ? s.exercises.length : 0;
           let totalSets = 0;
           let notesCount = 0;
@@ -12340,7 +12537,10 @@
         } else {
           let html = '';
           sessions.forEach(s => {
-            const dateStr = new Date(s.date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            const isTodaySession = (typeof isDateToday === 'function') && isDateToday(s.date);
+            const dateStr = isTodaySession
+              ? `<strong style="font-weight: 900; color: #fbbf24; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.35); border-radius: 6px; padding: 2px 7px; display: inline-flex; align-items: center; gap: 4px;">Hoy • ${new Date(s.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</strong>`
+              : new Date(s.date).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
             const exCount = s.exercises ? s.exercises.length : 0;
             let totalSets = 0;
             let notesCount = 0;
@@ -13992,7 +14192,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev23').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev24').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -14042,6 +14242,93 @@
     }
 
     // 2. Dynamic Day Selector & Routine Switching
+    function isDateToday(dateValue) {
+      if (!dateValue) return false;
+      const d = new Date(dateValue);
+      if (isNaN(d.getTime())) return false;
+      const today = new Date();
+      return d.getFullYear() === today.getFullYear() &&
+             d.getMonth() === today.getMonth() &&
+             d.getDate() === today.getDate();
+    }
+
+    function getTodayCompletedSession() {
+      const sessions = workoutState.sessions || [];
+      if (!sessions || !sessions.length) return null;
+      const today = new Date();
+      return sessions.find(s => {
+        if (!s || !s.date) return false;
+        const d = new Date(s.date);
+        return d.getFullYear() === today.getFullYear() &&
+               d.getMonth() === today.getMonth() &&
+               d.getDate() === today.getDate();
+      }) || null;
+    }
+
+    function getNextWorkoutDayTitle(dayId) {
+      const prog = currentProgram || (dayId && dayId.startsWith('fullbody') ? 'fullbody' : 'torso_pierna');
+      const seqFB = [
+        { id: 'fullbodyA', name: 'Día A: Squat + Torso' },
+        { id: 'fullbodyB', name: 'Día B: RDL + Torso' },
+        { id: 'fullbodyC', name: 'Día C: Pierna + Hipertrofia' }
+      ];
+      const seqTP = [
+        { id: 'torsoA', name: 'Día 1: Torso A • Empuje' },
+        { id: 'piernaA', name: 'Día 2: Pierna A • Cuádriceps' },
+        { id: 'torsoB', name: 'Día 3: Torso B • Tracción' },
+        { id: 'piernaB', name: 'Día 4: Pierna B • Isquios' }
+      ];
+      const seq = (prog === 'fullbody') ? seqFB : seqTP;
+      const idx = seq.findIndex(d => d.id === dayId);
+      if (idx !== -1) {
+        return seq[(idx + 1) % seq.length].name;
+      }
+      return seq[0].name;
+    }
+
+    function updateRestWarningBanner(dayId) {
+      if (!dayId || dayId === 'historialView' || dayId === 'routinePlanView') return;
+      const daySection = document.getElementById(dayId);
+      if (!daySection) return;
+
+      const existing = daySection.querySelector('.day-rest-notice-wrap');
+      if (existing) existing.remove();
+
+      const todaySession = getTodayCompletedSession();
+      if (!todaySession) return;
+
+      const isThisDayDoneToday = (todaySession.dayId === dayId);
+      const nextTitle = getNextWorkoutDayTitle(todaySession.dayId);
+
+      const noticeWrap = document.createElement('div');
+      noticeWrap.className = 'day-rest-notice-wrap';
+      noticeWrap.style.margin = '10px 0 14px 0';
+
+      if (isThisDayDoneToday) {
+        noticeWrap.innerHTML = `
+          <div class="today-done-banner" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(14, 24, 44, 0.8)); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.4);">
+            <span style="font-size: 1.5rem; line-height: 1; flex-shrink: 0;">✅</span>
+            <div style="flex: 1;">
+              <div style="font-size: 0.88rem; font-weight: 850; color: #34d399; margin-bottom: 2px;">¡Entrenamiento de hoy completado!</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.35;">Sesión archivada con éxito. Mañana toca: <strong style="color: #fff;">${escapeHtml(nextTitle)}</strong>. ¡Toca recuperar y descansar!</div>
+            </div>
+          </div>
+        `;
+      } else {
+        noticeWrap.innerHTML = `
+          <div class="rest-warning-banner" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(14, 24, 44, 0.8)); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.4);">
+            <span style="font-size: 1.5rem; line-height: 1; flex-shrink: 0;">🛌</span>
+            <div style="flex: 1;">
+              <div style="font-size: 0.88rem; font-weight: 850; color: #fbbf24; margin-bottom: 2px;">¡Hoy ya has entrenado (${escapeHtml(todaySession.dayName || todaySession.dayId)})!</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.35;">El músculo crece durante el descanso. Te recomendamos descansar hoy y dejar este entrenamiento para mañana.</div>
+            </div>
+          </div>
+        `;
+      }
+
+      daySection.insertBefore(noticeWrap, daySection.firstChild);
+    }
+
     function getRelativeWorkoutInfo(dateValue, now) {
       const dateObj = new Date(dateValue);
       if (!Number.isFinite(dateObj.getTime())) return null;
@@ -14108,6 +14395,7 @@
       ];
       const days = (prog === 'fullbody') ? seqFB : seqTP;
       const nextRec = getNextRecommendedDay(prog);
+      const todaySession = (typeof getTodayCompletedSession === 'function') ? getTodayCompletedSession() : null;
 
       sel.innerHTML = '';
       days.forEach(d => {
@@ -14115,9 +14403,12 @@
         opt.value = d.id;
         const lastInfo = getDayLastDoneInfo(d.id);
         const isNext = (d.id === nextRec);
+        const isTodayDone = todaySession && (todaySession.dayId === d.id);
         let extra = '';
-        if (isNext) {
-          extra = lastInfo ? ` (Toca hoy • Último: ${lastInfo.relative})` : ` (Toca hoy)`;
+        if (isTodayDone) {
+          extra = ' (✅ Completado hoy)';
+        } else if (isNext) {
+          extra = todaySession ? ' (📅 Mañana toca)' : (lastInfo ? ` (Toca hoy • Último: ${lastInfo.relative})` : ` (Toca hoy)`);
         } else if (lastInfo) {
           extra = ` (Último: ${lastInfo.relative})`;
         } else {
@@ -14153,19 +14444,30 @@
       if (!dayId || dayId === 'historialView') return;
       const chip = document.getElementById('lastDoneChip-' + dayId);
       if (!chip) return;
-      const lastInfo = getDayLastDoneInfo(dayId);
+      const todaySession = (typeof getTodayCompletedSession === 'function') ? getTodayCompletedSession() : null;
+      const isTodayDone = todaySession && (todaySession.dayId === dayId);
       const nextRec = getNextRecommendedDay(currentProgram);
       const isNext = (dayId === nextRec);
 
+      if (isTodayDone) {
+        chip.innerHTML = `<strong>✅ Completado hoy</strong>`;
+        chip.classList.remove('recommended');
+        chip.style.display = 'inline-flex';
+        return;
+      }
+
+      const lastInfo = getDayLastDoneInfo(dayId);
       if (lastInfo) {
         chip.innerHTML = isNext
-          ? `<strong>Toca hoy</strong> • Último: ${lastInfo.relative}`
+          ? (todaySession ? `<strong>Mañana</strong> • Último: ${lastInfo.relative}` : `<strong>Toca hoy</strong> • Último: ${lastInfo.relative}`)
           : `Último: ${lastInfo.relative}`;
-        chip.classList.toggle('recommended', isNext);
+        chip.classList.toggle('recommended', isNext && !todaySession);
         chip.style.display = 'inline-flex';
       } else {
-        chip.innerHTML = isNext ? `<strong>Toca hoy</strong> • Primera vez` : `Aún no realizado`;
-        chip.classList.toggle('recommended', isNext);
+        chip.innerHTML = isNext
+          ? (todaySession ? `<strong>Mañana</strong> • Primera vez` : `<strong>Toca hoy</strong> • Primera vez`)
+          : `Aún no realizado`;
+        chip.classList.toggle('recommended', isNext && !todaySession);
         chip.style.display = 'inline-flex';
       }
     }
@@ -14335,21 +14637,25 @@
         const dayKey = `${calCurrentYear}-${String(calCurrentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const daySessions = sessionsByDay[dayKey] || [];
 
-        if (isThisMonth && day === today.getDate()) {
+        const isCurrentDay = (isThisMonth && day === today.getDate());
+        if (isCurrentDay) {
           cell.classList.add('today');
         }
+
+        const dayNumHtml = isCurrentDay
+          ? `<strong class="cal-day-num" style="font-weight: 900 !important;">${day}</strong>`
+          : `<span class="cal-day-num">${day}</span>`;
 
         if (daySessions.length > 0) {
           cell.classList.add('has-workout');
           monthSessionCount += daySessions.length;
           cell.innerHTML = `
-            <span class="cal-day-num">${day}</span>
-            
+            ${dayNumHtml}
           `;
           cell.setAttribute('title', `${daySessions.length} entreno(s) el ${day} de ${monthNames[calCurrentMonth]}`);
           cell.onclick = () => openSessionDetailModal(daySessions, dayKey);
         } else {
-          cell.innerHTML = `<span class="cal-day-num">${day}</span>`;
+          cell.innerHTML = dayNumHtml;
           cell.onclick = () => openEmptyDayModal(day, monthNames[calCurrentMonth], calCurrentYear);
         }
 
@@ -14400,7 +14706,7 @@
             <div style="font-size: 1.05rem; font-weight: 800; color: #fff;">${escapeHtml(s.dayName || s.dayId)}</div>
             <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 3px; text-transform: capitalize; display: flex; align-items: center; gap: 5px;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              <span>${dateFormatted} a las ${timeFormatted}</span>
+              ${isDateToday(s.date) ? `<strong style="font-weight: 900; color: #fbbf24;">Hoy, ${dateFormatted} a las ${timeFormatted}</strong>` : `<span>${dateFormatted} a las ${timeFormatted}</span>`}
             </div>
 
             <div class="session-detail-header-meta">
@@ -14752,23 +15058,158 @@
 
       const sub = document.getElementById('flexCardSubtitle');
       if (sub) {
-        sub.innerText = `${activeSession.dayName} archivado con éxito (${activeSession.durationFormatted || '45 min'})`;
+        sub.innerText = `${activeSession.dayName} archivado con éxito`;
+      }
+
+      // 1. Calcular métricas clave
+      let totalVolume = 0;
+      let totalSets = 0;
+      let sessionPRs = [];
+
+      if (activeSession.exercises) {
+        activeSession.exercises.forEach(ex => {
+          if (ex.sets) {
+            totalSets += ex.sets.length;
+            ex.sets.forEach(st => {
+              totalVolume += (st.kg || 0) * (st.reps || 0);
+            });
+          }
+          if (ex.best1RM > 0) {
+            sessionPRs.push(ex);
+          }
+        });
+      }
+
+      const durDisplay = activeSession.durationFormatted || (activeSession.durationMinutes ? `${activeSession.durationMinutes} min` : '45 min');
+      const volDisplay = totalVolume >= 1000 ? `${(totalVolume / 1000).toFixed(1)} t` : `${totalVolume} kg`;
+
+      const elDur = document.getElementById('congratsDuration');
+      if (elDur) elDur.innerText = durDisplay;
+      const elVol = document.getElementById('congratsVolume');
+      if (elVol) elVol.innerText = volDisplay;
+      const elSets = document.getElementById('congratsSets');
+      if (elSets) elSets.innerText = String(totalSets);
+
+      // 2. Destacar PR / Récord conseguido
+      const prCard = document.getElementById('congratsPRCard');
+      if (prCard) {
+        let bestPR = null;
+        if (typeof lastPRInfo !== 'undefined' && lastPRInfo && lastPRInfo.exId) {
+          const exCat = EXERCISE_CATALOG[lastPRInfo.exId] || { name: lastPRInfo.exId };
+          bestPR = {
+            name: exCat.name,
+            kind: lastPRInfo.kind,
+            val: lastPRInfo.value,
+            prev: lastPRInfo.prev
+          };
+        } else if (sessionPRs.length > 0) {
+          const top = sessionPRs.reduce((max, ex) => ex.best1RM > max.best1RM ? ex : max, sessionPRs[0]);
+          bestPR = {
+            name: top.name,
+            kind: '1rm',
+            val: top.best1RM,
+            kg: top.bestKg,
+            reps: top.bestReps
+          };
+        }
+
+        if (bestPR) {
+          let prText = '';
+          if (bestPR.kind === 'seconds') {
+            prText = `Aguante récord: ${bestPR.val}s`;
+          } else if (bestPR.kg && bestPR.reps) {
+            prText = `${bestPR.kg} kg × ${bestPR.reps} reps (1RM est. ${bestPR.val} kg)`;
+          } else {
+            prText = `1RM est. ${bestPR.val} kg`;
+          }
+          prCard.innerHTML = `
+            <span class="congrats-card-icon">🏆</span>
+            <div>
+              <div class="congrats-card-title" style="color:#fbbf24;">¡Nuevo Récord Conseguido!</div>
+              <div class="congrats-card-body"><strong>${escapeHtml(bestPR.name)}</strong>: ${prText}. ¡La sobrecarga progresiva da sus frutos!</div>
+            </div>
+          `;
+        } else {
+          prCard.innerHTML = `
+            <span class="congrats-card-icon">🔥</span>
+            <div>
+              <div class="congrats-card-title" style="color:#fbbf24;">¡Constancia y Disciplina Impecable!</div>
+              <div class="congrats-card-body">Has completado todas las series planificadas manteniendo una excelente intensidad de entrenamiento.</div>
+            </div>
+          `;
+        }
+      }
+
+      // 3. Indicación de mejora para la próxima sesión
+      const tipCard = document.getElementById('congratsTipCard');
+      if (tipCard) {
+        let overloadTip = null;
+        if (workoutState.overloadSuggestions) {
+          const keys = Object.keys(workoutState.overloadSuggestions);
+          if (keys.length > 0) {
+            const sugExId = keys[0];
+            const sug = workoutState.overloadSuggestions[sugExId];
+            const exData = EXERCISE_CATALOG[sugExId] || { name: sugExId };
+            overloadTip = { name: exData.name, kg: sug.nextKg, reps: sug.baseReps };
+          }
+        }
+        if (overloadTip) {
+          tipCard.innerHTML = `
+            <span class="congrats-card-icon">💡</span>
+            <div>
+              <div class="congrats-card-title" style="color:var(--cyan);">Objetivo de Sobrecarga para Próxima Sesión</div>
+              <div class="congrats-card-body">En <strong>${escapeHtml(overloadTip.name)}</strong>: sube la carga a <strong>${overloadTip.kg} kg</strong> (rango base de ${overloadTip.reps} reps).</div>
+            </div>
+          `;
+        } else {
+          tipCard.innerHTML = `
+            <span class="congrats-card-icon">💡</span>
+            <div>
+              <div class="congrats-card-title" style="color:var(--cyan);">Indicación para Progresar</div>
+              <div class="congrats-card-body">En tu próxima sesión, intenta sumar 1 repetición más en tu serie más pesada antes de incrementar el peso.</div>
+            </div>
+          `;
+        }
+      }
+
+      // 4. Descanso y Preview del Próximo Día
+      const nextCard = document.getElementById('congratsNextCard');
+      if (nextCard) {
+        const nextTitle = (typeof getNextWorkoutDayTitle === 'function')
+          ? getNextWorkoutDayTitle(activeSession.dayId)
+          : 'próximo entrenamiento';
+        nextCard.innerHTML = `
+          <span class="congrats-card-icon">🛌</span>
+          <div>
+            <div class="congrats-card-title">Recuperación & Próximo Entreno</div>
+            <div class="congrats-card-body">Come bien, hidrátate y descansa hoy. Mañana toca: <strong style="color:#fff;">${escapeHtml(nextTitle)}</strong>.</div>
+          </div>
+        `;
       }
 
       modal.classList.add('open');
       document.body.classList.add('modal-open');
     }
 
+    function toggleFlexCardPreview(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      const container = document.getElementById('flexCardCanvasContainer');
+      const text = document.getElementById('toggleShareCardText');
+      if (!container) return;
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+        if (text) text.innerText = 'Ocultar tarjeta gráfica ▴';
+      } else {
+        container.style.display = 'none';
+        if (text) text.innerText = 'Ver tarjeta gráfica para compartir ▾';
+      }
+    }
+
     function closeWorkoutSummaryModal(e) {
-      if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn')) return;
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn') && !e.target.closest('.modal-close-btn') && !e.target.closest('.btn-congrats-rest')) return;
       document.getElementById('workoutSummaryModal')?.classList.remove('open');
       document.body.classList.remove('modal-open');
-
-      // Auto switch to next recommended day in rotation
-      const nextRec = getNextRecommendedDay(currentProgram);
-      if (nextRec) {
-        selectDay(nextRec);
-      }
+      // No cambiar automáticamente al día siguiente: se permanece en el día actual completado
     }
 
     function downloadFlexCard() {

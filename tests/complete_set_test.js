@@ -7,14 +7,14 @@ const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
 
 console.log('====================================================');
-console.log('🧪 VigorexiApp - Test de Marcado y Auto-Colapso (rev23)');
+console.log('🧪 VigorexiApp - Test de Marcado y Auto-Colapso (rev24)');
 console.log('====================================================\n');
 
 // 1. Verificación de versiones
 console.log('📦 1. Verificación de Versiones de Caché:');
-assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev23'/.test(sw), 'sw.js no tiene rev23');
-assert(/sw\.js\?v=1\.8\.4-rev23/.test(html), 'index.html no registra rev23');
-console.log('  ✓ Cache rev23 sincronizada en index.html y sw.js');
+assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev24'/.test(sw), 'sw.js no tiene rev24');
+assert(/sw\.js\?v=1\.8\.4-rev24/.test(html), 'index.html no registra rev24');
+console.log('  ✓ Cache rev24 sincronizada en index.html y sw.js');
 
 // 2. Verificación de colores amarillos en checks de serie
 console.log('\n💛 2. Verificación de Check Buttons Amarillos:');
