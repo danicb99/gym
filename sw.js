@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigorexiapp-v1.8.4-rev6';
+const CACHE_NAME = 'vigorexiapp-v1.8.4-rev7';
 const NOTIF_BADGE = './badge-dumbbell.png?v=3';
 const NOTIF_ICON = './icon-192.png?v=3';
 
@@ -8,6 +8,7 @@ const ASSETS = [
   './reloj.html',
   './qr_zepp.png',
   './watch_bridge.js',
+  './mascot.png',
   './icon-round-192.png',
   './icon-round-512.png',
   './badge-round.png',
