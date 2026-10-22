@@ -11,10 +11,10 @@ console.log('🧪 VigorexiApp - Test Post-Entreno, Descanso e Historial');
 console.log('====================================================\n');
 
 // 1. Verificación de versiones
-console.log('📦 1. Verificación de Versiones de Caché (rev26):');
-assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev26'/.test(sw), 'sw.js no tiene rev26');
-assert(/sw\.js\?v=1\.8\.4-rev26/.test(html), 'index.html no registra rev26');
-console.log('  ✓ Cache rev26 sincronizada en index.html y sw.js');
+console.log('📦 1. Verificación de Versiones de Caché (rev27):');
+assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev27'/.test(sw), 'sw.js no tiene rev27');
+assert(/sw\.js\?v=1\.8\.4-rev27/.test(html), 'index.html no registra rev27');
+console.log('  ✓ Cache rev27 sincronizada en index.html y sw.js');
 
 // 2. Verificación de Historial en Negrita
 console.log('\n📅 2. Verificación de Día Actual en Negrita en el Historial:');
@@ -94,6 +94,16 @@ console.log('  ✓ getNextWorkoutDayTitle sugiere correctamente el Día B tras e
 // Comprobar autoSelectInitialDay con sesión de hoy
 assert(/if\s*\(typeof isDateToday === 'function' && isDateToday\(lastSession\.date\)\)\s*\{\s*\/\/[^\n]*\s*selectDay\(lastDayId\);/i.test(html), 'autoSelectInitialDay debe seleccionar el día completado hoy si ya se entrenó hoy');
 console.log('  ✓ autoSelectInitialDay retiene el día completado hoy en vez de saltar al de mañana');
+
+// 5. Verificación de Iconos Vectoriales y Coherencia de Diseño (rev27)
+console.log('\n✨ 5. Verificación de Iconos Vectoriales y Cohesión Visual (rev27):');
+assert(html.includes('.today-done-badge'), 'Falta la clase CSS .today-done-badge');
+assert(html.includes('.rest-warning-badge'), 'Falta la clase CSS .rest-warning-badge');
+assert(!/class="today-done-banner"[^>]*>[\s\S]*?✅/i.test(html), 'today-done-banner no debe usar el emoji ✅ genérico');
+assert(html.includes('class="today-done-badge"'), 'today-done-banner debe usar el badge vectorial today-done-badge');
+assert(html.includes('class="rest-warning-badge"'), 'rest-warning-banner debe usar el badge vectorial rest-warning-badge');
+assert(!/updateRestWarningBanner[\s\S]*?✅/.test(html), 'updateRestWarningBanner no debe contener emojis ✅');
+console.log('  ✓ Iconos vectoriales dorados/cyan integrados en los banners sin emojis genéricos');
 
 console.log('\n====================================================');
 console.log('🎉 TODAS LAS PRUEBAS POST-ENTRENO Y DESCANSO APROBADAS');
