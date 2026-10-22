@@ -115,7 +115,7 @@ function daysAgo(n) {
   return d.toISOString();
 }
 
-console.log('Coach Mascota (rev15)');
+console.log('Coach Mascota (rev16)');
 
 test('Cabecera: mascota es un boton accesible sin onclick inline', () => {
   const tag = html.match(/<button[^>]*id="mascotBtn"[^>]*>/);
@@ -124,6 +124,7 @@ test('Cabecera: mascota es un boton accesible sin onclick inline', () => {
   assert(/aria-haspopup="dialog"/.test(tag[0]), 'Falta aria-haspopup');
   assert(/aria-label="Abrir coach"/.test(tag[0]), 'Falta aria-label inicial');
   assert(/<span class="mascot-badge" id="mascotBadge" aria-hidden="true"><\/span>/.test(html), 'Falta badge aria-hidden');
+  assert(/<div class="modal-title" id="coachModalTitle">Grefusito Poderoso<\/div>/.test(html), 'El título del modal debe ser Grefusito Poderoso');
 });
 
 test('Globo contextual: markup accesible y estilos de cabecera', () => {
@@ -138,9 +139,9 @@ test('Globo contextual: markup accesible y estilos de cabecera', () => {
   assert(/\.coach-bubble\.show\s*\{[\s\S]*?pointer-events:\s*auto/.test(html), 'El globo visible debe ser interactivo');
 });
 
-test('Cache rev15 en sw.js y en el registro', () => {
-  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev15'/.test(sw), 'CACHE_NAME no es rev15');
-  assert(/sw\.js\?v=1\.8\.4-rev15/.test(html), 'El registro no apunta a rev15');
+test('Cache rev16 en sw.js y en el registro', () => {
+  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev16'/.test(sw), 'CACHE_NAME no es rev16');
+  assert(/sw\.js\?v=1\.8\.4-rev16/.test(html), 'El registro no apunta a rev16');
 });
 
 test('Personalidad: whitelist y fallback a gymbro', () => {
@@ -154,6 +155,9 @@ test('Personalidad: whitelist y fallback a gymbro', () => {
   assert.strictEqual(ctx.sanitizeImportedState({ coachPersonality: 'ciencia' }).coachPersonality, 'ciencia');
   assert.strictEqual(ctx.sanitizeImportedState({ coachPersonality: 'inventado' }).coachPersonality, 'gymbro');
   assert.strictEqual(ctx.sanitizeImportedState({}).coachPersonality, 'gymbro');
+  assert.strictEqual(ctx.sanitizeImportedState({ coachTiredMode: true }).coachTiredMode, true);
+  assert.strictEqual(ctx.sanitizeImportedState({ coachTiredMode: 'true' }).coachTiredMode, false);
+  assert.strictEqual(ctx.sanitizeImportedState({}).coachTiredMode, false);
 });
 
 test('Alertas: inactivity, fatigue y yesterday con type', () => {
@@ -239,9 +243,82 @@ test('Briefing: ultimo entreno usa la sesion mas reciente, no el dia activo', ()
     ROUTINE_SLOTS: { fullbodyC: { shortName: 'Día C' } }
   };
   vm.createContext(ctx);
-  vm.runInContext(extractFunction('getCoachBriefing'), ctx);
+  vm.runInContext(extractFunction('getCoachTiredMode') + '\n' + extractFunction('getCoachBriefing'), ctx);
   const rows = ctx.getCoachBriefing();
   assert.strictEqual(rows.find(r => r.label === 'Último entreno').value, 'Hace 2 días');
+  ctx.workoutState.coachTiredMode = true;
+  assert.strictEqual(ctx.getCoachBriefing().find(r => r.label === 'Modo').value, 'Cansado · -10% carga');
+});
+
+test('Hora estimada de salida descuenta las series completadas', () => {
+  const ctx = {
+    ROUTINE_SLOTS: {
+      test: {
+        slots: [
+          { slotId: 'test_1', sets: [[0, 1], [0, 1]] },
+          { slotId: 'test_2', sets: [[0, 1], [0, 1]] },
+          { slotId: 'test_3', sets: [[0, 1], [0, 1]], isSkippable: true }
+        ]
+      }
+    },
+    workoutState: {
+      sessionStartTime: { test: new Date(2026, 9, 22, 10, 0, 0).getTime() },
+      completed: ['test_1_0', 'test_2_0']
+    },
+    isExpressMode: false,
+    calculateDayEstimatedDuration: () => 60,
+    Date: Date,
+    Math: Math,
+    Number: Number,
+    String: String,
+    Set: Set
+  };
+  vm.createContext(ctx);
+  vm.runInContext([
+    extractFunction('getDayTotalSets'),
+    extractFunction('getDayCompletedSets'),
+    extractFunction('getEstimatedExitTime')
+  ].join('\n'), ctx);
+
+  const res = ctx.getEstimatedExitTime('test', new Date(2026, 9, 22, 10, 10, 0).getTime());
+  assert.strictEqual(res.total, 6);
+  assert.strictEqual(res.done, 2);
+  assert.strictEqual(res.remainingMin, 40);
+  assert.strictEqual(res.clock, '10:50');
+  assert.strictEqual(res.label, '10:50 · ~40 min');
+  assert.strictEqual(ctx.getEstimatedExitTime('otro', Date.now()), null, 'Sin día válido no debe estimar salida');
+});
+
+test('Modo cansado: markup, estado y recomendación conservadora', () => {
+  assert(/id="coachTiredToggle"[^>]*aria-pressed="false"[^>]*onclick="toggleCoachTiredMode\(\)"/.test(html), 'Falta el toggle de modo cansado');
+  assert(/Baja un 10% la carga/.test(html), 'Falta la recomendación de carga');
+  const toggle = extractFunction('toggleCoachTiredMode');
+  assert(/coachTiredMode = typeof force === 'boolean'/.test(toggle), 'El toggle no acepta un valor explícito');
+  assert(/renderCoachModal\(\)/.test(toggle), 'El toggle no refresca el modal');
+  const render = extractFunction('renderCoachModal');
+  assert(/Hoy cansado: usa el 90% de esa carga/.test(render), 'El modal no ajusta la recomendación');
+});
+
+test('Gym SOS: tres escenarios y salida a alternativas', () => {
+  const sos = extractFunction('coachSOS');
+  assert(/scenario === 'lleno'/.test(sos), 'Falta el escenario de gym lleno');
+  assert(/scenario === 'sin-material'/.test(sos), 'Falta el escenario sin material');
+  assert(/scenario === 'sin-energia'/.test(sos), 'Falta el escenario sin energía');
+  assert(/openSwapModal\(context\.slotId\)/.test(sos), 'Gym lleno no abre alternativas');
+  assert(/coachTiredMode = true/.test(sos), 'Sin energía no activa modo cansado');
+  assert(/onclick="coachSOS\('lleno'\)"/.test(html), 'Falta el botón de gym lleno');
+  assert(/onclick="coachSOS\('sin-material'\)"/.test(html), 'Falta el botón sin material');
+  assert(/onclick="coachSOS\('sin-energia'\)"/.test(html), 'Falta el botón sin energía');
+});
+
+test('Flex Card: sello de mascota limitado a 112 px', () => {
+  assert(/const FLEX_CARD_MASCOT_MAX = 112/.test(html), 'Falta el límite de 112 px');
+  const seal = extractFunction('drawFlexCardMascot');
+  assert(/Math\.min\(FLEX_CARD_MASCOT_MAX/.test(seal), 'El sello no respeta el máximo');
+  assert(/drawImage\(img/.test(seal), 'El sello no dibuja mascot.png');
+  assert(/\.\/mascot\.png/.test(extractFunction('getFlexCardMascot')), 'No se carga mascot.png');
+  assert(/drawFlexCardMascot\(ctx, W\)/.test(extractFunction('drawFlexCard')), 'La Flex Card no dibuja el sello');
+  assert(/mascot\.onload = \(\) => drawFlexCard/.test(extractFunction('openWorkoutSummaryModal')), 'No se redibuja al cargar la mascota');
 });
 
 test('PR 1RM supera el mejor historico', () => {

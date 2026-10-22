@@ -1,16 +1,16 @@
 # Plan Definitivo: Coach Mascota v1.8.4
 
-> Estado: **Tanda 1 completada (rev14) y Tanda 1.5 implementada (rev15).**
+> Estado: **Tanda 1 (rev14), Tanda 1.5 (rev15) y Tanda 2 (rev16) completadas.**
 > Base: commit `edda61e` (`fix: corregir fecha relativa y voseo del coach`).
-> Versión actual del Service Worker: `rev15`.
+> Versión actual del Service Worker: `rev16`.
 
 ## Hoja de ruta
 
 | Fase | Contenido | Caché | Estado |
 | :--- | :--- | :--- | :--- |
-| **TANDA 1** | Mascota interactiva (`#mascotBtn`), modal Coach Vigorex, badge PR/Fatiga/Inactividad, personalidad, asistente de sobrecarga de solo lectura, `getWeightStep` y tests. | **rev13/rev14** | **Completada** |
+| **TANDA 1** | Mascota interactiva (`#mascotBtn`), modal Grefusito Poderoso, badge PR/Fatiga/Inactividad, personalidad, asistente de sobrecarga de solo lectura, `getWeightStep` y tests. | **rev13/rev14** | **Completada** |
 | **TANDA 1.5** | Globo contextual sobre la cabecera (auto-cierre 5 s, pausa y prioridades). | **rev15** | **Completada** |
-| **TANDA 2** | Modo cansado, Gym SOS, hora estimada de salida y sello en Flex Card. | rev16 | Congelada. |
+| **TANDA 2** | Modo cansado, Gym SOS, hora estimada de salida y sello en Flex Card. | **rev16** | **Completada** |
 
 ---
 
@@ -114,7 +114,7 @@ Punto único: `completeSet()` cuando la serie pasa a `done`.
 - Reset de `sessionPRSet` y `lastPRInfo` al cambiar de día de entrenamiento y al finalizar `executeDayArchive`.
 - El badge muestra `🔥` mientras exista al menos un PR en la sesión.
 
-### 6. Modal Coach Vigorex
+### 6. Modal Grefusito Poderoso
 
 - `.modal-overlay` + `.modal-sheet`, con `.open` y `body.modal-open`.
 - `role="dialog"`, `aria-modal="true"`, `aria-labelledby="coachModalTitle"`.
@@ -177,7 +177,13 @@ Punto único: `completeSet()` cuando la serie pasa a `done`.
 - Sin persistencia, TTS ni vibración.
 - El globo no dispara el auto-avance del acordeón ni modifica el estado del entreno.
 
-## Tanda 2 (congelada)
+## Tanda 2 (rev16)
 
-- Modo cansado, Gym SOS (3 escenarios), hora estimada de salida y sello Flex Card.
-- `mascot.png` se dibuja a un máximo de 112 px en la Flex Card.
+- **Modo cansado:** toggle persistente en el modal (`coachTiredMode`). Añade la fila `Modo` al briefing y ajusta la recomendación de sobrecarga al 90% de carga con 2-3 repeticiones en reserva.
+- **Gym SOS:** tres acciones rápidas.
+  - `Gym lleno`: abre el modal de alternativas del ejercicio activo.
+  - `Sin material`: recomienda adaptar los básicos con banda o peso corporal y usar alternativas.
+  - `Sin energía`: activa modo cansado y muestra la pauta conservadora.
+- **Hora estimada de salida:** `getEstimatedExitTime(dayId)` combina la duración base del día, las series completadas y la hora de inicio. Se muestra en el briefing como `HH:MM · ~N min` y se refresca mientras el modal está abierto.
+- **Sello Flex Card:** `drawFlexCardMascot` dibuja `mascot.png` en un círculo con anillo dorado; el tamaño máximo es `FLEX_CARD_MASCOT_MAX = 112` px. La tarjeta se redibuja cuando termina la carga de la imagen.
+- **Compatibilidad:** `coachTiredMode` se sanea en importaciones y se conserva en `localStorage`. Los estados antiguos sin el campo siguen funcionando con `false`.

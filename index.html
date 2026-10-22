@@ -1144,6 +1144,70 @@
     .coach-done-btn:active {
       transform: scale(0.97);
     }
+    .coach-tired-toggle {
+      width: 100%;
+      min-height: 44px;
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .coach-tired-toggle[aria-pressed="true"] {
+      border-color: rgba(251, 191, 36, 0.5);
+      color: var(--primary);
+      background: rgba(251, 191, 36, 0.10);
+    }
+    .coach-tired-toggle small {
+      display: block;
+      margin-top: 3px;
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .coach-sos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .coach-sos-btn {
+      min-height: 58px;
+      padding: 8px 6px;
+      border-radius: 12px;
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      background: rgba(56, 189, 248, 0.07);
+      color: #cbd5e1;
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1.25;
+      cursor: pointer;
+    }
+    .coach-sos-btn:active {
+      transform: scale(0.96);
+    }
+    .coach-sos-btn span {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 3px;
+    }
+    .coach-sos-result {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      background: rgba(16, 185, 129, 0.08);
+      color: #cbd5e1;
+      font-size: 0.75rem;
+      line-height: 1.5;
+    }
+    .coach-sos-result[hidden] {
+      display: none;
+    }
 
     /* Alternativas Cards in Modal */
     .alt-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 12px; transition: all 0.2s; }
@@ -9025,7 +9089,7 @@
         <div style="display: flex; align-items: center; gap: 10px;">
           <img src="./mascot.png" alt="" class="coach-avatar" width="36" height="36">
           <div>
-            <div class="modal-title" id="coachModalTitle">Coach Vigorex</div>
+            <div class="modal-title" id="coachModalTitle">Grefusito Poderoso</div>
             <div class="modal-subtitle" id="coachSubtitle">Tu colega de entrenamiento</div>
           </div>
         </div>
@@ -9040,6 +9104,20 @@
         <button type="button" class="coach-chip" data-personality="ciencia" aria-pressed="false" onclick="selectCoachPersonality('ciencia')">🔬 Ciencia</button>
         <button type="button" class="coach-chip" data-personality="gymbro" aria-pressed="false" onclick="selectCoachPersonality('gymbro')">🤝 Colega</button>
       </div>
+
+      <div class="coach-section-label">Estado de hoy</div>
+      <button type="button" class="coach-tired-toggle" id="coachTiredToggle" aria-pressed="false" onclick="toggleCoachTiredMode()">
+        Modo cansado
+        <small>Baja un 10% la carga y deja 2-3 repeticiones en reserva.</small>
+      </button>
+
+      <div class="coach-section-label">Gym SOS</div>
+      <div class="coach-sos-grid" role="group" aria-label="Soluciones rápidas para el entrenamiento de hoy">
+        <button type="button" class="coach-sos-btn" onclick="coachSOS('lleno')">Gym lleno</button>
+        <button type="button" class="coach-sos-btn" onclick="coachSOS('sin-material')">Sin material</button>
+        <button type="button" class="coach-sos-btn" onclick="coachSOS('sin-energia')">Sin energía</button>
+      </div>
+      <div class="coach-sos-result" id="coachSosResult" role="status" aria-live="polite" hidden></div>
 
       <div class="guide-card coach-overload" id="coachOverloadCard" style="display: none;"></div>
 
@@ -9238,11 +9316,12 @@
       tempSlots: {},          // slotId -> exId (temporary for current workout)
       sessionStartTime: {},   // dayId -> timestamp (Date.now())
       lastActivityTime: {},   // dayId -> timestamp of last input/set marked
-      coachPersonality: 'gymbro' // 'sargento' | 'ciencia' | 'gymbro' (etiqueta visual: Colega)
+      coachPersonality: 'gymbro', // 'sargento' | 'ciencia' | 'gymbro' (etiqueta visual: Colega)
+      coachTiredMode: false    // Modo cansado: recomendaciones conservadoras de carga
     };
 
     // ==========================================
-    // COACH MASCOTA — HELPERS PUROS (rev13)
+    // COACH MASCOTA — HELPERS PUROS (rev16)
     // ==========================================
     const COACH_PERSONALITIES = ['sargento', 'ciencia', 'gymbro'];
 
@@ -10646,6 +10725,8 @@
         if (activeSection && activeSection.id) {
           updateSessionTimerDisplay(activeSection.id);
         }
+        const coachModal = document.getElementById('coachModal');
+        if (coachModal && coachModal.classList.contains('open')) refreshCoachExitTime();
         checkAutoSave();
       }, 1000);
     }
@@ -12214,7 +12295,8 @@
         sessionStartTime: numMap(parsed.sessionStartTime),
         lastActivityTime: numMap(parsed.lastActivityTime),
         overloadSuggestions: obj(parsed.overloadSuggestions),
-        coachPersonality: COACH_PERSONALITIES.includes(parsed.coachPersonality) ? parsed.coachPersonality : 'gymbro'
+        coachPersonality: COACH_PERSONALITIES.includes(parsed.coachPersonality) ? parsed.coachPersonality : 'gymbro',
+        coachTiredMode: parsed.coachTiredMode === true
       };
     }
 
@@ -12904,10 +12986,12 @@
             sessionStartTime: {},
             lastActivityTime: {},
             overloadSuggestions: {},
-            coachPersonality: 'gymbro'
+            coachPersonality: 'gymbro',
+            coachTiredMode: false
           }, loaded);
           if (!workoutState.notes || typeof workoutState.notes !== 'object') workoutState.notes = {};
           if (!COACH_PERSONALITIES.includes(workoutState.coachPersonality)) workoutState.coachPersonality = 'gymbro';
+          workoutState.coachTiredMode = workoutState.coachTiredMode === true;
         } catch (e) {
           console.error(e);
         }
@@ -13116,7 +13200,7 @@
     }
 
     // ==========================================
-    // COACH MASCOTA — UI, BRIEFING Y GESTOS (rev13)
+    // COACH MASCOTA — UI, BRIEFING Y GESTOS (rev16)
     // ==========================================
     const COACH_COPY = {
       sargento: {
@@ -13170,17 +13254,71 @@
       return lines[Math.floor(Math.random() * lines.length)];
     }
 
-    function getCoachBriefing() {
+    function getCoachTiredMode() {
+      return workoutState.coachTiredMode === true;
+    }
+
+    function getDayTotalSets(dayId) {
+      const day = ROUTINE_SLOTS[dayId];
+      if (!day || !Array.isArray(day.slots)) return 0;
+      const express = typeof isExpressMode !== 'undefined' && isExpressMode;
+      return day.slots.reduce((total, slot) => {
+        if (express && slot.isSkippable) return total;
+        return total + ((slot.sets || []).length);
+      }, 0);
+    }
+
+    function getDayCompletedSets(dayId) {
+      const day = ROUTINE_SLOTS[dayId];
+      if (!day || !Array.isArray(day.slots)) return 0;
+      const slotIds = new Set(day.slots.map(slot => slot.slotId));
+      const completed = Array.isArray(workoutState.completed) ? workoutState.completed : [];
+      return completed.filter(key => {
+        if (typeof key !== 'string') return false;
+        const cut = key.lastIndexOf('_');
+        return cut > 0 && slotIds.has(key.slice(0, cut));
+      }).length;
+    }
+
+    function getEstimatedExitTime(dayId, now = Date.now()) {
+      if (!dayId || !ROUTINE_SLOTS[dayId]) return null;
+      const start = workoutState.sessionStartTime && workoutState.sessionStartTime[dayId];
+      if (!start) return null;
+
+      const total = getDayTotalSets(dayId);
+      const done = Math.min(total, getDayCompletedSets(dayId));
+      const baseMinutes = calculateDayEstimatedDuration(dayId, typeof isExpressMode !== 'undefined' && isExpressMode);
+      const remainingMin = Math.max(1, Math.ceil(baseMinutes * Math.max(0, total - done) / Math.max(1, total)));
+      const exit = new Date(Math.max(now, start) + remainingMin * 60000);
+      const clock = `${String(exit.getHours()).padStart(2, '0')}:${String(exit.getMinutes()).padStart(2, '0')}`;
+      return { exit, clock, label: `${clock} · ~${remainingMin} min`, remainingMin, done, total };
+    }
+
+    function refreshCoachExitTime() {
+      const row = document.getElementById('coachExitRow');
+      if (!row) return;
+      const dayId = typeof getCoachBubbleDayId === 'function' ? getCoachBubbleDayId() : '';
+      const info = dayId ? getEstimatedExitTime(dayId) : null;
+      const value = row.querySelector('strong');
+      if (value) value.textContent = info ? info.label : 'Sin sesión activa';
+    }
+
+    function getCoachBriefing(dayId) {
       const streak = calculateStreak(workoutState.sessions || []);
       const lastSession = getLastSession();
       const lastInfo = lastSession ? getRelativeWorkoutInfo(lastSession.date) : null;
       const nextId = getNextRecommendedDay(currentProgram);
       const nextName = (typeof ROUTINE_SLOTS !== 'undefined' && ROUTINE_SLOTS[nextId]) ? ROUTINE_SLOTS[nextId].shortName : nextId;
-      return [
+      const activeDay = dayId || (typeof getCoachBubbleDayId === 'function' ? getCoachBubbleDayId() : '');
+      const exitInfo = activeDay ? getEstimatedExitTime(activeDay) : null;
+      const rows = [
         { label: 'Racha', value: streak > 0 ? `${streak} día${streak === 1 ? '' : 's'}` : 'Sin racha' },
         { label: 'Último entreno', value: lastInfo ? lastInfo.relative : 'Sin registros' },
         { label: 'Siguiente', value: nextName || '—' }
       ];
+      if (exitInfo) rows.push({ label: 'Salida estimada', value: exitInfo.label, id: 'coachExitRow' });
+      if (getCoachTiredMode()) rows.push({ label: 'Modo', value: 'Cansado · -10% carga' });
+      return rows;
     }
 
     function getCoachBubbleDayId() {
@@ -13331,7 +13469,12 @@
         kg: parseFloat(row.querySelector('.input-kg')?.value) || 0,
         reps: parseInt(row.querySelector('.input-reps')?.value, 10) || 0
       }));
-      return { exId: exId, ex: ex, sets: sets };
+      return {
+        slotId: card.id && card.id.indexOf('card-') === 0 ? card.id.slice(5) : '',
+        exId: exId,
+        ex: ex,
+        sets: sets
+      };
     }
 
     function renderCoachModal() {
@@ -13342,7 +13485,7 @@
       const briefing = document.getElementById('coachBriefing');
       if (briefing) {
         briefing.innerHTML = getCoachBriefing().map(row =>
-          `<div class="coach-brief-row"><span>${escapeHtml(row.label)}</span><strong>${escapeHtml(row.value)}</strong></div>`
+          `<div class="coach-brief-row"${row.id ? ` id="${row.id}"` : ''}><span>${escapeHtml(row.label)}</span><strong>${escapeHtml(row.value)}</strong></div>`
         ).join('');
       }
 
@@ -13350,12 +13493,18 @@
         chip.setAttribute('aria-pressed', String(chip.getAttribute('data-personality') === getCoachPersonality()));
       });
 
+      const tiredBtn = document.getElementById('coachTiredToggle');
+      if (tiredBtn) tiredBtn.setAttribute('aria-pressed', String(getCoachTiredMode()));
+
       const card = document.getElementById('coachOverloadCard');
       if (card) {
         const ctx = getActiveExerciseContext();
         if (ctx) {
           const res = computeDoubleProgression(ctx.exId, ctx.ex, ctx.sets);
-          card.innerHTML = `<div class="coach-overload-title">📈 Próxima sesión</div><div class="coach-ex-name">${escapeHtml(ctx.ex.name || ctx.exId)}</div><div class="coach-advice">${res.text}</div>`;
+          const tiredNote = getCoachTiredMode()
+            ? '<div class="coach-advice" style="margin-top:8px;color:#fbbf24;">Hoy cansado: usa el 90% de esa carga y deja 2-3 repeticiones en reserva.</div>'
+            : '';
+          card.innerHTML = `<div class="coach-overload-title">📈 Próxima sesión</div><div class="coach-ex-name">${escapeHtml(ctx.ex.name || ctx.exId)}</div><div class="coach-advice">${res.text}</div>${tiredNote}`;
           card.style.display = 'block';
         } else {
           card.style.display = 'none';
@@ -13448,6 +13597,54 @@
       refreshMascotBadge();
     }
 
+    function setCoachSOSResult(text) {
+      const box = document.getElementById('coachSosResult');
+      if (!box) return;
+      box.textContent = text;
+      box.hidden = false;
+    }
+
+    function clearCoachSOSResult() {
+      const box = document.getElementById('coachSosResult');
+      if (!box) return;
+      box.textContent = '';
+      box.hidden = true;
+    }
+
+    function toggleCoachTiredMode(force) {
+      workoutState.coachTiredMode = typeof force === 'boolean' ? force : !getCoachTiredMode();
+      saveWorkoutState();
+      clearCoachSOSResult();
+      renderCoachModal();
+      refreshMascotBadge();
+      showToast(getCoachTiredMode() ? 'Modo cansado activado: hoy baja un 10% la carga' : 'Modo cansado desactivado');
+    }
+
+    function coachSOS(scenario) {
+      const context = getActiveExerciseContext();
+      if (scenario === 'lleno') {
+        if (context && context.slotId) {
+          setCoachSOSResult(`Te abro las alternativas de ${context.ex.name || 'este ejercicio'}.`);
+          closeCoachModal();
+          openSwapModal(context.slotId);
+        } else {
+          setCoachSOSResult('Abre un ejercicio de la rutina y vuelve a pulsar Gym lleno para ver sus alternativas.');
+        }
+        return;
+      }
+      if (scenario === 'sin-material') {
+        setCoachSOSResult('Prioriza los básicos con banda o peso corporal. Si un ejercicio no se adapta, abre sus alternativas y elige una variante con el material que tengas.');
+        return;
+      }
+      if (scenario === 'sin-energia') {
+        workoutState.coachTiredMode = true;
+        saveWorkoutState();
+        renderCoachModal();
+        setCoachSOSResult('Modo cansado activado: -10% de carga, 2-3 repeticiones en reserva y elimina el último accesorio si hace falta.');
+        refreshMascotBadge();
+      }
+    }
+
     function initMascotGestures() {
       const btn = document.getElementById('mascotBtn');
       if (!btn || btn.dataset.gesturesBound === '1') return;
@@ -13504,7 +13701,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev15').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev16').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -14019,6 +14216,50 @@
       };
     }
 
+    const FLEX_CARD_MASCOT_MAX = 112;
+    let flexCardMascot = null;
+
+    function getFlexCardMascot() {
+      if (typeof Image === 'undefined') return null;
+      if (!flexCardMascot) {
+        flexCardMascot = new Image();
+        flexCardMascot.src = './mascot.png';
+      }
+      return flexCardMascot;
+    }
+
+    function drawFlexCardMascot(ctx, W) {
+      const img = getFlexCardMascot();
+      if (!img || !img.complete || !img.naturalWidth || !img.naturalHeight) return false;
+
+      const size = Math.min(FLEX_CARD_MASCOT_MAX, Math.round(W * 0.11));
+      const cx = W - 72 - size / 2 - 4;
+      const cy = 72 + size / 2 + 6;
+      const radius = size / 2;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(6, 10, 19, 0.92)';
+      ctx.fill();
+      ctx.clip();
+      const scale = Math.min(size / img.naturalWidth, size / img.naturalHeight);
+      const drawW = img.naturalWidth * scale;
+      const drawH = img.naturalHeight * scale;
+      ctx.drawImage(img, cx - drawW / 2, cy - drawH / 2, drawW, drawH);
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = 'rgba(251, 191, 36, 0.85)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      return true;
+    }
+
     function drawFlexCard(canvas, session) {
       if (!canvas || !session) return;
       const ctx = canvas.getContext('2d');
@@ -14203,6 +14444,8 @@
       ctx.fillStyle = '#64748b';
       ctx.font = '700 18px -apple-system, BlinkMacSystemFont, sans-serif';
       ctx.fillText('vigorexiapp.pwa', W - 220, H - 95);
+
+      drawFlexCardMascot(ctx, W);
     }
 
     function openWorkoutSummaryModal(session) {
@@ -14214,6 +14457,10 @@
       if (!activeSession) return;
 
       drawFlexCard(canvas, activeSession);
+      const mascot = getFlexCardMascot();
+      if (mascot && !mascot.complete) {
+        mascot.onload = () => drawFlexCard(canvas, activeSession);
+      }
       canvas.dataset.sessionDate = activeSession.date || '';
 
       const sub = document.getElementById('flexCardSubtitle');
