@@ -11113,6 +11113,10 @@
           const cardRows = card.querySelectorAll('.set-row');
           const cardDone = card.querySelectorAll('.set-row.done');
           if (cardRows.length > 0 && cardDone.length >= cardRows.length) {
+            // Colapsar el ejercicio recién completado
+            card.classList.add('collapsed');
+            card.classList.remove('manually-expanded');
+
             let allCards = Array.from(section.querySelectorAll('.exercise-card'));
             if (document.body.classList.contains('express-mode')) {
               allCards = allCards.filter(c => c.getAttribute('data-skippable') !== 'true');
@@ -13942,7 +13946,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev20').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev21').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
