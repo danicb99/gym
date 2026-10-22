@@ -1456,13 +1456,76 @@
     }
     .btn-flex-share:active { transform: scale(0.97); }
 
+    /* Unified History Cards System */
+    .history-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .history-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .history-card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .history-card-icon {
+      font-size: 1.25rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .history-card-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0;
+      line-height: 1.2;
+    }
+    .history-card-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin: 2px 0 0 0;
+    }
+    .history-select-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .history-card .session-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-bottom: 8px;
+    }
+    .history-card .session-item.clickable:hover,
+    .history-card .session-item.clickable:active {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
     /* Streak Calendar Component */
     .calendar-card {
       background: var(--surface-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 16px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.25);
     }
     .calendar-header {
@@ -2639,6 +2702,7 @@
       display: flex;
       align-items: center;
       justify-self: start;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
     }
     .header-brand-wrap {
       display: flex;
@@ -3378,7 +3442,7 @@
   <header class="app-header-fixed" id="appHeaderFixed">
     <!-- Row 1: Day Selector (Left), Brand & Routine Centered (Center), Mascot (Right) -->
     <div class="header-top-row">
-      <div class="header-top-left">
+      <div class="header-top-left" id="headerTopLeft">
         <div class="header-day-chip-wrap">
           <button type="button" class="header-day-chip" id="headerDayChip" onclick="toggleDayPickerDropdown(event)">
             <span id="headerDayChipLabel">Día A</span>
@@ -8487,16 +8551,25 @@
         </div>
       </div>
 
-      <!-- Calendario Interactivo -->
-      <div class="calendar-card" id="streakCalendarCard">
-        <div class="calendar-header">
+      <!-- 1. Tarjeta: Calendario de Entrenamientos -->
+      <div class="calendar-card history-card" id="streakCalendarCard">
+        <div class="history-card-header">
+          <div class="history-card-title-group">
+            <span class="history-card-icon">📅</span>
+            <div>
+              <h3 class="history-card-title">Calendario de Entrenamientos</h3>
+              <p class="history-card-sub">Registro mensual de sesiones completadas</p>
+            </div>
+          </div>
+          <span class="cal-month-badge" id="calMonthTotalSessions">0 entrenos</span>
+          <span id="streakBadge" style="display:none !important;" aria-hidden="true"></span>
+        </div>
+        <div class="calendar-header" style="justify-content: center; margin-bottom: 12px;">
           <div class="calendar-nav">
             <button type="button" class="cal-nav-btn" onclick="changeCalendarMonth(-1)" title="Mes anterior">◀</button>
             <span class="cal-month-label" id="calMonthLabel">Octubre 2026</span>
             <button type="button" class="cal-nav-btn" onclick="changeCalendarMonth(1)" title="Mes siguiente">▶</button>
           </div>
-          <span class="cal-month-badge" id="calMonthTotalSessions">0 entrenos</span>
-          <span id="streakBadge" style="display:none !important;" aria-hidden="true"></span>
         </div>
         <div class="calendar-weekdays">
           <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
@@ -8506,9 +8579,17 @@
         </div>
       </div>
 
-      <!-- Past Sessions Timeline (Últimos 3 entrenamientos, justo bajo el calendario) -->
-      <div class="sessions-timeline">
-        <div class="timeline-title">Línea de Tiempo de Entrenamientos</div>
+      <!-- 2. Tarjeta: Línea de Tiempo de Entrenamientos (Últimos 3) -->
+      <div class="history-card" id="timelineCard">
+        <div class="history-card-header">
+          <div class="history-card-title-group">
+            <span class="history-card-icon">⏱️</span>
+            <div>
+              <h3 class="history-card-title">Línea de Tiempo</h3>
+              <p class="history-card-sub">Últimos entrenamientos completados</p>
+            </div>
+          </div>
+        </div>
         <div id="sessionsTimelineList">
           <!-- Rendered dynamically (últimos 3) -->
         </div>
@@ -8517,25 +8598,40 @@
         </div>
       </div>
 
-      <!-- Exercise Progression Visualizer (Solo ejercicios con datos) -->
-      <div class="ex-picker-wrap">
-        <label class="ex-picker-label">📈 Consultar Progresión por Ejercicio:</label>
-        <select class="ex-select" id="historyExSelector" onchange="renderHistoryTabChart(this.value)">
-          <option value="">Cargando ejercicios...</option>
-        </select>
-      </div>
-
-      <div id="historyTabContent">
-        <!-- Rendered dynamically by renderHistoryTabChart -->
-      </div>
-
-      <!-- Backup & Restore Control Center -->
-      <div class="backup-card">
-        <div class="backup-card-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          <span>Copias de Seguridad (Backup)</span>
+      <!-- 3. Tarjeta: Progresión por Ejercicio -->
+      <div class="history-card" id="progressionCard">
+        <div class="history-card-header">
+          <div class="history-card-title-group">
+            <span class="history-card-icon">📈</span>
+            <div>
+              <h3 class="history-card-title">Progresión por Ejercicio</h3>
+              <p class="history-card-sub">Evolución de fuerza, cargas y récords</p>
+            </div>
+          </div>
         </div>
-        <p class="backup-card-desc">Tus datos se guardan de forma privada en tu dispositivo. Descarga una copia de seguridad o compártela a tu Google Drive o WhatsApp para no perder nunca tus récords si cambias de móvil.</p>
+        <div class="ex-picker-wrap" style="margin-bottom: 12px;">
+          <label class="history-select-label" for="historyExSelector">Selecciona un ejercicio:</label>
+          <select class="ex-select" id="historyExSelector" onchange="renderHistoryTabChart(this.value)">
+            <option value="">Cargando ejercicios...</option>
+          </select>
+        </div>
+        <div id="historyTabContent">
+          <!-- Rendered dynamically by renderHistoryTabChart -->
+        </div>
+      </div>
+
+      <!-- 4. Tarjeta: Copias de Seguridad (Backup & Restore) -->
+      <div class="backup-card history-card" id="backupCard">
+        <div class="history-card-header">
+          <div class="history-card-title-group">
+            <span class="history-card-icon">💾</span>
+            <div>
+              <h3 class="history-card-title">Copias de Seguridad</h3>
+              <p class="history-card-sub">Exporta o restaura tus datos en tu dispositivo</p>
+            </div>
+          </div>
+        </div>
+        <p class="backup-card-desc" style="margin-top: 0;">Tus datos se guardan de forma privada en tu dispositivo. Descarga una copia de seguridad o compártela a tu Google Drive o WhatsApp para no perder nunca tus récords si cambias de móvil.</p>
         
         <div class="backup-btn-grid">
           <button class="btn-backup primary" onclick="downloadBackupJSON()">
@@ -9148,6 +9244,20 @@
     }
 
     function selectDay(dayId) {
+      // Ocultar selector de día en la cabecera si estamos en Historial o Rutina
+      const topLeft = document.getElementById('headerTopLeft');
+      if (topLeft && topLeft.style) {
+        if (dayId === 'historialView' || dayId === 'routinePlanView') {
+          topLeft.style.opacity = '0';
+          topLeft.style.visibility = 'hidden';
+          topLeft.style.pointerEvents = 'none';
+        } else {
+          topLeft.style.opacity = '1';
+          topLeft.style.visibility = 'visible';
+          topLeft.style.pointerEvents = 'auto';
+        }
+      }
+
       // Actualizar chip de día y subtítulo en la cabecera fija
       const chipLabel = document.getElementById('headerDayChipLabel');
       if (chipLabel) {
@@ -12428,7 +12538,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=design21').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=design22').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
