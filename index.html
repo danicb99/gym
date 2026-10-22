@@ -9586,6 +9586,114 @@
       } catch (e) {}
     }
 
+    // Detección automática y fail-safe de auriculares (Bluetooth / Jack / USB)
+    const HEADPHONE_KEYWORDS = [
+      'headphone', 'headset', 'earphone', 'airpod', 'buds', 'earbuds',
+      'bluetooth', 'wireless', 'auricular', 'cascos', 'freebuds', 'wh-', 'wf-'
+    ];
+
+    let audioDeviceScanTimer = null;
+
+    function detectHeadphonesFromDevices(deviceList) {
+      const list = Array.isArray(deviceList) ? deviceList : [];
+      let hasHeadphones = false;
+      let matchedLabel = '';
+      let labelsHidden = true;
+      let audioDeviceCount = 0;
+
+      list.forEach(d => {
+        if (!d) return;
+        const kind = String(d.kind || '');
+        if (kind === 'audiooutput' || kind === 'audioinput') {
+          audioDeviceCount++;
+          const label = String(d.label || '').trim();
+          if (label.length > 0) {
+            labelsHidden = false;
+            const lower = label.toLowerCase();
+            if (HEADPHONE_KEYWORDS.some(kw => lower.includes(kw))) {
+              hasHeadphones = true;
+              matchedLabel = label;
+            }
+          }
+        }
+      });
+
+      return {
+        hasHeadphones: hasHeadphones,
+        matchedLabel: matchedLabel,
+        labelsHidden: labelsHidden,
+        audioDeviceCount: audioDeviceCount
+      };
+    }
+
+    async function scanAudioDevices(reason = 'check') {
+      if (typeof navigator === 'undefined' || !navigator.mediaDevices || typeof navigator.mediaDevices.enumerateDevices !== 'function') {
+        return;
+      }
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const res = detectHeadphonesFromDevices(devices);
+
+        // Caso 1: Auriculares detectados explícitamente por nombre de hardware
+        if (res.hasHeadphones) {
+          if (audioMode !== 'headphones') {
+            audioMode = 'headphones';
+            localStorage.setItem('vigorexiapp_audio_mode', audioMode);
+            updateAudioModeUI();
+            if (typeof showToast === 'function') {
+              showToast('🎧 Auriculares conectados: Modo voz activado');
+            }
+          }
+          return;
+        }
+
+        // Caso 2: Fail-Safe ante desconexión física de hardware
+        // Si el usuario tenía auriculares activos y cambia el hardware o sabemos con certeza
+        // que ya no hay auriculares conectados, regresar inmediatamente a silencio para no
+        // emitir sonidos por el altavoz en el gimnasio.
+        if (audioMode === 'headphones') {
+          if (reason === 'devicechange') {
+            audioMode = 'silent';
+            localStorage.setItem('vigorexiapp_audio_mode', audioMode);
+            updateAudioModeUI();
+            if (typeof showToast === 'function') {
+              showToast('🔕 Auriculares desconectados: Modo silencioso activado');
+            }
+          } else if (!res.labelsHidden && res.audioDeviceCount > 0) {
+            // Etiquetas visibles pero ningún dispositivo coincide con cascos (p. ej. solo altavoz de PC/móvil)
+            audioMode = 'silent';
+            localStorage.setItem('vigorexiapp_audio_mode', audioMode);
+            updateAudioModeUI();
+          }
+        }
+      } catch (err) {
+        console.warn('[AudioAuto] Error escaneando dispositivos:', err);
+      }
+    }
+
+    function debouncedScanAudioDevices(reason = 'devicechange') {
+      clearTimeout(audioDeviceScanTimer);
+      audioDeviceScanTimer = setTimeout(() => {
+        scanAudioDevices(reason);
+      }, 250);
+    }
+
+    function initAudioDeviceDetection() {
+      if (typeof navigator === 'undefined' || !navigator.mediaDevices) return;
+      if (typeof navigator.mediaDevices.addEventListener === 'function') {
+        navigator.mediaDevices.addEventListener('devicechange', () => {
+          debouncedScanAudioDevices('devicechange');
+        });
+      }
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          scanAudioDevices('visibility');
+        }
+      });
+      // Escaneo inicial pasivo
+      scanAudioDevices('init');
+    }
+
     // Quick Stepper Dock handlers
     function selectActiveSetRow(row) {
       if (!row) return;
@@ -13756,6 +13864,7 @@
       if (typeof renderDayPickerDropdown === 'function') {
         renderDayPickerDropdown();
       }
+      initAudioDeviceDetection();
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', (event) => {
           if (event.data && (event.data.type === 'FORCE_UPDATE' || event.data.type === 'SW_ACTIVATED')) {
@@ -13763,7 +13872,7 @@
             window.location.reload();
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev17').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev18').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
