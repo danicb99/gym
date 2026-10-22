@@ -1172,8 +1172,9 @@
       pill.style.borderColor = isFresh ? 'rgba(16,185,129,0.45)' : 'rgba(56,189,248,0.45)';
       pill.style.background = isFresh ? 'rgba(16,185,129,0.12)' : 'rgba(56,189,248,0.10)';
       pill.style.boxShadow = isFresh ? '0 0 10px rgba(16,185,129,0.22)' : 'none';
-      const ageText = lastSuccessfulSyncTime > 0 ? `hace ${ageSec < 60 ? ageSec + 's' : Math.round(ageSec / 60) + 'm'}` : 'listo';
-      pill.title = `Amazfit Active 2: Sincronizado (${ageText}). Toca para ver detalles o configurar.`;
+      const ageText = lastSuccessfulSyncTime > 0 ? `hace ${ageSec < 60 ? ageSec + 's' : Math.round(ageSec / 60) + 'm'}` : 'al día';
+      const colorName = isFresh ? 'Verde' : 'Cian';
+      pill.title = `Amazfit Active 2: ${colorName} (${ageText}). Pulsa para estado o mantén para ajustes.`;
       pill.classList.add('status-synced');
     } else if (status === 'pending') {
       const count = valExtra || 1;
@@ -1181,7 +1182,7 @@
       pill.style.borderColor = 'rgba(251,191,36,0.50)';
       pill.style.background = 'rgba(251,191,36,0.12)';
       pill.style.boxShadow = '0 0 10px rgba(251,191,36,0.25)';
-      pill.title = `Amazfit Active 2: ${count} cambio(s) pendiente(s). Toca para ver detalles.`;
+      pill.title = `Amazfit Active 2: Ámbar (${count} pendiente(s)). Pulsa para estado o mantén para ajustes.`;
       pill.classList.add('status-pending');
     } else if (status === 'rate_limited') {
       const sec = valExtra || 60;
@@ -1189,16 +1190,165 @@
       pill.style.borderColor = 'rgba(245,158,11,0.50)';
       pill.style.background = 'rgba(245,158,11,0.12)';
       pill.style.boxShadow = 'none';
-      pill.title = `Amazfit Active 2: Límite de peticiones alcanzado (${sec}s de espera). Toca para ver detalles.`;
+      pill.title = `Amazfit Active 2: Naranja (${sec}s espera). Pulsa para estado o mantén para ajustes.`;
       pill.classList.add('status-ratelimited');
     } else {
       pill.style.color = '#ef4444';
       pill.style.borderColor = 'rgba(239,68,68,0.45)';
       pill.style.background = 'rgba(239,68,68,0.10)';
       pill.style.boxShadow = 'none';
-      pill.title = 'Amazfit Active 2: Sin conexión o reconectando. Toca para reconectar.';
+      pill.title = 'Amazfit Active 2: Rojo (Desconectado). Pulsa para estado o mantén para reconectar.';
       pill.classList.add('status-disconnected');
     }
+
+    attachWatchPillHandlers(pill);
+  }
+
+  // Lógica informativa de estados y colores del reloj
+  function getWatchStatusInfo(extra) {
+    const { status, extra: calcExtra } = determineCurrentSyncStatus();
+    const valExtra = extra !== undefined ? extra : calcExtra;
+    const now = Date.now();
+    const ageSec = lastSuccessfulSyncTime > 0 ? Math.round((now - lastSuccessfulSyncTime) / 1000) : 0;
+
+    if (status === 'synced') {
+      if (lastSuccessfulSyncTime === 0 || ageSec < 60) {
+        const timeText = lastSuccessfulSyncTime > 0 ? `hace ${ageSec}s` : 'al día';
+        return {
+          status: 'synced_fresh',
+          color: '#10b981',
+          emoji: '🟢',
+          title: 'Verde',
+          desc: `Reloj sincronizado y al día (${timeText})`
+        };
+      } else {
+        const min = Math.round(ageSec / 60);
+        return {
+          status: 'synced_idle',
+          color: '#38bdf8',
+          emoji: '🔵',
+          title: 'Cian',
+          desc: `Reloj enlazado en reposo (sync hace ${min}m)`
+        };
+      }
+    } else if (status === 'pending') {
+      const count = valExtra || 1;
+      return {
+        status: 'pending',
+        color: '#fbbf24',
+        emoji: '🟡',
+        title: 'Ámbar',
+        desc: `Sincronizando reloj (${count} cambio${count > 1 ? 's' : ''} en cola)`
+      };
+    } else if (status === 'rate_limited') {
+      const sec = valExtra || 60;
+      return {
+        status: 'rate_limited',
+        color: '#f59e0b',
+        emoji: '🟠',
+        title: 'Naranja',
+        desc: `Límite temporal de peticiones (espera ${sec}s)`
+      };
+    } else {
+      return {
+        status: 'disconnected',
+        color: '#ef4444',
+        emoji: '🔴',
+        title: 'Rojo',
+        desc: 'Reloj desconectado (sin enlace SSE)'
+      };
+    }
+  }
+
+  function showWatchStatusToast(extra) {
+    const info = getWatchStatusInfo(extra);
+    const msg = `${info.emoji} ${info.title}: ${info.desc}`;
+    if (typeof window.showToast === 'function') {
+      window.showToast(msg);
+    } else {
+      console.log('[WatchSync Toast]', msg);
+    }
+    return msg;
+  }
+
+  let lastPillClickTime = 0;
+  let longPressTimer = null;
+  let longPressTriggered = false;
+
+  function handleWatchPillClick(e) {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    if (longPressTriggered) {
+      longPressTriggered = false;
+      return;
+    }
+    const now = Date.now();
+    if (now - lastPillClickTime < 380) {
+      // Doble toque rápido -> Abrir modal completo de sincronización
+      lastPillClickTime = 0;
+      if (typeof window !== 'undefined' && typeof window.openWatchSyncModal === 'function') {
+        window.openWatchSyncModal();
+      } else {
+        openWatchSyncModal();
+      }
+      return;
+    }
+    lastPillClickTime = now;
+    showWatchStatusToast();
+  }
+
+  function attachWatchPillHandlers(pill) {
+    if (!pill || pill._watchEventsBound) return;
+    pill._watchEventsBound = true;
+
+    pill.onclick = (e) => {
+      handleWatchPillClick(e);
+    };
+
+    let touchMoved = false;
+
+    pill.addEventListener('touchstart', (e) => {
+      touchMoved = false;
+      longPressTriggered = false;
+      clearTimeout(longPressTimer);
+      longPressTimer = setTimeout(() => {
+        longPressTriggered = true;
+        openWatchSyncModal();
+      }, 500);
+    }, { passive: true });
+
+    pill.addEventListener('touchmove', () => {
+      touchMoved = true;
+      clearTimeout(longPressTimer);
+    }, { passive: true });
+
+    pill.addEventListener('touchend', (e) => {
+      clearTimeout(longPressTimer);
+      if (longPressTriggered) {
+        if (e.cancelable) e.preventDefault();
+      }
+    });
+
+    pill.addEventListener('touchcancel', () => {
+      clearTimeout(longPressTimer);
+    });
+
+    pill.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      longPressTriggered = false;
+      clearTimeout(longPressTimer);
+      longPressTimer = setTimeout(() => {
+        longPressTriggered = true;
+        openWatchSyncModal();
+      }, 500);
+    });
+
+    pill.addEventListener('mouseup', () => {
+      clearTimeout(longPressTimer);
+    });
+
+    pill.addEventListener('mouseleave', () => {
+      clearTimeout(longPressTimer);
+    });
   }
 
   // 7. Modal de estado y configuración de privacidad
@@ -1217,19 +1367,28 @@
     const cfg = getSyncConfig();
     const { status, extra } = determineCurrentSyncStatus();
 
-    let statusLabel = 'Desconectado';
+    let statusLabel = 'Desconectado (Rojo)';
     let statusBadgeColor = '#ef4444';
     let statusBg = 'rgba(239,68,68,0.15)';
     if (status === 'synced') {
-      statusLabel = 'Sincronizado';
-      statusBadgeColor = '#10b981';
-      statusBg = 'rgba(16,185,129,0.15)';
+      const ageSec = lastSuccessfulSyncTime > 0 ? Math.round((Date.now() - lastSuccessfulSyncTime) / 1000) : 0;
+      const isFresh = lastSuccessfulSyncTime === 0 || ageSec < 60;
+      if (isFresh) {
+        statusLabel = 'Sincronizado (Verde: al día)';
+        statusBadgeColor = '#10b981';
+        statusBg = 'rgba(16,185,129,0.15)';
+      } else {
+        const min = Math.round(ageSec / 60);
+        statusLabel = `En reposo (Cian: hace ${min}m)`;
+        statusBadgeColor = '#38bdf8';
+        statusBg = 'rgba(56,189,248,0.15)';
+      }
     } else if (status === 'pending') {
-      statusLabel = `Pendiente (${extra || 1})`;
+      statusLabel = `Pendiente (Ámbar: ${extra || 1} en cola)`;
       statusBadgeColor = '#fbbf24';
       statusBg = 'rgba(251,191,36,0.15)';
     } else if (status === 'rate_limited') {
-      statusLabel = `Límite alcanzado (${extra || 60}s)`;
+      statusLabel = `Límite alcanzado (Naranja: ${extra || 60}s)`;
       statusBadgeColor = '#f59e0b';
       statusBg = 'rgba(245,158,11,0.15)';
     }
@@ -1276,6 +1435,33 @@
           <div style="display:flex;gap:8px;margin-top:14px;">
             <button id="btnForceSyncNow" style="flex:1;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;border:none;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">Forzar Sync</button>
             <button id="btnReconnectSse" style="background:#334155;color:#f8fafc;border:none;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">🔄 Reconectar</button>
+          </div>
+        </div>
+
+        <!-- Guía de Colores del Icono -->
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 14px;margin-bottom:16px;">
+          <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">🎨 Guía de Colores del Icono</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#cbd5e1;line-height:1.4;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="width:10px;height:10px;border-radius:3px;background:#10b981;flex-shrink:0;"></span>
+              <span><strong>Verde:</strong> Sincronizado hace menos de 60 s (enlace al día)</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="width:10px;height:10px;border-radius:3px;background:#38bdf8;flex-shrink:0;"></span>
+              <span><strong>Cian:</strong> En reposo (enlazado, sync hace más de 1 min)</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="width:10px;height:10px;border-radius:3px;background:#fbbf24;flex-shrink:0;"></span>
+              <span><strong>Ámbar:</strong> Sincronización en curso (cambios en cola)</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="width:10px;height:10px;border-radius:3px;background:#f59e0b;flex-shrink:0;"></span>
+              <span><strong>Naranja:</strong> En espera temporal por límite de peticiones</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="width:10px;height:10px;border-radius:3px;background:#ef4444;flex-shrink:0;"></span>
+              <span><strong>Rojo:</strong> Sin conexión directa o reconectando</span>
+            </div>
           </div>
         </div>
 
@@ -1492,10 +1678,19 @@
     catchUp: catchUpFromWatch,
     openModal: openWatchSyncModal,
     closeModal: closeWatchSyncModal,
+    showStatus: showWatchStatusToast,
+    getStatusInfo: getWatchStatusInfo,
     getConfig: getSyncConfig,
     generateCode: generateSecureSyncCode,
     deriveTopicHash: deriveTopicHash
   };
+
+  // Exponer funciones globales para acceso directo desde UI y botones
+  window.handleWatchPillClick = handleWatchPillClick;
+  window.showWatchStatusToast = showWatchStatusToast;
+  window.getWatchStatusInfo = getWatchStatusInfo;
+  window.openWatchSyncModal = openWatchSyncModal;
+  window.closeWatchSyncModal = closeWatchSyncModal;
 
   // Hooks internos para pruebas de regresión (no usados por la app)
   window.__vigorexiWatchTest = {
@@ -1506,6 +1701,10 @@
     mergeSessionSets,
     clearSetTimestampsForDay,
     handleSetCompletedFromWatch,
-    handleWorkoutFinishedFromWatch
+    handleWorkoutFinishedFromWatch,
+    determineCurrentSyncStatus,
+    getWatchStatusInfo,
+    showWatchStatusToast,
+    handleWatchPillClick
   };
 })();

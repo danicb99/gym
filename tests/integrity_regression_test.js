@@ -427,4 +427,31 @@ console.log('Integrity regression tests');
   console.log('  ok - fin de sesión ajena ignorado');
 })();
 
+(function testWatchPillStatusAndToast() {
+  const win = context.window;
+  assert(typeof win.handleWatchPillClick === 'function', 'handleWatchPillClick debe estar en window');
+  assert(typeof win.showWatchStatusToast === 'function', 'showWatchStatusToast debe estar en window');
+  assert(typeof win.getWatchStatusInfo === 'function', 'getWatchStatusInfo debe estar en window');
+  assert(typeof win.openWatchSyncModal === 'function', 'openWatchSyncModal debe estar en window');
+  assert(typeof win.closeWatchSyncModal === 'function', 'closeWatchSyncModal debe estar en window');
+
+  let toastMessage = '';
+  win.showToast = (msg) => { toastMessage = msg; };
+
+  // Simular click simple -> debe disparar showToast
+  win.handleWatchPillClick();
+  assert(toastMessage.length > 0, 'click simple debe generar un toast');
+  assert(toastMessage.includes('Reloj'), 'toast debe contener info del reloj');
+
+  // Simular doble click rápido -> debe llamar a openWatchSyncModal
+  let modalOpened = false;
+  const origOpenModal = win.openWatchSyncModal;
+  win.openWatchSyncModal = () => { modalOpened = true; };
+  win.handleWatchPillClick();
+  assert(modalOpened, 'doble click rápido (<380ms) debe abrir el modal de sincronización');
+  win.openWatchSyncModal = origOpenModal;
+
+  console.log('  ok - estado del reloj, mensaje toast y doble click validados');
+})();
+
 console.log('Todos los tests de integridad pasaron.');
