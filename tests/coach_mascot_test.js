@@ -139,9 +139,9 @@ test('Globo contextual: markup accesible y estilos de cabecera', () => {
   assert(/\.coach-bubble\.show\s*\{[\s\S]*?pointer-events:\s*auto/.test(html), 'El globo visible debe ser interactivo');
 });
 
-test('Cache rev28/rev29 en sw.js y en el registro', () => {
-  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev2[89]'/.test(sw), 'CACHE_NAME no es rev28/rev29');
-  assert(/sw\.js\?v=1\.8\.4-rev2[89]/.test(html), 'El registro no apunta a rev28/rev29');
+test('Cache rev31 en sw.js y en el registro', () => {
+  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev31'/.test(sw), 'CACHE_NAME no es rev31');
+  assert(/sw\.js\?v=1\.8\.4-rev31/.test(html), 'El registro no apunta a rev31');
 });
 
 test('Personalidad: whitelist y fallback a gymbro', () => {

@@ -24,7 +24,7 @@
       --border-focus: #fbbf24;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      --text-dim: #8b9bb1;
       --primary: #fbbf24;
       --primary-dark: #d97706;
       --primary-glow: rgba(251, 191, 36, 0.28);
@@ -50,6 +50,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--bd); -webkit-tap-highlight-color: transparent; }
+    html { scroll-padding-top: 96px; }
     body { background-color: var(--bg); color: var(--text-main); padding-bottom: calc(85px + env(safe-area-inset-bottom, 24px)); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
     /* Background Ambient Glow */
@@ -1112,6 +1113,7 @@
       justify-content: center;
       padding: 16px;
       box-sizing: border-box;
+      overscroll-behavior: contain;
     }
     .modal-overlay.open {
       display: flex;
@@ -1128,7 +1130,9 @@
       max-width: 440px;
       max-height: 85vh;
       overflow-y: auto;
-      padding: 20px 20px 18px 20px;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px 20px calc(18px + env(safe-area-inset-bottom, 0px)) 20px;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
       box-sizing: border-box;
       animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1412,6 +1416,11 @@
     .btn-backup:hover { background: rgba(255, 255, 255, 0.08); }
     .btn-backup.primary { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2)); border-color: rgba(16, 185, 129, 0.4); color: #34d399; }
     .btn-backup.share { background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.35); color: var(--cyan); }
+    .btn-backup.danger { background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.35); color: #f87171; }
+    .btn-backup.danger:hover { background: rgba(239, 68, 68, 0.2); }
+    .session-detail-actions { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: flex-end; }
+    .btn-session-delete { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #f87171; border-radius: 8px; padding: 8px 14px; min-height: 40px; font-size: 0.76rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-session-delete:hover { background: rgba(239, 68, 68, 0.2); }
     
     .sessions-timeline { margin-top: 20px; }
     .timeline-title { font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
@@ -1555,12 +1564,11 @@
       border: none;
       outline: none;
       color: var(--text-main);
-      font-size: 0.78rem;
+      font-size: 16px;
       font-weight: 500;
     }
     .notes-input::placeholder {
       color: var(--text-dim);
-      font-size: 0.76rem;
     }
 
     /* Day Bottom Actions */
@@ -4144,20 +4152,6 @@
           </button>
           <!-- Dropdown Menu -->
           <div class="day-picker-dropdown" id="dayPickerDropdown"></div>
-          <script>
-            (function() {
-              try {
-                var prog = localStorage.getItem('vigorexiapp_program') || 'fullbody';
-                var lastDay = localStorage.getItem('vigorexiapp_last_day');
-                var chip = document.getElementById('headerDayChipLabel');
-                var sub = document.getElementById('headerRoutineSub');
-                if (prog === 'torso_pierna') {
-                  if (chip) chip.innerText = lastDay === 'piernaA' ? 'Pierna A' : lastDay === 'torsoB' ? 'Torso B' : lastDay === 'piernaB' ? 'Pierna B' : 'Torso A';
-                  if (sub) sub.innerHTML = 'Torso/Pierna · 4 días · <span id="headerEstDuration">~45 min</span>';
-                }
-              } catch(e) {}
-            })();
-          </script>
         </div>
       </div>
 
@@ -4165,6 +4159,21 @@
         <span class="app-brand-title">VigorexiApp</span>
         <span class="app-brand-sub" id="headerRoutineSub">Full Body · 3 días · <span id="headerEstDuration">~42 min</span> <span id="headerEstDurationNoSS" class="header-est-noss" title="Tiempo estimado sin superseries (series lineales individuales)">(sin SS: ~57 min)</span></span>
       </div>
+
+      <script>
+        (function() {
+          try {
+            var prog = localStorage.getItem('vigorexiapp_program') || 'fullbody';
+            var lastDay = localStorage.getItem('vigorexiapp_last_day');
+            var chip = document.getElementById('headerDayChipLabel');
+            var sub = document.getElementById('headerRoutineSub');
+            if (prog === 'torso_pierna') {
+              if (chip) chip.innerText = lastDay === 'piernaA' ? 'Pierna A' : lastDay === 'torsoB' ? 'Torso B' : lastDay === 'piernaB' ? 'Pierna B' : 'Torso A';
+              if (sub) sub.innerHTML = 'Torso/Pierna · 4 días · <span id="headerEstDuration">~45 min</span>';
+            }
+          } catch(e) {}
+        })();
+      </script>
 
       <div class="header-top-right">
         <button type="button" id="mascotBtn" class="header-mascot-wrap" aria-haspopup="dialog" aria-label="Abrir coach">
@@ -9362,6 +9371,14 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
             <span>Exportar Historial a Excel</span>
           </button>
+          <button class="btn-backup danger" onclick="restorePreRestoreSnapshot()" style="grid-column: span 2;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            <span>Deshacer última restauración</span>
+          </button>
+          <button class="btn-backup danger" onclick="clearAllSessions()" style="grid-column: span 2;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            <span>Borrar todo el historial</span>
+          </button>
         </div>
         <input type="file" id="restoreFileInput" accept=".json,application/json,text/plain,*/*" style="display:none" onchange="restoreBackupFromFile(this)">
       </div>
@@ -9436,14 +9453,14 @@
        MODAL DE GUÍA & CALENTAMIENTO (Bottom Sheet)
        ========================================== -->
   <div class="modal-overlay" id="guideModal" onclick="closeGuideModal(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="guideModalTitle" onclick="event.stopPropagation()">
       <div class="modal-drag-handle"></div>
       <div class="modal-header">
         <div>
-          <div class="modal-title">📖 Protocolo de Calentamiento</div>
+          <div class="modal-title" id="guideModalTitle">📖 Protocolo de Calentamiento</div>
           <div class="modal-subtitle">Protocolo ágil en 2 fases para el 1er básico (~6 min)</div>
         </div>
-        <button class="modal-close-btn" onclick="closeGuideModal()">✕</button>
+        <button class="modal-close-btn" onclick="closeGuideModal()" aria-label="Cerrar">✕</button>
       </div>
       
       <!-- Dynamic Exercise Selector for Warmup -->
@@ -9527,7 +9544,7 @@
        MODAL DE ALTERNATIVAS (Popup Centrado)
        ========================================== -->
   <div class="modal-overlay" id="swapModal" onclick="closeSwapModal(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="swapModalTitle" onclick="event.stopPropagation()">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 1.3rem;">🔄</span>
@@ -9536,7 +9553,7 @@
             <div class="modal-subtitle" id="swapModalSubtitle">Selecciona una alternativa si la máquina está ocupada</div>
           </div>
         </div>
-        <button type="button" class="modal-close-btn" onclick="closeSwapModal()">✕</button>
+        <button type="button" class="modal-close-btn" onclick="closeSwapModal()" aria-label="Cerrar">✕</button>
       </div>
       <div id="swapModalList">
         <!-- Rendered dynamically -->
@@ -9548,7 +9565,7 @@
        MODAL DE HISTORIAL DEL EJERCICIO (Popup Centrado)
        ========================================== -->
   <div class="modal-overlay" id="historyModal" onclick="closeHistoryModal(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle" onclick="event.stopPropagation()">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="display: inline-flex; align-items: center; justify-content: center; color: var(--gold);">
@@ -9562,7 +9579,7 @@
             <div class="modal-subtitle" id="historyModalSubtitle">Récords y evolución de fuerza</div>
           </div>
         </div>
-        <button type="button" class="modal-close-btn" onclick="closeHistoryModal()">✕</button>
+        <button type="button" class="modal-close-btn" onclick="closeHistoryModal()" aria-label="Cerrar">✕</button>
       </div>
       <div id="historyModalBody">
         <!-- Rendered dynamically -->
@@ -9574,7 +9591,7 @@
        MODAL DE TODOS LOS ENTRENAMIENTOS (Popup Centrado)
        ========================================== -->
   <div class="modal-overlay" id="allSessionsModal" onclick="closeAllSessionsModal(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="allSessionsTitle" onclick="event.stopPropagation()">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="display: inline-flex; align-items: center; justify-content: center; color: var(--gold);">
@@ -9584,11 +9601,11 @@
             </svg>
           </span>
           <div>
-            <div class="modal-title">Todos los Entrenamientos</div>
+            <div class="modal-title" id="allSessionsTitle">Todos los Entrenamientos</div>
             <div class="modal-subtitle" id="allSessionsSubtitle">Histórico de sesiones guardadas</div>
           </div>
         </div>
-        <button type="button" class="modal-close-btn" onclick="closeAllSessionsModal()">✕</button>
+        <button type="button" class="modal-close-btn" onclick="closeAllSessionsModal()" aria-label="Cerrar">✕</button>
       </div>
       <div id="allSessionsModalList" style="display: flex; flex-direction: column; gap: 8px;">
         <!-- Rendered dynamically -->
@@ -9604,7 +9621,7 @@
        MODAL TARJETA DE FELICITACIÓN Y FIN DE ENTRENO
        ========================================== -->
   <div class="modal-overlay" id="workoutSummaryModal" onclick="closeWorkoutSummaryModal(event)">
-    <div class="modal-sheet congrats-modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-sheet congrats-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="workoutSummaryTitle" onclick="event.stopPropagation()">
       <div class="modal-drag-handle"></div>
       <div class="modal-header" style="margin-bottom: 10px;">
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -9614,11 +9631,11 @@
             </svg>
           </div>
           <div>
-            <div class="modal-title" style="font-size: 1.12rem; font-weight: 850; color: #fff;">¡Entrenamiento Completado!</div>
+            <div class="modal-title" id="workoutSummaryTitle" style="font-size: 1.12rem; font-weight: 850; color: #fff;">¡Entrenamiento Completado!</div>
             <div class="modal-subtitle" id="flexCardSubtitle">Sesión archivada con éxito en tu historial</div>
           </div>
         </div>
-        <button class="modal-close-btn" onclick="closeWorkoutSummaryModal()">✕</button>
+        <button class="modal-close-btn" onclick="closeWorkoutSummaryModal()" aria-label="Cerrar">✕</button>
       </div>
 
       <!-- Métricas Clave de la Sesión -->
@@ -9694,14 +9711,14 @@
        MODAL DE CAMBIO DE RUTINA / PROGRAMA
        ========================================== -->
   <div class="modal-overlay" id="programSelectModal" onclick="closeProgramModal(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()" style="max-width:480px;">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="programSelectTitle" onclick="event.stopPropagation()" style="max-width:480px;">
       <div class="modal-drag-handle"></div>
       <div class="modal-header">
         <div>
-          <div class="modal-title">🔄 Cambiar Rutina Activa</div>
+          <div class="modal-title" id="programSelectTitle">🔄 Cambiar Rutina Activa</div>
           <div class="modal-subtitle">Selecciona el sistema de periodización que vas a seguir</div>
         </div>
-        <button class="modal-close-btn" onclick="closeProgramModal()">✕</button>
+        <button class="modal-close-btn" onclick="closeProgramModal()" aria-label="Cerrar">✕</button>
       </div>
       <div class="program-options-list">
         <div class="program-option-card" id="progOpt-fullbody" onclick="switchRoutineProgram('fullbody')">
@@ -9728,7 +9745,7 @@
        MODAL DE DETALLE DE SESIÓN EN CALENDARIO
        ========================================== -->
   <div class="modal-overlay" id="sessionDetailModal" onclick="closeSessionDetailModal(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()" style="max-width:540px;">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="sessionDetailTitle" onclick="event.stopPropagation()" style="max-width:540px;">
       <div class="modal-drag-handle"></div>
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -9742,11 +9759,11 @@
             </svg>
           </span>
           <div>
-            <div class="modal-title">Detalle de la Sesión</div>
+            <div class="modal-title" id="sessionDetailTitle">Detalle de la Sesión</div>
             <div class="modal-subtitle">Desglose completo de ejercicios y cargas</div>
           </div>
         </div>
-        <button class="modal-close-btn" onclick="closeSessionDetailModal()">✕</button>
+        <button class="modal-close-btn" onclick="closeSessionDetailModal()" aria-label="Cerrar">✕</button>
       </div>
       <div id="sessionDetailBody">
         <!-- Rendered dynamically -->
@@ -10230,38 +10247,6 @@
       selectDay(targetDayId || defaultDay);
     }
 
-    function updateHeaderDayDisplay(dayId) {
-      const titleEl = document.getElementById('headerDayTitle');
-      const subEl = document.getElementById('headerDaySub');
-      const progEl = document.getElementById('headerWorkoutProgress');
-      const progRow = document.getElementById('headerProgRow');
-      if (!titleEl || !subEl) return;
-
-      if (dayId === 'historialView') {
-        titleEl.textContent = 'Historial';
-        subEl.textContent = 'Estadísticas & Constancia';
-        if (progEl) progEl.style.display = 'none';
-        if (progRow) progRow.style.display = 'none';
-      } else if (dayId === 'routinePlanView') {
-        titleEl.textContent = 'Rutina';
-        subEl.textContent = (currentProgram === 'fullbody') ? 'Full Body · 3 días' : 'Torso / Pierna · 4 días';
-        if (progEl) progEl.style.display = 'none';
-        if (progRow) progRow.style.display = 'none';
-      } else {
-        const slot = (typeof ROUTINE_SLOTS !== 'undefined') ? ROUTINE_SLOTS[dayId] : null;
-        if (slot) {
-          const parts = (slot.title || '').split('•');
-          titleEl.textContent = parts[0] ? parts[0].trim() : (slot.shortName || dayId);
-          subEl.textContent = parts[1] ? parts[1].trim() : (slot.shortName || '');
-        } else {
-          titleEl.textContent = 'Entrenamiento';
-          subEl.textContent = '';
-        }
-        if (progEl) progEl.style.display = '';
-        if (progRow) progRow.style.display = '';
-      }
-    }
-
     // Navegación de 3 Pestañas Inferiores (Entrenar, Historial, Rutina)
     function switchMainTab(tabName) {
       document.querySelectorAll('.app-bottom-nav .nav-tab').forEach(b => b.classList.remove('on'));
@@ -10428,7 +10413,6 @@
         if (btn) btn.classList.add('on');
       }
 
-      updateHeaderDayDisplay(dayId);
       renderDaySelectorOptions();
       const sel = document.getElementById('daySelector');
       if (sel) {
@@ -10453,11 +10437,6 @@
       if (dayId === 'historialView') {
         renderGlobalHistoryView();
         renderStreakCalendar();
-        const retTxt = document.getElementById('historyBackText');
-        if (retTxt) {
-          const dData = (typeof ROUTINE_SLOTS !== 'undefined') ? ROUTINE_SLOTS[lastActiveWorkoutDay] : null;
-          retTxt.innerText = `← Volver a ${dData ? dData.shortName : 'Entrenamiento'}`;
-        }
       } else if (dayId === 'routinePlanView') {
         updateRoutinePlanViewCards();
         renderRoutinePlanDays();
@@ -11116,6 +11095,19 @@
       });
     }
 
+    // Descanso real definido en el markup de cada tarjeta (única fuente de verdad)
+    function getMarkupRestSeconds(dayId, slotId) {
+      if (typeof document === 'undefined' || !document.getElementById) return null;
+      const section = document.getElementById(dayId);
+      if (!section || !section.querySelector) return null;
+      const card = section.querySelector('.exercise-card[data-slot="' + slotId + '"]');
+      if (!card) return null;
+      const btn = card.querySelector('.set-row .check-btn');
+      if (!btn) return null;
+      const m = (btn.getAttribute('onclick') || '').match(/completeSet\s*\(\s*this\s*,\s*(\d+)/);
+      return m ? parseInt(m[1], 10) : null;
+    }
+
     function calculateDayEstimatedDuration(dayId, isExpress = false, withoutSupersets = false) {
       const day = ROUTINE_SLOTS[dayId];
       if (!day || !day.slots) return isExpress ? 33 : 43;
@@ -11162,7 +11154,10 @@
           const workSec = isIso ? 50 : 40;
           let exRest = 120;
           const catEx = (typeof EXERCISE_CATALOG !== 'undefined') && EXERCISE_CATALOG[slot.defaultExId];
-          if (withoutSupersets && catEx && catEx.rest) {
+          const markupRest = (typeof getMarkupRestSeconds === 'function') ? getMarkupRestSeconds(dayId, slot.slotId) : null;
+          if (!withoutSupersets && markupRest != null) {
+            exRest = markupRest;
+          } else if (withoutSupersets && catEx && catEx.rest) {
             exRest = catEx.rest;
           } else {
             if (slot.defaultExId === 'squat' || slot.defaultExId === 'rdl') exRest = 135;
@@ -11296,6 +11291,9 @@
         toast = document.createElement('div');
         toast.id = 'appToast';
         toast.className = 'toast-msg';
+        toast.setAttribute('role', 'status');
+        toast.setAttribute('aria-live', 'polite');
+        toast.setAttribute('aria-atomic', 'true');
         document.body.appendChild(toast);
       }
       toast.innerText = msg;
@@ -11320,12 +11318,13 @@
       if (!dayId || dayId === 'historialView') return;
       if (!workoutState.sessionStartTime) workoutState.sessionStartTime = {};
       if (!workoutState.lastActivityTime) workoutState.lastActivityTime = {};
+      if (workoutState.idlePaused && workoutState.idlePaused[dayId]) delete workoutState.idlePaused[dayId];
 
       if (!workoutState.sessionStartTime[dayId]) {
         workoutState.sessionStartTime[dayId] = Date.now();
       }
       workoutState.lastActivityTime[dayId] = Date.now();
-      saveWorkoutState();
+      scheduleSaveWorkoutState();
       updateSessionTimerDisplay(dayId);
     }
 
@@ -11405,12 +11404,14 @@
       }, 1000);
     }
 
-    // Auto-save after 60 minutes without activity (does not interrupt active sessions)
+    // Auto-guardado: si la sesión queda inactiva se persiste lo escrito, pero NO se
+    // archiva (no se borran series, notas ni se duplica el historial de ejercicios).
     const AUTO_SAVE_IDLE_MS = 30 * 60 * 1000; // 30 minutos sin actividad
 
     function checkAutoSave() {
       if (!workoutState.sessionStartTime) return;
       const now = Date.now();
+      if (!workoutState.idlePaused) workoutState.idlePaused = {};
 
       Object.keys(workoutState.sessionStartTime).forEach(dayId => {
         const startTime = workoutState.sessionStartTime[dayId];
@@ -11420,6 +11421,7 @@
         if (!daySection) {
           delete workoutState.sessionStartTime[dayId];
           if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[dayId];
+          delete workoutState.idlePaused[dayId];
           persistStateRaw();
           return;
         }
@@ -11429,21 +11431,29 @@
           : startTime;
 
         if (now - lastActivity < AUTO_SAVE_IDLE_MS) return;
+        if (workoutState.idlePaused[dayId]) return;
 
         const doneRows = daySection.querySelectorAll('.set-row.done');
-        const inputs = daySection.querySelectorAll('.set-input');
-        let hasInputs = false;
-        inputs.forEach(inp => { if (inp.value) hasInputs = true; });
+        let hasContent = doneRows.length > 0;
+        daySection.querySelectorAll('.set-input').forEach(inp => {
+          if (String(inp.value).trim() !== '') hasContent = true;
+        });
 
-        if (doneRows.length > 0) {
-          const durationMin = Math.max(1, Math.min(300, Math.round((lastActivity - startTime) / 60000)));
-          executeDayArchive(dayId, durationMin, true, true);
-        } else {
-          // Empty session, just clean up
+        if (!hasContent) {
+          // Sesión vacía: solo se descarta el cronómetro.
           delete workoutState.sessionStartTime[dayId];
           if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[dayId];
+          delete workoutState.idlePaused[dayId];
           persistStateRaw();
           updateSessionTimerDisplay(dayId);
+          return;
+        }
+
+        workoutState.idlePaused[dayId] = now;
+        persistStateRaw();
+        updateSessionTimerDisplay(dayId);
+        if (typeof showToast === 'function') {
+          showToast('💾 Progreso guardado automáticamente');
         }
       });
     }
@@ -11461,7 +11471,7 @@
       const row = input.closest('.set-row');
       const card = input.closest('.exercise-card');
       if (!row || !card) return;
-      saveWorkoutState();
+      scheduleSaveWorkoutState();
     }
 
     function handleNoteChange(slotId, val) {
@@ -12007,9 +12017,16 @@
       }, 350);
     }
 
+    // Evita archivados re-entrantes (doble toque en "Terminar" o archivo + reloj).
+    const archiveLocks = {};
+    const ARCHIVE_REENTRY_MS = 4000;
+
     function executeDayArchive(dayId, durationMin, isAutoSave, skipSwitchDay = true) {
       const daySection = document.getElementById(dayId);
       if (!daySection) return;
+      const lastLock = archiveLocks[dayId] || 0;
+      if (Date.now() - lastLock < ARCHIVE_REENTRY_MS) return;
+      archiveLocks[dayId] = Date.now();
 
       const durationFormatted = durationMin >= 60 
         ? `${Math.floor(durationMin / 60)}h ${durationMin % 60}m` 
@@ -12130,16 +12147,19 @@
             delete workoutState.overloadSuggestions[exId];
           }
 
-          // Append to relational exercise history
+          // Append to relational exercise history (sin duplicar la misma sesión)
           if (!workoutState.exerciseHistory[exId]) workoutState.exerciseHistory[exId] = [];
-          workoutState.exerciseHistory[exId].push({
-            date: sessionRecord.date,
-            sets: exSessionLog.sets,
-            bestKg: exSessionLog.bestKg,
-            bestReps: exSessionLog.bestReps,
-            best1RM: exSessionLog.best1RM,
-            notes: exSessionLog.notes || ''
-          });
+          const alreadyLogged = workoutState.exerciseHistory[exId].some(h => h && h.date === sessionRecord.date);
+          if (!alreadyLogged) {
+            workoutState.exerciseHistory[exId].push({
+              date: sessionRecord.date,
+              sets: exSessionLog.sets,
+              bestKg: exSessionLog.bestKg,
+              bestReps: exSessionLog.bestReps,
+              best1RM: exSessionLog.best1RM,
+              notes: exSessionLog.notes || ''
+            });
+          }
         }
 
         // Limpiar nota para la siguiente sesión
@@ -12851,6 +12871,9 @@
                   </div>
                   <span style="font-size:0.72rem; color:var(--cyan); font-weight:700;">Ver detalle ❯</span>
                 </div>
+                <div style="display:flex; justify-content:flex-end; margin-top:6px;">
+                  <button type="button" class="btn-session-delete" onclick="event.stopPropagation()" data-delete-session="${escapeHtml(String(s.id || ''))}" data-delete-date="${escapeHtml(String(s.date || ''))}">Eliminar</button>
+                </div>
               </div>
             `;
           });
@@ -12868,6 +12891,153 @@
       if (modal) modal.classList.remove('open');
       document.body.classList.remove('modal-open');
     }
+
+    function refreshHistoryViews(deletedDayId) {
+      try { updateProgress(); } catch (e) {}
+      try { renderStreakCalendar(); } catch (e) {}
+      try { refreshMascotBadge(); } catch (e) {}
+      try {
+        if (typeof renderHistoryTabChart === 'function') {
+          const picker = document.getElementById('historyExSelector');
+          renderHistoryTabChart(picker ? picker.value : '');
+        }
+      } catch (e) {}
+      if (deletedDayId) {
+        try { updateDayBannerLastDone(deletedDayId); } catch (e) {}
+      }
+      if (typeof updateHistoryExerciseSelector === 'function') {
+        try { updateHistoryExerciseSelector(); } catch (e) {}
+      }
+    }
+
+    function deleteSessionById(sessionId, sessionDate) {
+      const sessions = Array.isArray(workoutState.sessions) ? workoutState.sessions : [];
+      const target = sessions.find(s => s && s.id === sessionId)
+        || (sessionDate ? sessions.find(s => s && s.date === sessionDate) : null);
+      if (!target) return;
+      const when = new Date(target.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+      if (!window.confirm(`¿Eliminar la sesión de ${target.dayName || target.dayId} del ${when}?\n\nSe borrará del historial y de las estadísticas. Esta acción no se puede deshacer.`)) return;
+
+      workoutState.sessions = sessions.filter(s => s && s.id !== target.id);
+      if (workoutState.exerciseHistory && typeof workoutState.exerciseHistory === 'object') {
+        Object.keys(workoutState.exerciseHistory).forEach(exId => {
+          const list = workoutState.exerciseHistory[exId];
+          if (Array.isArray(list)) {
+            workoutState.exerciseHistory[exId] = list.filter(h => !h || h.date !== target.date);
+          }
+        });
+      }
+
+      persistStateRaw();
+      closeSessionDetailModal();
+      closeAllSessionsModal();
+      refreshHistoryViews(target.dayId);
+      showToast('Sesión eliminada del historial');
+    }
+
+    function clearAllSessions() {
+      const sessions = Array.isArray(workoutState.sessions) ? workoutState.sessions : [];
+      if (sessions.length === 0) {
+        showToast('No hay sesiones que borrar');
+        return;
+      }
+      const first = window.confirm(`¿Borrar TODO el historial (${sessions.length} ${sessions.length === 1 ? 'sesión' : 'sesiones'})?\n\nSe eliminarán las sesiones, los récords y las estadísticas. Tus rutinas y el campo "Anterior" se mantienen.`);
+      if (!first) return;
+      if (!window.confirm('Última confirmación: esta acción no se puede deshacer. ¿Continuar?')) return;
+
+      workoutState.sessions = [];
+      workoutState.exerciseHistory = {};
+      persistStateRaw();
+      closeSessionDetailModal();
+      closeAllSessionsModal();
+      refreshHistoryViews(null);
+      showToast('Historial borrado por completo');
+    }
+
+    document.addEventListener('click', function(event) {
+      const btn = event.target && event.target.closest ? event.target.closest('[data-delete-session]') : null;
+      if (!btn) return;
+      event.preventDefault();
+      event.stopPropagation();
+      deleteSessionById(btn.getAttribute('data-delete-session'), btn.getAttribute('data-delete-date'));
+    });
+
+    const MODAL_CLOSERS = {
+      sessionDetailModal: 'closeSessionDetailModal',
+      allSessionsModal: 'closeAllSessionsModal',
+      historyModal: 'closeHistoryModal',
+      swapModal: 'closeSwapModal',
+      guideModal: 'closeGuideModal',
+      programSelectModal: 'closeProgramModal',
+      workoutSummaryModal: 'closeWorkoutSummaryModal',
+      coachModal: 'closeCoachModal'
+    };
+    let lastFocusedBeforeModal = null;
+
+    function getOpenModals() {
+      return Array.from(document.querySelectorAll('.modal-overlay.open'));
+    }
+
+    function getFocusableIn(sheet) {
+      if (!sheet) return [];
+      return Array.from(sheet.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+        .filter(el => !el.disabled && el.getAttribute('aria-hidden') !== 'true');
+    }
+
+    function focusFirstInModal(modal) {
+      const sheet = modal ? modal.querySelector('.modal-sheet') : null;
+      const focusables = getFocusableIn(sheet);
+      if (focusables.length === 0) return;
+      const target = focusables[0];
+      try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
+    }
+
+    document.addEventListener('keydown', function(event) {
+      const open = getOpenModals();
+      if (open.length === 0) return;
+      const top = open[open.length - 1];
+
+      if (event.key === 'Escape' || event.key === 'Esc') {
+        event.preventDefault();
+        const closerName = MODAL_CLOSERS[top.id];
+        if (closerName && typeof window[closerName] === 'function') window[closerName]();
+        else top.classList.remove('open');
+        return;
+      }
+
+      if (event.key === 'Tab') {
+        const focusables = getFocusableIn(top.querySelector('.modal-sheet'));
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (event.shiftKey && (document.activeElement === first || !top.contains(document.activeElement))) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    });
+
+    const modalObserver = new MutationObserver(function(mutations) {
+      mutations.forEach(m => {
+        const el = m.target;
+        if (!el.classList || !el.classList.contains('modal-overlay')) return;
+        if (el.classList.contains('open')) {
+          if (!lastFocusedBeforeModal || !document.contains(lastFocusedBeforeModal)) {
+            lastFocusedBeforeModal = document.activeElement;
+          }
+          focusFirstInModal(el);
+        } else if (getOpenModals().length === 0) {
+          if (lastFocusedBeforeModal && document.contains(lastFocusedBeforeModal)) {
+            try { lastFocusedBeforeModal.focus({ preventScroll: true }); } catch (e) {}
+          }
+          lastFocusedBeforeModal = null;
+        }
+      });
+    });
+    modalObserver.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
 
     function updateHistoryExerciseSelector() {
       const selector = document.getElementById('historyExSelector');
@@ -13034,24 +13204,119 @@
       if (!isPlainObject(parsed)) throw new Error('Formato inválido: se esperaba un objeto JSON');
       const obj = (v) => (isPlainObject(v) ? v : {});
       const arr = (v) => (Array.isArray(v) ? v : []);
+      const str = (v, max = 200) => (typeof v === 'string' ? v.slice(0, max) : '');
+      const num = (v, min, max, fallback = 0) => {
+        const n = Number(v);
+        if (!Number.isFinite(n)) return fallback;
+        return Math.min(max, Math.max(min, n));
+      };
+      const validDays = (typeof ROUTINE_SLOTS !== 'undefined' && ROUTINE_SLOTS)
+        ? Object.keys(ROUTINE_SLOTS)
+        : ['fullbodyA', 'fullbodyB', 'fullbodyC', 'torsoA', 'torsoB', 'piernaA', 'piernaB'];
+      const isDayId = (v) => typeof v === 'string' && validDays.indexOf(v) !== -1;
+      const isSafeId = (v) => typeof v === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(v);
+      const isKnownExercise = (v) => {
+        if (!isSafeId(v)) return false;
+        if (typeof EXERCISE_CATALOG === 'undefined' || !EXERCISE_CATALOG) return true;
+        return !!EXERCISE_CATALOG[v];
+      };
       const numMap = (v) => {
         const src = obj(v);
         const out = {};
         Object.keys(src).forEach(k => {
+          if (!isDayId(k)) return;
           const n = Number(src[k]);
           if (Number.isFinite(n) && n > 0) out[k] = n;
         });
         return out;
       };
+      const slotMap = (v) => {
+        const src = obj(v);
+        const out = {};
+        Object.keys(src).forEach(k => {
+          if (!/^[A-Za-z0-9_-]{1,64}$/.test(k)) return;
+          if (isKnownExercise(src[k])) out[k] = src[k];
+        });
+        return out;
+      };
+      const idMap = (v) => {
+        const src = obj(v);
+        const out = {};
+        Object.keys(src).forEach(k => {
+          if (isDayId(k) && isSafeId(src[k])) out[k] = src[k];
+        });
+        return out;
+      };
+      const tsMap = (v) => {
+        const src = obj(v);
+        const out = {};
+        const now = Date.now();
+        Object.keys(src).forEach(k => {
+          if (!/^[A-Za-z0-9_-]{1,80}$/.test(k)) return;
+          const n = Number(src[k]);
+          if (Number.isFinite(n) && n > 0 && n <= now + 86400000 && now - n < 30 * 86400000) out[k] = n;
+        });
+        return out;
+      };
+      const boolMap = (v) => {
+        const src = obj(v);
+        const out = {};
+        Object.keys(src).forEach(k => {
+          if (/^[A-Za-z0-9_-]{1,80}$/.test(k) && typeof src[k] === 'boolean') out[k] = src[k];
+        });
+        return out;
+      };
+      const textMap = (v) => {
+        const src = obj(v);
+        const out = {};
+        Object.keys(src).forEach(k => {
+          if (/^[A-Za-z0-9_-]{1,80}$/.test(k)) out[k] = str(src[k], 20);
+        });
+        return out;
+      };
+      const cleanSets = (sets) => arr(sets).filter(isPlainObject).map((st, i) => {
+        const clean = {
+          set: Math.round(num(st.set, 1, 99, i + 1)),
+          kg: num(st.kg, 0, 5000, 0),
+          reps: num(st.reps, 0, 5000, 0),
+          est1RM: num(st.est1RM, 0, 5000, 0),
+          completed: st.completed !== false
+        };
+        const ts = Number(st.timestamp);
+        if (Number.isFinite(ts) && ts > 0) clean.timestamp = ts;
+        return clean;
+      });
 
       const sessions = arr(parsed.sessions)
-        .filter(s => isPlainObject(s) && typeof s.date === 'string' && s.date && typeof s.dayId === 'string' && s.dayId)
-        .map(s => ({
-          ...s,
-          exercises: arr(s.exercises)
-            .filter(isPlainObject)
-            .map(ex => ({ ...ex, sets: arr(ex.sets).filter(isPlainObject) }))
-        }));
+        .filter(s => isPlainObject(s) && isDayId(s.dayId))
+        .map(s => {
+          const ts = new Date(str(s.date, 40)).getTime();
+          if (!Number.isFinite(ts)) return null;
+          const dur = Math.round(num(s.durationMinutes, 1, 600, 45));
+          return {
+            id: isSafeId(s.id) ? s.id : 'ses_' + ts,
+            sessionId: isSafeId(s.sessionId) ? s.sessionId : null,
+            date: new Date(ts).toISOString(),
+            dayId: s.dayId,
+            dayName: str(s.dayName, 80) || s.dayId,
+            durationMinutes: dur,
+            durationFormatted: dur >= 60 ? `${Math.floor(dur / 60)}h ${dur % 60}m` : `${dur} min`,
+            exercises: arr(s.exercises)
+              .filter(isPlainObject)
+              .map(ex => ({
+                slotId: str(ex.slotId, 64),
+                exId: isSafeId(ex.exId) ? ex.exId : '',
+                name: str(ex.name, 100),
+                sets: cleanSets(ex.sets),
+                bestKg: num(ex.bestKg, 0, 5000, 0),
+                bestReps: num(ex.bestReps, 0, 5000, 0),
+                best1RM: num(ex.best1RM, 0, 5000, 0),
+                notes: str(ex.notes, 500)
+              }))
+              .filter(ex => ex.exId)
+          };
+        })
+        .filter(Boolean);
 
       return {
         inputs: obj(parsed.inputs),
@@ -13060,20 +13325,71 @@
         previous: obj(parsed.previous),
         exerciseHistory: obj(parsed.exerciseHistory),
         sessions: sessions,
-        customSlots: obj(parsed.customSlots),
-        tempSlots: obj(parsed.tempSlots),
+        customSlots: slotMap(parsed.customSlots),
+        tempSlots: slotMap(parsed.tempSlots),
         sessionStartTime: numMap(parsed.sessionStartTime),
         lastActivityTime: numMap(parsed.lastActivityTime),
+        sessionIds: idMap(parsed.sessionIds),
+        setTimestamps: tsMap(parsed.setTimestamps),
+        warmupChecks: boolMap(parsed.warmupChecks),
+        warmupInputs: textMap(parsed.warmupInputs),
+        supersetsMode: parsed.supersetsMode === 'disabled' ? 'disabled' : 'enabled',
         overloadSuggestions: obj(parsed.overloadSuggestions),
         coachPersonality: COACH_PERSONALITIES.includes(parsed.coachPersonality) ? parsed.coachPersonality : 'gymbro',
         coachTiredMode: parsed.coachTiredMode === true
       };
     }
 
+    const PRE_RESTORE_KEY = 'vigorexiapp_pre_restore';
+    const MAX_BACKUP_BYTES = 8 * 1024 * 1024;
+
+    function savePreRestoreSnapshot() {
+      try {
+        localStorage.setItem(PRE_RESTORE_KEY, JSON.stringify({
+          savedAt: new Date().toISOString(),
+          state: workoutState
+        }));
+        return true;
+      } catch (err) {
+        console.warn('[Backup] No se pudo guardar el respaldo previo:', err);
+        return false;
+      }
+    }
+
+    function confirmRestore(parsed) {
+      const incoming = Array.isArray(parsed && parsed.sessions) ? parsed.sessions.length : 0;
+      const current = Array.isArray(workoutState.sessions) ? workoutState.sessions.length : 0;
+      const extra = current > 0
+        ? '\n\nSe sustituirán TODOS tus datos actuales. Antes se guardará un respaldo del estado actual.'
+        : '';
+      return window.confirm(`¿Restaurar esta copia de seguridad?\n\nSesiones en el archivo: ${incoming}\nSesiones actuales: ${current}${extra}\n\n¿Continuar?`);
+    }
+
+    function restorePreRestoreSnapshot() {
+      let snapshot = null;
+      try {
+        snapshot = JSON.parse(localStorage.getItem(PRE_RESTORE_KEY) || 'null');
+      } catch (err) {
+        snapshot = null;
+      }
+      if (!snapshot || !snapshot.state) {
+        showToast('No hay ninguna restauración reciente que deshacer');
+        return;
+      }
+      const when = snapshot.savedAt ? new Date(snapshot.savedAt).toLocaleString('es-ES') : 'fecha desconocida';
+      if (!window.confirm(`¿Deshacer la restauración y volver al estado del ${when}?`)) return;
+      try {
+        applyRestoredState(snapshot.state);
+        showToast('Estado anterior restaurado');
+      } catch (err) {
+        alert('No se pudo restaurar el respaldo previo: ' + err.message);
+      }
+    }
+
     function applyRestoredState(parsed) {
       workoutState = sanitizeImportedState(parsed);
 
-      localStorage.setItem('aesthetic_routine_data', JSON.stringify(workoutState));
+      persistStateRaw();
       applyCustomSlotsToDOM();
 
       // Auto-migración preventiva de marcas históricas con formato 'k' -> 'kg'
@@ -13104,12 +13420,20 @@
       const file = fileInput.files[0];
       if (!file) return;
 
+      if (file.size > MAX_BACKUP_BYTES) {
+        alert('El archivo es demasiado grande para ser una copia válida (máximo 8 MB).');
+        fileInput.value = '';
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
           const parsed = JSON.parse(e.target.result);
+          if (!confirmRestore(parsed)) return;
+          const hadSnapshot = savePreRestoreSnapshot();
           applyRestoredState(parsed);
-          showToast('Copia de seguridad restaurada con éxito');
+          showToast(hadSnapshot ? 'Copia restaurada. Respaldo previo guardado.' : 'Copia de seguridad restaurada con éxito');
         } catch (err) {
           alert('Error al leer el archivo de copia de seguridad: ' + err.message);
         }
@@ -13143,11 +13467,17 @@
       }
 
       if (!text || !text.trim()) return;
+      if (text.length > MAX_BACKUP_BYTES) {
+        alert('El texto pegado es demasiado grande para ser una copia válida (máximo 8 MB).');
+        return;
+      }
 
       try {
         const parsed = JSON.parse(text);
+        if (!confirmRestore(parsed)) return;
+        const hadSnapshot = savePreRestoreSnapshot();
         applyRestoredState(parsed);
-        showToast('Copia de seguridad restaurada con éxito');
+        showToast(hadSnapshot ? 'Copia restaurada. Respaldo previo guardado.' : 'Copia de seguridad restaurada con éxito');
       } catch (err) {
         alert('Error al procesar los datos pegados: ' + err.message);
       }
@@ -13280,6 +13610,7 @@
     let timerEndTime = null;
     let timerInterval = null;
     let isTimerActive = false;
+    let restWarningAnnouncedFor = 0;
 
     function formatClock(seconds) {
       const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -13490,12 +13821,15 @@
         // Audio cue con rango de seguridad (<= 10s y >= 5s) para avisar 10 segundos antes
         if (diff <= 10 && diff >= 5 && !voicedWarning) {
           voicedWarning = true;
-          if (navigator.vibrate) {
-            try { navigator.vibrate([150, 100, 150]); } catch(e) {}
-          }
-          if (audioMode === 'headphones') {
-            playPreWarningTone();
-            speakAudioCue("Diez segundos");
+          if (restWarningAnnouncedFor !== timerEndTime) {
+            restWarningAnnouncedFor = timerEndTime;
+            if (navigator.vibrate) {
+              try { navigator.vibrate([150, 100, 150]); } catch(e) {}
+            }
+            if (audioMode === 'headphones') {
+              playPreWarningTone();
+              speakAudioCue("Diez segundos");
+            }
           }
         }
 
@@ -13582,7 +13916,17 @@
     // PERSISTENT STORAGE ENGINE
     // ==========================================
     function persistStateRaw() {
-      localStorage.setItem('aesthetic_routine_data', JSON.stringify(workoutState));
+      try {
+        localStorage.setItem('aesthetic_routine_data', JSON.stringify(workoutState));
+        return true;
+      } catch (err) {
+        const quota = err && (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED' || err.code === 22 || err.code === 1014);
+        console.error('[Storage] No se pudo guardar el estado:', err);
+        if (quota && typeof showToast === 'function') {
+          showToast('⚠️ Almacenamiento lleno: exporta una copia y borra sesiones antiguas');
+        }
+        return false;
+      }
     }
 
     let saveDebounceTimer = null;
@@ -13723,11 +14067,9 @@
         const notesInp = card.querySelector('.notes-input') || document.getElementById('notes-' + slotId);
         if (notesInp && notesInp.value.trim()) {
           workoutState.notes[slotId] = notesInp.value.trim();
-        } else if (workoutState.notes && workoutState.notes[slotId] && !notesInp) {
-          // Mantener si la card no está montada en el DOM
-        } else if (workoutState.notes && workoutState.notes[slotId]) {
-          delete workoutState.notes[slotId];
         }
+        // El borrado de notas se gestiona en handleNoteChange (evita perder notas
+        // de ejercicios cuyo input no está montado o aún no se ha hidratado).
       });
 
       persistStateRaw();
@@ -14475,14 +14817,21 @@
       }
       initAudioDeviceDetection();
       initScrubberController();
+      let swReloading = false;
+      function reloadForUpdate(reason) {
+        if (swReloading) return;
+        swReloading = true;
+        try { flushPendingSave(); } catch (e) {}
+        console.log('[App] Recargando por actualización:', reason);
+        window.location.reload();
+      }
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', (event) => {
           if (event.data && (event.data.type === 'FORCE_UPDATE' || event.data.type === 'SW_ACTIVATED')) {
-            console.log('[App] Nueva versión activada. Recargando interfaz...');
-            window.location.reload();
+            reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev29').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev31').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -14496,7 +14845,7 @@
           });
         }).catch(() => {});
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-          window.location.reload();
+          reloadForUpdate('controllerchange');
         });
       }
 
@@ -14794,7 +15143,6 @@
       if (!isRoutineTab) {
         selectDay(defaultDay);
       } else {
-        updateHeaderDayDisplay('routinePlanView');
         const chipLabel = document.getElementById('headerDayChipLabel');
         if (chipLabel) {
           const dayNames = {
@@ -15055,7 +15403,12 @@
           });
         }
 
+        const safeSessionId = escapeHtml(String(s.id || ''));
+        const safeSessionDate = escapeHtml(String(s.date || ''));
         html += `
+            </div>
+            <div class="session-detail-actions">
+              <button type="button" class="btn-session-delete" onclick="event.stopPropagation()" data-delete-session="${safeSessionId}" data-delete-date="${safeSessionDate}">🗑️ Eliminar sesión</button>
             </div>
           </div>
         `;
