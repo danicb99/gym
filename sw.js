@@ -8,6 +8,7 @@ const ASSETS = [
   './reloj.html',
   './qr_zepp.png',
   './watch_bridge.js',
+  './storage_format.js?v=1',
   './mascot.png',
   './icon-round-192.png',
   './icon-round-512.png',

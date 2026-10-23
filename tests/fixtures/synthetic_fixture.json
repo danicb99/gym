@@ -1,0 +1,188 @@
+{
+  "inputs": {
+    "fullbodyA_1_0_kg": "100",
+    "fullbodyA_1_0_reps": "8",
+    "peso": "82.5"
+  },
+  "notes": {
+    "fullbodyA_1": "",
+    "fullbodyA_2": "codo cuidado"
+  },
+  "completed": {
+    "fullbodyA_1_0": true,
+    "fullbodyA_1_1": false
+  },
+  "previous": {},
+  "customSlots": {},
+  "tempSlots": {},
+  "sessionStartTime": null,
+  "lastActivityTime": 1767225600000,
+  "overloadSuggestions": {
+    "squat": { "kg": 102.5, "reps": 8 }
+  },
+  "coachPersonality": "ciencia",
+  "coachTiredMode": false,
+  "sessionIds": {},
+  "setTimestamps": {},
+  "supersetsMode": true,
+  "idlePaused": false,
+  "exerciseHistory": {
+    "squat": [
+      {
+        "date": "2026-01-02",
+        "sets": [
+          {
+            "kg": "100",
+            "reps": "8",
+            "est1RM": 125,
+            "set": 1,
+            "completed": true,
+            "timestamp": 1767225600000,
+            "completedAt": "2026-01-02T10:05:00.000Z",
+            "notes": "",
+            "rpe": 8
+          },
+          {
+            "kg": "100",
+            "reps": "8",
+            "set": 2,
+            "completed": false
+          },
+          {
+            "reps": "10",
+            "set": 1
+          },
+          {
+            "kg": "100",
+            "set": 1
+          },
+          {
+            "est1RM": "125",
+            "set": 1
+          },
+          {
+            "set": 1
+          }
+        ],
+        "bestKg": "100",
+        "bestReps": "8",
+        "best1RM": 125,
+        "notes": "",
+        "source": "watch"
+      },
+      {
+        "date": "2026-01-09",
+        "sets": [
+          {
+            "kg": null,
+            "reps": 0,
+            "est1RM": "",
+            "set": 0,
+            "timestamp": 0,
+            "completedAt": "",
+            "notes": null
+          },
+          {
+            "kg": "105",
+            "reps": "8",
+            "est1RM": 133,
+            "completed": "yes"
+          }
+        ],
+        "bestKg": null,
+        "bestReps": 0
+      }
+    ],
+    "isometria": [
+      {
+        "date": "2026-01-03",
+        "sets": [
+          {
+            "kg": "0",
+            "reps": "45",
+            "est1RM": "45",
+            "set": 1,
+            "completed": false,
+            "completedAt": null
+          }
+        ],
+        "notes": null
+      },
+      {
+        "date": "2026-01-10",
+        "sets": [],
+        "best1RM": "50"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "s1",
+      "date": "2026-01-02T10:00:00.000Z",
+      "dayId": "fullbodyA",
+      "dayName": "Día A: Full Body A",
+      "durationMinutes": 60,
+      "durationFormatted": "1h 0m",
+      "exercises": [
+        {
+          "slotId": "fullbodyA_1",
+          "exId": "squat",
+          "name": "Sentadilla",
+          "sets": [
+            { "set": 1, "kg": "100", "reps": "8", "est1RM": 125 },
+            { "set": 2, "kg": "100", "reps": "8", "est1RM": 125 }
+          ],
+          "bestKg": "100",
+          "bestReps": "8",
+          "best1RM": 125
+        },
+        {
+          "slotId": "fullbodyA_2",
+          "exId": "banca",
+          "name": "Press Banca",
+          "sets": [
+            { "set": 1, "kg": "80", "reps": "8", "est1RM": 101.3, "notes": "última lenta" }
+          ],
+          "bestKg": null,
+          "bestReps": 0,
+          "notes": ""
+        }
+      ],
+      "synced": true
+    },
+    {
+      "id": "s2",
+      "sessionId": "web-fullbodyB-1",
+      "date": "2026-01-03T10:00:00.000Z",
+      "dayId": "fullbodyB",
+      "dayName": "Día B",
+      "durationMinutes": 0,
+      "exercises": [
+        {
+          "exId": "isometria",
+          "name": "Isometría",
+          "sets": [
+            {
+              "kg": "0",
+              "reps": "45",
+              "completed": false,
+              "completedAt": "2026-01-03T10:05:00.000Z",
+              "notes": "parcial"
+            }
+          ],
+          "notes": "sin slot",
+          "watchFlags": []
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "date": "2026-01-04T10:00:00.000Z",
+      "dayId": "cardio",
+      "dayName": "Cardio",
+      "durationMinutes": 30,
+      "durationFormatted": "30m",
+      "exercises": []
+    }
+  ]
+}

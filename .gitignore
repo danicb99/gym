@@ -5,3 +5,5 @@ watch/dist/
 .system_generated/
 scratch/
 watch/app-side/config.js
+tests/fixtures/backup_real.json
+tests/fixtures/*.local.json
