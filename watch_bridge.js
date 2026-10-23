@@ -600,9 +600,19 @@
     if (duplicateIdx !== -1) {
       const existing = workoutState.sessions[duplicateIdx];
       existing.exercises = mergeSessionExercises(existing.exercises, record.exercises);
-      existing.durationMinutes = Math.max(Number(existing.durationMinutes) || 0, Number(record.durationMinutes) || 0);
+      const incomingDur = Number(record.durationMinutes) || 0;
+      const currentDur = Number(existing.durationMinutes) || 0;
+      if (incomingDur > 150 && currentDur <= 150 && currentDur > 0) {
+        existing.durationMinutes = currentDur;
+      } else if (currentDur > 150 && incomingDur <= 150 && incomingDur > 0) {
+        existing.durationMinutes = incomingDur;
+      } else {
+        existing.durationMinutes = Math.min(150, Math.max(currentDur, incomingDur));
+      }
+      existing.durationFormatted = existing.durationMinutes >= 60 
+        ? `${Math.floor(existing.durationMinutes / 60)}h ${existing.durationMinutes % 60}m` 
+        : `${existing.durationMinutes} min`;
       if (!existing.dayName && record.dayName) existing.dayName = record.dayName;
-      if (!existing.durationFormatted && record.durationFormatted) existing.durationFormatted = record.durationFormatted;
       if (record.sessionId && !existing.sessionId) existing.sessionId = record.sessionId;
       if (record.id && !existing.id) existing.id = record.id;
       const existingTs = new Date(existing.date).getTime();
@@ -989,7 +999,11 @@
 
     console.log('[WatchBridge] Fin de entreno recibido desde el reloj:', id, sessionId);
     try {
-      const durMin = summary.durationMinutes || 45;
+      let durMin = summary.durationMinutes || 45;
+      if (durMin > 150) {
+        const totalSets = (summary.exercises || []).reduce((acc, ex) => acc + (ex.sets ? ex.sets.length : 0), 0);
+        durMin = totalSets > 0 ? Math.max(20, Math.min(90, Math.round(6 + totalSets * 2.5))) : 45;
+      }
       const durationFormatted = durMin >= 60 
         ? `${Math.floor(durMin / 60)}h ${durMin % 60}m` 
         : `${durMin} min`;

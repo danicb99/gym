@@ -1418,7 +1418,11 @@
     .btn-backup.share { background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.35); color: var(--cyan); }
     .btn-backup.danger { background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.35); color: #f87171; }
     .btn-backup.danger:hover { background: rgba(239, 68, 68, 0.2); }
-    .session-detail-actions { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: flex-end; }
+    .session-detail-actions { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+    .btn-session-edit { background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.35); color: #fbbf24; border-radius: 8px; padding: 8px 14px; min-height: 40px; font-size: 0.76rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-session-edit:hover { background: rgba(251, 191, 36, 0.2); }
+    .btn-fix-durations { background: var(--primary); color: #000; font-weight: 800; font-size: 0.78rem; border: none; border-radius: 8px; padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: transform 0.15s ease, opacity 0.15s ease; }
+    .btn-fix-durations:active { transform: scale(0.97); }
     .btn-session-delete { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #f87171; border-radius: 8px; padding: 8px 14px; min-height: 40px; font-size: 0.76rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
     .btn-session-delete:hover { background: rgba(239, 68, 68, 0.2); }
     
@@ -11016,6 +11020,8 @@
 
       if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[dayId];
       if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[dayId];
+      if (workoutState.idlePaused) delete workoutState.idlePaused[dayId];
+      if (workoutState.pausedDuration) delete workoutState.pausedDuration[dayId];
       if (workoutState.sessionIds) delete workoutState.sessionIds[dayId];
       _hasShown42MinAlert[dayId] = false;
 
@@ -11318,7 +11324,13 @@
       if (!dayId || dayId === 'historialView') return;
       if (!workoutState.sessionStartTime) workoutState.sessionStartTime = {};
       if (!workoutState.lastActivityTime) workoutState.lastActivityTime = {};
-      if (workoutState.idlePaused && workoutState.idlePaused[dayId]) delete workoutState.idlePaused[dayId];
+      if (!workoutState.pausedDuration) workoutState.pausedDuration = {};
+
+      if (workoutState.idlePaused && workoutState.idlePaused[dayId]) {
+        const pausedDelta = Math.max(0, Date.now() - workoutState.idlePaused[dayId]);
+        workoutState.pausedDuration[dayId] = (workoutState.pausedDuration[dayId] || 0) + pausedDelta;
+        delete workoutState.idlePaused[dayId];
+      }
 
       if (!workoutState.sessionStartTime[dayId]) {
         workoutState.sessionStartTime[dayId] = Date.now();
@@ -11330,13 +11342,18 @@
 
     function updateSessionTimerDisplay(dayId) {
       const startTime = workoutState.sessionStartTime ? workoutState.sessionStartTime[dayId] : null;
+      const isPaused = Boolean(workoutState.idlePaused && workoutState.idlePaused[dayId]);
+      const pausedTime = isPaused ? workoutState.idlePaused[dayId] : Date.now();
+      const pausedDuration = (workoutState.pausedDuration && workoutState.pausedDuration[dayId]) || 0;
+      const elapsedSecs = startTime ? Math.max(0, Math.floor((pausedTime - startTime - pausedDuration) / 1000)) : 0;
+
       const chip = document.getElementById('sessionTimer-' + dayId);
       if (chip) {
         if (startTime) {
-          const elapsedSecs = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
           const m = Math.floor(elapsedSecs / 60);
           const s = elapsedSecs % 60;
-          chip.innerText = `⏱️ ${m}:${s < 10 ? '0' : ''}${s}`;
+          const pauseTag = isPaused ? ' ⏸️' : '';
+          chip.innerText = `⏱️ ${m}:${s < 10 ? '0' : ''}${s}${pauseTag}`;
         } else {
           chip.innerText = '⏱️ 00:00';
         }
@@ -11346,10 +11363,10 @@
       if (hdrSessionTimer) {
         const clockSvg = '<svg class="clock-icon-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
         if (startTime) {
-          const elapsedSecs = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
           const m = Math.floor(elapsedSecs / 60);
           const s = elapsedSecs % 60;
-          hdrSessionTimer.innerHTML = `<span class="clock-icon" aria-hidden="true">${clockSvg}</span> ${m}:${s < 10 ? '0' : ''}${s}`;
+          const pauseTag = isPaused ? ' (Pausa)' : '';
+          hdrSessionTimer.innerHTML = `<span class="clock-icon" aria-hidden="true">${clockSvg}</span> ${m}:${s < 10 ? '0' : ''}${s}${pauseTag}`;
         } else {
           hdrSessionTimer.innerHTML = `<span class="clock-icon" aria-hidden="true">${clockSvg}</span> 00:00`;
         }
@@ -11373,22 +11390,72 @@
         chip.classList.remove('active');
         return;
       }
-      chip.style.borderColor = '';
-      chip.style.color = '';
-      const elapsedSec = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+      chip.style.borderColor = isPaused ? 'rgba(251, 191, 36, 0.5)' : '';
+      chip.style.color = isPaused ? '#fbbf24' : '';
       let timeText = '00:00';
-      if (elapsedSec >= 3600) {
-        const h = Math.floor(elapsedSec / 3600);
-        const m = Math.floor((elapsedSec % 3600) / 60).toString().padStart(2, '0');
-        const s = (elapsedSec % 60).toString().padStart(2, '0');
+      if (elapsedSecs >= 3600) {
+        const h = Math.floor(elapsedSecs / 3600);
+        const m = Math.floor((elapsedSecs % 3600) / 60).toString().padStart(2, '0');
+        const s = (elapsedSecs % 60).toString().padStart(2, '0');
         timeText = `${h}:${m}:${s}`;
       } else {
-        const m = Math.floor(elapsedSec / 60).toString().padStart(2, '0');
-        const s = (elapsedSec % 60).toString().padStart(2, '0');
+        const m = Math.floor(elapsedSecs / 60).toString().padStart(2, '0');
+        const s = (elapsedSecs % 60).toString().padStart(2, '0');
         timeText = `${m}:${s}`;
       }
+      if (isPaused) timeText += ' (Pausa)';
       chip.innerHTML = `${timerSvg}<span>${timeText}</span>`;
       chip.classList.add('active');
+    }
+
+    // Reconciliación de sesiones zombi / olvidadas de días anteriores al abrir la app
+    function reconcileStaleSessions() {
+      if (!workoutState.sessionStartTime) return;
+      const now = Date.now();
+      const FOUR_HOURS = 4 * 60 * 60 * 1000;
+
+      Object.keys(workoutState.sessionStartTime).forEach(dayId => {
+        const startTime = workoutState.sessionStartTime[dayId];
+        if (!startTime) return;
+
+        const isStale = (now - startTime > FOUR_HOURS) || !isDateToday(startTime);
+        if (!isStale) return;
+
+        const daySection = document.getElementById(dayId);
+        const doneRows = daySection ? daySection.querySelectorAll('.set-row.done') : [];
+        let completedCount = doneRows.length;
+        if (completedCount === 0 && Array.isArray(workoutState.completed)) {
+          completedCount = workoutState.completed.filter(id => id.startsWith(dayId + '_')).length;
+        }
+
+        if (completedCount > 0) {
+          const durationMin = calculateRealisticSessionDuration(dayId, startTime);
+          const durationFormatted = durationMin >= 60 
+            ? `${Math.floor(durationMin / 60)}h ${durationMin % 60}m` 
+            : `${durationMin} min`;
+          const sessionDate = new Date(startTime).toISOString();
+
+          executeDayArchive(dayId, durationMin, true, true);
+
+          if (workoutState.sessions && workoutState.sessions.length > 0) {
+            const lastArchived = workoutState.sessions.find(s => s.dayId === dayId && Math.abs(new Date(s.date).getTime() - Date.now()) < 5000);
+            if (lastArchived) {
+              lastArchived.date = sessionDate;
+              persistStateRaw();
+            }
+          }
+          if (typeof showToast === 'function') {
+            showToast(`📦 Sesión anterior archivada (${durationFormatted})`);
+          }
+        } else {
+          delete workoutState.sessionStartTime[dayId];
+          if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[dayId];
+          if (workoutState.idlePaused) delete workoutState.idlePaused[dayId];
+          if (workoutState.pausedDuration) delete workoutState.pausedDuration[dayId];
+          persistStateRaw();
+          updateSessionTimerDisplay(dayId);
+        }
+      });
     }
 
     function runSessionTimerTicker() {
@@ -11649,10 +11716,7 @@
 
           // 3. Ejecutar archivo de sesión automático
           const startTime = workoutState.sessionStartTime ? workoutState.sessionStartTime[section.id] : null;
-          let durationMin = 45;
-          if (startTime) {
-            durationMin = Math.max(1, Math.round((Date.now() - startTime) / 60000));
-          }
+          const durationMin = calculateRealisticSessionDuration(section.id, startTime);
           const sessionRecord = executeDayArchive(section.id, durationMin, false, true);
 
           // 4. Mostrar la tarjeta de fin de entreno ("Flex Card")
@@ -11982,6 +12046,44 @@
       }
     }
 
+    // Helper centralizado para calcular una duración realista sin inflar por inactividad o sesiones olvidadas
+    function calculateRealisticSessionDuration(dayId, startTime) {
+      if (!startTime) return 45;
+      const now = Date.now();
+      const pausedTotal = (workoutState.pausedDuration && workoutState.pausedDuration[dayId]) || 0;
+      const endTime = (workoutState.idlePaused && workoutState.idlePaused[dayId]) ? workoutState.idlePaused[dayId] : now;
+      
+      let rawMin = Math.round((endTime - startTime - pausedTotal) / 60000);
+      
+      // Si el tiempo neto activo es coherente (entre 5 y 120 minutos), se respeta fielmente
+      if (rawMin >= 5 && rawMin <= 120) {
+        return rawMin;
+      }
+      
+      // Si el tiempo es anómalo (> 120 minutos, negativo o desajustado por haber quedado abierto días),
+      // calculamos la duración realista según el contenido real completado:
+      const daySection = document.getElementById(dayId);
+      let doneCount = 0;
+      if (daySection) {
+        doneCount = daySection.querySelectorAll('.set-row.done').length;
+      } else if (Array.isArray(workoutState.completed)) {
+        doneCount = workoutState.completed.filter(id => id.startsWith(dayId + '_')).length;
+      }
+      
+      if (doneCount > 0) {
+        // 6 min calentamiento/aproximación + 2.5 min por serie realizada
+        const estFromSets = Math.round(6 + doneCount * 2.5);
+        return Math.max(20, Math.min(90, estFromSets));
+      }
+      
+      if (typeof calculateDayEstimatedDuration === 'function') {
+        const estDay = calculateDayEstimatedDuration(dayId, typeof isExpressMode !== 'undefined' && isExpressMode);
+        if (estDay > 0) return Math.min(75, estDay);
+      }
+      
+      return 45;
+    }
+
     // Finish & Archive Day Session
     function finishDaySession(dayId) {
       _hasShown42MinAlert[dayId] = false;
@@ -11999,10 +12101,7 @@
 
       // Calculate Session Duration
       const startTime = workoutState.sessionStartTime ? workoutState.sessionStartTime[dayId] : null;
-      let durationMin = 45;
-      if (startTime) {
-        durationMin = Math.max(1, Math.round((Date.now() - startTime) / 60000));
-      }
+      const durationMin = calculateRealisticSessionDuration(dayId, startTime);
       const durationFormatted = durationMin >= 60 
         ? `${Math.floor(durationMin / 60)}h ${durationMin % 60}m` 
         : `${durationMin} min`;
@@ -12706,7 +12805,10 @@
       if (workoutState.sessionStartTime) {
         for (const [dayId, sTime] of Object.entries(workoutState.sessionStartTime)) {
           if (sTime) {
-            const elapsedMin = Math.max(1, Math.round((Date.now() - sTime) / 60000));
+            const isPaused = Boolean(workoutState.idlePaused && workoutState.idlePaused[dayId]);
+            const pTime = isPaused ? workoutState.idlePaused[dayId] : Date.now();
+            const pDur = (workoutState.pausedDuration && workoutState.pausedDuration[dayId]) || 0;
+            const elapsedMin = Math.max(1, Math.min(120, Math.round((pTime - sTime - pDur) / 60000)));
             const elapsedFormatted = elapsedMin >= 60 
               ? `${Math.floor(elapsedMin / 60)}h ${elapsedMin % 60}m` 
               : `${elapsedMin} min`;
@@ -12746,17 +12848,36 @@
         }
       }
 
+      // Detección de sesiones con duración anómala (+2.5h) para ofrecer corrección rápida
+      const excessiveCount = sessions.filter(s => (Number(s.durationMinutes) || 0) > 150).length;
+      let fixBannerHTML = '';
+      if (excessiveCount > 0) {
+        fixBannerHTML = `
+          <div class="excessive-duration-banner" style="background: rgba(245, 158, 11, 0.12); border: 1.5px solid rgba(245, 158, 11, 0.4); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+            <div style="display:flex; align-items:center; gap:10px; min-width:200px; flex:1;">
+              <span style="font-size:1.4rem;">⚠️</span>
+              <div style="font-size:0.8rem; color:#fff; line-height:1.35;">
+                <strong>${excessiveCount} ${excessiveCount === 1 ? 'entrenamiento' : 'entrenamientos'}</strong> con duración excesiva (+2.5h) por no haberse cerrado a tiempo.
+              </div>
+            </div>
+            <button type="button" class="btn-fix-durations" onclick="autoFixExcessiveDurations()">
+              ⚡ Corregir a tiempo estimado
+            </button>
+          </div>
+        `;
+      }
+
       // Render timeline list (Show latest 3 sessions)
       const timelineList = document.getElementById('sessionsTimelineList');
       const moreContainer = document.getElementById('sessionsTimelineMore');
-      if (sessions.length === 0 && !ongoingHTML) {
+      if (sessions.length === 0 && !ongoingHTML && !fixBannerHTML) {
         if (timelineList) timelineList.innerHTML = '<div class="history-empty">Aún no has completado entrenamientos. Cuando guardes un día, aparecerá aquí.</div>';
         if (moreContainer) {
           moreContainer.innerHTML = '';
           moreContainer.style.display = 'none';
         }
       } else {
-        let timelineHTML = ongoingHTML;
+        let timelineHTML = fixBannerHTML + ongoingHTML;
         sessions.slice(0, 3).forEach(s => {
           const isTodaySession = (typeof isDateToday === 'function') && isDateToday(s.date);
           const dateStr = isTodaySession
@@ -12872,7 +12993,7 @@
                   <span style="font-size:0.72rem; color:var(--cyan); font-weight:700;">Ver detalle ❯</span>
                 </div>
                 <div style="display:flex; justify-content:flex-end; margin-top:6px;">
-                  <button type="button" class="btn-session-delete" onclick="event.stopPropagation()" data-delete-session="${escapeHtml(String(s.id || ''))}" data-delete-date="${escapeHtml(String(s.date || ''))}">Eliminar</button>
+                  <button type="button" class="btn-session-edit" onclick="event.stopPropagation()" data-edit-duration-session="${escapeHtml(String(s.id || ''))}" data-edit-duration-date="${escapeHtml(String(s.date || ''))}">✏️ Duración</button>
                 </div>
               </div>
             `;
@@ -12908,6 +13029,68 @@
       if (typeof updateHistoryExerciseSelector === 'function') {
         try { updateHistoryExerciseSelector(); } catch (e) {}
       }
+    }
+
+    function autoFixExcessiveDurations() {
+      const sessions = Array.isArray(workoutState.sessions) ? workoutState.sessions : [];
+      const excessive = sessions.filter(s => (Number(s.durationMinutes) || 0) > 150);
+      if (excessive.length === 0) {
+        showToast('No se detectaron entrenamientos con duración excesiva');
+        return;
+      }
+
+      if (!confirm(`¿Corregir automáticamente ${excessive.length} ${excessive.length === 1 ? 'entrenamiento' : 'entrenamientos'} con duración excesiva?\n\nSe ajustará la duración al tiempo estimado según las series realizadas (~40-55 min) y se actualizarán las medias del historial sin alterar tus pesos ni repeticiones.`)) {
+        return;
+      }
+
+      let fixedCount = 0;
+      sessions.forEach(s => {
+        const dMin = Number(s.durationMinutes) || 0;
+        if (dMin > 150) {
+          const totalSets = (s.exercises || []).reduce((acc, ex) => acc + (ex.sets ? ex.sets.length : 0), 0);
+          let est = 45;
+          if (totalSets > 0) {
+            est = Math.round(6 + totalSets * 2.5);
+            est = Math.max(25, Math.min(80, est));
+          } else if (typeof calculateDayEstimatedDuration === 'function' && s.dayId) {
+            est = calculateDayEstimatedDuration(s.dayId) || 45;
+          }
+          s.durationMinutes = est;
+          s.durationFormatted = est >= 60 ? `${Math.floor(est / 60)}h ${est % 60}m` : `${est} min`;
+          fixedCount++;
+        }
+      });
+
+      persistStateRaw();
+      renderGlobalHistoryView();
+      showToast(`✓ ${fixedCount} ${fixedCount === 1 ? 'entrenamiento corregido' : 'entrenamientos corregidos'} con éxito`);
+    }
+
+    function editSessionDurationById(sessionId, sessionDate) {
+      const sessions = Array.isArray(workoutState.sessions) ? workoutState.sessions : [];
+      const target = sessions.find(s => s && s.id === sessionId)
+        || (sessionDate ? sessions.find(s => s && s.date === sessionDate) : null);
+      if (!target) return;
+
+      const currentMin = target.durationMinutes || 45;
+      const input = window.prompt(`Editar duración de la sesión (${target.dayName || target.dayId}):\nIntroduce los minutos reales (ej: 45):`, currentMin);
+      if (input === null) return;
+
+      const parsedMin = parseInt(input.trim(), 10);
+      if (isNaN(parsedMin) || parsedMin <= 0 || parsedMin > 360) {
+        showToast('⚠️ Introduce un número válido de minutos (entre 1 y 360)');
+        return;
+      }
+
+      target.durationMinutes = parsedMin;
+      target.durationFormatted = parsedMin >= 60 
+        ? `${Math.floor(parsedMin / 60)}h ${parsedMin % 60}m` 
+        : `${parsedMin} min`;
+
+      persistStateRaw();
+      openSessionDetailModal([target], target.date);
+      refreshHistoryViews(target.dayId);
+      showToast(`✓ Duración actualizada a ${target.durationFormatted}`);
     }
 
     function deleteSessionById(sessionId, sessionDate) {
@@ -12955,6 +13138,13 @@
     }
 
     document.addEventListener('click', function(event) {
+      const editBtn = event.target && event.target.closest ? event.target.closest('[data-edit-duration-session]') : null;
+      if (editBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+        editSessionDurationById(editBtn.getAttribute('data-edit-duration-session'), editBtn.getAttribute('data-edit-duration-date'));
+        return;
+      }
       const btn = event.target && event.target.closest ? event.target.closest('[data-delete-session]') : null;
       if (!btn) return;
       event.preventDefault();
@@ -14817,6 +15007,7 @@
       }
       initAudioDeviceDetection();
       initScrubberController();
+      reconcileStaleSessions();
       let swReloading = false;
       function reloadForUpdate(reason) {
         if (swReloading) return;
@@ -14831,7 +15022,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev31').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev33').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -14850,10 +15041,14 @@
       }
 
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && 'serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistration().then(reg => {
-            if (reg) reg.update();
-          });
+        if (document.visibilityState === 'visible') {
+          checkAutoSave();
+          reconcileStaleSessions();
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistration().then(reg => {
+              if (reg) reg.update();
+            });
+          }
         }
       });
     }
@@ -15333,19 +15528,18 @@
         const dateFormatted = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
         const timeFormatted = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         
-        let totalVol = 0;
+        const exCount = s.exercises ? s.exercises.length : 0;
         let totalSets = 0;
+        let notesCount = 0;
         if (s.exercises) {
           s.exercises.forEach(ex => {
-            if (ex.sets) {
-              totalSets += ex.sets.length;
-              ex.sets.forEach(st => {
-                totalVol += (st.kg || 0) * (st.reps || 0);
-              });
-            }
+            if (ex.sets) totalSets += ex.sets.length;
+            if (ex.notes && ex.notes.trim()) notesCount++;
           });
         }
-        const volDisplay = totalVol >= 1000 ? `${(totalVol / 1000).toFixed(1)} t` : `${totalVol} kg`;
+        const notesBadge = notesCount > 0
+          ? `<span class="session-detail-tag" style="display:inline-flex; align-items:center; gap:3px; background:rgba(251,191,36,0.15); border-color:rgba(251,191,36,0.3); color:var(--amber);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>${notesCount} ${notesCount === 1 ? 'nota' : 'notas'}</span>`
+          : '';
 
         html += `
           <div class="session-detail-card" style="margin-bottom: ${sIdx < sessions.length - 1 ? '16px' : '0'};">
@@ -15360,8 +15554,8 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 <span>${s.durationFormatted || (s.durationMinutes ? s.durationMinutes + ' min' : '45 min')}</span>
               </span>
-              <span class="session-detail-tag">${totalSets} series</span>
-              <span class="session-detail-tag">${volDisplay}</span>
+              <span class="session-detail-tag">${exCount} ${exCount === 1 ? 'ejercicio' : 'ejercicios'} (${totalSets} series)</span>
+              ${notesBadge}
             </div>
 
             <div class="session-detail-exercises">
@@ -15408,6 +15602,7 @@
         html += `
             </div>
             <div class="session-detail-actions">
+              <button type="button" class="btn-session-edit" onclick="event.stopPropagation()" data-edit-duration-session="${safeSessionId}" data-edit-duration-date="${safeSessionDate}">✏️ Editar duración</button>
               <button type="button" class="btn-session-delete" onclick="event.stopPropagation()" data-delete-session="${safeSessionId}" data-delete-date="${safeSessionDate}">🗑️ Eliminar sesión</button>
             </div>
           </div>

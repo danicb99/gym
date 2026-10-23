@@ -348,7 +348,17 @@ App(
 
     finishWorkout() {
       const day = ROUTINE_SLOTS[this.globalData.activeDayId]
-      const durationMinutes = Math.round((Date.now() - (this.globalData.sessionStartTime || Date.now())) / 60000)
+      let durationMinutes = Math.round((Date.now() - (this.globalData.sessionStartTime || Date.now())) / 60000)
+      if (durationMinutes > 150) {
+        let setCounter = 0
+        if (day && day.slots) {
+          day.slots.forEach(slot => {
+            const sets = this.globalData.sessionLoggedSets[slot.slotId] || []
+            setCounter += sets.filter(s => s && s.completed).length
+          })
+        }
+        durationMinutes = setCounter > 0 ? Math.max(20, Math.min(90, Math.round(6 + setCounter * 2.5))) : 45
+      }
       const finishedSessionId = this.globalData.sessionId || `watch-${this.globalData.activeDayId}-${Date.now()}`
 
       const sessionSummary = {
