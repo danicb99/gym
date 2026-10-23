@@ -55,6 +55,27 @@ App(
           this.globalData.sessionLoggedSets = saved.activeSession.sessionLoggedSets || {}
           this.globalData.slotExOverrides = saved.activeSession.slotExOverrides || {}
           this.globalData.slotExtraSets = saved.activeSession.slotExtraSets || {}
+
+          // Restaurar descanso en curso. `endTime` es absoluto, así que la cuenta
+          // sigue avanzando aunque la app se haya cerrado. Si ya venció se deja
+          // inactivo para no vibrar por un descanso terminado hace tiempo.
+          const savedRest = saved.activeSession.restTimer
+          if (savedRest && savedRest.active) {
+            const now = Date.now()
+            const endTime = savedRest.endTime ||
+              (savedRest.remainingSeconds > 0 ? now + savedRest.remainingSeconds * 1000 : 0)
+            const remaining = endTime > now ? Math.max(1, Math.round((endTime - now) / 1000)) : 0
+            if (remaining > 0) {
+              this.globalData.restTimer = {
+                active: true,
+                endTime,
+                remainingSeconds: remaining,
+                totalSeconds: Math.max(remaining, savedRest.totalSeconds || 90),
+                nextExerciseName: savedRest.nextExerciseName || '',
+                nextSetNum: savedRest.nextSetNum || 1
+              }
+            }
+          }
         }
       }
 
@@ -99,8 +120,31 @@ App(
         sessionStartTime: this.globalData.sessionStartTime,
         sessionLoggedSets: this.globalData.sessionLoggedSets,
         slotExOverrides: this.globalData.slotExOverrides,
-        slotExtraSets: this.globalData.slotExtraSets || {}
+        slotExtraSets: this.globalData.slotExtraSets || {},
+        restTimer: this.globalData.restTimer || null
       })
+    },
+
+    // Crea el descanso y lo persiste de inmediato: si el reloj se reinicia
+    // durante la cuenta atrás, al volver a abrir la app sigue corriendo.
+    startRestTimer(durationSeconds, nextExerciseName, nextSetNum) {
+      const total = Math.max(1, Math.round(durationSeconds || 90))
+      this.globalData.restTimer = {
+        active: true,
+        endTime: Date.now() + total * 1000,
+        remainingSeconds: total,
+        totalSeconds: total,
+        nextExerciseName: nextExerciseName || '',
+        nextSetNum: nextSetNum || 1
+      }
+      this.persistActiveSession()
+      return this.globalData.restTimer
+    },
+
+    stopRestTimer(persist = true) {
+      if (this.globalData.restTimer) this.globalData.restTimer.active = false
+      if (persist) this.persistActiveSession()
+      return this.globalData.restTimer
     },
 
     async checkPhoneLiveSession(force = false) {

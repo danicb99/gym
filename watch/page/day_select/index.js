@@ -204,7 +204,11 @@ Page(
         click_func: () => {
           if (app.globalData.phoneLiveSession && app.globalData.phoneLiveSession.workoutActive) {
             app.adoptPhoneSession(app.globalData.phoneLiveSession)
-            if (app.globalData.restTimer && app.globalData.restTimer.active && app.globalData.restTimer.remainingSeconds > 2) {
+            const rt = app.globalData.restTimer
+            const restRemaining = (rt && rt.active)
+              ? (rt.endTime ? Math.max(0, Math.round((rt.endTime - Date.now()) / 1000)) : (rt.remainingSeconds || 0))
+              : 0
+            if (restRemaining > 2) {
               push({ url: 'page/timer/index' })
             } else {
               push({ url: 'page/workout/index' })

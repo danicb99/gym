@@ -211,6 +211,7 @@ Page({
       this.state.app.globalData.restTimer.remainingSeconds = this.state.remainingSeconds
       this.state.app.globalData.restTimer.endTime = Date.now() + this.state.remainingSeconds * 1000
       this.state.app.globalData.restTimer.totalSeconds = this.state.totalSeconds
+      if (this.state.app.persistActiveSession) this.state.app.persistActiveSession()
     }
     this.updateUI()
   },
@@ -267,7 +268,11 @@ Page({
 
   finishRest() {
     this.clearCountdown()
-    this.state.app.globalData.restTimer.active = false
+    if (this.state.app && typeof this.state.app.stopRestTimer === 'function') {
+      this.state.app.stopRestTimer()
+    } else if (this.state.app && this.state.app.globalData.restTimer) {
+      this.state.app.globalData.restTimer.active = false
+    }
     replace({ url: 'page/workout/index' })
   },
 

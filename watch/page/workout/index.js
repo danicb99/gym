@@ -56,13 +56,19 @@ Page(BasePage({
 
   initCurrentValues() {
     const app = this.state.app
+    if (!app || !app.globalData) return
     const slot = app.getActiveSlot()
     const ex = app.getActiveExercise()
 
     this.state.stepKg = (ex && ex.stepKg) ? ex.stepKg : 2.5
 
+    // Sin slot activo no hay serie que inicializar. build() redirige a day_select.
+    // Evita el crash al arrancar con un día sin slots o un índice fuera de rango.
+    if (!slot) return
+    const allLoggedSets = app.globalData.sessionLoggedSets || {}
+
     // Si ya hay series guardadas en esta sesión para este slot, cargar la actual
-    const logged = app.globalData.sessionLoggedSets[slot.slotId]
+    const logged = allLoggedSets[slot.slotId]
     if (logged && logged[app.globalData.currentSetIndex]) {
       this.state.currentKg = logged[app.globalData.currentSetIndex].kg
       this.state.currentReps = logged[app.globalData.currentSetIndex].reps
@@ -595,6 +601,7 @@ Page(BasePage({
       } else {
         rt.active = false
         this.state.restPreWarned = false
+        if (app.persistActiveSession) app.persistActiveSession()
         vibrateRestFinished()
         // Al terminar el descanso: consultar bajo demanda con el móvil respetando throttle de 60s
         this.checkPhoneSyncOnDemand(false)
@@ -681,14 +688,7 @@ Page(BasePage({
           if (pairedSlot) {
             app.globalData.currentSlotIndex = pairedSlotIdx
             const nextEx = app.getActiveExercise()
-            app.globalData.restTimer = {
-              active: true,
-              endTime: Date.now() + pairRest * 1000,
-              remainingSeconds: pairRest,
-              totalSeconds: pairRest,
-              nextExerciseName: nextEx ? nextEx.name : '',
-              nextSetNum: app.globalData.currentSetIndex + 1
-            }
+            app.startRestTimer(pairRest, nextEx ? nextEx.name : '', app.globalData.currentSetIndex + 1)
             replace({ url: 'page/timer/index' })
             return
           }
@@ -702,14 +702,7 @@ Page(BasePage({
             app.globalData.currentSlotIndex = pairedSlotIdx
             app.globalData.currentSetIndex += 1
             const nextEx = app.getActiveExercise()
-            app.globalData.restTimer = {
-              active: true,
-              endTime: Date.now() + pairRest * 1000,
-              remainingSeconds: pairRest,
-              totalSeconds: pairRest,
-              nextExerciseName: nextEx ? nextEx.name : '',
-              nextSetNum: app.globalData.currentSetIndex + 1
-            }
+            app.startRestTimer(pairRest, nextEx ? nextEx.name : '', app.globalData.currentSetIndex + 1)
             replace({ url: 'page/timer/index' })
             return
           }
@@ -719,16 +712,8 @@ Page(BasePage({
           if (maxPairIdx + 1 < day.slots.length) {
             app.globalData.currentSlotIndex = maxPairIdx + 1
             app.globalData.currentSetIndex = 0
-            const nextSlot = app.getActiveSlot()
             const nextEx = app.getActiveExercise()
-            app.globalData.restTimer = {
-              active: true,
-              endTime: Date.now() + pairRest * 1000,
-              remainingSeconds: pairRest,
-              totalSeconds: pairRest,
-              nextExerciseName: nextEx ? nextEx.name : '',
-              nextSetNum: 1
-            }
+            app.startRestTimer(pairRest, nextEx ? nextEx.name : '', 1)
             replace({ url: 'page/timer/index' })
             return
           } else {
@@ -744,29 +729,14 @@ Page(BasePage({
     // FLUJO NORMAL (EJERCICIO INDIVIDUAL)
     if (app.globalData.currentSetIndex + 1 < totalSetsInSlot) {
       app.globalData.currentSetIndex += 1
-      app.globalData.restTimer = {
-        active: true,
-        endTime: Date.now() + restDuration * 1000,
-        remainingSeconds: restDuration,
-        totalSeconds: restDuration,
-        nextExerciseName: ex ? ex.name : '',
-        nextSetNum: app.globalData.currentSetIndex + 1
-      }
+      app.startRestTimer(restDuration, ex ? ex.name : '', app.globalData.currentSetIndex + 1)
     } else {
       // Pasamos al siguiente ejercicio
       if (app.globalData.currentSlotIndex + 1 < day.slots.length) {
         app.globalData.currentSlotIndex += 1
         app.globalData.currentSetIndex = 0
-        const nextSlot = app.getActiveSlot()
         const nextEx = app.getActiveExercise()
-        app.globalData.restTimer = {
-          active: true,
-          endTime: Date.now() + restDuration * 1000,
-          remainingSeconds: restDuration,
-          totalSeconds: restDuration,
-          nextExerciseName: nextEx ? nextEx.name : '',
-          nextSetNum: 1
-        }
+        app.startRestTimer(restDuration, nextEx ? nextEx.name : '', 1)
       } else {
         // Fin del entrenamiento
         app.finishWorkout()
