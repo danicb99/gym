@@ -12992,9 +12992,6 @@
                   </div>
                   <span style="font-size:0.72rem; color:var(--cyan); font-weight:700;">Ver detalle ❯</span>
                 </div>
-                <div style="display:flex; justify-content:flex-end; margin-top:6px;">
-                  <button type="button" class="btn-session-edit" onclick="event.stopPropagation()" data-edit-duration-session="${escapeHtml(String(s.id || ''))}" data-edit-duration-date="${escapeHtml(String(s.date || ''))}">✏️ Duración</button>
-                </div>
               </div>
             `;
           });
@@ -15602,8 +15599,8 @@
         html += `
             </div>
             <div class="session-detail-actions">
-              <button type="button" class="btn-session-edit" onclick="event.stopPropagation()" data-edit-duration-session="${safeSessionId}" data-edit-duration-date="${safeSessionDate}">✏️ Editar duración</button>
-              <button type="button" class="btn-session-delete" onclick="event.stopPropagation()" data-delete-session="${safeSessionId}" data-delete-date="${safeSessionDate}">🗑️ Eliminar sesión</button>
+              <button type="button" class="btn-session-edit" onclick="event.stopPropagation()" data-edit-duration-session="${safeSessionId}" data-edit-duration-date="${safeSessionDate}">Editar duración</button>
+              <button type="button" class="btn-session-delete" onclick="event.stopPropagation()" data-delete-session="${safeSessionId}" data-delete-date="${safeSessionDate}">Eliminar sesión</button>
             </div>
           </div>
         `;
