@@ -12,16 +12,16 @@ console.log('====================================================\n');
 console.log('🎨 1. Verificación de Reglas CSS:');
 
 assert(
-  /\.exercise-card\.collapsed\.exercise-completed\s*\{[\s\S]*?border-left:\s*4px\s+solid\s+#10b981/.test(html),
-  'Falta la franja lateral izquierda de 4px sólida #10b981 en tarjetas compactadas completadas'
+  /\.exercise-card\.collapsed\.exercise-completed\s*\{[\s\S]*?border-left:\s*4px\s+solid\s+#fbbf24/.test(html),
+  'Falta la franja lateral izquierda de 4px sólida #fbbf24 en tarjetas compactadas completadas'
 );
-console.log('  ✓ Franja lateral izquierda sólida de 4px en #10b981 presente');
+console.log('  ✓ Franja lateral izquierda sólida de 4px en #fbbf24 presente');
 
 assert(
-  /\.exercise-card\.collapsed\.exercise-completed\s*\{[\s\S]*?background:\s*rgba\(16,\s*185,\s*129,\s*0\.08\)/.test(html),
-  'Falta el fondo sólido esmeralda contenido rgba(16, 185, 129, 0.08) en tarjetas completadas'
+  /\.exercise-card\.collapsed\.exercise-completed\s*\{[\s\S]*?background:\s*rgba\(251,\s*191,\s*36,\s*0\.08\)/.test(html),
+  'Falta el fondo sólido amarillo contenido rgba(251, 191, 36, 0.08) en tarjetas completadas'
 );
-console.log('  ✓ Fondo sólido esmeralda (sin degradados) configurado');
+console.log('  ✓ Fondo sólido amarillo ámbar (sin degradados) configurado');
 
 assert(
   /\.exercise-card\.exercise-completed\s+\.summary-icon-badge::after\s*\{[\s\S]*?content:\s*['"]✓['"]/.test(html),
@@ -30,32 +30,32 @@ assert(
 console.log('  ✓ Avatar decorado con badge circular flotante con checkmark (✓)');
 
 assert(
-  /\.exercise-card\.exercise-completed\s+\.summary-sub\s*\{[\s\S]*?color:\s*#34d399/.test(html),
-  'El subtítulo en tarjeta completada no usa el color verde esmeralda #34d399'
+  /\.exercise-card\.exercise-completed\s+\.summary-sub\s*\{[\s\S]*?color:\s*#fbbf24/.test(html),
+  'El subtítulo en tarjeta completada no usa el color amarillo ámbar #fbbf24'
 );
 assert(
   /\.exercise-card\.exercise-completed\s+\.summary-sub::before\s*\{[\s\S]*?content:\s*['"]✓\s*['"]/.test(html),
   'El subtítulo en tarjeta completada no incluye el prefijo de check ✓'
 );
-console.log('  ✓ Subtítulo con color verde esmeralda #34d399 y prefijo de check ✓');
+console.log('  ✓ Subtítulo con color amarillo ámbar #fbbf24 y prefijo de check ✓');
 
 assert(
-  /\.summary-sub\.in-progress\s*\{[\s\S]*?color:\s*#fbbf24/.test(html),
-  'Falta el color ámbar #fbbf24 para el estado en progreso (.in-progress)'
+  /\.summary-sub\.in-progress\s*\{[\s\S]*?color:\s*#cbd5e1/.test(html),
+  'Falta el color contrastado #cbd5e1 para el estado en progreso (.in-progress)'
 );
-console.log('  ✓ Estado en curso (.in-progress) tematizado en ámbar (#fbbf24)');
+console.log('  ✓ Estado en curso (.in-progress) contrastado (#cbd5e1)');
 
 assert(
-  /\.exercise-card\.collapsed\.exercise-completed\s+\.summary-chevron\s*\{[\s\S]*?color:\s*#10b981/.test(html),
-  'El chevron de la tarjeta completada no usa el color esmeralda #10b981'
+  /\.exercise-card\.collapsed\.exercise-completed\s+\.summary-chevron\s*\{[\s\S]*?color:\s*#fbbf24/.test(html),
+  'El chevron de la tarjeta completada no usa el color amarillo #fbbf24'
 );
-console.log('  ✓ Chevron en tarjeta completada tematizado en #10b981');
+console.log('  ✓ Chevron en tarjeta completada tematizado en #fbbf24');
 
 assert(
-  /\.exercise-pair-container:has\(\.exercise-card\.exercise-completed\):not\(:has\(\.exercise-card:not\(\.exercise-completed\)\)\)\s*\{[\s\S]*?border-left-color:\s*#10b981/.test(html),
-  'La superserie no cambia a esmeralda cuando ambos ejercicios están completados'
+  /\.exercise-pair-container:has\(\.exercise-card\.exercise-completed\):not\(:has\(\.exercise-card:not\(\.exercise-completed\)\)\)\s*\{[\s\S]*?border-left-color:\s*#fbbf24/.test(html),
+  'La superserie no cambia a amarillo cuando ambos ejercicios están completados'
 );
-console.log('  ✓ Contenedor de superserie sincronizado a esmeralda al completar la pareja');
+console.log('  ✓ Contenedor de superserie sincronizado a amarillo ámbar al completar la pareja');
 
 // 2. Simulación funcional de estados de subtítulo y clases
 console.log('\n⚙️ 2. Verificación de Lógica de Estados en JavaScript:');

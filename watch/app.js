@@ -19,6 +19,7 @@ App(
       sessionStartTime: null,
       sessionLoggedSets: {},  // slotId -> [ { kg: 80, reps: 8, completed: true } ]
       slotExOverrides: {},    // slotId -> exId (sustituciones en caliente)
+      customSlots: {},        // slotId -> exId (sustituciones predeterminadas persistentes)
       slotExtraSets: {},      // slotId -> delta de series añadidas/quitadas
       phoneLiveSession: null, // Datos del entreno activo en el móvil si existe
       isPhoneSynced: false,   // True si la sesión actual está enlazada al móvil
@@ -40,6 +41,10 @@ App(
 
       // 1. Restaurar sesión autónoma previa si existía en memoria flash
       const saved = loadWorkoutData()
+      if (saved && saved.customSlots) {
+        this.globalData.customSlots = Object.assign({}, saved.customSlots)
+        this.globalData.slotExOverrides = Object.assign({}, saved.customSlots)
+      }
       if (saved && saved.activeSession) {
         const sTime = saved.activeSession.sessionStartTime
         const maxAge = 8 * 3600 * 1000 // 8 horas máximo de validez
@@ -178,7 +183,14 @@ App(
       this.globalData.currentSetIndex = phoneSession.currentSetIndex || 0
       this.globalData.sessionStartTime = phoneSession.sessionStartTime || Date.now()
       this.globalData.sessionLoggedSets = phoneSession.sessionLoggedSets || {}
-      this.globalData.slotExOverrides = phoneSession.slotExOverrides || {}
+      if (phoneSession.slotExOverrides) {
+        this.globalData.slotExOverrides = Object.assign({}, this.globalData.customSlots, phoneSession.slotExOverrides)
+        this.globalData.customSlots = Object.assign({}, this.globalData.customSlots, phoneSession.slotExOverrides)
+        const currentData = loadWorkoutData()
+        saveWorkoutData(Object.assign({}, currentData, { customSlots: this.globalData.customSlots }))
+      } else {
+        this.globalData.slotExOverrides = Object.assign({}, this.globalData.customSlots)
+      }
       if (phoneSession.slotExtraSets) {
         this.globalData.slotExtraSets = Object.assign({}, this.globalData.slotExtraSets, phoneSession.slotExtraSets)
       }
@@ -233,6 +245,9 @@ App(
 
       if (phoneSession.slotExOverrides) {
         this.globalData.slotExOverrides = Object.assign({}, this.globalData.slotExOverrides, phoneSession.slotExOverrides)
+        this.globalData.customSlots = Object.assign({}, this.globalData.customSlots, phoneSession.slotExOverrides)
+        const currentData = loadWorkoutData()
+        saveWorkoutData(Object.assign({}, currentData, { customSlots: this.globalData.customSlots }))
       }
       if (phoneSession.slotExtraSets) {
         this.globalData.slotExtraSets = Object.assign({}, this.globalData.slotExtraSets, phoneSession.slotExtraSets)
@@ -289,7 +304,7 @@ App(
       this.globalData.currentSetIndex = 0
       this.globalData.sessionStartTime = null
       this.globalData.sessionLoggedSets = {}
-      this.globalData.slotExOverrides = {}
+      this.globalData.slotExOverrides = Object.assign({}, this.globalData.customSlots || {})
       this.globalData.slotExtraSets = {}
       this.globalData.phoneLiveSession = null
       this.globalData.isPhoneSynced = false
@@ -310,7 +325,7 @@ App(
       this.globalData.currentSlotIndex = 0
       this.globalData.currentSetIndex = 0
       this.globalData.sessionLoggedSets = {}
-      this.globalData.slotExOverrides = {}
+      this.globalData.slotExOverrides = Object.assign({}, this.globalData.customSlots || {})
       this.globalData.slotExtraSets = {}
       this.globalData.phoneLiveSession = null
       this.globalData.hrHistory = []
@@ -450,7 +465,7 @@ App(
       this.globalData.currentSetIndex = 0
       this.globalData.sessionStartTime = null
       this.globalData.sessionLoggedSets = {}
-      this.globalData.slotExOverrides = {}
+      this.globalData.slotExOverrides = Object.assign({}, this.globalData.customSlots || {})
       this.globalData.slotExtraSets = {}
       this.globalData.isPhoneSynced = false
       this.globalData.phoneLiveSession = null

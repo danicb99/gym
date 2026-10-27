@@ -454,7 +454,7 @@ export const EXERCISE_CATALOG = {
     muscle: "Isquiosurales",
     rest: 90,
     stepKg: 2.5,
-    alternatives: ["curl_femoral_sentado", "curl_femoral_unilateral", "curl_femoral_mancuerna"]
+    alternatives: ["curlsentado", "curl_femoral_sentado", "curl_femoral_unilateral", "curl_femoral_mancuerna"]
   },
   curl_femoral_sentado: {
     id: "curl_femoral_sentado",

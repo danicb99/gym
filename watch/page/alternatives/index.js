@@ -64,7 +64,18 @@ Page({
       text: `Actual: ${currentEx.name}`
     })
 
-    const alternatives = currentEx.alternatives || []
+    const currentExId = app.globalData.slotExOverrides[slot.slotId] || slot.defaultExId
+    const candidateIds = new Set()
+    if (slot.defaultExId) candidateIds.add(slot.defaultExId)
+    const defEx = EXERCISE_CATALOG[slot.defaultExId]
+    if (defEx && Array.isArray(defEx.alternatives)) {
+      defEx.alternatives.forEach((id) => candidateIds.add(id))
+    }
+    if (currentEx && Array.isArray(currentEx.alternatives)) {
+      currentEx.alternatives.forEach((id) => candidateIds.add(id))
+    }
+    candidateIds.delete(currentExId)
+    const alternatives = Array.from(candidateIds).filter((id) => !!EXERCISE_CATALOG[id])
     let curY = 112
     const btnW = 376
     const btnH = 68
@@ -88,6 +99,9 @@ Page({
         text: altEx.name,
         click_func: () => {
           app.globalData.slotExOverrides[slot.slotId] = altId
+          if (typeof app.persistActiveSession === 'function') {
+            app.persistActiveSession()
+          }
           replace({ url: 'page/workout/index' })
         }
       })
