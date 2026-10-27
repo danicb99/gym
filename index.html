@@ -576,12 +576,14 @@
       flex-shrink: 0;
     }
 
-    /* Accordion collapsed card */
+    /* Accordion collapsed card (Default / Pending) */
     .exercise-card.collapsed {
       padding: 10px 14px;
       margin-bottom: 8px;
-      background: rgba(15, 23, 42, 0.45);
-      border-color: rgba(255, 255, 255, 0.07);
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-left: 4px solid rgba(255, 255, 255, 0.10);
+      transition: background 0.2s ease, border-color 0.2s ease, border-left-color 0.2s ease;
     }
     .exercise-card.collapsed .card-body-collapsible {
       display: none !important;
@@ -590,20 +592,77 @@
       display: flex !important;
     }
 
-    /* Accordion collapsed & completed (green success accent) */
-    .exercise-card.exercise-completed .summary-check-icon {
-      background: var(--success);
-      border-color: var(--success);
-      color: #000;
+    /* Accordion collapsed: In progress (partial sets done) */
+    .exercise-card.collapsed:has(.set-row.done):not(.exercise-completed) {
+      border-left: 4px solid rgba(251, 191, 36, 0.7);
     }
+
+    /* Accordion collapsed & completed: High visual distinction (Solid emerald, no gradients) */
     .exercise-card.collapsed.exercise-completed {
-      background: rgba(16, 185, 129, 0.04);
-      border-color: rgba(16, 185, 129, 0.25);
+      background: rgba(16, 185, 129, 0.08) !important;
+      border: 1px solid rgba(16, 185, 129, 0.35) !important;
+      border-left: 4px solid #10b981 !important;
+      box-shadow: 0 2px 12px rgba(16, 185, 129, 0.12);
     }
-    .exercise-card.collapsed:not(.exercise-completed) .summary-toggle-btn {
-      color: var(--text-muted);
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.08);
+
+    /* Completed Icon Badge: Solid emerald + corner checkmark badge */
+    .exercise-card.exercise-completed .summary-icon-badge {
+      position: relative;
+      background: rgba(16, 185, 129, 0.18) !important;
+      border-color: rgba(16, 185, 129, 0.60) !important;
+    }
+    .exercise-card.exercise-completed .summary-icon-badge .ex-svg-icon {
+      color: #10b981;
+      fill: #10b981;
+    }
+    .exercise-card.exercise-completed .summary-icon-badge::after {
+      content: '✓';
+      position: absolute;
+      bottom: -3px;
+      right: -3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #10b981;
+      color: #060a12;
+      font-size: 11px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #0b1322;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+      line-height: 1;
+      z-index: 2;
+    }
+
+    /* Subtitle in completed collapsed card */
+    .exercise-card.exercise-completed .summary-sub {
+      color: #34d399 !important;
+      font-weight: 750;
+      letter-spacing: 0.01em;
+    }
+    .exercise-card.exercise-completed .summary-sub::before {
+      content: '✓ ';
+      font-weight: 900;
+      color: #10b981;
+    }
+
+    /* Subtitle in progress */
+    .summary-sub.in-progress {
+      color: #fbbf24 !important;
+      font-weight: 700;
+    }
+
+    /* Chevron in completed collapsed card */
+    .exercise-card.collapsed.exercise-completed .summary-chevron {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+    .exercise-card.collapsed.exercise-completed .summary-chevron:hover {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: rgba(16, 185, 129, 0.55);
     }
 
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; cursor: pointer; }
@@ -2871,6 +2930,14 @@
       border-left: 3px solid #fbbf24;
       border-radius: 16px;
       transition: all 0.2s ease;
+    }
+    .exercise-pair-container:has(.exercise-card.exercise-completed):not(:has(.exercise-card:not(.exercise-completed))) {
+      border-left-color: #10b981 !important;
+      border-color: rgba(16, 185, 129, 0.35);
+      background: rgba(16, 185, 129, 0.04);
+    }
+    .exercise-pair-container:has(.exercise-card.exercise-completed):not(:has(.exercise-card:not(.exercise-completed))) .pair-header-label {
+      color: #10b981 !important;
     }
     .pair-header-label {
       display: flex;
@@ -11762,7 +11829,18 @@
       const doneSets = doneRows.length;
 
       const subLabel = document.getElementById('summary-sub-' + slotId);
-      if (subLabel) subLabel.innerText = `${doneSets}/${totalSets} series completadas`;
+      if (subLabel) {
+        if (totalSets > 0 && doneSets >= totalSets) {
+          subLabel.innerText = `${doneSets}/${totalSets} series completadas`;
+          subLabel.classList.remove('in-progress');
+        } else if (doneSets > 0) {
+          subLabel.innerText = `${doneSets}/${totalSets} series en curso`;
+          subLabel.classList.add('in-progress');
+        } else {
+          subLabel.innerText = `${totalSets} series por realizar`;
+          subLabel.classList.remove('in-progress');
+        }
+      }
 
       // Find best completed set for pill display
       let bestKg = 0;
@@ -11831,6 +11909,7 @@
         card.classList.remove('manually-expanded');
         if (existingBadge) existingBadge.remove();
       }
+      updateCardSummaryStatus(card);
       refreshMascotBadge();
     }
 
@@ -11928,10 +12007,13 @@
       if (subLabel) {
         if (isComplete) {
           subLabel.innerText = `${doneSets}/${totalSets} series completadas`;
+          subLabel.classList.remove('in-progress');
         } else if (doneSets > 0) {
           subLabel.innerText = `${doneSets}/${totalSets} series en curso`;
+          subLabel.classList.add('in-progress');
         } else {
           subLabel.innerText = `${totalSets} series por realizar`;
+          subLabel.classList.remove('in-progress');
         }
       }
 
@@ -15438,7 +15520,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev33').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev34').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
