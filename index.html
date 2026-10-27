@@ -12742,10 +12742,9 @@
         sumBadgeEl.innerHTML = `<svg class="ex-svg-icon" viewBox="0 0 512 512"><use href="#sym-${ex.svgSlug}"></use></svg>`;
       }
 
-      // Update slot status badge (Predeterminado / Solo hoy) in card header
+      // Update slot status badge (Solo hoy) in card header
       const tagRow = card.querySelector('.tag-row');
       let altBadge = document.getElementById('badge-alt-' + slotId);
-      const isCustom = workoutState.customSlots && workoutState.customSlots[slotId];
       const isTemp = workoutState.tempSlots && workoutState.tempSlots[slotId];
       if (isTemp) {
         if (!altBadge && tagRow) {
@@ -12756,16 +12755,6 @@
         if (altBadge) {
           altBadge.className = 'tag tag-custom-temp';
           altBadge.innerText = '⚡ Solo hoy';
-        }
-      } else if (isCustom) {
-        if (!altBadge && tagRow) {
-          altBadge = document.createElement('span');
-          altBadge.id = 'badge-alt-' + slotId;
-          tagRow.appendChild(altBadge);
-        }
-        if (altBadge) {
-          altBadge.className = 'tag tag-custom-pred';
-          altBadge.innerText = '📌 Predeterminado';
         }
       } else if (altBadge) {
         altBadge.remove();
@@ -15675,7 +15664,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev36').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev37').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;

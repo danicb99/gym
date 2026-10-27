@@ -23,9 +23,9 @@ console.log('  ✓ Función revertSlotToRoutineDefault definida');
 assert(indexHtml.includes('swap-custom-banner'), 'CSS y plantilla de swap-custom-banner deben existir');
 console.log('  ✓ Banner de predeterminado activo en modal presente');
 
-assert(indexHtml.includes('tag-custom-pred'), 'Estilos de tag-custom-pred deben existir');
 assert(indexHtml.includes('tag-custom-temp'), 'Estilos de tag-custom-temp deben existir');
-console.log('  ✓ Clases CSS de pills de estado (tag-custom-pred y tag-custom-temp) presentes');
+assert(!indexHtml.includes('📌 Predeterminado'), 'No debe existir el pin ni el badge de 📌 Predeterminado en la tarjeta');
+console.log('  ✓ Pin y mensaje de "predeterminado" eliminados en tarjetas de ejercicios');
 
 assert(watchAppJs.includes('this.globalData.customSlots = Object.assign({}, saved.customSlots)'), 'watch/app.js debe restaurar customSlots en onCreate');
 console.log('  ✓ watch/app.js restaura customSlots en onCreate');
