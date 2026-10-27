@@ -10624,8 +10624,145 @@
       selectDay('torsoA');
     }
 
+    // ==========================================
+    // DYNAMIC WARMUP & GUIDE ENGINE
+    // ==========================================
+
+    function getWarmupTargetWeight(exId, cardEl) {
+      if (!cardEl && exId && typeof document !== 'undefined') {
+        cardEl = document.querySelector(`.exercise-card[data-current-ex="${exId}"]`);
+      }
+
+      // 1. Si el usuario ha introducido hoy un peso en el input de la Serie 1, adaptamos el calentamiento a ese objetivo
+      if (cardEl) {
+        const firstRow = cardEl.querySelector('.set-row[data-set-num="1"]');
+        const inp = firstRow ? firstRow.querySelector('.input-kg') : cardEl.querySelector('.input-kg');
+        if (inp && inp.value && !isNaN(parseFloat(inp.value))) {
+          const typed = parseFloat(inp.value);
+          if (typed > 0) return typed;
+        }
+      }
+
+      // 2. Historial de sesiones (máximo peso alcanzado en la última sesión realizada de este ejercicio)
+      const hist = workoutState.exerciseHistory && workoutState.exerciseHistory[exId];
+      if (Array.isArray(hist) && hist.length > 0) {
+        const lastSession = hist[hist.length - 1];
+        if (lastSession) {
+          if (Number(lastSession.bestKg) > 0) return Number(lastSession.bestKg);
+          if (Array.isArray(lastSession.sets) && lastSession.sets.length > 0) {
+            const maxKg = Math.max(...lastSession.sets.map(s => Number(s && s.kg) || 0));
+            if (maxKg > 0) return maxKg;
+          }
+        }
+      }
+
+      // 3. Sesiones archivadas (buscar de más reciente a más antigua)
+      if (Array.isArray(workoutState.sessions)) {
+        for (let i = workoutState.sessions.length - 1; i >= 0; i--) {
+          const s = workoutState.sessions[i];
+          if (s && Array.isArray(s.exercises)) {
+            const match = s.exercises.find(e => e && e.exId === exId);
+            if (match) {
+              if (Number(match.bestKg) > 0) return Number(match.bestKg);
+              if (Array.isArray(match.sets) && match.sets.length > 0) {
+                const maxKg = Math.max(...match.sets.map(set => Number(set && set.kg) || 0));
+                if (maxKg > 0) return maxKg;
+              }
+            }
+          }
+        }
+      }
+
+      // 4. Marcas de referencia 'Anterior' (calcular el MÁXIMO de todas las series previas)
+      if (workoutState.previous && workoutState.previous[exId]) {
+        let maxPrev = 0;
+        Object.values(workoutState.previous[exId]).forEach(val => {
+          const m = String(val).match(/^([\d.]+)/);
+          if (m) {
+            const kg = parseFloat(m[1]);
+            if (kg > maxPrev) maxPrev = kg;
+          }
+        });
+        if (maxPrev > 0) return maxPrev;
+      }
+
+      // 5. Fallback al placeholder del input o catálogo
+      if (cardEl) {
+        const firstRow = cardEl.querySelector('.set-row[data-set-num="1"]');
+        const inp = firstRow ? firstRow.querySelector('.input-kg') : cardEl.querySelector('.input-kg');
+        if (inp && inp.placeholder && !isNaN(parseFloat(inp.placeholder))) {
+          const ph = parseFloat(inp.placeholder);
+          if (ph > 0) return ph;
+        }
+      }
+
+      return 0;
+    }
+
+    function calculateWarmupWeight(exId, targetKg, pct) {
+      if (!targetKg || targetKg <= 0) return 0;
+      const ex = EXERCISE_CATALOG[exId] || {};
+      const equip = (ex.equipment || '').toLowerCase();
+      const isBarbell = equip.includes('barra') || equip.includes('multipower') || equip.includes('smith');
+      const isDumbbell = equip.includes('mancuerna');
+
+      const rawKg = targetKg * pct;
+
+      if (isBarbell) {
+        // En barra olímpica / libre:
+        // La barra pesa 20 kg. Si el objetivo es >= 40 kg, el suelo es 20 kg (barra sola).
+        // Si el objetivo es menor, barra vacía o barra ligera (15-20 kg).
+        const minBar = (targetKg >= 40) ? 20 : (targetKg >= 20 ? 15 : 10);
+        const rounded = Math.round(rawKg / 2.5) * 2.5;
+        return Math.max(minBar, rounded);
+      } else if (isDumbbell) {
+        // En mancuernas: escalón mínimo de 1 kg o stepKg de catálogo
+        const step = ex.stepKg || 1;
+        return Math.max(step, Math.round(rawKg / step) * step);
+      } else {
+        // Poleas y máquinas guiadas: saltos de 2.5 kg o stepKg
+        const step = ex.stepKg || 2.5;
+        return Math.max(step, Math.round(rawKg / step) * step);
+      }
+    }
+
+    function updateCardWarmupRows(slotOrCard) {
+      const card = (typeof slotOrCard === 'string')
+        ? (document.getElementById('card-' + slotOrCard) || document.querySelector(`.exercise-card[data-slot="${slotOrCard}"]`))
+        : slotOrCard;
+      if (!card) return;
+
+      const exId = card.getAttribute('data-current-ex');
+      if (!exId) return;
+
+      const targetKg = getWarmupTargetWeight(exId, card);
+      const rows = card.querySelectorAll('.warmup-row');
+      if (!rows || rows.length === 0) return;
+
+      rows.forEach(row => {
+        const pctCell = row.querySelector('.warmup-cell-pct');
+        const kgCell = row.querySelector('.warmup-cell-kg');
+        if (!kgCell) return;
+
+        const pctText = pctCell ? pctCell.innerText : '';
+        const matchPct = pctText.match(/(\d+)%/);
+        const pct = matchPct ? (parseFloat(matchPct[1]) / 100) : 0.5;
+
+        if (targetKg > 0) {
+          const calcKg = calculateWarmupWeight(exId, targetKg, pct);
+          kgCell.innerText = `${calcKg} kg`;
+        }
+      });
+    }
+
+    function updateAllWarmupRows() {
+      document.querySelectorAll('.exercise-card').forEach(card => {
+        updateCardWarmupRows(card);
+      });
+    }
+
     // Guide Modal & Auto-calculation of warmup kilos from history
-    function openGuideModal() {
+    function openGuideModal(preferredExId) {
       const activeSection = document.querySelector('.day-content.active');
       const dayId = (activeSection && activeSection.id !== 'historialView') ? activeSection.id : 'torsoA';
       const dayData = ROUTINE_SLOTS[dayId];
@@ -10633,6 +10770,7 @@
       const picker = document.getElementById('guideExPicker');
       picker.innerHTML = '';
 
+      let foundPreferred = false;
       if (dayData && dayData.slots) {
         dayData.slots.forEach(slot => {
           const activeExId = getSlotExerciseId(slot.slotId);
@@ -10641,13 +10779,28 @@
             const opt = document.createElement('option');
             opt.value = activeExId;
             opt.innerText = `${slot.num}. ${ex.name} (${ex.equipment})`;
+            if (preferredExId && activeExId === preferredExId) {
+              opt.selected = true;
+              foundPreferred = true;
+            }
             picker.appendChild(opt);
           }
         });
       }
 
-      if (picker.options.length > 0) {
-        renderGuideWarmupTable(picker.options[0].value);
+      if (preferredExId && !foundPreferred && EXERCISE_CATALOG[preferredExId]) {
+        const ex = EXERCISE_CATALOG[preferredExId];
+        const opt = document.createElement('option');
+        opt.value = preferredExId;
+        opt.innerText = `${ex.name} (${ex.equipment})`;
+        opt.selected = true;
+        picker.insertBefore(opt, picker.firstChild);
+        foundPreferred = true;
+      }
+
+      const selectedExId = picker.value || (picker.options.length > 0 ? picker.options[0].value : null);
+      if (selectedExId) {
+        renderGuideWarmupTable(selectedExId);
       }
 
       document.getElementById('guideModal').classList.add('open');
@@ -10665,46 +10818,23 @@
       if (!card) return;
       const ex = EXERCISE_CATALOG[exId] || { name: exId };
 
-      let targetWeight = 0;
-      // 1. Check history
-      if (workoutState.exerciseHistory && workoutState.exerciseHistory[exId] && workoutState.exerciseHistory[exId].length > 0) {
-        const lastSession = workoutState.exerciseHistory[exId][workoutState.exerciseHistory[exId].length - 1];
-        targetWeight = lastSession.bestKg || 0;
-      }
-      // 2. Check previous
-      if (!targetWeight && workoutState.previous && workoutState.previous[exId]) {
-        for (const val of Object.values(workoutState.previous[exId])) {
-          const match = val.match(/^([\d\.]+)/);
-          if (match) { targetWeight = parseFloat(match[1]); break; }
-        }
-      }
-      // 3. Check current card inputs
-      if (!targetWeight) {
-        const cardEl = document.querySelector(`.exercise-card[data-current-ex="${exId}"]`);
-        if (cardEl) {
-          const inp = cardEl.querySelector('.input-kg');
-          if (inp && inp.value) targetWeight = parseFloat(inp.value) || 0;
-        }
-      }
-
+      const targetWeight = getWarmupTargetWeight(exId);
       const isBarbell = (ex.equipment || '').toLowerCase().includes('barra');
-      const roundPlate = (kg) => Math.round(kg / 2.5) * 2.5;
 
       let tableBody = '';
       let noteHTML = '';
 
       if (targetWeight && targetWeight > 0) {
-        const minBarWeight = (isBarbell && targetWeight >= 40) ? 20 : (targetWeight > 10 ? 5 : 2);
-        const fase1Kg = Math.max(minBarWeight, roundPlate(targetWeight * 0.5));
-        const fase2Kg = Math.max(fase1Kg, roundPlate(targetWeight * 0.725));
-        const fase1Desc = isBarbell && targetWeight >= 40 ? 'Barra sola (20 kg) o 50%' : `~50% = ${fase1Kg} kg`;
+        const fase1Kg = calculateWarmupWeight(exId, targetWeight, 0.5);
+        const fase2Kg = calculateWarmupWeight(exId, targetWeight, 0.725);
+        const fase1Desc = isBarbell && targetWeight >= 40 ? 'Barra sola (20 kg) o ~50%' : `~50% = ${fase1Kg} kg`;
 
         tableBody = `
           <tr><td>1. Fase 1 (Aproximación)</td><td style="color:var(--cyan); font-weight:700;">${fase1Desc} (${fase1Kg} kg)</td><td>8</td><td>30 - 45 s</td></tr>
           <tr><td>2. Fase 2 (Media)</td><td style="color:var(--cyan); font-weight:700;">~70-75% = ${fase2Kg} kg</td><td>3 - 5</td><td>60 - 90 s</td></tr>
           <tr><td style="color:var(--primary); font-weight:700;">3. EFECTIVAS</td><td style="color:var(--primary); font-weight:800;">100% = ${targetWeight} kg</td><td>Reps objetivo</td><td>Descanso oficial</td></tr>
         `;
-        noteHTML = `<div style="font-size:0.72rem; color:#34d399; margin-top:8px; font-weight:600;">Protocolo ágil en 2 fases: listo en ~5-6 min sin fatiga residual. Kilos calculados con tu marca de ${targetWeight} kg en ${ex.name}. Los siguientes ejercicios accesorios mantienen solo 1 serie de tanteo.</div>`;
+        noteHTML = `<div style="font-size:0.72rem; color:#34d399; margin-top:8px; font-weight:600;">Protocolo ágil en 2 fases: listo en ~5-6 min sin fatiga residual. Kilos calculados dinámicamente con tu marca máxima de ${targetWeight} kg en ${ex.name}. Los siguientes ejercicios accesorios mantienen solo 1 serie de tanteo.</div>`;
       } else {
         const fase1Desc = isBarbell ? 'Barra sola (20 kg) o ~50%' : '~50% del peso de trabajo';
         tableBody = `
@@ -10766,9 +10896,7 @@
       const card = cell.closest('.exercise-card');
       if (!card) return;
       const exId = card.getAttribute('data-current-ex');
-      const firstKgInp = card.querySelector('.input-kg');
-      const targetWeight = firstKgInp ? (parseFloat(firstKgInp.value) || parseFloat(firstKgInp.placeholder) || 0) : 0;
-      openGuideModal(exId, targetWeight);
+      openGuideModal(exId);
     }
 
     function toggleWarmupCheck(btn) {
@@ -11100,6 +11228,7 @@
       _hasShown42MinAlert[dayId] = false;
 
       resetTimerDock();
+      if (typeof updateAllWarmupRows === 'function') updateAllWarmupRows();
       saveWorkoutState();
       if (typeof scheduleBroadcast === 'function') {
         scheduleBroadcast(0);
@@ -11603,6 +11732,10 @@
     function handleSetInput(input) {
       const row = input.closest('.set-row');
       if (row) updateRow1RMBadge(row);
+      const card = input.closest('.exercise-card');
+      if (card && input.classList.contains('input-kg') && row && row.getAttribute('data-set-num') === '1') {
+        updateCardWarmupRows(card);
+      }
       const section = input.closest('.day-content');
       if (section) startSessionTimerIfNeeded(section.id);
       scheduleSaveWorkoutState();
@@ -11612,6 +11745,9 @@
       const row = input.closest('.set-row');
       const card = input.closest('.exercise-card');
       if (!row || !card) return;
+      if (input.classList.contains('input-kg') && row.getAttribute('data-set-num') === '1') {
+        updateCardWarmupRows(card);
+      }
       scheduleSaveWorkoutState();
     }
 
@@ -12399,6 +12535,7 @@
         });
       }
 
+      if (typeof updateAllWarmupRows === 'function') updateAllWarmupRows();
       saveWorkoutState();
       if (typeof scheduleBroadcast === 'function') {
         scheduleBroadcast(0);
@@ -12495,6 +12632,7 @@
         cell.innerText = '—';
         cell.classList.add('empty');
       }
+      if (typeof updateCardWarmupRows === 'function') updateCardWarmupRows(card);
       saveWorkoutState();
       showToast('Marca de referencia actualizada');
     }
@@ -12829,6 +12967,9 @@
           }
         }
       });
+
+      // Update warmup rows dynamically for swapped exercise
+      if (typeof updateCardWarmupRows === 'function') updateCardWarmupRows(card);
     }
 
     // ==========================================
@@ -15119,6 +15260,9 @@
         }
       });
 
+      // Recalcular dinámicamente los pesos de las series de calentamiento (Serie 0)
+      if (typeof updateAllWarmupRows === 'function') updateAllWarmupRows();
+
       updateProgress();
       const activeSec = document.querySelector('.day-content.active');
       if (activeSec && activeSec.id !== 'historialView' && activeSec.id !== 'routinePlanView') {
@@ -15664,7 +15808,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev37').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev38').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
