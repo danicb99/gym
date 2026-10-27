@@ -1,8 +1,8 @@
 # Auditoría de Ejercicios y Recursos Multimedia (VigorexiApp)
 
-> **Fecha de auditoría:** 21 de octubre de 2026
-> **Versión de la app:** v1.8.0
-> **Estado global:** 101 ejercicios auditados. **99 recursos verificados HTTP 200 OK**. 2 ejercicios sin GIF (marcados limpiamente sin URLs rotas). 100% de los ejercicios cuentan con $\ge 3$ alternativas válidas en catálogo.
+> **Fecha de auditoría:** 27 de octubre de 2026
+> **Versión de la app:** v1.8.4
+> **Estado global:** 101 ejercicios auditados. **101 recursos verificados HTTP 200 OK** (100% de cobertura multimedia). 0 enlaces rotos. 100% de los ejercicios cuentan con $\ge 3$ alternativas válidas en catálogo.
 
 ---
 
@@ -10,9 +10,9 @@
 
 1. **Verificación de Enlaces y Recursos (HTTP 200):**
    - Se comprobaron todas las URLs de demostración multimedia registradas en `EXERCISE_CATALOG` mediante peticiones de red directas.
-   - 99 recursos responden con código de éxito **HTTP 200 OK**.
+   - 101 recursos responden con código de éxito **HTTP 200 OK** (100% de cobertura).
    - 0 enlaces rotos o inexistentes (404, 500 o fallos de DNS).
-   - Los únicos 2 ejercicios sin recurso GIF (`aperturas_polea` y `pec_deck`) tienen la propiedad vacía de forma deliberada (cumpliendo la Regla Innegociable de no inventar URLs no verificadas) y disponen de sus iconos vectoriales SVG completos y alternativas funcionales.
+   - Cobertura completa de demostraciones multimedia (incluyendo las incorporaciones de Cable Crossover para `aperturas_polea` y Pec Deck Fly para `pec_deck`).
 
 2. **Verificación Biomecánica del Movimiento:**
    - Se revisó cada ejercicio de la rutina para asegurar que el movimiento corresponde exactamente al patrón de movimiento prescrito:
@@ -61,7 +61,7 @@
 | fullbodyC_1 | **Prensa de Piernas 45°** | `prensa_45` | `leg-press` | [Ver GIF](https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/glutes/sled-45-leg-press-side-pov.gif) | 🟢 200 OK | ✅ Prensa de Piernas a 45°. Pies a mitad de plataforma, cadera pegada sin redondear el sacro. | `squat`, `sentadilla_hack`, `sentadilla_multipower` |
 | fullbodyC_2 | **Curl Femoral Tumbado** | `curltumbado` | `leg-curl` | [Ver GIF](https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/hamstrings/lever-lying-leg-curl.gif) | 🟢 200 OK | ✅ Biomecánica correcta conforme a los cues del catálogo. | `curl_femoral_sentado`, `curl_femoral_unilateral`, `curl_femoral_mancuerna` |
 | fullbodyC_3 | **Jalón al Pecho con Agarre Neutro Cerrado** | `jalonneutro` | `close-grip-lat-pulldown` | [Ver GIF](https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/lats/cable-lateral-pulldown-with-v-bar.gif) | 🟢 200 OK | ✅ Biomecánica correcta conforme a los cues del catálogo. | `pullover_polea`, `dominadas_neutras`, `jalon_supino` |
-| fullbodyC_8 | **Aperturas en Polea (Cruces)** | `aperturas_polea` | `bench-press` | *Sin GIF (marcador limpio)* | ⚪ Sin URL | ✅ Aperturas en Polea (Cruces). Codos con ángulo suave fijo, estirar profundo sin dolor articular. | `pec_deck`, `press_maq_convergente`, `press_manc_plano` |
+| fullbodyC_8 | **Aperturas en Polea (Cruces)** | `aperturas_polea` | `bench-press` | [Ver GIF](https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Crossover.gif) | 🟢 200 OK | ✅ Aperturas en Polea (Cruces). Codos con ángulo suave fijo, estirar profundo sin dolor articular. | `pec_deck`, `press_maq_convergente`, `press_manc_plano` |
 | fullbodyC_4 | **Elevaciones Laterales en Polea (o Mancuernas)** | `laterales2` | `cable-lateral-raise` | [Ver GIF](https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif) | 🟢 200 OK | ✅ Biomecánica correcta conforme a los cues del catálogo. | `laterales_mancuernas_estrictas`, `laterales_maquina_laterales`, `laterales_cruzadas_polea` |
 | fullbodyC_9 | **Elevación de Talones de Pie en Máquina** | `gemelopie` | `standing-calf-raise` | [Ver GIF](https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/calves/lever-standing-calf-raise.gif) | 🟢 200 OK | ✅ Biomecánica correcta conforme a los cues del catálogo. | `gemelos_prensa`, `gemelos_unilateral`, `gemelos_multipower` |
 | fullbodyC_5 | **Press Francés con Barra Z o Mancuernas** | `frances` | `skull-crusher` | [Ver GIF](https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/ez-bar-lying-close-grip-triceps-extension-behind-head.gif) | 🟢 200 OK | ✅ Biomecánica correcta conforme a los cues del catálogo. | `triceps_trasnuca_polea`, `katana_extensions`, `press_cerrado_banca` |
