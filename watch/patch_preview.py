@@ -4,7 +4,7 @@ import json
 import os
 import glob
 
-dist_dir = r"c:\_DESARROLLO\VIGOREXIAPP_DEV\watch\dist"
+dist_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dist")
 
 def patch_inner_zip(zip_bytes):
     in_buf = io.BytesIO(zip_bytes)
