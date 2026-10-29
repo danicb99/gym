@@ -2432,17 +2432,17 @@
       max-width: 600px;
       margin: 0 auto;
       bottom: calc(68px + env(safe-area-inset-bottom, 8px));
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(10, 16, 30, 0.98) 100%);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 16, 30, 0.99) 100%);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(251, 191, 36, 0.38);
+      border: 1px solid rgba(251, 191, 36, 0.45);
       border-radius: 16px;
       padding: 10px 14px 10px;
       display: none;
       flex-direction: column;
       gap: 6px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 0 24px rgba(251, 191, 36, 0.15);
-      z-index: 990;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75), 0 0 24px rgba(251, 191, 36, 0.2);
+      z-index: 2000;
       animation: slideUpRestDock 0.28s cubic-bezier(0.16, 1, 0.3, 1);
       box-sizing: border-box;
     }
@@ -2477,13 +2477,13 @@
     }
     .rest-dock b {
       font-family: var(--bn, sans-serif);
-      font-size: 2.6rem;
+      font-size: 2.85rem;
       line-height: 1;
-      font-weight: 850;
+      font-weight: 900;
       color: #fbbf24;
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.5px;
-      text-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
+      text-shadow: 0 0 18px rgba(251, 191, 36, 0.5);
     }
     .rest-dock-badge {
       font-size: 0.60rem;
@@ -2708,9 +2708,10 @@
       margin-left: auto;
     }
     .nav-timer-container.running {
-      border-color: rgba(251, 191, 36, 0.55);
-      background: rgba(251, 191, 36, 0.08);
-      box-shadow: 0 0 14px rgba(251, 191, 36, 0.2);
+      border-color: rgba(251, 191, 36, 0.65);
+      background: rgba(251, 191, 36, 0.12);
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.3);
+      max-width: 270px;
     }
     .nav-timer-digits-wrap {
       display: flex;
@@ -2751,9 +2752,10 @@
       transition: font-size 0.2s ease;
     }
     .nav-timer-container.running .nav-timer-digits {
-      font-size: 1.28rem;
-      font-weight: 850;
-      text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+      font-size: 1.55rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
     }
     .nav-timer-controls {
       display: flex;
@@ -15619,7 +15621,7 @@
     function getDayCompletedSets(dayId) {
       if (typeof document !== 'undefined') {
         const section = document.getElementById(dayId);
-        if (section) {
+        if (section && typeof section.querySelectorAll === 'function') {
           const isExpress = typeof isExpressMode !== 'undefined' && isExpressMode;
           const cards = Array.from(section.querySelectorAll('.exercise-card'));
           const domCount = cards.reduce((sum, card) => {
@@ -16092,7 +16094,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev38').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev39').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;

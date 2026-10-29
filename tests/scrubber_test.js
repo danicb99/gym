@@ -68,11 +68,11 @@ assert(calcKg(80, 80) >= 86, 'dx=80 debe acelerar y permitir saltos mayores');
 assert.strictEqual(calcKg(80, -500), 0, 'No debe bajar de 0 kg');
 console.log('  ✓ Lógica de Peso (kg) correcta (paso de 1kg fino con aceleración progresiva)');
 
-// 5. Verificación de Caché SW rev38
-console.log('\n📦 5. Verificación de Cache PWA rev38:');
-assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev38'/.test(sw), 'sw.js debe ser rev38');
-assert(/sw\.js\?v=1\.8\.4-rev38/.test(html), 'index.html debe registrar rev38');
-console.log('  ✓ PWA cache rev38 sincronizada para despliegue inmediato');
+// 5. Verificación de Caché SW rev39
+console.log('\n📦 5. Verificación de Cache PWA rev39:');
+assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev39'/.test(sw), 'sw.js debe ser rev39');
+assert(/sw\.js\?v=1\.8\.4-rev39/.test(html), 'index.html debe registrar rev39');
+console.log('  ✓ PWA cache rev39 sincronizada para despliegue inmediato');
 
 console.log('\n====================================================');
 console.log('🎉 TODAS LAS PRUEBAS DEL SELECTOR TÁCTIL APROBADAS');
