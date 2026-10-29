@@ -2429,43 +2429,133 @@
       position: fixed;
       left: 12px;
       right: 12px;
-      max-width: 656px;
+      max-width: 600px;
       margin: 0 auto;
-      bottom: calc(72px + env(safe-area-inset-bottom, 12px));
-      background: var(--amber);
-      color: #2a1800;
-      border-radius: 12px;
-      padding: 10px 16px;
+      bottom: calc(68px + env(safe-area-inset-bottom, 8px));
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(10, 16, 30, 0.98) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(251, 191, 36, 0.38);
+      border-radius: 16px;
+      padding: 10px 14px 10px;
       display: none;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 0 24px rgba(251, 191, 36, 0.15);
       z-index: 990;
-      animation: slideUpRestDock 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: slideUpRestDock 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      box-sizing: border-box;
     }
     .rest-dock.on {
+      display: flex !important;
+    }
+    .rest-dock-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 2px;
+    }
+    .rest-dock-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      transition: width 0.3s ease;
+    }
+    .rest-dock-main {
       display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .rest-dock-digits-col {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
     }
     .rest-dock b {
       font-family: var(--bn, sans-serif);
-      font-size: 32px;
+      font-size: 2.6rem;
       line-height: 1;
+      font-weight: 850;
+      color: #fbbf24;
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.5px;
+      text-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
     }
-    .rest-dock span {
-      flex: 1;
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1.25;
-      min-width: 0;
+    .rest-dock-badge {
+      font-size: 0.60rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      text-transform: uppercase;
+    }
+    .rest-dock-badge.paused {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    .rest-dock-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rest-dock-btn {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      color: #f1f5f9;
+      border-radius: 10px;
+      height: 34px;
+      min-width: 34px;
+      padding: 0 10px;
+      font-family: var(--bd, sans-serif);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+    .rest-dock-btn:active {
+      transform: scale(0.92);
+    }
+    .rest-dock-btn.plus {
+      background: rgba(251, 191, 36, 0.15);
+      border-color: rgba(251, 191, 36, 0.35);
+      color: #fbbf24;
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 0 10px;
+    }
+    .rest-dock-btn.play {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f1f5f9;
+      width: 36px;
+      padding: 0;
+    }
+    .rest-dock-btn.skip {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      width: 36px;
+      padding: 0;
+      font-size: 0.88rem;
     }
     .rest-dock-mute {
       border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(0, 0, 0, 0.25);
+      background: rgba(255, 255, 255, 0.06);
       color: #94a3b8;
       border-radius: 10px;
-      padding: 6px 10px;
+      height: 34px;
+      width: 36px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -2474,30 +2564,73 @@
     }
     .rest-dock-mute.active {
       color: #38bdf8;
-      border-color: rgba(56, 189, 248, 0.5);
+      border-color: rgba(56, 189, 248, 0.45);
       background: rgba(56, 189, 248, 0.15);
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
     }
     .rest-dock-mute svg {
       display: block;
       pointer-events: none;
     }
-    .rest-dock button#skipRestBtn {
-      border: 0;
-      background: rgba(0, 0, 0, 0.22);
-      color: inherit;
-      border-radius: 10px;
-      padding: 9px 14px;
-      font: 700 13px var(--bd, sans-serif);
-      cursor: pointer;
-      transition: background 0.15s;
+    .rest-dock-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      line-height: 1.25;
+      padding-top: 3px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
-    .rest-dock button#skipRestBtn:active {
-      background: rgba(0, 0, 0, 0.35);
+    .rest-dock-sub {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .rest-dock-ex-name {
+      color: #f1f5f9;
+      font-weight: 700;
+    }
+    .rest-dock-rem {
+      color: #38bdf8;
+      font-weight: 750;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
     }
     @keyframes slideUpRestDock {
       from { transform: translateY(16px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
+    }
+    @media (max-width: 380px) {
+      .rest-dock {
+        padding: 8px 10px 8px;
+        left: 8px;
+        right: 8px;
+      }
+      .rest-dock b {
+        font-size: 2.1rem;
+      }
+      .rest-dock-btn {
+        height: 30px;
+        min-width: 30px;
+        padding: 0 6px;
+      }
+      .rest-dock-btn.plus {
+        padding: 0 6px;
+        font-size: 0.75rem;
+      }
+      .rest-dock-btn.play, .rest-dock-btn.skip, .rest-dock-mute {
+        width: 30px;
+        height: 30px;
+      }
+      .rest-dock-info {
+        font-size: 0.68rem;
+      }
     }
 
     /* App Bottom Navigation Bar & Integrated Rest Timer Dock */
@@ -2615,6 +2748,12 @@
       letter-spacing: -0.3px;
       font-variant-numeric: tabular-nums;
       line-height: 1;
+      transition: font-size 0.2s ease;
+    }
+    .nav-timer-container.running .nav-timer-digits {
+      font-size: 1.28rem;
+      font-weight: 850;
+      text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
     }
     .nav-timer-controls {
       display: flex;
@@ -3781,6 +3920,19 @@
       cursor: pointer;
       transition: all 0.15s ease;
       flex-shrink: 0;
+      user-select: none;
+    }
+    .session-timer-chip:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .header-rem-badge {
+      color: #38bdf8;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
     }
     .session-timer-chip .clock-icon {
       display: inline-flex;
@@ -4271,7 +4423,7 @@
     <div class="header-status-row">
       <div class="status-left">
         <span class="status-sets-chip" id="headerSetsProgress">0/23 series · 0%</span>
-        <span class="session-timer-chip" id="headerSessionTimer" title="Tiempo de sesión">
+        <span class="session-timer-chip" id="headerSessionTimer" onclick="toggleHeaderTimerMode()" title="Tiempo de sesión · Toca para alternar transcurrido / restante">
           <span class="clock-icon" aria-hidden="true"><svg class="clock-icon-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
           <span class="session-timer-digits">00:00</span>
         </span>
@@ -11255,12 +11407,14 @@
 
     function handleBottomTimerClick() {
       if (isTimerActive && timerRemaining > 0) {
-        // Si hay temporizador corriendo, mostrar toast con descanso restante y opción de +30s
         showToast(`⏱️ Descanso restante: ${formatClock(timerRemaining)}`);
         const dock = document.getElementById('restTimerDock');
-        if (dock) dock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (dock) {
+          dock.classList.add('on');
+          dock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       } else {
-        // Abrir descanso manual de 90s o modal
+        // Abrir descanso manual de 90s
         triggerRest(90, 'Descanso Manual', '');
         showToast('⏱️ Temporizador de 90s iniciado');
       }
@@ -11384,12 +11538,21 @@
       if (!routineSub) return;
       const targetDay = dayId || (typeof lastActiveWorkoutDay !== 'undefined' && lastActiveWorkoutDay) || (currentProgram === 'fullbody' ? 'fullbodyA' : 'torsoA');
       const isFB = targetDay.startsWith('fullbody');
-      const durEst = calculateDayEstimatedDuration(targetDay, isExpressMode, false);
-      if (isFB) {
-        const durNoSS = calculateDayEstimatedDuration(targetDay, isExpressMode, true);
-        routineSub.innerHTML = `Full Body · 3 días · <span id="headerEstDuration">~${durEst} min</span> <span id="headerEstDurationNoSS" class="header-est-noss" title="Tiempo estimado sin superseries (series lineales individuales)">(sin SS: ~${durNoSS} min)</span>`;
+      const progName = isFB ? 'Full Body' : 'Torso/Pierna';
+
+      const exitInfo = (typeof getEstimatedExitTime === 'function') ? getEstimatedExitTime(targetDay) : null;
+      if (exitInfo && exitInfo.inProgress) {
+        routineSub.innerHTML = `${progName} · <span id="headerEstDuration" class="header-rem-badge" title="Tiempo estimado para finalizar sesión">⏳ ~${exitInfo.remainingMin} min rest. (fin ~${exitInfo.clock})</span>`;
+      } else if (exitInfo && exitInfo.isComplete) {
+        routineSub.innerHTML = `${progName} · <span id="headerEstDuration" style="color:#34d399; font-weight:800;">✓ ¡Entrenamiento completado!</span>`;
       } else {
-        routineSub.innerHTML = `Torso/Pierna · 4 días · <span id="headerEstDuration">~${durEst} min</span>`;
+        const durEst = calculateDayEstimatedDuration(targetDay, isExpressMode, false);
+        if (isFB) {
+          const durNoSS = calculateDayEstimatedDuration(targetDay, isExpressMode, true);
+          routineSub.innerHTML = `Full Body · 3 días · <span id="headerEstDuration">~${durEst} min</span> <span id="headerEstDurationNoSS" class="header-est-noss" title="Tiempo estimado sin superseries (series lineales individuales)">(sin SS: ~${durNoSS} min)</span>`;
+        } else {
+          routineSub.innerHTML = `Torso/Pierna · 4 días · <span id="headerEstDuration">~${durEst} min</span>`;
+        }
       }
     }
 
@@ -11543,6 +11706,18 @@
       updateSessionTimerDisplay(dayId);
     }
 
+    let headerSessionTimerMode = 'elapsed'; // 'elapsed' | 'remaining'
+
+    function toggleHeaderTimerMode() {
+      headerSessionTimerMode = (headerSessionTimerMode === 'elapsed') ? 'remaining' : 'elapsed';
+      const activeContent = document.querySelector('.day-content.active');
+      const dayId = (activeContent && WORKOUT_DAYS.includes(activeContent.id)) ? activeContent.id : lastActiveWorkoutDay;
+      updateSessionTimerDisplay(dayId);
+      if (typeof showToast === 'function') {
+        showToast(headerSessionTimerMode === 'remaining' ? '⏳ Cronómetro en modo: Tiempo restante' : '⏱️ Cronómetro en modo: Tiempo transcurrido');
+      }
+    }
+
     function updateSessionTimerDisplay(dayId) {
       const startTime = workoutState.sessionStartTime ? workoutState.sessionStartTime[dayId] : null;
       const isPaused = Boolean(workoutState.idlePaused && workoutState.idlePaused[dayId]);
@@ -11565,13 +11740,23 @@
       const hdrSessionTimer = document.getElementById('headerSessionTimer');
       if (hdrSessionTimer) {
         const clockSvg = '<svg class="clock-icon-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+        const hourglassSvg = '<svg class="clock-icon-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>';
         if (startTime) {
-          const m = Math.floor(elapsedSecs / 60);
-          const s = elapsedSecs % 60;
           const pauseTag = isPaused ? ' (Pausa)' : '';
-          hdrSessionTimer.innerHTML = `<span class="clock-icon" aria-hidden="true">${clockSvg}</span> ${m}:${s < 10 ? '0' : ''}${s}${pauseTag}`;
+          if (headerSessionTimerMode === 'remaining') {
+            const exitInfo = (typeof getEstimatedExitTime === 'function') ? getEstimatedExitTime(dayId) : null;
+            const remText = exitInfo ? `~${exitInfo.remainingMin}m rest.` : '00:00';
+            hdrSessionTimer.innerHTML = `<span class="clock-icon" aria-hidden="true">${hourglassSvg}</span> ${remText}${pauseTag}`;
+            hdrSessionTimer.title = "Modo: Tiempo restante. Toca para alternar a tiempo transcurrido.";
+          } else {
+            const m = Math.floor(elapsedSecs / 60);
+            const s = elapsedSecs % 60;
+            hdrSessionTimer.innerHTML = `<span class="clock-icon" aria-hidden="true">${clockSvg}</span> ${m}:${s < 10 ? '0' : ''}${s}${pauseTag}`;
+            hdrSessionTimer.title = "Modo: Tiempo transcurrido. Toca para alternar a tiempo restante.";
+          }
         } else {
           hdrSessionTimer.innerHTML = `<span class="clock-icon" aria-hidden="true">${clockSvg}</span> 00:00`;
+          hdrSessionTimer.title = "Tiempo de sesión · Toca para alternar";
         }
       }
 
@@ -12269,6 +12454,9 @@
         bannerChip.innerHTML = renderProgressChipHtml(doneSets, totalSets, percentage);
         bannerChip.classList.toggle('completed', isComplete);
       }
+
+      updateHeaderEstimatedDuration(activeContent.id);
+      updateSessionTimerDisplay(activeContent.id);
     }
 
     // Helper centralizado para calcular una duración realista sin inflar por inactividad o sesiones olvidadas
@@ -14249,6 +14437,67 @@
         }
       }
 
+      // Dock flotante de descanso prominente con dígitos gigantes
+      const restDock = document.getElementById('restTimerDock');
+      if (restDock) {
+        if (isTimerActive && timerRemaining > 0) {
+          restDock.classList.add('on');
+        } else if (!isTimerActive && (timerRemaining <= 0 || !timerEndTime)) {
+          restDock.classList.remove('on');
+        }
+      }
+
+      const dockPlayBtn = document.getElementById('dockPlayBtn');
+      if (dockPlayBtn) {
+        dockPlayBtn.innerHTML = isTimerActive
+          ? '<svg class="dock-play-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>'
+          : '<svg class="dock-play-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>';
+        dockPlayBtn.title = isTimerActive ? "Pausar descanso" : "Reanudar descanso";
+      }
+
+      const dockBadge = document.getElementById('restDockStateBadge');
+      if (dockBadge) {
+        if (isTimerActive) {
+          dockBadge.innerText = 'EN CURSO';
+          dockBadge.classList.remove('paused');
+        } else if (timerRemaining > 0 && timerRemaining < timerDuration) {
+          dockBadge.innerText = 'PAUSA';
+          dockBadge.classList.add('paused');
+        } else {
+          dockBadge.innerText = 'LISTO';
+          dockBadge.classList.remove('paused');
+        }
+      }
+
+      const dockFill = document.getElementById('restDockProgressFill');
+      if (dockFill && timerDuration > 0) {
+        const pct = Math.max(0, Math.min(100, ((timerDuration - timerRemaining) / timerDuration) * 100));
+        dockFill.style.width = pct + '%';
+      }
+
+      const dockExName = document.getElementById('restDockExName');
+      const dockSetInfo = document.getElementById('restDockSetInfo');
+      if (dockExName) {
+        dockExName.innerText = (currentRestExerciseInfo && currentRestExerciseInfo.name) ? currentRestExerciseInfo.name : 'Descanso activo';
+      }
+      if (dockSetInfo) {
+        dockSetInfo.innerText = (currentRestExerciseInfo && currentRestExerciseInfo.setInfo) ? `Siguiente: ${currentRestExerciseInfo.setInfo}` : 'Prepárate para la siguiente serie';
+      }
+
+      const dockRem = document.getElementById('restDockWorkoutRem');
+      if (dockRem) {
+        const activeContent = document.querySelector('.day-content.active');
+        const dayId = (activeContent && WORKOUT_DAYS.includes(activeContent.id)) ? activeContent.id : lastActiveWorkoutDay;
+        const exitInfo = (typeof getEstimatedExitTime === 'function') ? getEstimatedExitTime(dayId) : null;
+        if (exitInfo && exitInfo.inProgress) {
+          dockRem.innerText = `⏳ Quedan ~${exitInfo.remainingMin} min (fin ~${exitInfo.clock})`;
+        } else if (exitInfo && exitInfo.isComplete) {
+          dockRem.innerText = `✓ ¡Último ejercicio!`;
+        } else {
+          dockRem.innerText = '';
+        }
+      }
+
       updateAudioModeUI();
 
       const dock = document.getElementById('navTimerDock');
@@ -14470,6 +14719,8 @@
       timerRemaining = timerDuration;
       releaseWakeLock();
       sendSWMessage({ type: 'CANCEL_REST_TIMER' });
+      const restDock = document.getElementById('restTimerDock');
+      if (restDock) restDock.classList.remove('on');
       updateTimerUI();
       saveRestTimerState();
       const btn = document.getElementById('timerPlayBtn');
@@ -14489,6 +14740,14 @@
       if (btn) {
         btn.innerText = "Listo";
         btn.classList.remove('paused');
+      }
+      const restDock = document.getElementById('restTimerDock');
+      if (restDock) {
+        const badge = document.getElementById('restDockStateBadge');
+        if (badge) badge.innerText = '¡LISTO!';
+        setTimeout(() => {
+          if (!isTimerActive) restDock.classList.remove('on');
+        }, 1500);
       }
       updateTimerUI();
       saveRestTimerState();
@@ -15358,6 +15617,18 @@
     }
 
     function getDayCompletedSets(dayId) {
+      if (typeof document !== 'undefined') {
+        const section = document.getElementById(dayId);
+        if (section) {
+          const isExpress = typeof isExpressMode !== 'undefined' && isExpressMode;
+          const cards = Array.from(section.querySelectorAll('.exercise-card'));
+          const domCount = cards.reduce((sum, card) => {
+            if (isExpress && card.getAttribute('data-skippable') === 'true') return sum;
+            return sum + card.querySelectorAll('.set-row.done').length;
+          }, 0);
+          if (domCount > 0) return domCount;
+        }
+      }
       const day = ROUTINE_SLOTS[dayId];
       if (!day || !Array.isArray(day.slots)) return 0;
       const slotIds = new Set(day.slots.map(slot => slot.slotId));
@@ -15372,15 +15643,28 @@
     function getEstimatedExitTime(dayId, now = Date.now()) {
       if (!dayId || !ROUTINE_SLOTS[dayId]) return null;
       const start = workoutState.sessionStartTime && workoutState.sessionStartTime[dayId];
-      if (!start) return null;
+      const done = getDayCompletedSets(dayId);
+      if (!start && done === 0) return null;
 
       const total = getDayTotalSets(dayId);
-      const done = Math.min(total, getDayCompletedSets(dayId));
+      const doneClamped = Math.min(total, done);
       const baseMinutes = calculateDayEstimatedDuration(dayId, typeof isExpressMode !== 'undefined' && isExpressMode);
-      const remainingMin = Math.max(1, Math.ceil(baseMinutes * Math.max(0, total - done) / Math.max(1, total)));
-      const exit = new Date(Math.max(now, start) + remainingMin * 60000);
+      const inProgress = doneClamped > 0 && doneClamped < total;
+      const isComplete = total > 0 && doneClamped >= total;
+      const remainingMin = isComplete ? 0 : Math.max(1, Math.ceil(baseMinutes * Math.max(0, total - doneClamped) / Math.max(1, total)));
+      const baseTime = start ? Math.max(now, start) : now;
+      const exit = new Date(baseTime + remainingMin * 60000);
       const clock = `${String(exit.getHours()).padStart(2, '0')}:${String(exit.getMinutes()).padStart(2, '0')}`;
-      return { exit, clock, label: `${clock} · ~${remainingMin} min`, remainingMin, done, total };
+      return {
+        exit,
+        clock,
+        label: isComplete ? 'Completado' : `${clock} · ~${remainingMin} min`,
+        remainingMin,
+        done: doneClamped,
+        total,
+        inProgress,
+        isComplete
+      };
     }
 
     function refreshCoachExitTime() {
@@ -17089,15 +17373,36 @@
   <!-- ==========================================
        DOCK DE DESCANSO FLOTANTE (Encima de la navegación inferior)
        ========================================== -->
-  <div class="rest-dock" id="restTimerDock" role="timer">
-    <b id="restTimerDigits">02:00</b>
-    <span id="restTimerSub">Descanso<br>Siguiente serie lista</span>
-    <button type="button" class="rest-dock-mute" id="dockAudioBtn" onclick="toggleAudioMode()" title="Modo Silencioso ACTIVO: Cero sonido por altavoz (Toca para activar auriculares)" aria-label="Modo de audio">
-      <svg class="audio-icon audio-silent" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M18.63 13A17.89 17.89 0 0 1 18 8"/><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"/><path d="M18 8a6 6 0 0 0-9.33-5"/><line x1="1" y1="1" x2="23" y2="23"/>
-      </svg>
-    </button>
-    <button type="button" id="skipRestBtn" onclick="resetTimerDock()">Saltar</button>
+  <div class="rest-dock" id="restTimerDock" role="timer" aria-live="polite">
+    <div class="rest-dock-track">
+      <div class="rest-dock-fill" id="restDockProgressFill" style="width: 0%;"></div>
+    </div>
+    <div class="rest-dock-main">
+      <div class="rest-dock-digits-col" onclick="togglePlayTimer()" title="Pausar / Reanudar descanso">
+        <b id="restTimerDigits">02:00</b>
+        <span class="rest-dock-badge" id="restDockStateBadge">EN CURSO</span>
+      </div>
+      <div class="rest-dock-actions">
+        <button type="button" class="rest-dock-btn plus" onclick="adjustTimer(30)" title="Sumar 30 segundos">+30s</button>
+        <button type="button" class="rest-dock-btn play" id="dockPlayBtn" onclick="togglePlayTimer()" title="Pausar / Reanudar descanso" aria-label="Pausar descanso">
+          <svg class="dock-play-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+        </button>
+        <button type="button" class="rest-dock-mute" id="dockAudioBtn" onclick="toggleAudioMode()" title="Modo Silencioso ACTIVO: Cero sonido por altavoz (Toca para activar auriculares)" aria-label="Modo de audio">
+          <svg class="audio-icon audio-silent" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M18.63 13A17.89 17.89 0 0 1 18 8"/><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"/><path d="M18 8a6 6 0 0 0-9.33-5"/><line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </button>
+        <button type="button" class="rest-dock-btn skip" id="skipRestBtn" onclick="resetTimerDock()" title="Saltar descanso">✕</button>
+      </div>
+    </div>
+    <div class="rest-dock-info">
+      <span id="restTimerSub" class="rest-dock-sub">
+        <span class="rest-dock-ex-name" id="restDockExName">Descanso activo</span>
+        <span class="rest-dock-dot">·</span>
+        <span class="rest-dock-set-info" id="restDockSetInfo">Siguiente serie lista</span>
+      </span>
+      <span class="rest-dock-rem" id="restDockWorkoutRem" title="Tiempo estimado para finalizar la sesión">⏳ ~24 min rest.</span>
+    </div>
   </div>
 
   <!-- ==========================================
