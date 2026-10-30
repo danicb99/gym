@@ -1,6 +1,9 @@
-const CACHE_NAME = 'vigorexiapp-v1.8.4-rev42';
-const NOTIF_BADGE = './badge-dumbbell.png?v=3';
-const NOTIF_ICON = './icon-192.png?v=3';
+const CACHE_NAME = 'vigorexiapp-v1.8.4-rev43';
+const NOTIF_TAG = 'vigorexiapp-rest';
+const BADGE_LIVE = './badge-timer.png?v=1';
+const BADGE_FINISHED = './badge-bell.png?v=1';
+const ICON_LIVE = './icon-192.png?v=3';
+const ICON_FINISHED = './icon-finished-192.png?v=1';
 
 const ASSETS = [
   './',
@@ -15,6 +18,12 @@ const ASSETS = [
   './badge-round.png',
   './badge.png',
   './badge-dumbbell.png',
+  './badge-timer.png',
+  './badge-timer.png?v=1',
+  './badge-bell.png',
+  './badge-bell.png?v=1',
+  './icon-finished-192.png',
+  './icon-finished-192.png?v=1',
   './manifest.json',
   './manifest.json?v=2',
   './icon-192.png',
@@ -50,6 +59,15 @@ self.addEventListener('activate', (e) => {
         })
       );
     }).then(() => self.clients.claim()).then(() => {
+      // Limpiar notificaciones huérfanas o con tags legacy de versiones anteriores
+      return self.registration.getNotifications().then((notifications) => {
+        notifications.forEach((n) => {
+          if (n.tag === 'vigorexiapp-rest-live' || n.tag === 'rest-finish') {
+            n.close();
+          }
+        });
+      }).catch(() => {});
+    }).then(() => {
       return self.clients.matchAll({ type: 'window' }).then((clients) => {
         clients.forEach((c) => c.postMessage({ type: 'FORCE_UPDATE', cache: CACHE_NAME }));
       });
@@ -101,8 +119,10 @@ self.addEventListener('fetch', (e) => {
 });
 
 let currentRestState = null;
+let currentRestGen = 0;
 let liveTickerInterval = null;
 let bgTimerId = null;
+let activeTimerResolve = null;
 
 function formatRestClock(totalSeconds) {
   const m = Math.floor(Math.max(0, totalSeconds) / 60);
@@ -117,8 +137,10 @@ function formatEndTime(timestamp) {
   return `${h}:${m}`;
 }
 
-function showLiveRestNotification(state) {
+function showLiveRestNotification(state, gen) {
   if (!state || !state.endTime) return Promise.resolve();
+  if (gen !== undefined && gen !== currentRestGen) return Promise.resolve();
+
   const remaining = Math.max(0, Math.round((state.endTime - Date.now()) / 1000));
   const timeText = formatRestClock(remaining);
   const finishTime = formatEndTime(state.endTime);
@@ -127,10 +149,10 @@ function showLiveRestNotification(state) {
 
   return self.registration.showNotification(`⏱️ ${timeText} — Descanso`, {
     body: `Termina ${finishTime} • ${subtitle}`,
-    icon: NOTIF_ICON,
-    badge: NOTIF_BADGE,
-    tag: 'vigorexiapp-rest-live',
-    ongoing: true,
+    icon: ICON_LIVE,
+    badge: BADGE_LIVE,
+    tag: NOTIF_TAG,
+    data: { phase: 'live', restGen: gen !== undefined ? gen : currentRestGen, endTime: state.endTime },
     silent: true,
     renotify: false,
     actions: [
@@ -140,24 +162,40 @@ function showLiveRestNotification(state) {
   }).catch(() => {});
 }
 
-function showRestFinishedNotification(state) {
-  clearLiveRestNotification();
+function showRestFinishedNotification(state, gen) {
+  if (gen !== undefined && gen !== currentRestGen) return Promise.resolve();
   const exName = state && state.exerciseName ? state.exerciseName : '';
+
   return self.registration.showNotification('¡Descanso Terminado! 🔔', {
     body: exName 
       ? `¡A por ello! Siguiente: ${exName} 💪` 
       : 'Hora de la siguiente serie en Vigorexiapp 💪',
-    icon: NOTIF_ICON,
-    badge: NOTIF_BADGE,
+    icon: ICON_FINISHED,
+    badge: BADGE_FINISHED,
     vibrate: [200, 100, 200, 100, 300],
-    tag: 'rest-finish',
+    tag: NOTIF_TAG,
+    data: { phase: 'finished', restGen: gen !== undefined ? gen : currentRestGen },
     renotify: true
   }).catch(() => {});
 }
 
 function clearLiveRestNotification() {
-  return self.registration.getNotifications({ tag: 'vigorexiapp-rest-live' }).then((notifications) => {
-    notifications.forEach((n) => n.close());
+  return self.registration.getNotifications({ tag: NOTIF_TAG }).then((notifications) => {
+    notifications.forEach((n) => {
+      if (!n.data || n.data.phase === 'live') {
+        n.close();
+      }
+    });
+  }).catch(() => {});
+}
+
+function clearAllRestNotifications() {
+  return self.registration.getNotifications().then((notifications) => {
+    notifications.forEach((n) => {
+      if (n.tag === NOTIF_TAG || n.tag === 'vigorexiapp-rest-live' || n.tag === 'rest-finish') {
+        n.close();
+      }
+    });
   }).catch(() => {});
 }
 
@@ -169,13 +207,11 @@ function hasVisibleClient() {
 }
 
 // Con la app visible, la página es la única que notifica (evita doble sonido/vibración)
-function notifyRestFinished(state) {
+function notifyRestFinished(state, gen) {
   return hasVisibleClient().then((visible) => {
-    if (!visible) return showRestFinishedNotification(state);
+    if (!visible) return showRestFinishedNotification(state, gen);
   });
 }
-
-let activeTimerResolve = null;
 
 function stopLiveTicker() {
   if (liveTickerInterval) {
@@ -194,29 +230,35 @@ function stopLiveTicker() {
 
 function startLiveTicker(state) {
   stopLiveTicker();
+  currentRestGen++;
+  const thisGen = currentRestGen;
   currentRestState = state;
   if (!currentRestState || !currentRestState.endTime) return Promise.resolve();
 
   // Actualizar inmediatamente
-  showLiveRestNotification(currentRestState);
+  showLiveRestNotification(currentRestState, thisGen);
 
   return new Promise((resolve) => {
     activeTimerResolve = resolve;
 
     // 1. Programar el despertar nativo para cuando expire el tiempo
     const delay = Math.max(0, currentRestState.endTime - Date.now());
-    bgTimerId = setTimeout(() => {
+    bgTimerId = setTimeout(async () => {
+      if (thisGen !== currentRestGen) {
+        resolve();
+        return;
+      }
       const finished = currentRestState;
       stopLiveTicker();
       currentRestState = null;
-      notifyRestFinished(finished);
-      notifyClients({ type: 'REST_TIMER_FINISHED' });
+      await notifyRestFinished(finished, thisGen);
+      await notifyClients({ type: 'REST_TIMER_FINISHED', restGen: thisGen });
       resolve();
     }, delay);
 
     // 2. Ticker de refresco en vivo mientras la pantalla o CPU estén activas
-    liveTickerInterval = setInterval(() => {
-      if (!currentRestState || !currentRestState.endTime) {
+    liveTickerInterval = setInterval(async () => {
+      if (thisGen !== currentRestGen || !currentRestState || !currentRestState.endTime) {
         stopLiveTicker();
         resolve();
         return;
@@ -226,11 +268,11 @@ function startLiveTicker(state) {
         const finished = currentRestState;
         stopLiveTicker();
         currentRestState = null;
-        notifyRestFinished(finished);
-        notifyClients({ type: 'REST_TIMER_FINISHED' });
+        await notifyRestFinished(finished, thisGen);
+        await notifyClients({ type: 'REST_TIMER_FINISHED', restGen: thisGen });
         resolve();
       } else {
-        showLiveRestNotification(currentRestState);
+        showLiveRestNotification(currentRestState, thisGen);
       }
     }, 1000);
   });
@@ -257,16 +299,18 @@ self.addEventListener('notificationclick', (event) => {
 
   if (action === 'skip') {
     stopLiveTicker();
-    clearLiveRestNotification();
+    currentRestGen++;
+    const thisGen = currentRestGen;
 
     const p = self.registration.showNotification('¡Listo para la serie! 💪', {
       body: currentRestState && currentRestState.exerciseName
         ? `A darlo todo en: ${currentRestState.exerciseName}`
         : 'Hora de la siguiente serie en Vigorexiapp 💪',
-      icon: NOTIF_ICON,
-      badge: NOTIF_BADGE,
+      icon: ICON_FINISHED,
+      badge: BADGE_FINISHED,
       vibrate: [150, 80, 150],
-      tag: 'rest-finish',
+      tag: NOTIF_TAG,
+      data: { phase: 'finished', restGen: thisGen },
       renotify: true
     }).catch(() => {});
 
@@ -276,7 +320,7 @@ self.addEventListener('notificationclick', (event) => {
     return;
   }
 
-  // Click estándar en el cuerpo de la notificación: enfocar ventana
+  // Click estándar en el cuerpo de la notificación: enfocar ventana y cerrar
   event.notification.close();
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
@@ -315,8 +359,11 @@ self.addEventListener('message', (event) => {
     if (event.waitUntil) event.waitUntil(p);
   } else if (event.data && event.data.type === 'CANCEL_REST_TIMER') {
     stopLiveTicker();
+    currentRestGen++;
     currentRestState = null;
     clearLiveRestNotification();
+  } else if (event.data && event.data.type === 'CLEAR_ALL_NOTIFICATIONS') {
+    clearAllRestNotifications();
   } else if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }

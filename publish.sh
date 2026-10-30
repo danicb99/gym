@@ -8,6 +8,7 @@ echo "🧪 Ejecutando suite de verificación..."
 node tests/verify_flow.js
 node tests/compat_test.js
 node tests/complete_set_test.js
+node tests/notification_replacement_and_badge_test.js
 
 echo "📦 Comprobando estado de git..."
 if [ -z "$(git status --porcelain)" ]; then

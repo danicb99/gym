@@ -14268,27 +14268,24 @@
       lastRestFinishedNotifyAt = Date.now();
       // 1. Android Notification API
       if ('Notification' in window && Notification.permission === 'granted') {
-        const title = '¡Descanso Terminado! ⏱️';
+        const title = '¡Descanso Terminado! 🔔';
         const options = {
-          body: 'Hora de la siguiente serie en Vigorexiapp 💪',
-          icon: './icon-192.png?v=3',
-          badge: './badge-dumbbell.png?v=3',
+          body: currentRestExerciseInfo.name 
+            ? `¡A por ello! Siguiente: ${currentRestExerciseInfo.name} 💪` 
+            : 'Hora de la siguiente serie en Vigorexiapp 💪',
+          icon: './icon-finished-192.png?v=1',
+          badge: './badge-bell.png?v=1',
           vibrate: [200, 100, 200, 100, 300],
-          tag: 'rest-finish',
+          tag: 'vigorexiapp-rest',
           renotify: true,
-          silent: false
+          silent: false,
+          data: { phase: 'finished' }
         };
 
         if (navigator.serviceWorker && navigator.serviceWorker.ready) {
           navigator.serviceWorker.ready.then(reg => {
-            reg.showNotification(title, options).catch(() => {
-              try { new Notification(title, options); } catch(e) {}
-            });
-          }).catch(() => {
-            try { new Notification(title, options); } catch(e) {}
-          });
-        } else {
-          try { new Notification(title, options); } catch(e) {}
+            reg.showNotification(title, options).catch(() => {});
+          }).catch(() => {});
         }
       }
 
@@ -14299,6 +14296,20 @@
       if (navigator.vibrate) {
         navigator.vibrate([200, 100, 200, 100, 300]);
       }
+    }
+
+    function clearAppNotifications() {
+      try {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.getNotifications({ tag: 'vigorexiapp-rest' }).then(notifs => {
+              notifs.forEach(n => {
+                if (!isTimerActive) n.close();
+              });
+            }).catch(() => {});
+          }).catch(() => {});
+        }
+      } catch(e) {}
     }
 
     function playAlertTone() {
@@ -14652,7 +14663,7 @@
       isTimerActive = false;
       timerEndTime = null;
       releaseWakeLock();
-      sendSWMessage({ type: 'CANCEL_REST_TIMER' });
+      // No se envía CANCEL_REST_TIMER para preservar la notificación de fin de descanso en la bandeja
       const btn = document.getElementById('timerPlayBtn');
       if (btn) {
         btn.innerText = "Listo";
@@ -14695,19 +14706,24 @@
 
     // When screen wakes up or app is focused, re-evaluate timer instantly
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && isTimerActive && timerEndTime) {
-        const diff = Math.max(0, Math.round((timerEndTime - Date.now()) / 1000));
-        timerRemaining = diff;
-        updateTimerUI();
-        if (diff <= 0) {
-          finishTimer();
+      if (!document.hidden) {
+        if (isTimerActive && timerEndTime) {
+          const diff = Math.max(0, Math.round((timerEndTime - Date.now()) / 1000));
+          timerRemaining = diff;
+          updateTimerUI();
+          if (diff <= 0) {
+            finishTimer();
+          } else {
+            sendSWMessage({
+              type: 'UPDATE_REST_TIMER',
+              endTime: timerEndTime,
+              exerciseName: currentRestExerciseInfo.name || '',
+              setInfo: currentRestExerciseInfo.setInfo || ''
+            });
+          }
         } else {
-          sendSWMessage({
-            type: 'UPDATE_REST_TIMER',
-            endTime: timerEndTime,
-            exerciseName: currentRestExerciseInfo.name || '',
-            setInfo: currentRestExerciseInfo.setInfo || ''
-          });
+          // Si no hay temporizador activo y la app pasa a primer plano, limpiar avisos obsoletos
+          clearAppNotifications();
         }
       }
     });
@@ -16009,6 +16025,7 @@
       initAudioDeviceDetection();
       initScrubberController();
       reconcileStaleSessions();
+      clearAppNotifications();
       let swReloading = false;
       function reloadForUpdate(reason) {
         if (swReloading) return;
@@ -16023,7 +16040,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev42').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev43').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
