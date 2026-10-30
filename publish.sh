@@ -19,5 +19,9 @@ MSG="${1:-Fix aplicado en caliente desde Antigravity Remote}"
 git add .
 git commit -m "$MSG"
 echo "🚀 Subiendo a GitHub origin main..."
-git push origin main
+if [ -f "$HOME/.ssh/id_ed25519_github" ]; then
+  GIT_SSH_COMMAND="ssh -i $HOME/.ssh/id_ed25519_github -o IdentitiesOnly=yes" git push origin main
+else
+  git push origin main
+fi
 echo "✅ Publicado con éxito. GitHub Pages se actualizará en unos instantes."
