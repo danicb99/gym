@@ -3057,6 +3057,18 @@
       display: none !important;
     }
 
+    /* Zona de Ejercicios Completados al Final de la Rutina */
+    .completed-cards-zone {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 0;
+      min-height: 0;
+    }
+    .exercise-pair-container.pair-all-completed {
+      display: none !important;
+    }
+
   
     /* Fase 4: Serie 0 de calentamiento y aproximación */
     .warmup-row {
@@ -11289,6 +11301,9 @@
       }
 
       if (daySection) {
+        if (typeof restoreAllCardsToOriginal === 'function') {
+          restoreAllCardsToOriginal(daySection);
+        }
         daySection.querySelectorAll('.exercise-card').forEach(card => {
           const slotId = card.getAttribute('data-slot');
           if (slotId) slotIds.add(slotId);
@@ -11480,7 +11495,11 @@
 
       const exitInfo = (typeof getEstimatedExitTime === 'function') ? getEstimatedExitTime(targetDay) : null;
       if (exitInfo && exitInfo.inProgress) {
-        routineSub.innerHTML = `${progName} · <span id="headerEstDuration" class="header-rem-badge" title="Tiempo estimado para finalizar sesión">⏳ ~${exitInfo.remainingMin} min rest. (fin ~${exitInfo.clock})</span>`;
+        if (exitInfo.hasSupersets) {
+          routineSub.innerHTML = `${progName} · <span id="headerEstDuration" class="header-rem-badge" title="Tiempo estimado para finalizar sesión con superseries">⏳ ~${exitInfo.remainingMin} min rest. (fin ~${exitInfo.clock})</span> <span id="headerEstDurationNoSS" class="header-est-noss" title="Tiempo estimado sin superseries (series lineales individuales)">(sin SS: ~${exitInfo.remainingMinNoSS} min, fin ~${exitInfo.clockNoSS})</span>`;
+        } else {
+          routineSub.innerHTML = `${progName} · <span id="headerEstDuration" class="header-rem-badge" title="Tiempo estimado para finalizar sesión">⏳ ~${exitInfo.remainingMin} min rest. (fin ~${exitInfo.clock})</span>`;
+        }
       } else if (exitInfo && exitInfo.isComplete) {
         routineSub.innerHTML = `${progName} · <span id="headerEstDuration" style="color:#34d399; font-weight:800;">✓ ¡Entrenamiento completado!</span>`;
       } else {
@@ -11644,16 +11663,31 @@
       updateSessionTimerDisplay(dayId);
     }
 
-    let headerSessionTimerMode = 'elapsed'; // 'elapsed' | 'remaining'
+    let headerSessionTimerMode = 'elapsed'; // 'elapsed' | 'remaining' | 'remaining_noss'
 
     function toggleHeaderTimerMode() {
-      headerSessionTimerMode = (headerSessionTimerMode === 'elapsed') ? 'remaining' : 'elapsed';
       const activeContent = document.querySelector('.day-content.active');
       const dayId = (activeContent && WORKOUT_DAYS.includes(activeContent.id)) ? activeContent.id : lastActiveWorkoutDay;
-      updateSessionTimerDisplay(dayId);
-      if (typeof showToast === 'function') {
-        showToast(headerSessionTimerMode === 'remaining' ? '⏳ Cronómetro en modo: Tiempo restante' : '⏱️ Cronómetro en modo: Tiempo transcurrido');
+      const exitInfo = (typeof getEstimatedExitTime === 'function') ? getEstimatedExitTime(dayId) : null;
+      const hasSS = Boolean(exitInfo && exitInfo.hasSupersets);
+
+      if (headerSessionTimerMode === 'elapsed') {
+        headerSessionTimerMode = 'remaining';
+        if (typeof showToast === 'function') {
+          showToast(hasSS ? '⏳ Cronómetro en modo: Tiempo restante (con SS)' : '⏳ Cronómetro en modo: Tiempo restante');
+        }
+      } else if (headerSessionTimerMode === 'remaining' && hasSS) {
+        headerSessionTimerMode = 'remaining_noss';
+        if (typeof showToast === 'function') {
+          showToast('⏳ Cronómetro en modo: Tiempo restante (sin SS)');
+        }
+      } else {
+        headerSessionTimerMode = 'elapsed';
+        if (typeof showToast === 'function') {
+          showToast('⏱️ Cronómetro en modo: Tiempo transcurrido');
+        }
       }
+      updateSessionTimerDisplay(dayId);
     }
 
     function updateSessionTimerDisplay(dayId) {
@@ -11681,11 +11715,19 @@
         const hourglassSvg = '<svg class="clock-icon-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>';
         if (startTime) {
           const pauseTag = isPaused ? ' (Pausa)' : '';
-          if (headerSessionTimerMode === 'remaining') {
-            const exitInfo = (typeof getEstimatedExitTime === 'function') ? getEstimatedExitTime(dayId) : null;
-            const remText = exitInfo ? `~${exitInfo.remainingMin}m rest.` : '00:00';
+          if (headerSessionTimerMode === 'remaining' || headerSessionTimerMode === 'remaining_noss') {
+            const isNoSS = headerSessionTimerMode === 'remaining_noss';
+            const exitInfo = (typeof getEstimatedExitTime === 'function') ? getEstimatedExitTime(dayId, Date.now(), isNoSS) : null;
+            const remMin = exitInfo ? (isNoSS ? exitInfo.remainingMinNoSS : exitInfo.remainingMin) : null;
+            const remText = remMin != null ? `~${remMin}m rest.${(isNoSS && exitInfo && exitInfo.hasSupersets) ? ' (sin SS)' : ''}` : '00:00';
             hdrSessionTimer.innerHTML = `<span class="clock-icon" aria-hidden="true">${hourglassSvg}</span> ${remText}${pauseTag}`;
-            hdrSessionTimer.title = "Modo: Tiempo restante. Toca para alternar a tiempo transcurrido.";
+            if (isNoSS) {
+              hdrSessionTimer.title = exitInfo ? `Modo: Tiempo restante sin superseries (~${exitInfo.remainingMinNoSS}m, fin ~${exitInfo.clockNoSS}). Toca para alternar a tiempo transcurrido.` : "Modo: Tiempo restante. Toca para alternar.";
+            } else {
+              hdrSessionTimer.title = exitInfo && exitInfo.hasSupersets
+                ? `Modo: Tiempo restante con superseries (~${exitInfo.remainingMin}m, fin ~${exitInfo.clock} | sin SS: ~${exitInfo.remainingMinNoSS}m, fin ~${exitInfo.clockNoSS}). Toca para alternar.`
+                : "Modo: Tiempo restante. Toca para alternar a tiempo transcurrido.";
+            }
           } else {
             const m = Math.floor(elapsedSecs / 60);
             const s = elapsedSecs % 60;
@@ -11993,27 +12035,37 @@
         if (card && section) {
           const cardRows = card.querySelectorAll('.set-row');
           const cardDone = card.querySelectorAll('.set-row.done');
-          if (cardRows.length > 0 && cardDone.length >= cardRows.length) {
+          const isCardFullyDone = (cardRows.length > 0 && cardDone.length >= cardRows.length);
+
+          if (isCardFullyDone) {
             // Colapsar el ejercicio recién completado
             card.classList.add('collapsed');
             card.classList.remove('manually-expanded');
 
-            let allCards = Array.from(section.querySelectorAll('.exercise-card'));
-            if (document.body.classList.contains('express-mode')) {
-              allCards = allCards.filter(c => c.getAttribute('data-skippable') !== 'true');
-            }
-            const nextPending = allCards.find(c => {
-              const cDone = c.querySelectorAll('.set-row.done').length;
-              const cTot = c.querySelectorAll('.set-row').length;
-              return cTot > 0 && cDone < cTot;
-            });
+            const handleNextPending = () => {
+              let allCards = Array.from(section.querySelectorAll('.exercise-card'));
+              if (document.body.classList.contains('express-mode')) {
+                allCards = allCards.filter(c => c.getAttribute('data-skippable') !== 'true');
+              }
+              const nextPending = allCards.find(c => {
+                const cDone = c.querySelectorAll('.set-row.done').length;
+                const cTot = c.querySelectorAll('.set-row').length;
+                return cTot > 0 && cDone < cTot;
+              });
 
-            if (nextPending) {
-              nextPending.classList.remove('collapsed');
-              nextPending.classList.add('manually-expanded');
-              setTimeout(() => {
+              if (nextPending) {
+                nextPending.classList.remove('collapsed');
+                nextPending.classList.add('manually-expanded');
                 nextPending.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-              }, 200);
+              }
+            };
+
+            if (typeof reconcileCardPosition === 'function') {
+              reconcileCardPosition(card, true, false, handleNextPending);
+            }
+          } else {
+            if (typeof reconcileCardPosition === 'function') {
+              reconcileCardPosition(card, false, true);
             }
           }
         }
@@ -12037,6 +12089,9 @@
         const isDayFullyFinished = (allRowsInDay.length > 0) && allRowsInDay.every(r => r.classList.contains('done'));
 
         if (isDone && isDayFullyFinished) {
+          if (typeof cancelAllPendingCardTimers === 'function') {
+            cancelAllPendingCardTimers(section.id);
+          }
           // ULTIMA SERIE DEL ENTRENAMIENTO COMPLETO:
           // 1. NO iniciar contador de descanso y detenerlo si estuviera activo
           resetTimerDock();
@@ -12187,6 +12242,188 @@
       if (slotId === 'torsoB_6') return 'torsoB_7';
       if (slotId === 'torsoB_7') return 'torsoB_6';
       return null;
+    }
+
+    // ==========================================
+    // GESTIÓN DINÁMICA DE EJERCICIOS COMPLETADOS AL FINAL
+    // ==========================================
+    const pendingCardTimers = new Map();
+
+    function cancelAllPendingCardTimers(dayId) {
+      if (dayId) {
+        for (const [slotId, timerId] of pendingCardTimers.entries()) {
+          if (slotId.startsWith(dayId + '_')) {
+            clearTimeout(timerId);
+            pendingCardTimers.delete(slotId);
+          }
+        }
+      } else {
+        for (const timerId of pendingCardTimers.values()) {
+          clearTimeout(timerId);
+        }
+        pendingCardTimers.clear();
+      }
+    }
+
+    function getOrCreateCompletedZone(daySection) {
+      if (!daySection || typeof daySection.querySelector !== 'function') return null;
+      let zone = daySection.querySelector('.completed-cards-zone');
+      if (!zone) {
+        zone = document.createElement('div');
+        zone.className = 'completed-cards-zone';
+        zone.id = 'completed-zone-' + daySection.id;
+        const bottomActions = daySection.querySelector('.day-bottom-actions');
+        if (bottomActions && bottomActions.parentNode === daySection) {
+          daySection.insertBefore(zone, bottomActions);
+        } else {
+          daySection.appendChild(zone);
+        }
+      }
+      return zone;
+    }
+
+    function updatePairContainerVisibility(container) {
+      if (!container || !container.classList || !container.classList.contains('exercise-pair-container')) return;
+      const cardsInside = container.querySelectorAll('.exercise-card');
+      if (cardsInside.length === 0) {
+        container.classList.add('pair-all-completed');
+        container.style.display = 'none';
+      } else {
+        container.classList.remove('pair-all-completed');
+        container.style.display = '';
+      }
+    }
+
+    function reconcileCardPosition(card, isComplete, immediate = false, onMovedCallback = null) {
+      if (!card) return;
+      const slotId = card.getAttribute('data-slot');
+      if (!slotId) return;
+
+      if (pendingCardTimers.has(slotId)) {
+        clearTimeout(pendingCardTimers.get(slotId));
+        pendingCardTimers.delete(slotId);
+      }
+
+      const daySection = card.closest ? card.closest('.day-content') : null;
+      if (!daySection) return;
+
+      if (isComplete) {
+        const executeMove = () => {
+          if (!card.isConnected) return;
+          const rows = card.querySelectorAll('.set-row');
+          const doneRows = card.querySelectorAll('.set-row.done');
+          if (rows.length === 0 || doneRows.length < rows.length) return;
+
+          const completedZone = getOrCreateCompletedZone(daySection);
+          if (!completedZone) return;
+          if (card.parentNode === completedZone) {
+            if (typeof onMovedCallback === 'function') onMovedCallback();
+            return;
+          }
+
+          if (!card._slotAnchor) {
+            const marker = document.createComment('marker-' + slotId);
+            const parent = card.parentNode;
+            const nextSibling = card.nextSibling;
+            if (parent) {
+              parent.insertBefore(marker, card);
+              card._slotAnchor = {
+                marker: marker,
+                parent: parent,
+                nextSibling: nextSibling
+              };
+            }
+          }
+
+          completedZone.appendChild(card);
+          if (card._slotAnchor && card._slotAnchor.parent) {
+            updatePairContainerVisibility(card._slotAnchor.parent);
+          }
+          if (typeof onMovedCallback === 'function') {
+            onMovedCallback();
+          }
+        };
+
+        if (immediate) {
+          executeMove();
+        } else {
+          const timerId = setTimeout(() => {
+            pendingCardTimers.delete(slotId);
+            executeMove();
+          }, 200);
+          pendingCardTimers.set(slotId, timerId);
+        }
+      } else {
+        if (card._slotAnchor) {
+          const anchor = card._slotAnchor;
+          let restored = false;
+          if (anchor.marker && anchor.marker.parentNode) {
+            anchor.marker.parentNode.insertBefore(card, anchor.marker);
+            anchor.marker.remove();
+            restored = true;
+          } else if (anchor.parent && anchor.parent.isConnected) {
+            if (anchor.nextSibling && anchor.nextSibling.parentNode === anchor.parent) {
+              anchor.parent.insertBefore(card, anchor.nextSibling);
+            } else {
+              anchor.parent.appendChild(card);
+            }
+            restored = true;
+          }
+          if (restored) {
+            card._slotAnchor = null;
+            if (anchor.parent) {
+              updatePairContainerVisibility(anchor.parent);
+            }
+          }
+        }
+      }
+    }
+
+    function restoreAllCardsToOriginal(daySection) {
+      if (!daySection || typeof daySection.querySelector !== 'function') return;
+      const completedZone = daySection.querySelector('.completed-cards-zone');
+      if (!completedZone) return;
+
+      const cards = Array.from(completedZone.querySelectorAll('.exercise-card'));
+      cards.forEach(card => {
+        const slotId = card.getAttribute('data-slot');
+        if (slotId && pendingCardTimers.has(slotId)) {
+          clearTimeout(pendingCardTimers.get(slotId));
+          pendingCardTimers.delete(slotId);
+        }
+        if (card._slotAnchor) {
+          const anchor = card._slotAnchor;
+          let restored = false;
+          if (anchor.marker && anchor.marker.parentNode) {
+            anchor.marker.parentNode.insertBefore(card, anchor.marker);
+            anchor.marker.remove();
+            restored = true;
+          } else if (anchor.parent && anchor.parent.isConnected) {
+            if (anchor.nextSibling && anchor.nextSibling.parentNode === anchor.parent) {
+              anchor.parent.insertBefore(card, anchor.nextSibling);
+            } else {
+              anchor.parent.appendChild(card);
+            }
+            restored = true;
+          }
+          if (restored) {
+            card._slotAnchor = null;
+            if (anchor.parent) {
+              updatePairContainerVisibility(anchor.parent);
+            }
+          }
+        }
+      });
+
+      if (typeof daySection.querySelectorAll === 'function') {
+        const pairs = daySection.querySelectorAll('.exercise-pair-container');
+        if (pairs && pairs.length) {
+          pairs.forEach(c => {
+            c.classList.remove('pair-all-completed');
+            c.style.display = '';
+          });
+        }
+      }
     }
 
     // Accordion Manager: 1 ejercicio desplegado por defecto, permitiendo tener desplegados los 2 ejercicios de una superserie a la vez
@@ -12662,6 +12899,12 @@
       }
 
       if (typeof updateAllWarmupRows === 'function') updateAllWarmupRows();
+      if (typeof restoreAllCardsToOriginal === 'function') {
+        restoreAllCardsToOriginal(daySection);
+      }
+      if (typeof updateDayExerciseAccordion === 'function') {
+        updateDayExerciseAccordion(dayId);
+      }
       saveWorkoutState();
       if (typeof scheduleBroadcast === 'function') {
         scheduleBroadcast(0);
@@ -12706,6 +12949,9 @@
       if (!confirm('¿Quieres reiniciar las casillas de hoy?\n(La columna "Anterior" y el historial no se borrarán)')) return;
       const daySection = document.getElementById(dayId);
       if (daySection) {
+        if (typeof restoreAllCardsToOriginal === 'function') {
+          restoreAllCardsToOriginal(daySection);
+        }
         daySection.querySelectorAll('.exercise-card').forEach(card => {
           card.classList.remove('exercise-completed');
           card.classList.remove('manually-expanded');
@@ -14419,7 +14665,9 @@
         const exitInfo = (typeof getEstimatedExitTime === 'function') ? getEstimatedExitTime(dayId) : null;
         if (exitInfo && exitInfo.inProgress) {
           remEl.innerText = `⏳ ~${exitInfo.remainingMin}m rest.`;
-          remEl.title = `Fin estimado: ~${exitInfo.clock}`;
+          remEl.title = exitInfo.hasSupersets
+            ? `Fin estimado: ~${exitInfo.clock} (sin SS: ~${exitInfo.clockNoSS}, ~${exitInfo.remainingMinNoSS}m rest.)`
+            : `Fin estimado: ~${exitInfo.clock}`;
         } else if (exitInfo && exitInfo.isComplete) {
           remEl.innerText = `✓ ¡Último!`;
         } else {
@@ -15419,6 +15667,14 @@
         checkExerciseCardCompletion(card);
       });
 
+      // Sincronizar posición de tarjetas completadas en arranque
+      document.querySelectorAll('.exercise-card').forEach(card => {
+        const isComplete = card.classList.contains('exercise-completed');
+        if (typeof reconcileCardPosition === 'function') {
+          reconcileCardPosition(card, isComplete, true);
+        }
+      });
+
       // Retrocompatibilidad: vincular notas de sesiones archivadas a exerciseHistory si faltaban
       if (Array.isArray(workoutState.sessions) && workoutState.exerciseHistory) {
         workoutState.sessions.forEach(s => {
@@ -15587,30 +15843,68 @@
       }).length;
     }
 
-    function getEstimatedExitTime(dayId, now = Date.now()) {
+    function getEstimatedExitTime(dayId, now = Date.now(), withoutSupersets = false) {
       if (!dayId || !ROUTINE_SLOTS[dayId]) return null;
+      const day = ROUTINE_SLOTS[dayId];
       const start = workoutState.sessionStartTime && workoutState.sessionStartTime[dayId];
       const done = getDayCompletedSets(dayId);
       if (!start && done === 0) return null;
 
       const total = getDayTotalSets(dayId);
       const doneClamped = Math.min(total, done);
-      const baseMinutes = calculateDayEstimatedDuration(dayId, typeof isExpressMode !== 'undefined' && isExpressMode);
+      const isExpress = typeof isExpressMode !== 'undefined' && !!isExpressMode;
+      const hasSupersets = !!(day && day.slots && day.slots.some(s => !!s.pairSlotId && (!isExpress || !s.isSkippable)));
+      const baseMinutesSS = calculateDayEstimatedDuration(dayId, isExpress, false);
+      const baseMinutesNoSS = hasSupersets ? calculateDayEstimatedDuration(dayId, isExpress, true) : baseMinutesSS;
+      const baseMinutes = (withoutSupersets && hasSupersets) ? baseMinutesNoSS : baseMinutesSS;
+
       const inProgress = doneClamped > 0 && doneClamped < total;
       const isComplete = total > 0 && doneClamped >= total;
-      const remainingMin = isComplete ? 0 : Math.max(1, Math.ceil(baseMinutes * Math.max(0, total - doneClamped) / Math.max(1, total)));
+
+      const remainingMinSS = isComplete ? 0 : Math.max(1, Math.ceil(baseMinutesSS * Math.max(0, total - doneClamped) / Math.max(1, total)));
+      const remainingMinNoSS = isComplete ? 0 : Math.max(1, Math.ceil(baseMinutesNoSS * Math.max(0, total - doneClamped) / Math.max(1, total)));
+      const remainingMin = (withoutSupersets && hasSupersets) ? remainingMinNoSS : remainingMinSS;
+
       const baseTime = start ? Math.max(now, start) : now;
-      const exit = new Date(baseTime + remainingMin * 60000);
-      const clock = `${String(exit.getHours()).padStart(2, '0')}:${String(exit.getMinutes()).padStart(2, '0')}`;
+      const exitSS = new Date(baseTime + remainingMinSS * 60000);
+      const exitNoSS = new Date(baseTime + remainingMinNoSS * 60000);
+      const exit = (withoutSupersets && hasSupersets) ? exitNoSS : exitSS;
+
+      const clockSS = `${String(exitSS.getHours()).padStart(2, '0')}:${String(exitSS.getMinutes()).padStart(2, '0')}`;
+      const clockNoSS = `${String(exitNoSS.getHours()).padStart(2, '0')}:${String(exitNoSS.getMinutes()).padStart(2, '0')}`;
+      const clock = (withoutSupersets && hasSupersets) ? clockNoSS : clockSS;
+
+      const labelSS = isComplete ? 'Completado' : `${clockSS} · ~${remainingMinSS} min`;
+      const labelNoSS = isComplete ? 'Completado' : `${clockNoSS} · ~${remainingMinNoSS} min`;
+      const label = isComplete
+        ? 'Completado'
+        : (hasSupersets
+            ? (withoutSupersets
+                ? `${clockNoSS} · ~${remainingMinNoSS} min (con SS: ${clockSS} · ~${remainingMinSS} min)`
+                : `${clockSS} · ~${remainingMinSS} min (sin SS: ${clockNoSS} · ~${remainingMinNoSS} min)`)
+            : `${clockSS} · ~${remainingMinSS} min`);
+
       return {
         exit,
         clock,
-        label: isComplete ? 'Completado' : `${clock} · ~${remainingMin} min`,
+        label,
         remainingMin,
         done: doneClamped,
         total,
         inProgress,
-        isComplete
+        isComplete,
+        hasSupersets,
+        baseMinutes,
+        baseMinutesSS,
+        baseMinutesNoSS,
+        remainingMinSS,
+        remainingMinNoSS,
+        exitSS,
+        exitNoSS,
+        clockSS,
+        clockNoSS,
+        labelSS,
+        labelNoSS
       };
     }
 
@@ -16040,7 +16334,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev43').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev45').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;

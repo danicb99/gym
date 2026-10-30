@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigorexiapp-v1.8.4-rev43';
+const CACHE_NAME = 'vigorexiapp-v1.8.4-rev45';
 const NOTIF_TAG = 'vigorexiapp-rest';
 const BADGE_LIVE = './badge-timer.png?v=1';
 const BADGE_FINISHED = './badge-bell.png?v=1';
