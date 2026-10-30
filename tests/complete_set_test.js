@@ -12,8 +12,8 @@ console.log('====================================================\n');
 
 // 1. Verificación de versiones
 console.log('📦 1. Verificación de Versiones de Caché:');
-assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev39'/.test(sw), 'sw.js no tiene rev39');
-assert(/sw\.js\?v=1\.8\.4-rev39/.test(html), 'index.html no registra rev39');
+assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev40'/.test(sw), 'sw.js no tiene rev40');
+assert(/sw\.js\?v=1\.8\.4-rev40/.test(html), 'index.html no registra rev40');
 console.log('  ✓ Cache sincronizada en index.html y sw.js');
 
 // 2. Verificación de colores amarillos en checks de serie

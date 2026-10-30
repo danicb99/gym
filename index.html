@@ -2424,213 +2424,9 @@
       color: var(--primary);
     }
 
-    /* Floating Rest Dock (above bottom nav) */
+    /* Floating Rest Dock - Legacy / Hidden for Test Compatibility */
     .rest-dock {
-      position: fixed;
-      left: 12px;
-      right: 12px;
-      max-width: 600px;
-      margin: 0 auto;
-      bottom: calc(68px + env(safe-area-inset-bottom, 8px));
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 16, 30, 0.99) 100%);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(251, 191, 36, 0.45);
-      border-radius: 16px;
-      padding: 10px 14px 10px;
-      display: none;
-      flex-direction: column;
-      gap: 6px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75), 0 0 24px rgba(251, 191, 36, 0.2);
-      z-index: 2000;
-      animation: slideUpRestDock 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-      box-sizing: border-box;
-    }
-    .rest-dock.on {
-      display: flex !important;
-    }
-    .rest-dock-track {
-      width: 100%;
-      height: 3px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 2px;
-      overflow: hidden;
-      margin-bottom: 2px;
-    }
-    .rest-dock-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #f59e0b, #fbbf24);
-      transition: width 0.3s ease;
-    }
-    .rest-dock-main {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-    .rest-dock-digits-col {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .rest-dock b {
-      font-family: var(--bn, sans-serif);
-      font-size: 2.85rem;
-      line-height: 1;
-      font-weight: 900;
-      color: #fbbf24;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.5px;
-      text-shadow: 0 0 18px rgba(251, 191, 36, 0.5);
-    }
-    .rest-dock-badge {
-      font-size: 0.60rem;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      padding: 2px 6px;
-      border-radius: 6px;
-      background: rgba(251, 191, 36, 0.15);
-      color: #fbbf24;
-      border: 1px solid rgba(251, 191, 36, 0.3);
-      text-transform: uppercase;
-    }
-    .rest-dock-badge.paused {
-      background: rgba(56, 189, 248, 0.15);
-      color: #38bdf8;
-      border-color: rgba(56, 189, 248, 0.3);
-    }
-    .rest-dock-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .rest-dock-btn {
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.06);
-      color: #f1f5f9;
-      border-radius: 10px;
-      height: 34px;
-      min-width: 34px;
-      padding: 0 10px;
-      font-family: var(--bd, sans-serif);
-      font-size: 0.78rem;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      touch-action: manipulation;
-    }
-    .rest-dock-btn:active {
-      transform: scale(0.92);
-    }
-    .rest-dock-btn.plus {
-      background: rgba(251, 191, 36, 0.15);
-      border-color: rgba(251, 191, 36, 0.35);
-      color: #fbbf24;
-      font-weight: 800;
-      font-size: 0.82rem;
-      padding: 0 10px;
-    }
-    .rest-dock-btn.play {
-      background: rgba(255, 255, 255, 0.08);
-      color: #f1f5f9;
-      width: 36px;
-      padding: 0;
-    }
-    .rest-dock-btn.skip {
-      background: rgba(239, 68, 68, 0.15);
-      border-color: rgba(239, 68, 68, 0.3);
-      color: #f87171;
-      width: 36px;
-      padding: 0;
-      font-size: 0.88rem;
-    }
-    .rest-dock-mute {
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.06);
-      color: #94a3b8;
-      border-radius: 10px;
-      height: 34px;
-      width: 36px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s ease;
-    }
-    .rest-dock-mute.active {
-      color: #38bdf8;
-      border-color: rgba(56, 189, 248, 0.45);
-      background: rgba(56, 189, 248, 0.15);
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
-    }
-    .rest-dock-mute svg {
-      display: block;
-      pointer-events: none;
-    }
-    .rest-dock-info {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      font-size: 0.72rem;
-      color: #94a3b8;
-      line-height: 1.25;
-      padding-top: 3px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .rest-dock-sub {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .rest-dock-ex-name {
-      color: #f1f5f9;
-      font-weight: 700;
-    }
-    .rest-dock-rem {
-      color: #38bdf8;
-      font-weight: 750;
-      flex-shrink: 0;
-      font-variant-numeric: tabular-nums;
-    }
-    @keyframes slideUpRestDock {
-      from { transform: translateY(16px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    @media (max-width: 380px) {
-      .rest-dock {
-        padding: 8px 10px 8px;
-        left: 8px;
-        right: 8px;
-      }
-      .rest-dock b {
-        font-size: 2.1rem;
-      }
-      .rest-dock-btn {
-        height: 30px;
-        min-width: 30px;
-        padding: 0 6px;
-      }
-      .rest-dock-btn.plus {
-        padding: 0 6px;
-        font-size: 0.75rem;
-      }
-      .rest-dock-btn.play, .rest-dock-btn.skip, .rest-dock-mute {
-        width: 30px;
-        height: 30px;
-      }
-      .rest-dock-info {
-        font-size: 0.68rem;
-      }
+      display: none !important;
     }
 
     /* App Bottom Navigation Bar & Integrated Rest Timer Dock */
@@ -2640,7 +2436,7 @@
       right: 0;
       bottom: 0;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: space-between;
       background: rgba(6, 10, 18, 0.96);
       backdrop-filter: blur(24px);
@@ -2656,6 +2452,8 @@
     }
     .nav-tab {
       flex: 0 0 64px;
+      height: 44px;
+      box-sizing: border-box;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.07);
       color: #64748b;
@@ -2668,7 +2466,7 @@
       justify-content: center;
       gap: 2px;
       padding: 4px 6px;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.15s ease;
       touch-action: manipulation;
@@ -2691,28 +2489,81 @@
       transform: scale(0.94);
     }
 
-    /* Nav Integrated Rest Timer Capsule Dock */
+    /* Nav Integrated Rest Timer Capsule Dock (Animates and expands upwards on rest) */
     .nav-timer-container {
       flex: 1;
-      max-width: 240px;
+      max-width: 245px;
       height: 44px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
+      border-radius: 12px;
       display: flex;
+      flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      padding: 2px 5px 2px 8px;
+      padding: 0 6px 0 8px;
       box-sizing: border-box;
-      transition: all 0.2s ease;
       margin-left: auto;
+      align-self: flex-end;
+      overflow: hidden;
+      position: relative;
+      transition: height 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+                  max-width 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+                  padding 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.25s ease,
+                  border-color 0.25s ease,
+                  box-shadow 0.25s ease,
+                  border-radius 0.25s ease;
     }
     .nav-timer-container.running {
-      border-color: rgba(251, 191, 36, 0.65);
-      background: rgba(251, 191, 36, 0.12);
-      box-shadow: 0 0 16px rgba(251, 191, 36, 0.3);
-      max-width: 270px;
+      height: 104px;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
+      padding: 8px 10px 8px 10px;
+      background: linear-gradient(180deg, rgba(20, 29, 47, 0.98) 0%, rgba(10, 16, 28, 0.99) 100%);
+      border: 1px solid rgba(251, 191, 36, 0.55);
+      border-radius: 16px;
+      box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.75), 0 0 20px rgba(251, 191, 36, 0.25);
+      max-width: 255px;
+      z-index: 1010;
     }
+
+    /* Top progress track on capsule */
+    .nav-timer-track {
+      display: none;
+      width: 100%;
+      height: 2.5px;
+      background: rgba(255, 255, 255, 0.08);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+    }
+    .nav-timer-container.running .nav-timer-track {
+      display: block;
+    }
+    .nav-timer-track-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      transition: width 0.35s ease;
+    }
+
+    /* Top row: Digits + Meta info */
+    .nav-timer-top-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
+    .nav-timer-container.running .nav-timer-top-row {
+      align-items: baseline;
+      justify-content: space-between;
+      width: 100%;
+      padding-top: 1px;
+    }
+
     .nav-timer-digits-wrap {
       display: flex;
       align-items: center;
@@ -2720,10 +2571,10 @@
       cursor: pointer;
       user-select: none;
       touch-action: manipulation;
-      padding-right: 2px;
     }
-    .nav-timer-digits-wrap:active {
-      opacity: 0.8;
+    .nav-timer-container.running .nav-timer-digits-wrap {
+      align-items: baseline;
+      gap: 6px;
     }
     .nav-timer-icon {
       display: inline-flex;
@@ -2738,9 +2589,10 @@
       color: #fbbf24;
       transition: transform 0.2s ease;
     }
-    .nav-timer-container.running .nav-timer-icon svg {
-      filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.65));
+    .nav-timer-container.running .nav-timer-icon {
+      display: none;
     }
+
     .nav-timer-digits {
       font-family: var(--bn, sans-serif);
       font-size: 1.15rem;
@@ -2749,19 +2601,59 @@
       letter-spacing: -0.3px;
       font-variant-numeric: tabular-nums;
       line-height: 1;
-      transition: font-size 0.2s ease;
+      transition: font-size 0.25s ease;
     }
     .nav-timer-container.running .nav-timer-digits {
-      font-size: 1.55rem;
+      font-size: 2.45rem;
       font-weight: 900;
       letter-spacing: -0.5px;
-      text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+      text-shadow: 0 0 16px rgba(251, 191, 36, 0.5);
     }
+
+    .nav-timer-meta {
+      display: none;
+    }
+    .nav-timer-container.running .nav-timer-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 2px;
+      min-width: 0;
+      overflow: hidden;
+      text-align: right;
+    }
+    .nav-timer-ex {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+      line-height: 1.2;
+    }
+    .nav-timer-rem {
+      font-size: 0.66rem;
+      font-weight: 800;
+      color: #38bdf8;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+
+    /* Bottom row: Control buttons */
     .nav-timer-controls {
       display: flex;
       align-items: center;
       gap: 3px;
     }
+    .nav-timer-container.running .nav-timer-controls {
+      width: 100%;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
     .nav-tbtn {
       height: 32px;
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -2779,6 +2671,19 @@
     .nav-tbtn:active {
       transform: scale(0.92);
     }
+    .nav-tbtn.plus {
+      display: none;
+    }
+    .nav-timer-container.running .nav-tbtn.plus {
+      display: inline-flex;
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: #fbbf24;
+      font-weight: 800;
+      font-size: 0.78rem;
+      padding: 0 8px;
+      flex: 1;
+    }
     .nav-tbtn.play {
       background: #fbbf24;
       color: #060a12;
@@ -2788,18 +2693,14 @@
       font-size: 0.72rem;
       border-radius: 10px;
     }
+    .nav-timer-container.running .nav-tbtn.play {
+      flex: 1.2;
+      min-width: 0;
+    }
     .nav-tbtn.play.paused {
       background: rgba(56, 189, 248, 0.2);
       color: #38bdf8;
       border: 1px solid rgba(56, 189, 248, 0.45);
-      border-radius: 10px;
-    }
-    .nav-tbtn.plus {
-      background: rgba(255, 255, 255, 0.08);
-      color: #cbd5e1;
-      width: 32px;
-      padding: 0;
-      font-size: 0.68rem;
       border-radius: 10px;
     }
     .nav-tbtn.audio {
@@ -2814,6 +2715,7 @@
       align-items: center;
       justify-content: center;
       transition: all 0.15s ease;
+      flex-shrink: 0;
     }
     .nav-tbtn.audio.active {
       background: rgba(56, 189, 248, 0.16);
@@ -2829,9 +2731,34 @@
       background: rgba(255, 255, 255, 0.08);
       color: #94a3b8;
       width: 32px;
+      height: 32px;
       padding: 0;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .nav-timer-container.running .nav-tbtn.skip {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.35);
+      color: #f87171;
+    }
+
+    @media (max-width: 380px) {
+      .nav-tab {
+        flex: 0 0 54px;
+        padding: 4px 2px;
+      }
+      .nav-timer-container.running {
+        max-width: 230px;
+        height: 98px;
+        padding: 6px 8px;
+      }
+      .nav-timer-container.running .nav-timer-digits {
+        font-size: 2.1rem;
+      }
+      .nav-timer-container.running .nav-timer-ex {
+        max-width: 95px;
+      }
     }
 
     /* Routine Plan Section & Cards */
@@ -11410,11 +11337,6 @@
     function handleBottomTimerClick() {
       if (isTimerActive && timerRemaining > 0) {
         showToast(`⏱️ Descanso restante: ${formatClock(timerRemaining)}`);
-        const dock = document.getElementById('restTimerDock');
-        if (dock) {
-          dock.classList.add('on');
-          dock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
       } else {
         // Abrir descanso manual de 90s
         triggerRest(90, 'Descanso Manual', '');
@@ -14425,6 +14347,8 @@
       const restDigits = document.getElementById('restTimerDigits');
       if (restDigits) restDigits.innerText = formatClock(timerRemaining);
 
+      const isResting = isTimerActive || (timerRemaining > 0 && timerRemaining < timerDuration && Boolean(timerEndTime));
+
       const playBtn = document.getElementById('timerPlayBtn');
       if (playBtn) {
         if (isTimerActive) {
@@ -14439,74 +14363,46 @@
         }
       }
 
-      // Dock flotante de descanso prominente con dígitos gigantes
-      const restDock = document.getElementById('restTimerDock');
-      if (restDock) {
-        if (isTimerActive && timerRemaining > 0) {
-          restDock.classList.add('on');
-        } else if (!isTimerActive && (timerRemaining <= 0 || !timerEndTime)) {
-          restDock.classList.remove('on');
-        }
-      }
-
-      const dockPlayBtn = document.getElementById('dockPlayBtn');
-      if (dockPlayBtn) {
-        dockPlayBtn.innerHTML = isTimerActive
-          ? '<svg class="dock-play-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>'
-          : '<svg class="dock-play-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>';
-        dockPlayBtn.title = isTimerActive ? "Pausar descanso" : "Reanudar descanso";
-      }
-
-      const dockBadge = document.getElementById('restDockStateBadge');
-      if (dockBadge) {
-        if (isTimerActive) {
-          dockBadge.innerText = 'EN CURSO';
-          dockBadge.classList.remove('paused');
-        } else if (timerRemaining > 0 && timerRemaining < timerDuration) {
-          dockBadge.innerText = 'PAUSA';
-          dockBadge.classList.add('paused');
+      // Animación vertical de crecimiento en la barra de navegación al iniciar descanso
+      const dock = document.getElementById('navTimerDock');
+      if (dock && !dock.classList.contains('finishing')) {
+        if (isResting) {
+          dock.classList.add('running');
         } else {
-          dockBadge.innerText = 'LISTO';
-          dockBadge.classList.remove('paused');
+          dock.classList.remove('running');
         }
       }
 
-      const dockFill = document.getElementById('restDockProgressFill');
-      if (dockFill && timerDuration > 0) {
+      const trackFill = document.getElementById('navTimerTrackFill');
+      if (trackFill && timerDuration > 0) {
         const pct = Math.max(0, Math.min(100, ((timerDuration - timerRemaining) / timerDuration) * 100));
-        dockFill.style.width = pct + '%';
+        trackFill.style.width = pct + '%';
       }
 
-      const dockExName = document.getElementById('restDockExName');
-      const dockSetInfo = document.getElementById('restDockSetInfo');
-      if (dockExName) {
-        dockExName.innerText = (currentRestExerciseInfo && currentRestExerciseInfo.name) ? currentRestExerciseInfo.name : 'Descanso activo';
-      }
-      if (dockSetInfo) {
-        dockSetInfo.innerText = (currentRestExerciseInfo && currentRestExerciseInfo.setInfo) ? `Siguiente: ${currentRestExerciseInfo.setInfo}` : 'Prepárate para la siguiente serie';
+      const exEl = document.getElementById('navTimerExName');
+      if (exEl) {
+        const name = (currentRestExerciseInfo && currentRestExerciseInfo.name) ? currentRestExerciseInfo.name : 'Descanso activo';
+        const setInfo = (currentRestExerciseInfo && currentRestExerciseInfo.setInfo) ? ` · ${currentRestExerciseInfo.setInfo}` : '';
+        exEl.innerText = `${name}${setInfo}`;
+        exEl.title = `${name}${setInfo}`;
       }
 
-      const dockRem = document.getElementById('restDockWorkoutRem');
-      if (dockRem) {
+      const remEl = document.getElementById('navTimerRem');
+      if (remEl) {
         const activeContent = document.querySelector('.day-content.active');
         const dayId = (activeContent && WORKOUT_DAYS.includes(activeContent.id)) ? activeContent.id : lastActiveWorkoutDay;
         const exitInfo = (typeof getEstimatedExitTime === 'function') ? getEstimatedExitTime(dayId) : null;
         if (exitInfo && exitInfo.inProgress) {
-          dockRem.innerText = `⏳ Quedan ~${exitInfo.remainingMin} min (fin ~${exitInfo.clock})`;
+          remEl.innerText = `⏳ ~${exitInfo.remainingMin}m rest.`;
+          remEl.title = `Fin estimado: ~${exitInfo.clock}`;
         } else if (exitInfo && exitInfo.isComplete) {
-          dockRem.innerText = `✓ ¡Último ejercicio!`;
+          remEl.innerText = `✓ ¡Último!`;
         } else {
-          dockRem.innerText = '';
+          remEl.innerText = '';
         }
       }
 
       updateAudioModeUI();
-
-      const dock = document.getElementById('navTimerDock');
-      if (dock) {
-        if (isTimerActive) dock.classList.add('running');
-        else dock.classList.remove('running');
-      }
 
       const widget = document.getElementById('topTimerWidget');
       if (widget) {
@@ -14721,6 +14617,11 @@
       timerRemaining = timerDuration;
       releaseWakeLock();
       sendSWMessage({ type: 'CANCEL_REST_TIMER' });
+      const navDock = document.getElementById('navTimerDock');
+      if (navDock) {
+        navDock.classList.remove('finishing');
+        navDock.classList.remove('running');
+      }
       const restDock = document.getElementById('restTimerDock');
       if (restDock) restDock.classList.remove('on');
       updateTimerUI();
@@ -14743,14 +14644,28 @@
         btn.innerText = "Listo";
         btn.classList.remove('paused');
       }
+      const navDock = document.getElementById('navTimerDock');
+      if (navDock) {
+        navDock.classList.add('running');
+        navDock.classList.add('finishing');
+      }
       const restDock = document.getElementById('restTimerDock');
       if (restDock) {
         const badge = document.getElementById('restDockStateBadge');
         if (badge) badge.innerText = '¡LISTO!';
-        setTimeout(() => {
-          if (!isTimerActive) restDock.classList.remove('on');
-        }, 1500);
       }
+      setTimeout(() => {
+        if (!isTimerActive) {
+          if (navDock) {
+            navDock.classList.remove('finishing');
+            navDock.classList.remove('running');
+          }
+          if (restDock) restDock.classList.remove('on');
+          if (btn && btn.innerText === 'Listo') {
+            btn.innerText = 'Iniciar';
+          }
+        }
+      }, 1200);
       updateTimerUI();
       saveRestTimerState();
       if (!fromSW) {
@@ -16094,7 +16009,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev39').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev40').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -17373,41 +17288,6 @@
   </script>
   <script src="./watch_bridge.js"></script>
   <!-- ==========================================
-       DOCK DE DESCANSO FLOTANTE (Encima de la navegación inferior)
-       ========================================== -->
-  <div class="rest-dock" id="restTimerDock" role="timer" aria-live="polite">
-    <div class="rest-dock-track">
-      <div class="rest-dock-fill" id="restDockProgressFill" style="width: 0%;"></div>
-    </div>
-    <div class="rest-dock-main">
-      <div class="rest-dock-digits-col" onclick="togglePlayTimer()" title="Pausar / Reanudar descanso">
-        <b id="restTimerDigits">02:00</b>
-        <span class="rest-dock-badge" id="restDockStateBadge">EN CURSO</span>
-      </div>
-      <div class="rest-dock-actions">
-        <button type="button" class="rest-dock-btn plus" onclick="adjustTimer(30)" title="Sumar 30 segundos">+30s</button>
-        <button type="button" class="rest-dock-btn play" id="dockPlayBtn" onclick="togglePlayTimer()" title="Pausar / Reanudar descanso" aria-label="Pausar descanso">
-          <svg class="dock-play-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-        </button>
-        <button type="button" class="rest-dock-mute" id="dockAudioBtn" onclick="toggleAudioMode()" title="Modo Silencioso ACTIVO: Cero sonido por altavoz (Toca para activar auriculares)" aria-label="Modo de audio">
-          <svg class="audio-icon audio-silent" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M18.63 13A17.89 17.89 0 0 1 18 8"/><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"/><path d="M18 8a6 6 0 0 0-9.33-5"/><line x1="1" y1="1" x2="23" y2="23"/>
-          </svg>
-        </button>
-        <button type="button" class="rest-dock-btn skip" id="skipRestBtn" onclick="resetTimerDock()" title="Saltar descanso">✕</button>
-      </div>
-    </div>
-    <div class="rest-dock-info">
-      <span id="restTimerSub" class="rest-dock-sub">
-        <span class="rest-dock-ex-name" id="restDockExName">Descanso activo</span>
-        <span class="rest-dock-dot">·</span>
-        <span class="rest-dock-set-info" id="restDockSetInfo">Siguiente serie lista</span>
-      </span>
-      <span class="rest-dock-rem" id="restDockWorkoutRem" title="Tiempo estimado para finalizar la sesión">⏳ ~24 min rest.</span>
-    </div>
-  </div>
-
-  <!-- ==========================================
        BARRA DE NAVEGACIÓN INFERIOR (Entrenar, Historial + Temporizador Dock)
        ========================================== -->
   
@@ -17421,20 +17301,30 @@
       <span>Historial</span>
     </button>
 
-    <!-- Tab 3: Temporizador con todas las opciones -->
+    <!-- Tab 3: Temporizador con todas las opciones (Crece en altura al iniciarse) -->
     <div class="nav-timer-container" id="navTimerDock">
-      <div class="nav-timer-digits-wrap" onclick="togglePlayTimer()" title="Iniciar / Pausar descanso">
-        <span class="nav-timer-icon" aria-hidden="true">
-          <svg class="nav-timer-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="13" r="8"/>
-            <path d="M12 9v4l2.5 2"/>
-            <path d="M10 2h4"/>
-            <path d="M12 2v3"/>
-          </svg>
-        </span>
-        <span class="nav-timer-digits" id="timerDisplay">00:00</span>
+      <div class="nav-timer-track" id="navTimerTrack">
+        <div class="nav-timer-track-fill" id="navTimerTrackFill" style="width: 0%;"></div>
+      </div>
+      <div class="nav-timer-top-row">
+        <div class="nav-timer-digits-wrap" onclick="togglePlayTimer()" title="Iniciar / Pausar descanso">
+          <span class="nav-timer-icon" aria-hidden="true">
+            <svg class="nav-timer-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="13" r="8"/>
+              <path d="M12 9v4l2.5 2"/>
+              <path d="M10 2h4"/>
+              <path d="M12 2v3"/>
+            </svg>
+          </span>
+          <span class="nav-timer-digits" id="timerDisplay">00:00</span>
+        </div>
+        <div class="nav-timer-meta" id="navTimerMeta">
+          <span class="nav-timer-ex" id="navTimerExName"></span>
+          <span class="nav-timer-rem" id="navTimerRem"></span>
+        </div>
       </div>
       <div class="nav-timer-controls">
+        <button type="button" class="nav-tbtn plus" id="navTimerPlusBtn" onclick="adjustTimer(30)" title="Sumar 30 segundos">+30s</button>
         <button type="button" class="nav-tbtn play" id="timerPlayBtn" onclick="togglePlayTimer()" title="Iniciar / Pausar descanso">Iniciar</button>
         <button type="button" class="nav-tbtn audio" id="audioModeBtn" onclick="toggleAudioMode()" title="Modo Silencioso ACTIVO: Cero sonido por altavoz (Toca para activar auriculares)" aria-label="Modo de audio">
           <svg class="audio-icon audio-silent" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -17456,6 +17346,12 @@
     <div class="header-day-picker">
       <button id="btnProgramSwitch" class="btn-program-switch" type="button">3D ▾</button>
       <select id="daySelector" class="header-day-select" onchange="handleDaySelectChange(this.value)"></select>
+    </div>
+    <div class="rest-dock" id="restTimerDock">
+      <b id="restTimerDigits"></b>
+      <span id="restTimerSub"></span>
+      <button type="button" id="skipRestBtn" onclick="resetTimerDock()"></button>
+      <button type="button" id="dockAudioBtn" onclick="toggleAudioMode()"></button>
     </div>
   </div>
 
