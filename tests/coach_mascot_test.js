@@ -139,9 +139,9 @@ test('Globo contextual: markup accesible y estilos de cabecera', () => {
   assert(/\.coach-bubble\.show\s*\{[\s\S]*?pointer-events:\s*auto/.test(html), 'El globo visible debe ser interactivo');
 });
 
-test('Cache rev41 en sw.js y en el registro', () => {
-  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev41'/.test(sw), 'CACHE_NAME no es rev41');
-  assert(/sw\.js\?v=1\.8\.4-rev41/.test(html), 'El registro no apunta a rev41');
+test('Cache rev42 en sw.js y en el registro', () => {
+  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev42'/.test(sw), 'CACHE_NAME no es rev42');
+  assert(/sw\.js\?v=1\.8\.4-rev42/.test(html), 'El registro no apunta a rev42');
 });
 
 test('Personalidad: whitelist y fallback a gymbro', () => {
@@ -372,9 +372,13 @@ test('Rampa 70/80/80 al techo sube a 82.5 kg x 6', () => {
   assert.strictEqual(res.reps, 6);
 });
 
-test('pec_deck usa su stepKg de 5 kg', () => {
+test('pec_deck usa su stepKg de 5 kg y svgSlug pec-deck', () => {
   const ex = catalog.pec_deck;
   assert(ex, 'Falta pec_deck en el catalogo');
+  assert.strictEqual(ex.svgSlug, 'pec-deck', 'pec_deck debe usar svgSlug pec-deck');
+  assert.strictEqual(catalog.aperturas_polea.svgSlug, 'cable-fly', 'aperturas_polea debe usar svgSlug cable-fly');
+  assert(/<symbol id="sym-pec-deck"/.test(html), 'Falta el simbolo sym-pec-deck en index.html');
+  assert(/<symbol id="sym-cable-fly"/.test(html), 'Falta el simbolo sym-cable-fly en index.html');
   const t = targetReps(ex.dose);
   const res = sandbox.computeDoubleProgression('pec_deck', ex, [
     { kg: 50, reps: t.max }, { kg: 50, reps: t.max }
