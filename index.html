@@ -2516,7 +2516,7 @@
                   border-radius 0.25s ease;
     }
     .nav-timer-container.running {
-      height: 104px;
+      height: 124px;
       flex-direction: column;
       justify-content: space-between;
       align-items: stretch;
@@ -2525,7 +2525,7 @@
       border: 1px solid rgba(251, 191, 36, 0.55);
       border-radius: 16px;
       box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.75), 0 0 20px rgba(251, 191, 36, 0.25);
-      max-width: 255px;
+      max-width: 265px;
       z-index: 1010;
     }
 
@@ -2550,7 +2550,7 @@
       transition: width 0.35s ease;
     }
 
-    /* Top row: Digits + Meta info */
+    /* Top row: Digits + Remaining workout badge */
     .nav-timer-top-row {
       display: flex;
       align-items: center;
@@ -2558,7 +2558,7 @@
       min-width: 0;
     }
     .nav-timer-container.running .nav-timer-top-row {
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
       width: 100%;
       padding-top: 1px;
@@ -2604,42 +2604,56 @@
       transition: font-size 0.25s ease;
     }
     .nav-timer-container.running .nav-timer-digits {
-      font-size: 2.45rem;
+      font-size: 2.55rem;
       font-weight: 900;
       letter-spacing: -0.5px;
       text-shadow: 0 0 16px rgba(251, 191, 36, 0.5);
     }
 
-    .nav-timer-meta {
+    .nav-timer-rem {
       display: none;
     }
-    .nav-timer-container.running .nav-timer-meta {
+    .nav-timer-container.running .nav-timer-rem {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      padding: 2px 7px;
+      border-radius: 6px;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+    .nav-timer-rem:empty {
+      display: none !important;
+    }
+
+    /* Middle row: Exercise text directly UNDER the timer */
+    .nav-timer-ex-row {
+      display: none;
+    }
+    .nav-timer-container.running .nav-timer-ex-row {
       display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 2px;
+      align-items: center;
+      width: 100%;
       min-width: 0;
       overflow: hidden;
-      text-align: right;
+      margin: 1px 0 3px 0;
     }
     .nav-timer-ex {
-      font-size: 0.68rem;
+      font-size: 0.76rem;
       font-weight: 700;
       color: #f1f5f9;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 120px;
-      line-height: 1.2;
-    }
-    .nav-timer-rem {
-      font-size: 0.66rem;
-      font-weight: 800;
-      color: #38bdf8;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
-      line-height: 1.2;
+      width: 100%;
+      text-align: left;
+      line-height: 1.25;
+      letter-spacing: -0.2px;
     }
 
     /* Bottom row: Control buttons */
@@ -2749,15 +2763,15 @@
         padding: 4px 2px;
       }
       .nav-timer-container.running {
-        max-width: 230px;
-        height: 98px;
+        max-width: 240px;
+        height: 118px;
         padding: 6px 8px;
       }
       .nav-timer-container.running .nav-timer-digits {
-        font-size: 2.1rem;
+        font-size: 2.25rem;
       }
       .nav-timer-container.running .nav-timer-ex {
-        max-width: 95px;
+        font-size: 0.72rem;
       }
     }
 
@@ -16009,7 +16023,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev40').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev41').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -17318,10 +17332,10 @@
           </span>
           <span class="nav-timer-digits" id="timerDisplay">00:00</span>
         </div>
-        <div class="nav-timer-meta" id="navTimerMeta">
-          <span class="nav-timer-ex" id="navTimerExName"></span>
-          <span class="nav-timer-rem" id="navTimerRem"></span>
-        </div>
+        <span class="nav-timer-rem" id="navTimerRem"></span>
+      </div>
+      <div class="nav-timer-ex-row" id="navTimerExRow">
+        <span class="nav-timer-ex" id="navTimerExName"></span>
       </div>
       <div class="nav-timer-controls">
         <button type="button" class="nav-tbtn plus" id="navTimerPlusBtn" onclick="adjustTimer(30)" title="Sumar 30 segundos">+30s</button>
