@@ -345,6 +345,20 @@
             if (chosenEx) activeExIds.add(chosenEx);
             if (slot.defaultExId) activeExIds.add(slot.defaultExId);
             if (slot.slotId) activeExIds.add(slot.slotId);
+
+            // Incluir alternativas de catálogo para que el reloj disponga de previousSets
+            // incluso si el usuario cambia de ejercicio directamente desde el reloj
+            if (typeof EXERCISE_CATALOG !== 'undefined') {
+              const checkAlts = exId => {
+                const ex = EXERCISE_CATALOG[exId];
+                if (ex && Array.isArray(ex.alternatives)) {
+                  ex.alternatives.forEach(altId => activeExIds.add(altId));
+                }
+              };
+              if (slot.defaultExId) checkAlts(slot.defaultExId);
+              if (chosenEx) checkAlts(chosenEx);
+            }
+
             if (Array.isArray(slot.options)) {
               slot.options.forEach(opt => {
                 if (opt && opt.id) activeExIds.add(opt.id);
@@ -1067,6 +1081,30 @@
         });
       }
       clearSetTimestampsForDay(summary.dayId);
+
+      // Reset temporary swaps ("Usar solo hoy") para el día terminado
+      if (workoutState.tempSlots) {
+        const dayCards = daySection ? Array.from(daySection.querySelectorAll('.exercise-card')) : [];
+        dayCards.forEach(card => {
+          const slotId = card.getAttribute('data-slot');
+          if (workoutState.tempSlots[slotId]) {
+            delete workoutState.tempSlots[slotId];
+            const effectiveExId = (workoutState.customSlots && workoutState.customSlots[slotId]) || card.getAttribute('data-default-ex');
+            if (effectiveExId && typeof renderSlotExercise === 'function') {
+              renderSlotExercise(slotId, effectiveExId);
+            }
+          }
+        });
+        if (dayData && Array.isArray(dayData.slots)) {
+          dayData.slots.forEach(slot => {
+            if (workoutState.tempSlots && workoutState.tempSlots[slot.slotId]) {
+              delete workoutState.tempSlots[slot.slotId];
+            }
+          });
+        }
+      }
+      if (workoutState.sessionStartTime) delete workoutState.sessionStartTime[summary.dayId];
+      if (workoutState.lastActivityTime) delete workoutState.lastActivityTime[summary.dayId];
 
       // Cancelar temporizador de descanso si estaba activo
       if (typeof finishTimer === 'function' && typeof isTimerActive !== 'undefined' && isTimerActive) {

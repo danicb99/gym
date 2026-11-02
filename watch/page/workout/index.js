@@ -95,7 +95,7 @@ Page(BasePage({
               loadedKg = 0
               loadedReps = parseInt(mSec[1], 10)
             } else {
-              const m = str.match(/^(?:\+?([\d\.]+)\s*(?:kg)?\s*[×xX]\s*)?(\d+)\s*(?:s|seg|reps?)?$/i)
+              const m = str.match(/^(?:\+?([\d\.]+)\s*(?:kg)?\s*[×xX]\s*)?(\d+)\s*(?:s|seg|reps?|\/lado)?$/i)
               if (m) {
                 if (m[1] !== undefined) loadedKg = parseFloat(m[1])
                 if (m[2] !== undefined) loadedReps = parseInt(m[2], 10)
@@ -105,9 +105,11 @@ Page(BasePage({
         }
       }
 
-      if (loadedKg !== null && loadedReps !== null) {
-        this.state.currentKg = loadedKg
+      if (loadedReps !== null) {
+        this.state.currentKg = loadedKg !== null ? loadedKg : 0
         this.state.currentReps = loadedReps
+      } else if (loadedKg !== null) {
+        this.state.currentKg = loadedKg
       } else {
         // Si no hay marca de la sesión anterior, recurrir al último set realizado en este slot
         let lastLoggedSet = null

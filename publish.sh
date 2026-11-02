@@ -10,6 +10,8 @@ node tests/compat_test.js
 node tests/complete_set_test.js
 node tests/completed_exercises_reorder_test.js
 node tests/notification_replacement_and_badge_test.js
+node tests/alternatives_history_audit_test.js
+node tests/stepper_and_dial_test.js
 
 echo "📦 Comprobando estado de git..."
 if [ -z "$(git status --porcelain)" ]; then
