@@ -828,8 +828,8 @@
     .set-input {
       width: 64px;
       height: 38px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.5) 100%);
-      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(15, 23, 42, 0.75) 20%, rgba(15, 23, 42, 0.75) 80%, rgba(0, 0, 0, 0.5) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
       border-radius: 10px;
       color: #ffffff;
       font-size: 16px;
@@ -839,24 +839,24 @@
       outline: none;
       font-variant-numeric: tabular-nums;
       transition: border-color 0.18s, background 0.18s, box-shadow 0.18s, transform 0.12s;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+      box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.55), inset 0 -3px 5px rgba(0, 0, 0, 0.55);
       touch-action: pan-y;
       cursor: pointer;
     }
     .set-input:hover {
       border-color: rgba(251, 191, 36, 0.45);
-      background: linear-gradient(180deg, rgba(251, 191, 36, 0.08) 0%, rgba(0, 0, 0, 0.5) 100%);
+      background: linear-gradient(180deg, rgba(251, 191, 36, 0.1) 0%, rgba(15, 23, 42, 0.8) 20%, rgba(15, 23, 42, 0.8) 80%, rgba(0, 0, 0, 0.5) 100%);
     }
     .set-input:focus,
     .set-input.active-stepper-target {
       border-color: var(--primary) !important;
-      background: rgba(251, 191, 36, 0.12) !important;
-      box-shadow: 0 0 12px var(--primary-glow) !important;
+      background: linear-gradient(180deg, rgba(251, 191, 36, 0.16) 0%, rgba(15, 23, 42, 0.8) 20%, rgba(15, 23, 42, 0.8) 80%, rgba(251, 191, 36, 0.08) 100%) !important;
+      box-shadow: 0 0 12px var(--primary-glow), inset 0 3px 5px rgba(0, 0, 0, 0.5), inset 0 -3px 5px rgba(0, 0, 0, 0.5) !important;
     }
     .set-input.scrubbing-active {
       border-color: var(--primary) !important;
-      background: rgba(251, 191, 36, 0.22) !important;
-      box-shadow: 0 0 16px var(--primary-glow), inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+      background: linear-gradient(180deg, rgba(251, 191, 36, 0.25) 0%, rgba(20, 30, 50, 0.9) 20%, rgba(20, 30, 50, 0.9) 80%, rgba(251, 191, 36, 0.15) 100%) !important;
+      box-shadow: 0 0 18px var(--primary-glow), inset 0 3px 6px rgba(0, 0, 0, 0.7), inset 0 -3px 6px rgba(0, 0, 0, 0.7) !important;
       user-select: none !important;
       -webkit-user-select: none !important;
       transform: scale(1.04);
@@ -864,7 +864,7 @@
 
     /* ========================================================
        SCRUBBER HUD: SELECTOR POR DESPLAZAMIENTO TÁCTIL HÁPTICO
-       (DIAL ANCLADO ULTRA-ESTABLE A 120 FPS)
+       (DIAL ANCLADO ULTRA-ESTABLE A 120 FPS CON RUEDA 3D)
        ======================================================== */
     .scrubber-hud {
       position: fixed;
@@ -874,7 +874,7 @@
       pointer-events: none;
       opacity: 0;
       visibility: hidden;
-      transform: translate3d(-50%, 0, 0) scale(0.92);
+      transform: translate3d(-50%, -100%, 0) scale(0.92);
       transform-origin: center center;
       transition: opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.16s;
       will-change: transform, opacity;
@@ -882,17 +882,20 @@
     .scrubber-hud.active {
       opacity: 1;
       visibility: visible;
+      transform: translate3d(-50%, -100%, 0) scale(1);
+    }
+    .scrubber-hud.active.hud-flipped {
       transform: translate3d(-50%, 0, 0) scale(1);
     }
     .scrubber-hud-card {
-      background: rgba(11, 19, 34, 0.94);
+      background: rgba(11, 19, 34, 0.95);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       border: 1.5px solid rgba(251, 191, 36, 0.45);
       border-radius: 16px;
       box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85), 0 0 28px rgba(251, 191, 36, 0.25);
-      padding: 10px 18px 12px;
-      min-width: 165px;
+      padding: 10px 16px 12px;
+      min-width: 175px;
       text-align: center;
       position: relative;
       user-select: none;
@@ -902,13 +905,20 @@
       content: '';
       position: absolute;
       bottom: -7px;
-      left: 50%;
+      left: var(--hud-arrow-x, 50%);
       transform: translateX(-50%);
       width: 0;
       height: 0;
       border-left: 7px solid transparent;
       border-right: 7px solid transparent;
-      border-top: 7px solid rgba(251, 191, 36, 0.5);
+      border-top: 7px solid rgba(251, 191, 36, 0.65);
+      transition: left 0.08s ease-out;
+    }
+    .scrubber-hud.hud-flipped .scrubber-hud-card::after {
+      bottom: auto;
+      top: -7px;
+      border-top: none;
+      border-bottom: 7px solid rgba(251, 191, 36, 0.65);
     }
     .scrubber-hud-badge {
       font-size: 10px;
@@ -922,28 +932,110 @@
       justify-content: center;
       gap: 5px;
     }
+
+    /* Rueda Cilíndrica 3D (Drum Roller) */
+    .hud-drum-roller {
+      position: relative;
+      height: 94px;
+      margin: 4px 0 6px;
+      overflow: hidden;
+      perspective: 320px;
+      -webkit-perspective: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 22%, rgba(0,0,0,1) 78%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 22%, rgba(0,0,0,1) 78%, transparent 100%);
+    }
+    .hud-drum-bezel {
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      top: 50%;
+      height: 44px;
+      transform: translateY(-50%);
+      background: linear-gradient(180deg, rgba(251, 191, 36, 0.14) 0%, rgba(251, 191, 36, 0.05) 100%);
+      border-top: 1px solid rgba(251, 191, 36, 0.5);
+      border-bottom: 1px solid rgba(251, 191, 36, 0.5);
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 2;
+      box-shadow: inset 0 0 12px rgba(251, 191, 36, 0.18), 0 0 10px rgba(0,0,0,0.5);
+    }
+    .hud-drum-cylinder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      will-change: transform;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transition: transform 0.06s linear;
+    }
+    .drum-slot {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--bn);
+      font-variant-numeric: tabular-nums;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .drum-slot-upper {
+      font-size: 22px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.45);
+      opacity: 0.38;
+      filter: blur(0.6px);
+      transform: rotateX(24deg) scale(0.86);
+      transform-origin: center bottom;
+    }
+    .drum-slot-center {
+      height: 38px;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 5px;
+      z-index: 3;
+      transform: translateZ(10px);
+    }
+    .drum-slot-center .scrubber-hud-val,
+    .scrubber-hud-val {
+      font-family: var(--bn);
+      font-size: 42px;
+      font-weight: 800;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 18px var(--primary-glow), 0 2px 10px rgba(0, 0, 0, 0.85);
+      line-height: 1;
+      min-width: 50px;
+    }
+    .drum-slot-center .scrubber-hud-unit,
+    .scrubber-hud-unit {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .drum-slot-lower {
+      font-size: 22px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.45);
+      opacity: 0.38;
+      filter: blur(0.6px);
+      transform: rotateX(-24deg) scale(0.86);
+      transform-origin: center top;
+    }
     .scrubber-hud-value-row {
       display: flex;
       align-items: baseline;
       justify-content: center;
       gap: 6px;
       line-height: 1;
-      margin: 2px 0 4px;
-    }
-    .scrubber-hud-val {
-      font-family: var(--bn);
-      font-size: 40px;
-      font-weight: 800;
-      color: #ffffff;
-      font-variant-numeric: tabular-nums;
-      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
-      min-width: 50px;
-    }
-    .scrubber-hud-unit {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
     }
     .scrubber-hud-delta {
       font-size: 11px;
@@ -16474,7 +16566,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev46').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev47').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -17697,7 +17789,8 @@
       isKg: false,
       isScrubbing: false,
       gestureDecided: false,
-      suppressClick: false
+      suppressClick: false,
+      holdTimer: null
     };
 
     function updateScrubberHud(clientX, clientY, currentVal, origVal, isKgMetric, dx) {
@@ -17709,15 +17802,47 @@
       const badgeTextEl = document.getElementById('scrubberHudBadgeText');
       const deltaEl = document.getElementById('scrubberHudDelta');
       const ticksEl = document.getElementById('scrubberRulerTicks');
+      const upperEl = document.getElementById('hudDrumValUpper');
+      const lowerEl = document.getElementById('hudDrumValLower');
+      const cylinderEl = document.getElementById('hudDrumCylinder');
 
       const card = scrubberState.activeInput ? scrubberState.activeInput.closest('.exercise-card') : null;
       const exId = card ? card.getAttribute('data-current-ex') : null;
       const ex = (exId && typeof EXERCISE_CATALOG !== 'undefined') ? EXERCISE_CATALOG[exId] : null;
       const isIso = !isKgMetric && ex && ex.metricType === 'isometria';
+      const step = scrubberState.activeInput ? getExerciseIncrementStep(scrubberState.activeInput, isKgMetric) : (isKgMetric ? 2.5 : 1);
 
       if (valEl) valEl.textContent = currentVal;
       if (unitEl) unitEl.textContent = isKgMetric ? 'kg' : (isIso ? 'seg' : 'reps');
       if (badgeTextEl) badgeTextEl.textContent = isKgMetric ? 'PESO (KG)' : (isIso ? 'TIEMPO (SEG)' : 'REPETICIONES');
+
+      // Actualizar ranuras superior e inferior difuminadas de la rueda cilíndrica 3D
+      if (upperEl) {
+        if (isKgMetric) {
+          const upperVal = Math.round((currentVal + step) * 10) / 10;
+          upperEl.textContent = upperVal <= 999 ? `${upperVal}` : '—';
+        } else {
+          const upperVal = currentVal + step;
+          upperEl.textContent = upperVal <= 99 ? `${upperVal}` : '—';
+        }
+      }
+
+      if (lowerEl) {
+        if (isKgMetric) {
+          const lowerVal = Math.round((currentVal - step) * 10) / 10;
+          lowerEl.textContent = lowerVal >= 0 ? `${lowerVal}` : '—';
+        } else {
+          const lowerVal = currentVal - step;
+          lowerEl.textContent = lowerVal >= 0 ? `${lowerVal}` : '—';
+        }
+      }
+
+      // Animación de rodadura sutil en el cilindro 3D con el arrastre horizontal
+      if (cylinderEl) {
+        const rollOffsetY = Math.round(((dx % 18) / 18) * 6);
+        const rollTiltX = Math.round(((dx % 18) / 18) * 4);
+        cylinderEl.style.transform = `translate3d(0, ${rollOffsetY}px, 0) rotateX(${rollTiltX}deg)`;
+      }
 
       if (deltaEl) {
         const diff = Math.round((currentVal - origVal) * 10) / 10;
@@ -17746,22 +17871,38 @@
 
       closeStepperDock();
 
-      // Posicionamiento ANCLADO Y ESTABLE (Cero temblores con el pulgar)
-      const row = input.closest('.set-row');
-      const rowRect = row ? row.getBoundingClientRect() : input.getBoundingClientRect();
+      // Posicionamiento ANCLADO DIRECTAMENTE SOBRE EL CUADRO TOCADO (despejando el pulgar)
+      const inputRect = input.getBoundingClientRect();
+      const inputCenterX = inputRect.left + (inputRect.width / 2);
+      const hudWidth = 175;
+      const halfW = hudWidth / 2;
+      const padX = 10;
+      const vw = window.innerWidth || (document.documentElement ? document.documentElement.clientWidth : 360);
+
+      // Clamp para evitar que desborde los laterales de la pantalla en móviles estrechos
+      const clampedCenterX = Math.max(padX + halfW, Math.min(vw - padX - halfW, inputCenterX));
+
+      // Flecha indicadora apuntando directamente al centro de la casilla tocada
+      const arrowX = Math.max(16, Math.min(hudWidth - 16, Math.round(inputCenterX - (clampedCenterX - halfW))));
+      hud.style.setProperty('--hud-arrow-x', `${arrowX}px`);
+
       const safeTop = 85;
+      const hudHeightEst = 185;
+      let topY = inputRect.top - 14;
+      let isFlipped = false;
 
-      let topY = rowRect.top - 12;
-      let transform = 'translate3d(-50%, -100%, 0)';
-
-      if (topY < safeTop + 90) {
-        topY = rowRect.bottom + 12;
-        transform = 'translate3d(-50%, 0, 0)';
+      // Si está demasiado cerca de la cabecera fija, voltear hacia abajo
+      if (topY - hudHeightEst < safeTop && (topY < 185)) {
+        topY = inputRect.bottom + 14;
+        isFlipped = true;
+        hud.classList.add('hud-flipped');
+      } else {
+        hud.classList.remove('hud-flipped');
       }
 
-      hud.style.left = '50%';
+      hud.style.left = `${Math.round(clampedCenterX)}px`;
       hud.style.top = `${Math.round(topY)}px`;
-      hud.style.transform = `${transform} scale(1)`;
+      hud.style.transform = isFlipped ? 'translate3d(-50%, 0, 0) scale(1)' : 'translate3d(-50%, -100%, 0) scale(1)';
 
       updateScrubberHud(clientX, clientY, origVal, origVal, isKgMetric, 0);
       hud.classList.add('active');
@@ -17770,7 +17911,7 @@
     function hideScrubberHud() {
       const hud = document.getElementById('scrubber-hud');
       if (hud) {
-        hud.classList.remove('active');
+        hud.classList.remove('active', 'hud-flipped');
         hud.style.transform = '';
       }
     }
@@ -17786,6 +17927,11 @@
           return;
         }
         if (scrubberState.isScrubbing) return;
+
+        if (scrubberState.holdTimer) {
+          clearTimeout(scrubberState.holdTimer);
+          scrubberState.holdTimer = null;
+        }
 
         const isKg = input.classList.contains('input-kg');
         const rawVal = (input.value || '').trim();
@@ -17807,6 +17953,25 @@
         scrubberState.isScrubbing = false;
         scrubberState.gestureDecided = false;
         scrubberState.suppressClick = false;
+
+        // Temporizador de presión sostenida (Long-Press / Hold a 220ms):
+        // Despliega el visor inmediatamente sobre el cuadro antes de mover el dedo
+        scrubberState.holdTimer = setTimeout(() => {
+          if (scrubberState.activeInput === input && !scrubberState.gestureDecided) {
+            scrubberState.gestureDecided = true;
+            scrubberState.isScrubbing = true;
+            scrubberState.suppressClick = true;
+            try {
+              input.setPointerCapture(scrubberState.pointerId);
+            } catch (err) {}
+            input.blur();
+            input.classList.add('scrubbing-active');
+            try {
+              if (navigator.vibrate) navigator.vibrate(15);
+            } catch (err) {}
+            showScrubberHud(input, scrubberState.isKg, scrubberState.initialVal, scrubberState.startX, scrubberState.startY);
+          }
+        }, 220);
       }, { passive: true });
 
       document.addEventListener('pointermove', (e) => {
@@ -17817,14 +17982,22 @@
 
         if (!scrubberState.gestureDecided) {
           // Discriminador de gestos:
-          // Movimiento vertical dominante -> Ceder al scroll nativo
-          if (Math.abs(dy) > 9 && Math.abs(dy) > Math.abs(dx)) {
+          // Movimiento vertical dominante -> Ceder al scroll nativo y cancelar hold
+          if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) {
+            if (scrubberState.holdTimer) {
+              clearTimeout(scrubberState.holdTimer);
+              scrubberState.holdTimer = null;
+            }
             scrubberState.gestureDecided = true;
             scrubberState.activeInput = null;
             return;
           }
-          // Movimiento horizontal dominante -> Activar Scrubber
-          if (Math.abs(dx) > 10 && Math.abs(dx) >= Math.abs(dy)) {
+          // Movimiento horizontal dominante -> Activar Scrubber inmediatamente
+          if (Math.abs(dx) > 8 && Math.abs(dx) >= Math.abs(dy)) {
+            if (scrubberState.holdTimer) {
+              clearTimeout(scrubberState.holdTimer);
+              scrubberState.holdTimer = null;
+            }
             scrubberState.gestureDecided = true;
             scrubberState.isScrubbing = true;
             scrubberState.suppressClick = true;
@@ -17865,6 +18038,11 @@
       }, { passive: false });
 
       function endScrubber(e) {
+        if (scrubberState.holdTimer) {
+          clearTimeout(scrubberState.holdTimer);
+          scrubberState.holdTimer = null;
+        }
+
         if (!scrubberState.activeInput) return;
         if (e && scrubberState.pointerId !== null && e.pointerId !== scrubberState.pointerId) return;
 
@@ -18099,9 +18277,17 @@
         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h16M12 4v16"/></svg>
         <span id="scrubberHudBadgeText">REPETICIONES</span>
       </div>
-      <div class="scrubber-hud-value-row">
-        <span class="scrubber-hud-val" id="scrubberHudVal">8</span>
-        <span class="scrubber-hud-unit" id="scrubberHudUnit">reps</span>
+      <!-- RUEDA CILÍNDRICA 3D (DRUM ROLLER) -->
+      <div class="hud-drum-roller" id="hudDrumRoller">
+        <div class="hud-drum-bezel"></div>
+        <div class="hud-drum-cylinder" id="hudDrumCylinder">
+          <div class="drum-slot drum-slot-upper" id="hudDrumValUpper">10</div>
+          <div class="drum-slot drum-slot-center scrubber-hud-value-row" id="hudDrumValCenter">
+            <span class="scrubber-hud-val" id="scrubberHudVal">8</span>
+            <span class="scrubber-hud-unit" id="scrubberHudUnit">reps</span>
+          </div>
+          <div class="drum-slot drum-slot-lower" id="hudDrumValLower">6</div>
+        </div>
       </div>
       <div class="scrubber-hud-delta" id="scrubberHudDelta">±0</div>
       <div class="scrubber-ruler-track">
