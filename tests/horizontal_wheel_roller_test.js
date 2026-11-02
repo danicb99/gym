@@ -22,9 +22,10 @@ console.log('  ✓ Estructura DOM de tambor cilíndrico horizontal validada');
 // 2. Verificación de Estilos CSS
 console.log('\n🎨 2. Verificación de Estilos CSS de Rueda Horizontal:');
 assert(html.includes('.set-wheel-box {'), 'Falta estilo .set-wheel-box');
-assert(html.includes('.wheel-barrel-notch'), 'Falta estilo .wheel-barrel-notch');
-assert(html.includes('.notch-left'), 'Falta estilo .notch-left');
-assert(html.includes('.notch-right'), 'Falta estilo .notch-right');
+assert(html.includes('touch-action: pan-y;'), 'Debe tener touch-action: pan-y para permitir scroll vertical nativo');
+assert(html.includes('.wheel-edge-num'), 'Falta estilo .wheel-edge-num');
+assert(html.includes('.wheel-edge-left'), 'Falta estilo .wheel-edge-left');
+assert(html.includes('.wheel-edge-right'), 'Falta estilo .wheel-edge-right');
 assert(html.includes('.hwheel-roller-track'), 'Falta estilo .hwheel-roller-track');
 assert(html.includes('.hwheel-slot-left'), 'Falta estilo .hwheel-slot-left');
 assert(html.includes('rotateY(-24deg)'), 'Falta inclinación 3D en el eje Y para slot izquierdo');
@@ -46,11 +47,12 @@ function simulateScrubberPlacement(inputRect, vw = 375) {
 
   const safeTop = 75;
   const hudHeight = 52;
-  let topY = inputRect.top - 10;
+  const thumbClearance = 32;
+  let topY = inputRect.top - thumbClearance;
   let didClampTop = false;
 
   if (topY - hudHeight < safeTop) {
-    topY = safeTop + hudHeight + 2;
+    topY = safeTop + hudHeight + 4;
     didClampTop = true;
   }
 
@@ -60,23 +62,23 @@ function simulateScrubberPlacement(inputRect, vw = 375) {
   return { clampedCenterX, arrowX, topY, isNeverBelowHand, didClampTop };
 }
 
-// Caso 1: Serie 1 a 210px del techo (caso clásico que antes se volteaba debajo de la mano)
+// Caso 1: Serie 1 a 210px del techo
 const row1 = simulateScrubberPlacement({ left: 100, width: 66, top: 210, bottom: 248 });
 assert(row1.isNeverBelowHand, 'HUD debe estar por encima de la mano');
-assert.strictEqual(row1.topY, 200, 'HUD debe anclarse a 10px sobre el top de la casilla (200px)');
+assert.strictEqual(row1.topY, 178, 'HUD debe anclarse a 32px sobre el top de la casilla (178px)');
 assert.strictEqual(row1.didClampTop, false, 'No necesita clamp a 210px');
 
 // Caso 2: Serie pegada al techo (top = 110px)
 const rowTop = simulateScrubberPlacement({ left: 100, width: 66, top: 110, bottom: 148 });
 assert(rowTop.isNeverBelowHand, 'HUD debe mantenerse por encima de la mano');
 assert.strictEqual(rowTop.didClampTop, true, 'Debe clampear al margen seguro');
-assert.strictEqual(rowTop.topY, 75 + 52 + 2, 'HUD se sitúa exactamente bajo el safeTop');
+assert.strictEqual(rowTop.topY, 75 + 52 + 4, 'HUD se sitúa exactamente bajo el safeTop');
 
 // Caso 3: Serie a mitad de pantalla (top = 450px)
 const rowMid = simulateScrubberPlacement({ left: 240, width: 66, top: 450, bottom: 488 });
 assert(rowMid.isNeverBelowHand, 'HUD debe estar por encima de la casilla');
-assert.strictEqual(rowMid.topY, 440, 'HUD anclado a 440px directamente sobre el dedo');
-console.log('  ✓ Regla Anti-Oclusión "SIEMPRE ENCIMA" verificada en todas las alturas');
+assert.strictEqual(rowMid.topY, 418, 'HUD anclado a 418px directamente sobre el dedo (32px de elevación)');
+console.log('  ✓ Regla Anti-Oclusión "SIEMPRE ENCIMA" verificada en todas las alturas con 32px de elevación');
 
 // 4. Aritmética de Ranuras del Tambor Horizontal
 console.log('\n🧮 4. Verificación de Ranuras Izquierda y Derecha del Tambor Horizontal:');
@@ -113,11 +115,11 @@ assert.strictEqual(slots0.leftText, '—', 'Por debajo de 0 kg debe mostrar —'
 assert.strictEqual(slots0.rightText, '2.5', 'Ranura derecha debe ser 2.5');
 console.log('  ✓ Cuantización cuántica de ranuras laterales horizontal 100% correcta');
 
-// 5. Verificación de Caché SW rev49
-console.log('\n📦 5. Verificación de Caché SW rev49:');
-assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev49'/.test(sw), 'sw.js debe ser rev49');
-assert(/sw\.js\?v=1\.8\.4-rev49/.test(html), 'index.html debe registrar rev49');
-console.log('  ✓ PWA cache rev49 sincronizada');
+// 5. Verificación de Caché SW rev50
+console.log('\n📦 5. Verificación de Caché SW rev50:');
+assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev50'/.test(sw), 'sw.js debe ser rev50');
+assert(/sw\.js\?v=1\.8\.4-rev50/.test(html), 'index.html debe registrar rev50');
+console.log('  ✓ PWA cache rev50 sincronizada');
 
 console.log('\n====================================================');
 console.log('🎉 TODAS LAS PRUEBAS DE RUEDA HORIZONTAL APROBADAS');

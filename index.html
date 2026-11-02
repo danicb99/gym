@@ -864,33 +864,33 @@
 
     /* ========================================================
        RUEDA CILÍNDRICA HORIZONTAL EN TABLA (.set-wheel-box)
-       (Tambor cilíndrico horizontal integrado con bisel lateral y notches)
+       (Tambor cilíndrico horizontal integrado con números adyacentes reales)
        ======================================================== */
     .set-wheel-box {
       position: relative;
-      width: 66px;
+      width: 72px;
       height: 38px;
       margin: 0 auto;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       background: linear-gradient(
         90deg,
-        rgba(10, 15, 26, 0.96) 0%,
-        rgba(26, 38, 60, 0.82) 18%,
+        rgba(10, 15, 26, 0.98) 0%,
+        rgba(22, 33, 54, 0.88) 16%,
         rgba(255, 255, 255, 0.08) 50%,
-        rgba(26, 38, 60, 0.82) 82%,
-        rgba(10, 15, 26, 0.96) 100%
+        rgba(22, 33, 54, 0.88) 84%,
+        rgba(10, 15, 26, 0.98) 100%
       );
       border: 1.5px solid rgba(255, 255, 255, 0.12);
       border-radius: 8px;
       box-shadow: 
-        inset 4px 0 6px -1px rgba(0, 0, 0, 0.8),
-        inset -4px 0 6px -1px rgba(0, 0, 0, 0.8),
-        0 1px 2px rgba(0, 0, 0, 0.3);
+        inset 6px 0 8px -2px rgba(0, 0, 0, 0.9),
+        inset -6px 0 8px -2px rgba(0, 0, 0, 0.9),
+        0 1px 3px rgba(0, 0, 0, 0.35);
       overflow: hidden;
       cursor: pointer;
-      touch-action: none;
+      touch-action: pan-y;
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
@@ -904,33 +904,48 @@
       border-color: var(--primary) !important;
       box-shadow: 
         0 0 16px var(--primary-glow),
-        inset 4px 0 6px rgba(0, 0, 0, 0.9),
-        inset -4px 0 6px rgba(0, 0, 0, 0.9) !important;
+        inset 6px 0 8px rgba(0, 0, 0, 0.9),
+        inset -6px 0 8px rgba(0, 0, 0, 0.9) !important;
       transform: scale(1.04);
     }
-    .wheel-barrel-notch {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 13px;
-      font-weight: 800;
-      color: rgba(251, 191, 36, 0.35);
+    .wheel-edge-num {
+      width: 14px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-family: var(--bn);
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      opacity: 0.38;
+      overflow: hidden;
+      white-space: nowrap;
       pointer-events: none;
       line-height: 1;
-      transition: color 0.15s, transform 0.15s;
       z-index: 2;
     }
-    .wheel-barrel-notch.notch-left { left: 4px; }
-    .wheel-barrel-notch.notch-right { right: 4px; }
-    .set-wheel-box.drag-right .wheel-barrel-notch.notch-right {
-      color: var(--primary);
-      transform: translateY(-50%) scale(1.25);
+    .wheel-edge-num.wheel-edge-left {
+      justify-content: flex-end;
+      padding-right: 1px;
+      transform: perspective(50px) rotateY(-28deg) scale(0.82);
+      transform-origin: right center;
+      filter: blur(0.3px);
+      mask-image: linear-gradient(to right, transparent 0%, black 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 100%);
     }
-    .set-wheel-box.drag-left .wheel-barrel-notch.notch-left {
-      color: var(--primary);
-      transform: translateY(-50%) scale(1.25);
+    .wheel-center-slot {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      border-left: 1px solid rgba(251, 191, 36, 0.3);
+      border-right: 1px solid rgba(251, 191, 36, 0.3);
+      background: rgba(251, 191, 36, 0.03);
     }
-    .set-wheel-box .set-input {
+    .wheel-center-slot .set-input {
       width: 100% !important;
       height: 100% !important;
       background: transparent !important;
@@ -948,6 +963,25 @@
       pointer-events: none;
       line-height: 38px;
     }
+    .wheel-edge-num.wheel-edge-right {
+      justify-content: flex-start;
+      padding-left: 1px;
+      transform: perspective(50px) rotateY(28deg) scale(0.82);
+      transform-origin: left center;
+      filter: blur(0.3px);
+      mask-image: linear-gradient(to left, transparent 0%, black 100%);
+      -webkit-mask-image: linear-gradient(to left, transparent 0%, black 100%);
+    }
+    .wheel-barrel-lens {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.35) 100%);
+      pointer-events: none;
+      z-index: 3;
+    }
+    .wheel-barrel-notch {
+      display: none;
+    }
     .set-wheel-box.keyboard-mode .set-input {
       pointer-events: auto !important;
       background: rgba(251, 191, 36, 0.15) !important;
@@ -963,7 +997,7 @@
 
     /* ========================================================
        SCRUBBER HUD: SELECTOR POR DESPLAZAMIENTO TÁCTIL HÁPTICO
-       (VISOR FLOTANTE ANTI-OCLUSIÓN: TAMBOR CILÍNDRICO HORIZONTAL 3D)
+       (VISOR FLOTANTE ANTI-OCLUSIÓN ELEVADO +32PX)
        ======================================================== */
     .scrubber-hud {
       position: fixed;
@@ -993,7 +1027,7 @@
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       border: 1.5px solid rgba(251, 191, 36, 0.5);
       border-radius: 14px;
-      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.88), 0 0 26px rgba(251, 191, 36, 0.28);
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.9), 0 0 28px rgba(251, 191, 36, 0.3);
       padding: 4px 10px;
       min-width: 220px;
       height: 52px;
@@ -1007,20 +1041,20 @@
     .scrubber-hud-card::after {
       content: '';
       position: absolute;
-      bottom: -7px;
+      bottom: -11px;
       left: var(--hud-arrow-x, 50%);
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-top: 7px solid rgba(251, 191, 36, 0.65);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 11px solid rgba(251, 191, 36, 0.7);
       transition: left 0.06s ease-out;
     }
     .scrubber-hud.hud-flipped .scrubber-hud-card::after {
-      bottom: -7px;
+      bottom: -11px;
       top: auto;
-      border-top: 7px solid rgba(251, 191, 36, 0.65);
+      border-top: 11px solid rgba(251, 191, 36, 0.7);
       border-bottom: none;
     }
     .scrubber-hud-badge {
@@ -16705,7 +16739,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev49').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev50').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -17935,9 +17969,8 @@
       const box = input.closest('.set-wheel-box');
       if (!box) return;
 
-      const upperEl = box.querySelector('.wheel-slot-upper');
-      const lowerEl = box.querySelector('.wheel-slot-lower');
-      if (!upperEl || !lowerEl) return;
+      const leftEl = box.querySelector('.wheel-edge-left');
+      const rightEl = box.querySelector('.wheel-edge-right');
 
       const isKg = input.classList.contains('input-kg');
       const step = getExerciseIncrementStep(input, isKg);
@@ -17947,17 +17980,17 @@
       const baseVal = rawVal !== '' ? parseFloat(rawVal.replace(',', '.')) || 0 : parseFloat(placeholderVal.replace(',', '.')) || 0;
 
       const maxVal = isKg ? 999 : 99;
-      if (isKg) {
-        const up = Math.round((baseVal + step) * 10) / 10;
-        const down = Math.round((baseVal - step) * 10) / 10;
-        upperEl.textContent = up <= maxVal ? `${up}` : '—';
-        lowerEl.textContent = down >= 0 ? `${down}` : '—';
-      } else {
-        const up = baseVal + step;
-        const down = baseVal - step;
-        upperEl.textContent = up <= maxVal ? `${up}` : '—';
-        lowerEl.textContent = down >= 0 ? `${down}` : '—';
-      }
+      const down = isKg ? Math.round((baseVal - step) * 10) / 10 : baseVal - step;
+      const up = isKg ? Math.round((baseVal + step) * 10) / 10 : baseVal + step;
+
+      if (leftEl) leftEl.textContent = down >= 0 ? `${down}` : '';
+      if (rightEl) rightEl.textContent = up <= maxVal ? `${up}` : '';
+
+      // Ranuras internas de compatibilidad
+      const upperEl = box.querySelector('.wheel-slot-upper');
+      const lowerEl = box.querySelector('.wheel-slot-lower');
+      if (upperEl) upperEl.textContent = up <= maxVal ? `${up}` : '—';
+      if (lowerEl) lowerEl.textContent = down >= 0 ? `${down}` : '—';
     }
 
     function updateAllWheelBoxes() {
@@ -17978,15 +18011,19 @@
         const isKg = input.classList.contains('input-kg');
         box.setAttribute('data-metric', isKg ? 'kg' : 'reps');
 
-        const notchLeft = document.createElement('span');
-        notchLeft.className = 'wheel-barrel-notch notch-left';
-        notchLeft.textContent = '‹';
+        const edgeLeft = document.createElement('div');
+        edgeLeft.className = 'wheel-edge-num wheel-edge-left';
 
-        const notchRight = document.createElement('span');
-        notchRight.className = 'wheel-barrel-notch notch-right';
-        notchRight.textContent = '›';
+        const centerSlot = document.createElement('div');
+        centerSlot.className = 'wheel-center-slot';
 
-        // Ranuras de compatibilidad interna para sincronización
+        const edgeRight = document.createElement('div');
+        edgeRight.className = 'wheel-edge-num wheel-edge-right';
+
+        const lens = document.createElement('div');
+        lens.className = 'wheel-barrel-lens';
+
+        // Ranuras de compatibilidad interna para sincronización y tests
         const upper = document.createElement('div');
         upper.className = 'wheel-slot wheel-slot-upper';
 
@@ -17996,17 +18033,20 @@
         const lower = document.createElement('div');
         lower.className = 'wheel-slot wheel-slot-lower';
 
-        const lens = document.createElement('div');
-        lens.className = 'wheel-lens-reflection';
+        const lensCompat = document.createElement('div');
+        lensCompat.className = 'wheel-lens-reflection';
 
         parent.insertBefore(box, input);
-        box.appendChild(notchLeft);
-        box.appendChild(input);
-        box.appendChild(notchRight);
+        centerSlot.appendChild(input);
+        box.appendChild(edgeLeft);
+        box.appendChild(centerSlot);
+        box.appendChild(edgeRight);
+        box.appendChild(lens);
+
         box.appendChild(upper);
         box.appendChild(center);
         box.appendChild(lower);
-        box.appendChild(lens);
+        box.appendChild(lensCompat);
 
         updateSingleWheelBox(input);
       });
@@ -18111,7 +18151,6 @@
       const box = input.closest('.set-wheel-box');
       const targetEl = box || input;
 
-      // Posicionamiento ANCLADO DIRECTAMENTE SOBRE EL CUADRO TOCADO (SIEMPRE ENCIMA DEL DEDO)
       const inputRect = targetEl.getBoundingClientRect();
       const inputCenterX = inputRect.left + (inputRect.width / 2);
       const hudWidth = 220;
@@ -18119,22 +18158,20 @@
       const padX = 10;
       const vw = window.innerWidth || (document.documentElement ? document.documentElement.clientWidth : 360);
 
-      // Clamp para evitar que desborde los laterales de la pantalla en móviles estrechos
       const clampedCenterX = Math.max(padX + halfW, Math.min(vw - padX - halfW, inputCenterX));
-
-      // Flecha indicadora apuntando directamente al centro de la casilla tocada
       const arrowX = Math.max(18, Math.min(hudWidth - 18, Math.round(inputCenterX - (clampedCenterX - halfW))));
       hud.style.setProperty('--hud-arrow-x', `${arrowX}px`);
 
-      // REGLA DE ORO ANTI-OCLUSIÓN: SIEMPRE ENCIMA (Cero volteos debajo de la mano)
-      const safeTop = 75; // Altura de la barra sticky superior
-      const hudHeight = 52; // Altura compacta del tambor horizontal
-      let topY = inputRect.top - 10;
+      // ELEVACIÓN DE 32PX: El visor flota completamente por encima de la uña/pulgar
+      const safeTop = 75;
+      const hudHeight = 52;
+      const thumbClearance = 32;
+      let topY = inputRect.top - thumbClearance;
 
       if (topY - hudHeight < safeTop) {
-        topY = safeTop + hudHeight + 2;
-        if (inputRect.top < safeTop + hudHeight + 14) {
-          window.scrollBy({ top: inputRect.top - (safeTop + hudHeight + 20), behavior: 'smooth' });
+        topY = safeTop + hudHeight + 4;
+        if (inputRect.top < safeTop + hudHeight + 20) {
+          window.scrollBy({ top: inputRect.top - (safeTop + hudHeight + 30), behavior: 'smooth' });
         }
       }
 
@@ -18171,11 +18208,10 @@
         const input = box.querySelector('.set-input');
         if (!input) return;
 
-        if (e.cancelable) e.preventDefault();
-
-        try {
-          box.setPointerCapture(e.pointerId);
-        } catch (err) {}
+        if (scrubberState.holdTimer) {
+          clearTimeout(scrubberState.holdTimer);
+          scrubberState.holdTimer = null;
+        }
 
         const isKg = input.classList.contains('input-kg');
         const rawVal = (input.value || '').trim();
@@ -18199,51 +18235,71 @@
         scrubberState.gestureDecided = false;
         scrubberState.suppressClick = false;
 
-        box.classList.add('scrubbing-active');
-
-        // Despliegue INMEDIATO del visor anclado (0ms latencia)
-        showScrubberHud(input, isKg, baseVal, e.clientX, e.clientY);
-        try {
-          if (navigator.vibrate) navigator.vibrate(10);
-        } catch (err) {}
-
-        // Temporizador de compatibilidad
-        if (scrubberState.holdTimer) clearTimeout(scrubberState.holdTimer);
-        scrubberState.holdTimer = setTimeout(() => {}, 220);
-      }, { passive: false });
+        // Long-press sostenido de 160ms para ver el visor directamente sobre el dedo sin arrastrar
+        scrubberState.holdTimer = setTimeout(() => {
+          if (scrubberState.activeInput === input && !scrubberState.gestureDecided) {
+            scrubberState.gestureDecided = true;
+            scrubberState.isScrubbing = true;
+            scrubberState.suppressClick = true;
+            try {
+              box.setPointerCapture(scrubberState.pointerId);
+            } catch (err) {}
+            box.classList.add('scrubbing-active');
+            showScrubberHud(input, isKg, baseVal, scrubberState.startX, scrubberState.startY);
+            try {
+              if (navigator.vibrate) navigator.vibrate(12);
+            } catch (err) {}
+          }
+        }, 160);
+      }, { passive: true }); // Permite que el scroll nativo vertical fluya al instante
 
       document.addEventListener('pointermove', (e) => {
         if (!scrubberState.activeInput || e.pointerId !== scrubberState.pointerId) return;
-        if (e.cancelable) e.preventDefault();
 
         const dx = e.clientX - scrubberState.startX;
         const dy = e.clientY - scrubberState.startY;
 
-        // Desplazamiento horizontal prioritario para rueda horizontal
-        const isHorizontal = Math.abs(dx) >= Math.abs(dy);
-        const deltaPx = isHorizontal ? dx : -dy;
+        if (!scrubberState.gestureDecided) {
+          // 1. Scroll vertical dominante: CEDER 100% AL SCROLL NATIVO
+          if (Math.abs(dy) >= 6 && Math.abs(dy) > Math.abs(dx)) {
+            if (scrubberState.holdTimer) {
+              clearTimeout(scrubberState.holdTimer);
+              scrubberState.holdTimer = null;
+            }
+            scrubberState.gestureDecided = true;
+            scrubberState.activeInput = null;
+            scrubberState.activeBox = null;
+            hideScrubberHud();
+            return; // Cero modificaciones numéricas
+          }
 
-        if (Math.abs(deltaPx) >= 6) {
-          scrubberState.isScrubbing = true;
-          scrubberState.suppressClick = true;
-        }
-
-        if (scrubberState.activeBox) {
-          if (deltaPx > 4) {
-            scrubberState.activeBox.classList.add('drag-right');
-            scrubberState.activeBox.classList.remove('drag-left');
-          } else if (deltaPx < -4) {
-            scrubberState.activeBox.classList.add('drag-left');
-            scrubberState.activeBox.classList.remove('drag-right');
-          } else {
-            scrubberState.activeBox.classList.remove('drag-right', 'drag-left');
+          // 2. Arrastre horizontal dominante: ACTIVAR SCRUBBING
+          if (Math.abs(dx) >= 8 && Math.abs(dx) > Math.abs(dy)) {
+            if (scrubberState.holdTimer) {
+              clearTimeout(scrubberState.holdTimer);
+              scrubberState.holdTimer = null;
+            }
+            scrubberState.gestureDecided = true;
+            scrubberState.isScrubbing = true;
+            scrubberState.suppressClick = true;
+            try {
+              scrubberState.activeBox.setPointerCapture(scrubberState.pointerId);
+            } catch (err) {}
+            scrubberState.activeBox.classList.add('scrubbing-active');
+            showScrubberHud(scrubberState.activeInput, scrubberState.isKg, scrubberState.initialVal, e.clientX, e.clientY);
+            try {
+              if (navigator.vibrate) navigator.vibrate(10);
+            } catch (err) {}
           }
         }
 
         if (scrubberState.isScrubbing) {
+          if (e.cancelable) e.preventDefault();
+
+          // REGLA ABSOLUTA: Solo dx (horizontal) altera el peso
           const step = getExerciseIncrementStep(scrubberState.activeInput, scrubberState.isKg);
-          const pxPerStep = 16;
-          const stepsCount = Math.round(deltaPx / pxPerStep);
+          const pxPerStep = 18;
+          const stepsCount = Math.round(dx / pxPerStep);
 
           let newVal;
           if (!scrubberState.isKg) {
@@ -18262,7 +18318,7 @@
             updateSingleWheelBox(scrubberState.activeInput);
           }
 
-          updateScrubberHud(e.clientX, e.clientY, newVal, scrubberState.initialVal, scrubberState.isKg, deltaPx);
+          updateScrubberHud(e.clientX, e.clientY, newVal, scrubberState.initialVal, scrubberState.isKg, dx);
         }
       }, { passive: false });
 
@@ -18282,7 +18338,7 @@
           try {
             box.releasePointerCapture(scrubberState.pointerId);
           } catch (err) {}
-          box.classList.remove('scrubbing-active', 'drag-right', 'drag-left');
+          box.classList.remove('scrubbing-active');
         }
 
         hideScrubberHud();
@@ -18293,7 +18349,6 @@
             scrubberState.suppressClick = false;
           }, 250);
         } else if (!scrubberState.suppressClick) {
-          // Tap simple sin arrastre -> Abrir Stepper Dock
           openStepperDock(input);
         }
 
