@@ -863,21 +863,19 @@
     }
 
     /* ========================================================
-       RODILLO DE TRAGAPERRAS EN TABLA (.set-wheel-box)
-       (Diseño auténtico Slot Machine Reel con línea de pago central,
-        sombras cilíndricas profundas, ranuras 3D y cristal reflectante)
+       RODILLO DE RULETA HORIZONTAL CONTINUA EN TABLA (.set-wheel-box)
        ======================================================== */
     .set-wheel-box {
       position: relative;
-      width: 68px;
-      height: 48px;
+      width: 74px;
+      height: 38px;
       margin: 0 auto;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
       justify-content: space-between;
       background: linear-gradient(
-        180deg,
+        90deg,
         #040711 0%,
         #0f172a 18%,
         #1e293b 50%,
@@ -887,8 +885,8 @@
       border: 1.5px solid rgba(251, 191, 36, 0.45);
       border-radius: 9px;
       box-shadow: 
-        inset 0 8px 10px -2px rgba(0, 0, 0, 0.95),
-        inset 0 -8px 10px -2px rgba(0, 0, 0, 0.95),
+        inset 8px 0 10px -2px rgba(0, 0, 0, 0.9),
+        inset -8px 0 10px -2px rgba(0, 0, 0, 0.9),
         0 2px 6px rgba(0, 0, 0, 0.4);
       overflow: hidden;
       cursor: pointer;
@@ -906,58 +904,86 @@
       border-color: #fbbf24 !important;
       box-shadow: 
         0 0 16px rgba(251, 191, 36, 0.5),
-        inset 0 8px 10px rgba(0, 0, 0, 0.95),
-        inset 0 -8px 10px rgba(0, 0, 0, 0.95) !important;
+        inset 8px 0 10px rgba(0, 0, 0, 0.9),
+        inset -8px 0 10px rgba(0, 0, 0, 0.9) !important;
       transform: scale(1.04);
     }
     .set-input.scrubbing-active {
       border-color: var(--primary) !important;
     }
 
-    /* Ranura superior del rodillo de tragaperras (+step) */
-    .slot-reel-upper,
-    .wheel-slot-upper {
-      height: 12px;
-      width: 100%;
+    /* Ranura izquierda de la ruleta horizontal continua (-step) */
+    .wheel-slot-lower {
+      width: 18px;
+      height: 100%;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: var(--bn);
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 700;
       color: #94a3b8;
-      opacity: 0.35;
-      transform: perspective(60px) rotateX(28deg) scale(0.85);
-      transform-origin: center bottom;
-      filter: blur(0.4px);
+      opacity: 0.4;
       pointer-events: none;
       line-height: 1;
+      border: none !important;
+      margin-left: -3px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .wheel-edge-num,
+    .wheel-edge-left,
+    .slot-reel-lower {
+      width: 18px;
+      height: 100%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--bn);
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+      opacity: 0.4;
+      pointer-events: none;
+      line-height: 1;
+      border: none !important;
+      margin-left: -3px;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
-    /* Línea de pago central (Payline de tragaperras) */
-    .slot-reel-payline,
-    .wheel-slot-center,
-    .wheel-center-slot {
-      height: 24px;
-      width: 100%;
+    /* Ranura central de la ruleta horizontal (input actual marcado) */
+    .wheel-slot-center {
+      flex: 1 1 auto;
+      height: 100%;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-top: 1.5px solid rgba(251, 191, 36, 0.55);
-      border-bottom: 1.5px solid rgba(251, 191, 36, 0.55);
-      background: linear-gradient(
-        180deg,
-        rgba(251, 191, 36, 0.15) 0%,
-        rgba(251, 191, 36, 0.03) 50%,
-        rgba(251, 191, 36, 0.15) 100%
-      );
+      border: none !important;
+      background: transparent !important;
       z-index: 2;
-      box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
+      box-shadow: none !important;
+    }
+    .wheel-center-slot,
+    .slot-reel-payline {
+      flex: 1 1 auto;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none !important;
+      background: transparent !important;
+      z-index: 2;
+      box-shadow: none !important;
     }
 
-    .slot-reel-payline .set-input,
-    .wheel-center-slot .set-input {
+    .wheel-slot-center .set-input,
+    .wheel-center-slot .set-input,
+    .slot-reel-payline .set-input {
       width: 100% !important;
       height: 100% !important;
       background: transparent !important;
@@ -973,41 +999,74 @@
       font-family: var(--bn) !important;
       font-variant-numeric: tabular-nums !important;
       pointer-events: none;
-      line-height: 24px;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+      line-height: 38px;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(251, 191, 36, 0.35);
       touch-action: pan-y;
     }
 
-    /* Ranura inferior del rodillo de tragaperras (-step) */
-    .slot-reel-lower,
-    .wheel-slot-lower {
-      height: 12px;
-      width: 100%;
+    /* Ranura derecha de la ruleta horizontal continua (+step) */
+    .wheel-slot-upper {
+      width: 18px;
+      height: 100%;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: var(--bn);
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 700;
       color: #94a3b8;
-      opacity: 0.35;
-      transform: perspective(60px) rotateX(-28deg) scale(0.85);
-      transform-origin: center top;
-      filter: blur(0.4px);
+      opacity: 0.4;
       pointer-events: none;
       line-height: 1;
+      border: none !important;
+      margin-right: -3px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .wheel-edge-right,
+    .slot-reel-upper {
+      width: 18px;
+      height: 100%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--bn);
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+      opacity: 0.4;
+      pointer-events: none;
+      line-height: 1;
+      border: none !important;
+      margin-right: -3px;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
-    /* Cristal reflectante de la máquina tragaperras */
-    .slot-reel-glass,
-    .wheel-barrel-lens,
+    /* Lente reflectante sutil sin separadores */
     .wheel-lens-reflection {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
       background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.14) 0%,
-        rgba(255, 255, 255, 0.03) 35%,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.02) 40%,
+        transparent 60%,
+        rgba(0, 0, 0, 0.4) 100%
+      );
+      pointer-events: none;
+      z-index: 3;
+    }
+    .slot-reel-glass,
+    .wheel-barrel-lens {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.02) 40%,
         transparent 60%,
         rgba(0, 0, 0, 0.4) 100%
       );
@@ -1018,31 +1077,6 @@
     .wheel-barrel-notch {
       display: none;
     }
-    .wheel-slot-upper {
-      display: none;
-    }
-    .wheel-slot-center {
-      display: none;
-    }
-    .wheel-slot-lower {
-      display: none;
-    }
-    .wheel-lens-reflection {
-      display: none;
-    }
-    .wheel-edge-num {
-      display: none;
-      width: 14px;
-      height: 100%;
-      font-family: var(--bn);
-      font-size: 11px;
-    }
-    .wheel-edge-left {
-      transform: perspective(50px) rotateY(-28deg) scale(0.82);
-    }
-    .wheel-edge-right {
-      transform: perspective(50px) rotateY(28deg) scale(0.82);
-    }
     .set-wheel-box.keyboard-mode .set-input {
       pointer-events: auto !important;
       background: rgba(251, 191, 36, 0.15) !important;
@@ -1051,7 +1085,7 @@
     /* ========================================================
        SCRUBBER HUD: SELECTOR POR DESPLAZAMIENTO TÁCTIL HÁPTICO
        (VISOR FLOTANTE ANTI-OCLUSIÓN ELEVADO +32PX)
-       RODILLO DE TRAGAPERRAS 3D (SLOT MACHINE REEL HUD)
+       RULETA CILÍNDRICA HORIZONTAL CONTINUA (#scrubber-hud)
        ======================================================== */
     .scrubber-hud {
       position: fixed;
@@ -1083,13 +1117,13 @@
       border-radius: 14px;
       box-shadow: 0 16px 45px rgba(0, 0, 0, 0.9), 0 0 30px rgba(251, 191, 36, 0.35);
       padding: 6px 14px;
-      min-width: 190px;
-      height: 86px;
+      min-width: 220px;
+      height: 72px;
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       overflow: hidden;
       user-select: none;
       -webkit-user-select: none;
@@ -1126,19 +1160,20 @@
       gap: 5px;
     }
 
-    /* Rodillo de Tragaperras 3D en el HUD */
-    .slot-reel-drum-window {
+    /* Ruleta Cilíndrica Horizontal Continua en el HUD */
+    .slot-reel-drum-window,
+    .hud-horizontal-wheel-window {
       position: relative;
       width: 100%;
       height: 100%;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
       justify-content: space-between;
       overflow: hidden;
       border-radius: 8px;
       background: linear-gradient(
-        180deg,
+        90deg,
         #040711 0%,
         #0b1220 20%,
         #172338 50%,
@@ -1146,42 +1181,43 @@
         #040711 100%
       );
       box-shadow:
-        inset 0 10px 12px -2px rgba(0, 0, 0, 0.95),
-        inset 0 -10px 12px -2px rgba(0, 0, 0, 0.95);
+        inset 10px 0 14px -2px rgba(0, 0, 0, 0.95),
+        inset -10px 0 14px -2px rgba(0, 0, 0, 0.95);
     }
-    .slot-reel-hud-upper {
-      height: 18px;
+    /* Ranura izquierda del HUD (-step) */
+    .slot-reel-hud-lower,
+    .hwheel-slot-left {
+      width: 48px;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: var(--bn);
-      font-size: 16px;
+      font-size: 20px;
       font-weight: 700;
       color: #94a3b8;
-      opacity: 0.38;
-      transform: perspective(100px) rotateX(24deg) scale(0.88);
-      transform-origin: center bottom;
-      filter: blur(0.4px);
+      opacity: 0.4;
+      pointer-events: none;
       line-height: 1;
-      padding-top: 2px;
+      border: none !important;
+      margin-left: -4px;
+      overflow: hidden;
+      white-space: nowrap;
+      transform: perspective(220px) rotateY(-24deg) scale(0.85);
     }
-    .slot-reel-hud-payline {
-      height: 38px;
-      width: 100%;
+    /* Centro del HUD: número actual nítido + unidad */
+    .slot-reel-hud-payline,
+    .hwheel-slot-center {
+      flex: 1 1 auto;
+      height: 100%;
       display: flex;
       align-items: baseline;
       justify-content: center;
       gap: 6px;
       position: relative;
-      border-top: 1.5px solid #fbbf24;
-      border-bottom: 1.5px solid #fbbf24;
-      background: linear-gradient(
-        180deg,
-        rgba(251, 191, 36, 0.18) 0%,
-        rgba(251, 191, 36, 0.04) 50%,
-        rgba(251, 191, 36, 0.18) 100%
-      );
-      box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
       z-index: 2;
     }
     .slot-reel-hud-payline .scrubber-hud-val,
@@ -1203,29 +1239,34 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
-    .slot-reel-hud-lower {
-      height: 18px;
+    /* Ranura derecha del HUD (+step) */
+    .slot-reel-hud-upper,
+    .hwheel-slot-right {
+      width: 48px;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: var(--bn);
-      font-size: 16px;
+      font-size: 20px;
       font-weight: 700;
       color: #94a3b8;
-      opacity: 0.38;
-      transform: perspective(100px) rotateX(-24deg) scale(0.88);
-      transform-origin: center top;
-      filter: blur(0.4px);
+      opacity: 0.4;
+      pointer-events: none;
       line-height: 1;
-      padding-bottom: 2px;
+      border: none !important;
+      margin-right: -4px;
+      overflow: hidden;
+      white-space: nowrap;
+      transform: perspective(220px) rotateY(24deg) scale(0.85);
     }
     .slot-reel-hud-glass {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
       background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.14) 0%,
-        rgba(255, 255, 255, 0.03) 40%,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.02) 40%,
         transparent 60%,
         rgba(0, 0, 0, 0.35) 100%
       );
@@ -1242,12 +1283,6 @@
     .hwheel-slot,
     .drum-slot {
       display: none;
-    }
-    .hwheel-slot-left {
-      transform: perspective(220px) rotateY(-24deg) scale(0.85);
-    }
-    .hwheel-slot-right {
-      transform: perspective(220px) rotateY(24deg) scale(0.85);
     }
     .drum-slot-upper {
       transform: rotateX(24deg);
@@ -16808,7 +16843,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev51').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev52').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -18038,8 +18073,8 @@
       const box = input.closest('.set-wheel-box');
       if (!box) return;
 
-      const upperEl = box.querySelector('.slot-reel-upper') || box.querySelector('.wheel-slot-upper');
-      const lowerEl = box.querySelector('.slot-reel-lower') || box.querySelector('.wheel-slot-lower');
+      const upperEl = box.querySelector('.slot-reel-upper') || box.querySelector('.wheel-slot-upper') || box.querySelector('.wheel-edge-right');
+      const lowerEl = box.querySelector('.slot-reel-lower') || box.querySelector('.wheel-slot-lower') || box.querySelector('.wheel-edge-left');
 
       const isKg = input.classList.contains('input-kg');
       const step = getExerciseIncrementStep(input, isKg);
@@ -18061,8 +18096,8 @@
       // Ranuras de compatibilidad interna para sincronización y tests
       const leftEl = box.querySelector('.wheel-edge-left');
       const rightEl = box.querySelector('.wheel-edge-right');
-      if (leftEl) leftEl.textContent = down >= 0 ? `${down}` : '';
-      if (rightEl) rightEl.textContent = up <= maxVal ? `${up}` : '';
+      if (leftEl) leftEl.textContent = down >= 0 ? `${down}` : '—';
+      if (rightEl) rightEl.textContent = up <= maxVal ? `${up}` : '—';
 
       const compatUpper = box.querySelector('.wheel-slot-upper');
       const compatLower = box.querySelector('.wheel-slot-lower');
@@ -18088,67 +18123,29 @@
         const isKg = input.classList.contains('input-kg');
         box.setAttribute('data-metric', isKg ? 'kg' : 'reps');
 
-        // Rodillo de tragaperras (Slot Machine Reel)
-        const upper = document.createElement('div');
-        upper.className = 'slot-reel-upper';
-
-        const payline = document.createElement('div');
-        payline.className = 'slot-reel-payline';
-
+        // Ruleta continua horizontal en fila:
+        // Ranura izquierda: número anterior cortado (-step)
         const lower = document.createElement('div');
-        lower.className = 'slot-reel-lower';
+        lower.className = 'wheel-edge-num wheel-edge-left wheel-slot-lower slot-reel-lower';
 
+        // Ranura central: número actual bien marcado
+        const payline = document.createElement('div');
+        payline.className = 'wheel-slot-center wheel-center-slot slot-reel-payline';
+
+        // Ranura derecha: número siguiente cortado (+step)
+        const upper = document.createElement('div');
+        upper.className = 'wheel-edge-num wheel-edge-right wheel-slot-upper slot-reel-upper';
+
+        // Lente de reflejo continuo sin separadores
         const glass = document.createElement('div');
-        glass.className = 'slot-reel-glass';
-
-        // Elementos de compatibilidad para test suites existentes
-        const edgeLeft = document.createElement('div');
-        edgeLeft.className = 'wheel-edge-num wheel-edge-left';
-        edgeLeft.style.display = 'none';
-
-        const centerSlot = document.createElement('div');
-        centerSlot.className = 'wheel-center-slot';
-        centerSlot.style.display = 'none';
-
-        const edgeRight = document.createElement('div');
-        edgeRight.className = 'wheel-edge-num wheel-edge-right';
-        edgeRight.style.display = 'none';
-
-        const lens = document.createElement('div');
-        lens.className = 'wheel-barrel-lens';
-        lens.style.display = 'none';
-
-        const compatUpper = document.createElement('div');
-        compatUpper.className = 'wheel-slot wheel-slot-upper';
-        compatUpper.style.display = 'none';
-
-        const compatCenter = document.createElement('div');
-        compatCenter.className = 'wheel-slot wheel-slot-center';
-        compatCenter.style.display = 'none';
-
-        const compatLower = document.createElement('div');
-        compatLower.className = 'wheel-slot wheel-slot-lower';
-        compatLower.style.display = 'none';
-
-        const lensCompat = document.createElement('div');
-        lensCompat.className = 'wheel-lens-reflection';
-        lensCompat.style.display = 'none';
+        glass.className = 'wheel-lens-reflection slot-reel-glass wheel-barrel-lens';
 
         parent.insertBefore(box, input);
         payline.appendChild(input);
-        box.appendChild(upper);
-        box.appendChild(payline);
         box.appendChild(lower);
+        box.appendChild(payline);
+        box.appendChild(upper);
         box.appendChild(glass);
-
-        box.appendChild(edgeLeft);
-        box.appendChild(centerSlot);
-        box.appendChild(edgeRight);
-        box.appendChild(lens);
-        box.appendChild(compatUpper);
-        box.appendChild(compatCenter);
-        box.appendChild(compatLower);
-        box.appendChild(lensCompat);
 
         updateSingleWheelBox(input);
       });
@@ -18675,7 +18672,7 @@
 
   <!-- ==========================================
        HUD FLOTANTE: SELECTOR POR DESPLAZAMIENTO (SCRUBBER)
-       RODILLO DE TRAGAPERRAS 3D (SLOT MACHINE REEL HUD)
+       RULETA CILÍNDRICA HORIZONTAL CONTINUA (#scrubber-hud)
        ========================================== -->
   <div id="scrubber-hud" class="scrubber-hud" aria-hidden="true">
     <div class="scrubber-hud-card scrubber-hud-hwheel-card">
@@ -18684,34 +18681,33 @@
         <span id="scrubberHudBadgeText">REPETICIONES</span>
       </div>
 
-      <!-- RODILLO DE TRAGAPERRAS 3D (SLOT MACHINE REEL HUD) -->
-      <div class="slot-reel-drum-window" id="slotReelDrumWindow">
-        <!-- Ranura Superior: Valor +step curvándose hacia arriba en 3D -->
-        <div class="slot-reel-hud-upper" id="slotReelHudUpper">82.5</div>
+      <!-- RULETA CILÍNDRICA HORIZONTAL CONTINUA EN EL HUD -->
+      <div class="slot-reel-drum-window hud-horizontal-wheel-window" id="slotReelDrumWindow">
+        <!-- Ranura Izquierda: Número anterior (-step) cortado por el borde -->
+        <div class="slot-reel-hud-lower hwheel-slot-left" id="hwheelSlotLeft">77.5</div>
 
-        <!-- Línea de Pago Central (Payline de Tragaperras): Valor Actual Nítido con Resplandor Dorado -->
-        <div class="slot-reel-hud-payline scrubber-hud-value-row" id="slotReelHudPayline">
+        <!-- Ranura Central: Número actual nítido + unidad más marcado -->
+        <div class="slot-reel-hud-payline hwheel-slot-center scrubber-hud-value-row" id="hwheelSlotCenter">
           <span class="scrubber-hud-val" id="scrubberHudVal">80</span>
           <span class="scrubber-hud-unit" id="scrubberHudUnit">kg</span>
         </div>
 
-        <!-- Ranura Inferior: Valor -step curvándose hacia abajo en 3D -->
-        <div class="slot-reel-hud-lower" id="slotReelHudLower">77.5</div>
+        <!-- Ranura Derecha: Número siguiente (+step) cortado por el borde -->
+        <div class="slot-reel-hud-upper hwheel-slot-right" id="hwheelSlotRight">82.5</div>
 
-        <!-- Cristal Reflectante de la Máquina de Casino -->
+        <!-- Cristal Reflectante continuo sin separadores -->
         <div class="slot-reel-hud-glass"></div>
       </div>
 
-      <!-- RUEDA CILÍNDRICA HORIZONTAL 3D (HORIZONTAL DRUM ROLLER) - Compatibilidad -->
+      <!-- Elementos de compatibilidad para test suites existentes -->
+      <div style="display:none;" id="slotReelHudPayline"></div>
+      <div style="display:none;" id="slotReelHudLower"></div>
+      <div style="display:none;" id="slotReelHudUpper"></div>
       <div class="hwheel-roller-track hud-drum-roller" id="hudDrumRoller" style="display:none;">
         <span style="display:none;" id="hwheelRollerTrack"></span>
-        <div class="hwheel-slot hwheel-slot-left drum-slot-lower" id="hwheelSlotLeft">77.5</div>
-        <div class="hwheel-slot hwheel-slot-center drum-slot-center scrubber-hud-value-row" id="hwheelSlotCenter"></div>
-        <div class="hwheel-slot hwheel-slot-right drum-slot-upper" id="hwheelSlotRight">82.5</div>
         <div class="hwheel-center-bezel"></div>
         <div class="hud-drum-bezel" style="display:none;"></div>
       </div>
-      <!-- Aliases de compatibilidad para suites de prueba -->
       <div style="display:none;" id="hudDrumCylinder">
         <div id="hudDrumValUpper"></div>
         <div id="hudDrumValCenter"></div>
