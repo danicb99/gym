@@ -11,9 +11,9 @@ console.log('🧪 VigorexiApp - Test Post-Entreno, Descanso e Historial');
 console.log('====================================================\n');
 
 // 1. Verificación de versiones
-console.log('📦 1. Verificación de Versiones de Caché (rev47):');
-assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev47'/.test(sw), 'sw.js no tiene rev47');
-assert(/sw\.js\?v=1\.8\.4-rev47/.test(html), 'index.html no registra rev47');
+console.log('📦 1. Verificación de Versiones de Caché (rev48):');
+assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev48'/.test(sw), 'sw.js no tiene rev48');
+assert(/sw\.js\?v=1\.8\.4-rev48/.test(html), 'index.html no registra rev48');
 console.log('  ✓ Cache sincronizada en index.html y sw.js');
 
 // 2. Verificación de Historial en Negrita

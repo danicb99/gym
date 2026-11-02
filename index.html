@@ -863,6 +863,136 @@
     }
 
     /* ========================================================
+       RUEDA CILÍNDRICA INTEGRADA EN TABLA (.set-wheel-box)
+       (Siempre visible en reposo con valores superior/inferior)
+       ======================================================== */
+    .set-wheel-box {
+      position: relative;
+      width: 66px;
+      height: 52px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(
+        180deg,
+        rgba(10, 15, 26, 0.98) 0%,
+        rgba(22, 33, 54, 0.88) 22%,
+        rgba(255, 255, 255, 0.06) 50%,
+        rgba(22, 33, 54, 0.88) 78%,
+        rgba(10, 15, 26, 0.98) 100%
+      );
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 9px;
+      box-shadow: 
+        inset 0 3px 5px rgba(0, 0, 0, 0.8),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.8),
+        0 1px 3px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      cursor: pointer;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      transition: border-color 0.18s, box-shadow 0.18s, transform 0.12s;
+    }
+    .set-wheel-box:hover {
+      border-color: rgba(251, 191, 36, 0.5);
+    }
+    .set-wheel-box.scrubbing-active,
+    .set-wheel-box.active-target {
+      border-color: var(--primary) !important;
+      box-shadow: 
+        0 0 16px var(--primary-glow),
+        inset 0 3px 6px rgba(0, 0, 0, 0.9),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.9) !important;
+      transform: scale(1.04);
+    }
+    .wheel-slot {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--bn);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .wheel-slot-upper {
+      height: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      opacity: 0.45;
+      transform: scale(0.88) perspective(80px) rotateX(18deg);
+      transform-origin: center bottom;
+      filter: blur(0.3px);
+      padding-top: 2px;
+    }
+    .wheel-slot-center {
+      height: 28px;
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-top: 1px solid rgba(251, 191, 36, 0.25);
+      border-bottom: 1px solid rgba(251, 191, 36, 0.25);
+      background: rgba(251, 191, 36, 0.05);
+      z-index: 2;
+    }
+    .wheel-slot-lower {
+      height: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      opacity: 0.45;
+      transform: scale(0.88) perspective(80px) rotateX(-18deg);
+      transform-origin: center top;
+      filter: blur(0.3px);
+      padding-bottom: 2px;
+    }
+    .wheel-slot-center .set-input {
+      width: 100% !important;
+      height: 100% !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      color: #ffffff !important;
+      font-size: 17px !important;
+      font-weight: 800 !important;
+      text-align: center !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      outline: none !important;
+      font-family: var(--bn) !important;
+      font-variant-numeric: tabular-nums !important;
+      pointer-events: none;
+      line-height: 28px;
+    }
+    .set-wheel-box.keyboard-mode .set-input {
+      pointer-events: auto !important;
+      background: rgba(251, 191, 36, 0.15) !important;
+    }
+    .wheel-lens-reflection {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.07) 0%,
+        transparent 30%,
+        transparent 70%,
+        rgba(0, 0, 0, 0.4) 100%
+      );
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* ========================================================
        SCRUBBER HUD: SELECTOR POR DESPLAZAMIENTO TÁCTIL HÁPTICO
        (DIAL ANCLADO ULTRA-ESTABLE A 120 FPS CON RUEDA 3D)
        ======================================================== */
@@ -944,8 +1074,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 22%, rgba(0,0,0,1) 78%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 22%, rgba(0,0,0,1) 78%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 12%, rgba(0,0,0,1) 88%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 12%, rgba(0,0,0,1) 88%, transparent 100%);
     }
     .hud-drum-bezel {
       position: absolute;
@@ -985,12 +1115,12 @@
       -webkit-user-select: none;
     }
     .drum-slot-upper {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
-      color: rgba(255, 255, 255, 0.45);
-      opacity: 0.38;
-      filter: blur(0.6px);
-      transform: rotateX(24deg) scale(0.86);
+      color: rgba(255, 255, 255, 0.65);
+      opacity: 0.58;
+      filter: blur(0.3px);
+      transform: rotateX(24deg) scale(0.88);
       transform-origin: center bottom;
     }
     .drum-slot-center {
@@ -1022,12 +1152,12 @@
       letter-spacing: 0.05em;
     }
     .drum-slot-lower {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
-      color: rgba(255, 255, 255, 0.45);
-      opacity: 0.38;
-      filter: blur(0.6px);
-      transform: rotateX(-24deg) scale(0.86);
+      color: rgba(255, 255, 255, 0.65);
+      opacity: 0.58;
+      filter: blur(0.3px);
+      transform: rotateX(-24deg) scale(0.88);
       transform-origin: center top;
     }
     .scrubber-hud-value-row {
@@ -12134,6 +12264,7 @@
       }
       const section = input.closest('.day-content');
       if (section) startSessionTimerIfNeeded(section.id);
+      if (typeof updateSingleWheelBox === 'function') updateSingleWheelBox(input);
       scheduleSaveWorkoutState();
     }
 
@@ -15956,6 +16087,7 @@
 
       // Recalcular dinámicamente los pesos de las series de calentamiento (Serie 0)
       if (typeof updateAllWarmupRows === 'function') updateAllWarmupRows();
+      if (typeof updateAllWheelBoxes === 'function') updateAllWheelBoxes();
 
       updateProgress();
       const activeSec = document.querySelector('.day-content.active');
@@ -16566,7 +16698,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev47').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev48').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -17666,9 +17798,13 @@
       if (!input) return;
       if (activeStepperInput && activeStepperInput !== input) {
         activeStepperInput.classList.remove('active-stepper-target');
+        const prevBox = activeStepperInput.closest('.set-wheel-box');
+        if (prevBox) prevBox.classList.remove('active-target');
       }
       activeStepperInput = input;
       input.classList.add('active-stepper-target');
+      const curBox = input.closest('.set-wheel-box');
+      if (curBox) curBox.classList.add('active-target');
       try { input.blur(); } catch (e) {}
 
       const dock = document.getElementById('stepperDock');
@@ -17732,6 +17868,8 @@
       if (dock) dock.classList.remove('active');
       if (activeStepperInput) {
         activeStepperInput.classList.remove('active-stepper-target');
+        const box = activeStepperInput.closest('.set-wheel-box');
+        if (box) box.classList.remove('active-target', 'keyboard-mode');
         activeStepperInput = null;
       }
     }
@@ -17740,6 +17878,8 @@
       const inp = activeStepperInput;
       closeStepperDock();
       if (inp) {
+        const box = inp.closest('.set-wheel-box');
+        if (box) box.classList.add('keyboard-mode');
         inp.focus();
         if (typeof inp.select === 'function') inp.select();
       }
@@ -17776,11 +17916,87 @@
       } catch (e) {}
 
       handleSetInput(activeStepperInput);
+      updateSingleWheelBox(activeStepperInput);
       scheduleSaveWorkoutState();
+    }
+
+    /* ========================================================
+       FUNCIONES DE RUEDA CILÍNDRICA EN TABLA (.set-wheel-box)
+       ======================================================== */
+    function updateSingleWheelBox(input) {
+      if (!input) return;
+      const box = input.closest('.set-wheel-box');
+      if (!box) return;
+
+      const upperEl = box.querySelector('.wheel-slot-upper');
+      const lowerEl = box.querySelector('.wheel-slot-lower');
+      if (!upperEl || !lowerEl) return;
+
+      const isKg = input.classList.contains('input-kg');
+      const step = getExerciseIncrementStep(input, isKg);
+
+      const rawVal = (input.value || '').trim();
+      const placeholderVal = input.getAttribute('placeholder') || '0';
+      const baseVal = rawVal !== '' ? parseFloat(rawVal.replace(',', '.')) || 0 : parseFloat(placeholderVal.replace(',', '.')) || 0;
+
+      const maxVal = isKg ? 999 : 99;
+      if (isKg) {
+        const up = Math.round((baseVal + step) * 10) / 10;
+        const down = Math.round((baseVal - step) * 10) / 10;
+        upperEl.textContent = up <= maxVal ? `${up}` : '—';
+        lowerEl.textContent = down >= 0 ? `${down}` : '—';
+      } else {
+        const up = baseVal + step;
+        const down = baseVal - step;
+        upperEl.textContent = up <= maxVal ? `${up}` : '—';
+        lowerEl.textContent = down >= 0 ? `${down}` : '—';
+      }
+    }
+
+    function updateAllWheelBoxes() {
+      document.querySelectorAll('.set-input.input-kg, .set-input.input-reps').forEach(updateSingleWheelBox);
+    }
+
+    function initWheelBoxes() {
+      document.querySelectorAll('.set-input.input-kg, .set-input.input-reps').forEach(input => {
+        if (input.closest('.set-wheel-box')) {
+          updateSingleWheelBox(input);
+          return;
+        }
+        const parent = input.parentNode;
+        if (!parent) return;
+
+        const box = document.createElement('div');
+        box.className = 'set-wheel-box';
+        const isKg = input.classList.contains('input-kg');
+        box.setAttribute('data-metric', isKg ? 'kg' : 'reps');
+
+        const upper = document.createElement('div');
+        upper.className = 'wheel-slot wheel-slot-upper';
+
+        const center = document.createElement('div');
+        center.className = 'wheel-slot wheel-slot-center';
+
+        const lower = document.createElement('div');
+        lower.className = 'wheel-slot wheel-slot-lower';
+
+        const lens = document.createElement('div');
+        lens.className = 'wheel-lens-reflection';
+
+        parent.insertBefore(box, input);
+        center.appendChild(input);
+        box.appendChild(upper);
+        box.appendChild(center);
+        box.appendChild(lower);
+        box.appendChild(lens);
+
+        updateSingleWheelBox(input);
+      });
     }
 
     let scrubberState = {
       activeInput: null,
+      activeBox: null,
       pointerId: null,
       startX: 0,
       startY: 0,
@@ -17871,8 +18087,11 @@
 
       closeStepperDock();
 
+      const box = input.closest('.set-wheel-box');
+      const targetEl = box || input;
+
       // Posicionamiento ANCLADO DIRECTAMENTE SOBRE EL CUADRO TOCADO (despejando el pulgar)
-      const inputRect = input.getBoundingClientRect();
+      const inputRect = targetEl.getBoundingClientRect();
       const inputCenterX = inputRect.left + (inputRect.width / 2);
       const hudWidth = 175;
       const halfW = hudWidth / 2;
@@ -17892,7 +18111,7 @@
       let isFlipped = false;
 
       // Si está demasiado cerca de la cabecera fija, voltear hacia abajo
-      if (topY - hudHeightEst < safeTop && (topY < 185)) {
+      if (topY - hudHeightEst < safeTop) {
         topY = inputRect.bottom + 14;
         isFlipped = true;
         hud.classList.add('hud-flipped');
@@ -17917,21 +18136,26 @@
     }
 
     function initScrubberController() {
+      initWheelBoxes();
+
       document.addEventListener('pointerdown', (e) => {
         if (e.button !== undefined && e.button !== 0) return;
-        const input = e.target.closest('.set-input.input-kg, .set-input.input-reps');
-        if (!input) {
+        const box = e.target.closest('.set-wheel-box');
+        if (!box) {
           if (!e.target.closest('#stepperDock')) {
             closeStepperDock();
           }
           return;
         }
-        if (scrubberState.isScrubbing) return;
 
-        if (scrubberState.holdTimer) {
-          clearTimeout(scrubberState.holdTimer);
-          scrubberState.holdTimer = null;
-        }
+        const input = box.querySelector('.set-input');
+        if (!input) return;
+
+        if (e.cancelable) e.preventDefault();
+
+        try {
+          box.setPointerCapture(e.pointerId);
+        } catch (err) {}
 
         const isKg = input.classList.contains('input-kg');
         const rawVal = (input.value || '').trim();
@@ -17944,6 +18168,7 @@
         }
 
         scrubberState.activeInput = input;
+        scrubberState.activeBox = box;
         scrubberState.pointerId = e.pointerId;
         scrubberState.startX = e.clientX;
         scrubberState.startY = e.clientY;
@@ -17954,68 +18179,39 @@
         scrubberState.gestureDecided = false;
         scrubberState.suppressClick = false;
 
-        // Temporizador de presión sostenida (Long-Press / Hold a 220ms):
-        // Despliega el visor inmediatamente sobre el cuadro antes de mover el dedo
-        scrubberState.holdTimer = setTimeout(() => {
-          if (scrubberState.activeInput === input && !scrubberState.gestureDecided) {
-            scrubberState.gestureDecided = true;
-            scrubberState.isScrubbing = true;
-            scrubberState.suppressClick = true;
-            try {
-              input.setPointerCapture(scrubberState.pointerId);
-            } catch (err) {}
-            input.blur();
-            input.classList.add('scrubbing-active');
-            try {
-              if (navigator.vibrate) navigator.vibrate(15);
-            } catch (err) {}
-            showScrubberHud(input, scrubberState.isKg, scrubberState.initialVal, scrubberState.startX, scrubberState.startY);
-          }
-        }, 220);
-      }, { passive: true });
+        box.classList.add('scrubbing-active');
+
+        // Despliegue INMEDIATO del visor anclado (0ms latencia)
+        showScrubberHud(input, isKg, baseVal, e.clientX, e.clientY);
+        try {
+          if (navigator.vibrate) navigator.vibrate(10);
+        } catch (err) {}
+
+        // Temporizador de compatibilidad
+        if (scrubberState.holdTimer) clearTimeout(scrubberState.holdTimer);
+        scrubberState.holdTimer = setTimeout(() => {}, 220);
+      }, { passive: false });
 
       document.addEventListener('pointermove', (e) => {
         if (!scrubberState.activeInput || e.pointerId !== scrubberState.pointerId) return;
+        if (e.cancelable) e.preventDefault();
 
         const dx = e.clientX - scrubberState.startX;
         const dy = e.clientY - scrubberState.startY;
 
-        if (!scrubberState.gestureDecided) {
-          // Discriminador de gestos:
-          // Movimiento vertical dominante -> Ceder al scroll nativo y cancelar hold
-          if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) {
-            if (scrubberState.holdTimer) {
-              clearTimeout(scrubberState.holdTimer);
-              scrubberState.holdTimer = null;
-            }
-            scrubberState.gestureDecided = true;
-            scrubberState.activeInput = null;
-            return;
-          }
-          // Movimiento horizontal dominante -> Activar Scrubber inmediatamente
-          if (Math.abs(dx) > 8 && Math.abs(dx) >= Math.abs(dy)) {
-            if (scrubberState.holdTimer) {
-              clearTimeout(scrubberState.holdTimer);
-              scrubberState.holdTimer = null;
-            }
-            scrubberState.gestureDecided = true;
-            scrubberState.isScrubbing = true;
-            scrubberState.suppressClick = true;
-            try {
-              scrubberState.activeInput.setPointerCapture(scrubberState.pointerId);
-            } catch (err) {}
-            scrubberState.activeInput.blur();
-            scrubberState.activeInput.classList.add('scrubbing-active');
-            showScrubberHud(scrubberState.activeInput, scrubberState.isKg, scrubberState.initialVal, e.clientX, e.clientY);
-          }
+        // Desplazamiento omnidireccional: arriba/derecha suma, abajo/izquierda resta
+        const isVertical = Math.abs(dy) >= Math.abs(dx);
+        const deltaPx = isVertical ? -dy : dx;
+
+        if (Math.abs(deltaPx) >= 6) {
+          scrubberState.isScrubbing = true;
+          scrubberState.suppressClick = true;
         }
 
         if (scrubberState.isScrubbing) {
-          if (e.cancelable) e.preventDefault();
-
           const step = getExerciseIncrementStep(scrubberState.activeInput, scrubberState.isKg);
-          const pxPerStep = 18;
-          const stepsCount = Math.round(dx / pxPerStep);
+          const pxPerStep = 16;
+          const stepsCount = Math.round(deltaPx / pxPerStep);
 
           let newVal;
           if (!scrubberState.isKg) {
@@ -18031,9 +18227,10 @@
               if (navigator.vibrate) navigator.vibrate(10);
             } catch (err) {}
             handleSetInput(scrubberState.activeInput);
+            updateSingleWheelBox(scrubberState.activeInput);
           }
 
-          updateScrubberHud(e.clientX, e.clientY, newVal, scrubberState.initialVal, scrubberState.isKg, dx);
+          updateScrubberHud(e.clientX, e.clientY, newVal, scrubberState.initialVal, scrubberState.isKg, deltaPx);
         }
       }, { passive: false });
 
@@ -18046,21 +18243,30 @@
         if (!scrubberState.activeInput) return;
         if (e && scrubberState.pointerId !== null && e.pointerId !== scrubberState.pointerId) return;
 
-        if (scrubberState.isScrubbing) {
+        const box = scrubberState.activeBox;
+        const input = scrubberState.activeInput;
+
+        if (box) {
           try {
-            scrubberState.activeInput.releasePointerCapture(scrubberState.pointerId);
+            box.releasePointerCapture(scrubberState.pointerId);
           } catch (err) {}
-          scrubberState.activeInput.classList.remove('scrubbing-active');
-          hideScrubberHud();
+          box.classList.remove('scrubbing-active');
+        }
+
+        hideScrubberHud();
+
+        if (scrubberState.isScrubbing) {
           scheduleSaveWorkoutState();
           setTimeout(() => {
             scrubberState.suppressClick = false;
           }, 250);
         } else if (!scrubberState.suppressClick) {
-          openStepperDock(scrubberState.activeInput);
+          // Tap simple sin arrastre -> Abrir Stepper Dock
+          openStepperDock(input);
         }
 
         scrubberState.activeInput = null;
+        scrubberState.activeBox = null;
         scrubberState.isScrubbing = false;
         scrubberState.gestureDecided = false;
         scrubberState.pointerId = null;
@@ -18069,17 +18275,14 @@
       document.addEventListener('pointerup', endScrubber);
       document.addEventListener('pointercancel', endScrubber);
 
-      // Suprimir el evento click que se dispara al soltar el dedo tras el arrastre
-      document.addEventListener('click', (e) => {
-        if (scrubberState.suppressClick) {
-          const input = e.target.closest('.set-input.input-kg, .set-input.input-reps');
-          if (input) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-          }
+      // Desactivar modo teclado al perder foco
+      document.addEventListener('focusout', (e) => {
+        if (e.target && e.target.classList.contains('set-input')) {
+          const box = e.target.closest('.set-wheel-box');
+          if (box) box.classList.remove('keyboard-mode');
+          updateSingleWheelBox(e.target);
         }
-      }, true);
+      });
     }
 
   </script>
