@@ -162,7 +162,7 @@ export const EXERCISE_CATALOG = {
     name: "Press Plano Mancuernas",
     muscle: "Pectoral Mayor",
     rest: 120,
-    stepKg: 2.0,
+    stepKg: 2.5,
     alternatives: ["banca", "press_maq_convergente", "press_multipower_plano"]
   },
   press_maq_convergente: {
@@ -220,7 +220,7 @@ export const EXERCISE_CATALOG = {
     name: "Press Militar Manc.",
     muscle: "Deltoides Anterior",
     rest: 120,
-    stepKg: 2.0,
+    stepKg: 2.5,
     alternatives: ["press_hombro_maquina", "press_militar_barra", "press_multipower_hombro"]
   },
   press_hombro_maquina: {
@@ -268,7 +268,7 @@ export const EXERCISE_CATALOG = {
     name: "Remo Mancuerna Banco",
     muscle: "Dorsal Ancho",
     rest: 90,
-    stepKg: 2.0,
+    stepKg: 2.5,
     metricType: "unilateral",
     alternatives: ["remo", "remo_pecho_apoyado", "remo_barra_t"]
   },
@@ -285,7 +285,7 @@ export const EXERCISE_CATALOG = {
     name: "Elev. Laterales Manc.",
     muscle: "Deltoides Lateral",
     rest: 75,
-    stepKg: 1.0,
+    stepKg: 2.5,
     alternatives: ["laterales_polea_baja", "laterales_maquina", "laterales_inclinado"]
   },
   laterales_polea_baja: {
@@ -310,7 +310,7 @@ export const EXERCISE_CATALOG = {
     name: "Laterales Banco Incl.",
     muscle: "Deltoides Lateral",
     rest: 75,
-    stepKg: 1.0,
+    stepKg: 2.5,
     alternatives: ["laterales1", "laterales_polea_baja", "laterales_maquina"]
   },
   triceps1: {
@@ -352,7 +352,7 @@ export const EXERCISE_CATALOG = {
     name: "Curl Bíceps Manc.",
     muscle: "Bíceps",
     rest: 90,
-    stepKg: 1.0,
+    stepKg: 2.5,
     alternatives: ["curl_barra_z", "curl_polea_baja", "curl_inclinado"]
   },
   curl_barra_z: {
@@ -376,7 +376,7 @@ export const EXERCISE_CATALOG = {
     name: "Curl Bíceps Inclinado",
     muscle: "Bíceps",
     rest: 90,
-    stepKg: 1.0,
+    stepKg: 2.5,
     alternatives: ["biceps1", "curl_barra_z", "curl_polea_baja"]
   },
 
@@ -435,7 +435,7 @@ export const EXERCISE_CATALOG = {
     name: "Zancadas Caminando",
     muscle: "Cuádriceps & Glúteo",
     rest: 90,
-    stepKg: 2.0,
+    stepKg: 2.5,
     metricType: "unilateral",
     alternatives: ["legext", "sentadilla_sissy", "step_ups"]
   },
@@ -444,7 +444,7 @@ export const EXERCISE_CATALOG = {
     name: "Step-Ups en Cajón",
     muscle: "Cuádriceps & Glúteo",
     rest: 90,
-    stepKg: 2.0,
+    stepKg: 2.5,
     metricType: "unilateral",
     alternatives: ["legext", "sentadilla_sissy", "zancadas_caminando"]
   },
@@ -478,7 +478,7 @@ export const EXERCISE_CATALOG = {
     name: "Curl Femoral Manc.",
     muscle: "Isquiosurales",
     rest: 90,
-    stepKg: 2.0,
+    stepKg: 2.5,
     alternatives: ["curltumbado", "curl_femoral_sentado", "curl_femoral_unilateral"]
   },
   gemelopie: {
@@ -502,7 +502,7 @@ export const EXERCISE_CATALOG = {
     name: "Gemelos Unilateral",
     muscle: "Gastrocnemio",
     rest: 75,
-    stepKg: 2.0,
+    stepKg: 2.5,
     metricType: "unilateral",
     alternatives: ["gemelopie", "gemelos_prensa", "gemelos_multipower"]
   },
@@ -557,7 +557,7 @@ export const EXERCISE_CATALOG = {
     name: "Remo Unilateral Manc.",
     muscle: "Dorsal Ancho",
     rest: 90,
-    stepKg: 2.0,
+    stepKg: 2.5,
     metricType: "unilateral",
     alternatives: ["remo", "remo_unilateral_maquina", "remo_pecho_mancuernas", "remo_kroc"]
   },
@@ -575,7 +575,7 @@ export const EXERCISE_CATALOG = {
     name: "Remo Inclinado Manc.",
     muscle: "Espalda Alta",
     rest: 90,
-    stepKg: 2.0,
+    stepKg: 2.5,
     alternatives: ["remouni", "remo_unilateral_maquina", "remo_kroc"]
   },
   remo_kroc: {
@@ -583,7 +583,7 @@ export const EXERCISE_CATALOG = {
     name: "Kroc Rows Pesados",
     muscle: "Dorsal Ancho",
     rest: 90,
-    stepKg: 2.0,
+    stepKg: 2.5,
     metricType: "unilateral",
     alternatives: ["remouni", "remo_unilateral_maquina", "remo_pecho_mancuernas"]
   },
@@ -592,7 +592,7 @@ export const EXERCISE_CATALOG = {
     name: "Press Inclinado Manc.",
     muscle: "Pectoral Clavicular",
     rest: 120,
-    stepKg: 2.0,
+    stepKg: 2.5,
     alternatives: ["press_inclinado_barra", "press_inclinado_maquina", "press_inclinado_multipower"]
   },
   press_inclinado_barra: {
@@ -665,7 +665,7 @@ export const EXERCISE_CATALOG = {
     name: "Laterales Manc. Pausa",
     muscle: "Deltoides Lateral",
     rest: 75,
-    stepKg: 1.0,
+    stepKg: 2.5,
     alternatives: ["laterales2", "laterales_maquina_laterales", "laterales_cruzadas_polea"]
   },
   laterales_maquina_laterales: {
@@ -697,7 +697,7 @@ export const EXERCISE_CATALOG = {
     name: "Pájaros Mancuerna",
     muscle: "Deltoides Posterior",
     rest: 75,
-    stepKg: 1.0,
+    stepKg: 2.5,
     alternatives: ["facepull", "pajaros_pecdeck", "cruces_polea_inversa"]
   },
   pajaros_pecdeck: {
@@ -753,7 +753,7 @@ export const EXERCISE_CATALOG = {
     name: "Curl Martillo Manc.",
     muscle: "Braquial & Antebrazo",
     rest: 90,
-    stepKg: 1.0,
+    stepKg: 2.5,
     alternatives: ["curl_martillo_polea", "curl_inverso_barra", "curl_martillo_predicador"]
   },
   curl_martillo_polea: {
@@ -777,7 +777,7 @@ export const EXERCISE_CATALOG = {
     name: "Martillo Predicador",
     muscle: "Braquial",
     rest: 90,
-    stepKg: 1.0,
+    stepKg: 2.5,
     alternatives: ["martillo", "curl_martillo_polea", "curl_inverso_barra"]
   },
 
@@ -803,7 +803,7 @@ export const EXERCISE_CATALOG = {
     name: "RDL Mancuernas",
     muscle: "Isquios & Glúteo",
     rest: 120,
-    stepKg: 4.0,
+    stepKg: 2.5,
     alternatives: ["rdl", "rdl_multipower", "hip_thrust"]
   },
   hip_thrust: {
@@ -819,7 +819,7 @@ export const EXERCISE_CATALOG = {
     name: "Sentadilla Búlgara",
     muscle: "Glúteo & Cuádriceps",
     rest: 90,
-    stepKg: 2.0,
+    stepKg: 2.5,
     metricType: "unilateral",
     alternatives: ["bulgarian_multipower", "prensa_unilateral", "zancadas_estaticas"]
   },
@@ -846,7 +846,7 @@ export const EXERCISE_CATALOG = {
     name: "Zancadas Estáticas",
     muscle: "Cuádriceps & Glúteo",
     rest: 90,
-    stepKg: 2.0,
+    stepKg: 2.5,
     metricType: "unilateral",
     alternatives: ["bulgarian", "bulgarian_multipower", "prensa_unilateral"]
   },
@@ -889,7 +889,7 @@ export const EXERCISE_CATALOG = {
     name: "Sentadilla Goblet",
     muscle: "Cuádriceps",
     rest: 75,
-    stepKg: 2.0,
+    stepKg: 2.5,
     alternatives: ["legextb", "prensa_pies_bajos", "sissy_squat"]
   },
   prensa_pies_bajos: {

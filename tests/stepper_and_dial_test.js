@@ -57,7 +57,7 @@ function simulateGetStep(exId, isKg) {
     return 1;
   }
   if (ex && ex.stepKg) return Number(ex.stepKg);
-  if (ex && ex.equipment && ex.equipment.toLowerCase().includes('mancuerna')) return 2.0;
+  if (ex && ex.equipment && ex.equipment.toLowerCase().includes('mancuerna')) return 2.5;
   return 2.5;
 }
 
@@ -71,8 +71,8 @@ assert.strictEqual(simulateGetStep('pec_deck', true), 5.0, 'Pec deck debe tener 
 // Plancha isométrica (metricType: isometria)
 assert.strictEqual(simulateGetStep('plancha', false), 5, 'Plancha debe tener paso 5 segundos');
 
-// Dumbbells / Mancuernas
-assert.strictEqual(simulateGetStep('laterales1', true), 2.0, 'Laterales mancuerna debe tener paso 2.0 kg');
+// Dumbbells / Mancuernas (saltos de 2.5 kg)
+assert.strictEqual(simulateGetStep('laterales1', true), 2.5, 'Laterales mancuerna debe tener paso 2.5 kg');
 console.log('  ✓ Cuantización de stepKg y segundos isométricos correcta para todas las familias de ejercicios');
 
 // 5. Simulación de deltas de chips táctiles

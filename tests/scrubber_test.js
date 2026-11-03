@@ -36,43 +36,36 @@ assert(html.includes('function hideScrubberHud('), 'Falta la función hideScrubb
 assert(html.includes('initScrubberController();'), 'initScrubberController no se invoca en initApp');
 console.log('  ✓ Funciones del controlador integradas y conectadas a initApp');
 
-// 4. Verificación de Algoritmos de Cálculo
-console.log('\n🧮 4. Verificación de Fórmulas y Rangos:');
-// Simulación lógica de repeticiones (14px = 1 rep)
-const calcReps = (init, dx) => Math.max(0, Math.min(99, Math.round(init + Math.round(dx / 14))));
+// 4. Verificación de Algoritmos de Cálculo (Física Natural de Ruleta)
+console.log('\n🧮 4. Verificación de Fórmulas y Rangos (Física Natural de Ruleta):');
+// Simulación lógica de repeticiones (24px = 1 rep, arrastrar der = baja, arrastrar izq = sube)
+const calcReps = (init, dx) => Math.max(0, Math.min(99, Math.round(init + Math.round(-dx / 24))));
 assert.strictEqual(calcReps(8, 0), 8, 'dx=0 debe ser 8');
-assert.strictEqual(calcReps(8, 14), 9, 'dx=14 debe ser 9');
-assert.strictEqual(calcReps(8, 28), 10, 'dx=28 debe ser 10');
-assert.strictEqual(calcReps(8, -14), 7, 'dx=-14 debe ser 7');
-assert.strictEqual(calcReps(8, -150), 0, 'No debe bajar de 0 reps');
-console.log('  ✓ Lógica de Repeticiones correcta (paso de 1 en 1, límites 0-99)');
+assert.strictEqual(calcReps(8, 24), 7, 'dx=24 (arrastre derecha) debe ser 7 (-1 rep)');
+assert.strictEqual(calcReps(8, 48), 6, 'dx=48 (arrastre derecha) debe ser 6 (-2 reps)');
+assert.strictEqual(calcReps(8, -24), 9, 'dx=-24 (arrastre izquierda) debe ser 9 (+1 rep)');
+assert.strictEqual(calcReps(8, -48), 10, 'dx=-48 (arrastre izquierda) debe ser 10 (+2 reps)');
+assert.strictEqual(calcReps(8, 300), 0, 'No debe bajar de 0 reps');
+console.log('  ✓ Lógica de Repeticiones correcta (física natural: der=baja, izq=sube, límites 0-99)');
 
-// Simulación lógica de peso (1kg inicial + aceleración progresiva)
-const calcKg = (init, dx) => {
-  const sign = dx >= 0 ? 1 : -1;
-  const absDx = Math.abs(dx);
-  let deltaKg;
-  if (absDx <= 36) {
-    deltaKg = Math.round(absDx / 12);
-  } else {
-    deltaKg = Math.round(36 / 12 + Math.pow((absDx - 36) / 13, 1.25));
-  }
-  return Math.max(0, Math.min(999, Math.round(init + sign * deltaKg)));
+// Simulación lógica de peso (física natural de ruleta: der=baja, izq=sube con step del ejercicio)
+const calcKg = (init, dx, step = 2.5) => {
+  const stepsCount = Math.round(-dx / 24);
+  return Math.max(0, Math.min(999, Math.round((init + stepsCount * step) * 10) / 10));
 };
 assert.strictEqual(calcKg(80, 0), 80, 'dx=0 debe ser 80');
-assert.strictEqual(calcKg(80, 12), 81, 'dx=12 debe ser +1 kg');
-assert.strictEqual(calcKg(80, 24), 82, 'dx=24 debe ser +2 kg');
-assert.strictEqual(calcKg(80, 36), 83, 'dx=36 debe ser +3 kg');
-assert.strictEqual(calcKg(80, -12), 79, 'dx=-12 debe ser -1 kg');
-assert(calcKg(80, 80) >= 86, 'dx=80 debe acelerar y permitir saltos mayores');
-assert.strictEqual(calcKg(80, -500), 0, 'No debe bajar de 0 kg');
-console.log('  ✓ Lógica de Peso (kg) correcta (paso de 1kg fino con aceleración progresiva)');
+assert.strictEqual(calcKg(80, 24, 2.5), 77.5, 'dx=24 (arrastre derecha) debe ser 77.5 kg (-2.5 kg)');
+assert.strictEqual(calcKg(80, 48, 2.5), 75.0, 'dx=48 (arrastre derecha) debe ser 75.0 kg (-5.0 kg)');
+assert.strictEqual(calcKg(80, -24, 2.5), 82.5, 'dx=-24 (arrastre izquierda) debe ser 82.5 kg (+2.5 kg)');
+assert.strictEqual(calcKg(80, -48, 2.5), 85.0, 'dx=-48 (arrastre izquierda) debe ser 85.0 kg (+5.0 kg)');
+assert.strictEqual(calcKg(80, 1000), 0, 'No debe bajar de 0 kg');
+console.log('  ✓ Lógica de Peso (kg) correcta (física natural: der=baja, izq=sube)');
 
-// 5. Verificación de Caché SW rev52
-console.log('\n📦 5. Verificación de Cache PWA rev52:');
-assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev52'/.test(sw), 'sw.js debe ser rev52');
-assert(/sw\.js\?v=1\.8\.4-rev52/.test(html), 'index.html debe registrar rev52');
-console.log('  ✓ PWA cache rev52 sincronizada para despliegue inmediato');
+// 5. Verificación de Caché SW rev53
+console.log('\n📦 5. Verificación de Cache PWA rev53:');
+assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev53'/.test(sw), 'sw.js debe ser rev53');
+assert(/sw\.js\?v=1\.8\.4-rev53/.test(html), 'index.html debe registrar rev53');
+console.log('  ✓ PWA cache rev53 sincronizada para despliegue inmediato');
 
 console.log('\n====================================================');
 console.log('🎉 TODAS LAS PRUEBAS DEL SELECTOR TÁCTIL APROBADAS');

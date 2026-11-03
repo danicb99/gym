@@ -115,11 +115,11 @@ assert.strictEqual(slots0.leftText, '—', 'Por debajo de 0 kg debe mostrar —'
 assert.strictEqual(slots0.rightText, '2.5', 'Ranura derecha debe ser 2.5');
 console.log('  ✓ Cuantización cuántica de ranuras laterales horizontal 100% correcta');
 
-// 5. Verificación de Caché SW rev52
-console.log('\n📦 5. Verificación de Caché SW rev52:');
-assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev52'/.test(sw), 'sw.js debe ser rev52');
-assert(/sw\.js\?v=1\.8\.4-rev52/.test(html), 'index.html debe registrar rev52');
-console.log('  ✓ PWA cache rev52 sincronizada');
+// 5. Verificación de Caché SW rev53
+console.log('\n📦 5. Verificación de Caché SW rev53:');
+assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev53'/.test(sw), 'sw.js debe ser rev53');
+assert(/sw\.js\?v=1\.8\.4-rev53/.test(html), 'index.html debe registrar rev53');
+console.log('  ✓ PWA cache rev53 sincronizada');
 
 console.log('\n====================================================');
 console.log('🎉 TODAS LAS PRUEBAS DE RUEDA HORIZONTAL APROBADAS');

@@ -16843,7 +16843,7 @@
             reloadForUpdate('mensaje del SW');
           }
         });
-        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev52').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=1.8.4-rev53').then(reg => {
           reg.update();
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
@@ -17933,7 +17933,7 @@
       }
 
       if (ex && ex.stepKg) return Number(ex.stepKg);
-      if (ex && ex.equipment && ex.equipment.toLowerCase().includes('mancuerna')) return 2.0;
+      if (ex && ex.equipment && ex.equipment.toLowerCase().includes('mancuerna')) return 2.5;
       return 2.5;
     }
 
@@ -18219,11 +18219,12 @@
       if (lowerEl && lowerEl !== leftEl) lowerEl.textContent = lowerText;
       if (upperEl && upperEl !== rightEl) upperEl.textContent = upperText;
 
-      // Micro-inclinación física háptica del rodillo ante arrastre horizontal
+      // Micro-inclinación física háptica y seguimiento elástico continuo del rodillo
       const drumWindow = document.getElementById('slotReelDrumWindow');
       if (drumWindow) {
-        const tiltX = Math.round(((dx % 18) / 18) * 4);
-        drumWindow.style.transform = `perspective(120px) rotateY(${tiltX}deg)`;
+        const tiltX = Math.round(((dx % 24) / 24) * 6);
+        const subShift = Math.round((dx % 24) * 0.4);
+        drumWindow.style.transform = `perspective(120px) rotateY(${tiltX}deg) translateX(${subShift}px)`;
       }
 
       if (deltaEl) {
@@ -18242,7 +18243,7 @@
       }
 
       if (ticksEl) {
-        const rulerOffset = -(dx % 160);
+        const rulerOffset = dx % 160;
         ticksEl.style.transform = `translateX(calc(-50% + ${rulerOffset}px))`;
       }
     }
@@ -18294,6 +18295,10 @@
       if (hud) {
         hud.classList.remove('active', 'hud-flipped');
         hud.style.transform = '';
+      }
+      const drumWindow = document.getElementById('slotReelDrumWindow');
+      if (drumWindow) {
+        drumWindow.style.transform = '';
       }
     }
 
@@ -18409,9 +18414,18 @@
           }
 
           // REGLA ABSOLUTA: Solo dx (horizontal) altera el peso
+          // FÍSICA NATURAL DE RULETA:
+          // Arrastrar a la derecha (dx > 0) -> rodillo gira a la derecha -> entra slot izquierdo (-step) -> BAJA
+          // Arrastrar a la izquierda (dx < 0) -> rodillo gira a la izquierda -> entra slot derecho (+step) -> SUBE
           const step = getExerciseIncrementStep(scrubberState.activeInput, scrubberState.isKg);
-          const pxPerStep = 18;
-          const stepsCount = Math.round(dx / pxPerStep);
+          const pxPerStep = 24;
+          const stepsCount = Math.round(-dx / pxPerStep);
+
+          // Micro-desplazamiento táctil elástico en la casilla activa de tabla
+          if (box) {
+            const subShiftBox = Math.round((dx % 24) * 0.25);
+            box.style.transform = `scale(1.04) translateX(${subShiftBox}px)`;
+          }
 
           let newVal;
           if (!scrubberState.isKg) {
@@ -18451,6 +18465,7 @@
             box.releasePointerCapture(scrubberState.pointerId);
           } catch (err) {}
           box.classList.remove('scrubbing-active');
+          box.style.transform = '';
         }
 
         hideScrubberHud();
