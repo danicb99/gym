@@ -80,10 +80,10 @@ flowchart LR
 | **1** | **Sentadilla trasera con barra (Back Squat)** | 3 × 6-8 | 100 kg | 1-2 | 120 - 150 s *(Fuerza Cuádriceps)* |
 | **2a** | **⚡ SUPERSERIE: Press de banca plano con barra**<br>*Aprox. previa: ~60% × 5 reps (descanso 45-60 s)* | 4 × 6-8 | 80 kg | 1-2 | Inmediato a 2b |
 | **2b** | **⚡ SUPERSERIE: Jalón al pecho prono (agarre ancho)** | 4 × 8-10 | 70 kg | 1-2 | **90 - 120 s tras la pareja** |
-| **3a** | **⚡ SUPERSERIE: Elevaciones laterales con mancuernas** | 3 × 12-15 | 12 kg | 0-1 | Inmediato a 3b |
+| **3a** | **⚡ SUPERSERIE: Elevaciones laterales con mancuernas** | 3 × 12-15 | 12.5 kg | 0-1 | Inmediato a 3b |
 | **3b** | **⚡ SUPERSERIE: Elevación de talones de pie (gemelos)** | 3 × 12-15 | 70 kg *(pausa 1s abajo)* | 0-1 | **45 - 60 s tras la pareja** |
 | **4a** | **[Exprés omite] Extensión de tríceps en polea alta** | 3 × 10-12 | 30 kg | 1 | ⚡ 45 s (Biserie con Bíceps) |
-| **4b** | **[Exprés omite] Curl de bíceps con mancuernas** | 3 × 10-12 | 16 kg | 1 | ⚡ 45 s (Biserie con Tríceps) |
+| **4b** | **[Exprés omite] Curl de bíceps con mancuernas** | 3 × 10-12 | 15 kg | 1 | ⚡ 45 s (Biserie con Tríceps) |
 
 *Alternativas:*
 * *Sentadilla trasera:* Sentadilla Hack en máquina | Prensa 45° | Sentadilla en Multipower.
@@ -101,7 +101,7 @@ flowchart LR
 | **1** | **Peso Muerto Rumano (RDL) con barra** | 3 × 8-10 | 90 kg | 1-2 | 120 - 150 s *(Cadena Post./Isquios)* |
 | **2a** | **⚡ SUPERSERIE: Press inclinado con mancuernas (30°)**| 4 × 8-10 | 30 kg | 1-2 | Inmediato a 2b |
 | **2b** | **⚡ SUPERSERIE: Remo en polea baja agarre neutro** | 4 × 8-10 | 65 kg | 1-2 | **90 - 120 s tras la pareja** |
-| **3a** | **⚡ SUPERSERIE: Press militar sentado con mancuernas**| 3 × 8-10 | 24 kg | 1-2 | Inmediato a 3b |
+| **3a** | **⚡ SUPERSERIE: Press militar sentado con mancuernas**| 3 × 8-10 | 22.5 kg | 1-2 | Inmediato a 3b |
 | **3b** | **⚡ SUPERSERIE: Extensión de cuádriceps en máquina** | 3 × 12-15 | 55 - 60 kg | 0-1 | **75 - 90 s tras la pareja** |
 | **4a** | **Face Pull en polea alta** | 3 × 12-15 | 25 kg | 1 | ⚡ 45 s (Biserie con Plancha) |
 | **4b** | **[Exprés omite] Plancha abdominal isométrica** | 3 × 50-60 s | Peso corporal | — | ⚡ 45 s (Biserie con Face Pull) |
@@ -125,8 +125,8 @@ flowchart LR
 | **2b** | **⚡ SUPERSERIE: Aperturas en polea (o Pec Deck)** | 3 × 12-15 | 10 kg / lado | 1 | **75 - 90 s tras la pareja** |
 | **3a** | **⚡ SUPERSERIE: Elevaciones laterales en polea** | 3 × 12-15 | 10 kg | 0-1 | Inmediato a 3b |
 | **3b** | **⚡ SUPERSERIE: Elevación de talones de pie (gemelos)**| 3 × 12-15 | 70 kg | 0-1 | **45 - 60 s tras la pareja** |
-| **4a** | **[Exprés omite] Press francés con mancuernas o barra Z**| 3 × 10-12 | 32 kg | 1 | ⚡ 45 s (Biserie con Martillo) |
-| **4b** | **[Exprés omite] Curl martillo con mancuernas** | 3 × 10-12 | 16 kg | 1 | ⚡ 45 s (Biserie con Francés) |
+| **4a** | **[Exprés omite] Press francés con mancuernas o barra Z**| 3 × 10-12 | 32.5 kg | 1 | ⚡ 45 s (Biserie con Martillo) |
+| **4b** | **[Exprés omite] Curl martillo con mancuernas** | 3 × 10-12 | 15 kg | 1 | ⚡ 45 s (Biserie con Francés) |
 | **5** | **[Exprés omite] Crunch en polea alta arrodillado** | 3 × 12-15 | 40 kg | 1 | 60 s *(Recto Abdominal)* |
 
 *Alternativas:*
@@ -164,9 +164,9 @@ Día A ──> Día B ──> Día C ──> Día A ──> Día B ... (rotació
 ### DÍA 1: LUNES – TORSO A (Empuje)
 1. Press de banca plano barra: $4 \times 6\text{--}8$ (80 kg) | 120-150 s
 2. Jalón al pecho prono ancho: $4 \times 8\text{--}10$ (70 kg) | 90-120 s
-3. Press militar sentado mancuernas: $3 \times 8\text{--}10$ (24 kg) | 90 s
+3. Press militar sentado mancuernas: $3 \times 8\text{--}10$ (22.5 kg) | 90 s
 4. Remo en polea baja neutro: $3 \times 10\text{--}12$ (65 kg) | 90 s
-5. Elevaciones laterales mancuernas: $3 \times 12\text{--}15$ (12 kg) | 75 s
+5. Elevaciones laterales mancuernas: $3 \times 12\text{--}15$ (12.5 kg) | 75 s
 6. Biserie Brazos (Extensión tríceps $3 \times 10\text{--}12$ + Curl bíceps $3 \times 10\text{--}12$) | 45 s
 
 ### DÍA 2: MARTES – PIERNA A (Cuádriceps)
@@ -177,7 +177,7 @@ Día A ──> Día B ──> Día C ──> Día A ──> Día B ... (rotació
 5. Plancha abdominal isométrica: $3 \times 45\text{--}60\text{ s}$ | 45 s
 
 ### DÍA 3: JUEVES – TORSO B (Tracción)
-1. Remo unilateral con mancuerna: $4 \times 8\text{--}10$ (34 kg) | 90-120 s
+1. Remo unilateral con mancuerna: $4 \times 8\text{--}10$ (35 kg) | 90-120 s
 2. Press inclinado mancuernas: $4 \times 8\text{--}10$ (30 kg) | 90-120 s
 3. Jalón neutro cerrado: $4 \times 8\text{--}10$ (70 kg) | 90-120 s
 4. Elevaciones laterales polea: $3 \times 12\text{--}15$ (10 kg) | 75 s

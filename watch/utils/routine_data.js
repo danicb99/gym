@@ -17,10 +17,10 @@ export const ROUTINE_SLOTS = {
       { slotId: "fullbodyA_1", defaultExId: "squat", num: 1, sets: [["100", "8"], ["100", "8"], ["100", "7"]] },
       { slotId: "fullbodyA_2", defaultExId: "banca", num: "2a", sets: [["80", "8"], ["80", "8"], ["80", "7"], ["80", "6"]], pairSlotId: "fullbodyA_3", pairRole: "a", pairType: "superserie", pairRest: 105, pairName: "Banca + Jalón", warmupTip: "Aprox: ~60% x 5 (45-60s)" },
       { slotId: "fullbodyA_3", defaultExId: "jalon", num: "2b", sets: [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]], pairSlotId: "fullbodyA_2", pairRole: "b", pairType: "superserie", pairRest: 105, pairName: "Banca + Jalón" },
-      { slotId: "fullbodyA_4", defaultExId: "laterales1", num: "3a", sets: [["12", "15"], ["12", "14"], ["12", "12"]], pairSlotId: "fullbodyA_7", pairRole: "a", pairType: "superserie", pairRest: 50, pairName: "Laterales + Gemelos" },
+      { slotId: "fullbodyA_4", defaultExId: "laterales1", num: "3a", sets: [["12.5", "15"], ["12.5", "14"], ["12.5", "12"]], pairSlotId: "fullbodyA_7", pairRole: "a", pairType: "superserie", pairRest: 50, pairName: "Laterales + Gemelos" },
       { slotId: "fullbodyA_7", defaultExId: "gemelopie", num: "3b", sets: [["70", "15"], ["70", "14"], ["70", "12"]], pairSlotId: "fullbodyA_4", pairRole: "b", pairType: "superserie", pairRest: 50, pairName: "Laterales + Gemelos" },
       { slotId: "fullbodyA_5", defaultExId: "triceps1", num: "4a", sets: [["30", "12"], ["30", "11"], ["30", "10"]], pairSlotId: "fullbodyA_6", pairRole: "a", pairType: "biserie", pairRest: 45, pairName: "Brazos", isSkippable: true },
-      { slotId: "fullbodyA_6", defaultExId: "biceps1", num: "4b", sets: [["16", "12"], ["16", "10"], ["16", "10"]], pairSlotId: "fullbodyA_5", pairRole: "b", pairType: "biserie", pairRest: 45, pairName: "Brazos", isSkippable: true }
+      { slotId: "fullbodyA_6", defaultExId: "biceps1", num: "4b", sets: [["15", "12"], ["15", "10"], ["15", "10"]], pairSlotId: "fullbodyA_5", pairRole: "b", pairType: "biserie", pairRest: 45, pairName: "Brazos", isSkippable: true }
     ]
   },
   fullbodyB: {
@@ -35,7 +35,7 @@ export const ROUTINE_SLOTS = {
       { slotId: "fullbodyB_1", defaultExId: "rdl", num: 1, sets: [["90", "10"], ["90", "10"], ["90", "8"]] },
       { slotId: "fullbodyB_2", defaultExId: "inclinado", num: "2a", sets: [["30", "10"], ["30", "10"], ["30", "8"], ["30", "8"]], pairSlotId: "fullbodyB_3", pairRole: "a", pairType: "superserie", pairRest: 105, pairName: "Inclinado + Remo" },
       { slotId: "fullbodyB_3", defaultExId: "remo", num: "2b", sets: [["65", "10"], ["65", "10"], ["65", "9"], ["65", "8"]], pairSlotId: "fullbodyB_2", pairRole: "b", pairType: "superserie", pairRest: 105, pairName: "Inclinado + Remo" },
-      { slotId: "fullbodyB_4", defaultExId: "militar", num: "3a", sets: [["24", "10"], ["24", "10"], ["24", "8"]], pairSlotId: "fullbodyB_7", pairRole: "a", pairType: "superserie", pairRest: 80, pairName: "Militar + Cuádriceps" },
+      { slotId: "fullbodyB_4", defaultExId: "militar", num: "3a", sets: [["22.5", "10"], ["22.5", "10"], ["22.5", "8"]], pairSlotId: "fullbodyB_7", pairRole: "a", pairType: "superserie", pairRest: 80, pairName: "Militar + Cuádriceps" },
       { slotId: "fullbodyB_7", defaultExId: "legext", num: "3b", sets: [["55", "15"], ["55", "14"], ["55", "12"]], pairSlotId: "fullbodyB_4", pairRole: "b", pairType: "superserie", pairRest: 80, pairName: "Militar + Cuádriceps" },
       { slotId: "fullbodyB_5", defaultExId: "facepull", num: "4a", sets: [["25", "15"], ["25", "14"], ["25", "12"]], pairSlotId: "fullbodyB_6", pairRole: "a", pairType: "biserie", pairRest: 45, pairName: "Posterior + Core" },
       { slotId: "fullbodyB_6", defaultExId: "plancha", num: "4b", sets: [["0", "60"], ["0", "50"], ["0", "50"]], pairSlotId: "fullbodyB_5", pairRole: "b", pairType: "biserie", pairRest: 45, pairName: "Posterior + Core", isSkippable: true }
@@ -56,8 +56,8 @@ export const ROUTINE_SLOTS = {
       { slotId: "fullbodyC_8", defaultExId: "aperturas_polea", num: "2b", sets: [["10", "15"], ["10", "14"], ["10", "12"]], pairSlotId: "fullbodyC_3", pairRole: "b", pairType: "superserie", pairRest: 80, pairName: "Dorsal + Pecho" },
       { slotId: "fullbodyC_4", defaultExId: "laterales2", num: "3a", sets: [["10", "15"], ["10", "14"], ["10", "12"]], pairSlotId: "fullbodyC_9", pairRole: "a", pairType: "superserie", pairRest: 50, pairName: "Laterales + Gemelos" },
       { slotId: "fullbodyC_9", defaultExId: "gemelopie", num: "3b", sets: [["70", "15"], ["70", "14"], ["70", "12"]], pairSlotId: "fullbodyC_4", pairRole: "b", pairType: "superserie", pairRest: 50, pairName: "Laterales + Gemelos" },
-      { slotId: "fullbodyC_5", defaultExId: "frances", num: "4a", sets: [["32", "12"], ["32", "10"], ["32", "10"]], pairSlotId: "fullbodyC_6", pairRole: "a", pairType: "biserie", pairRest: 45, pairName: "Brazos", isSkippable: true },
-      { slotId: "fullbodyC_6", defaultExId: "martillo", num: "4b", sets: [["16", "12"], ["16", "11"], ["16", "10"]], pairSlotId: "fullbodyC_5", pairRole: "b", pairType: "biserie", pairRest: 45, pairName: "Brazos", isSkippable: true },
+      { slotId: "fullbodyC_5", defaultExId: "frances", num: "4a", sets: [["32.5", "12"], ["32.5", "10"], ["32.5", "10"]], pairSlotId: "fullbodyC_6", pairRole: "a", pairType: "biserie", pairRest: 45, pairName: "Brazos", isSkippable: true },
+      { slotId: "fullbodyC_6", defaultExId: "martillo", num: "4b", sets: [["15", "12"], ["15", "11"], ["15", "10"]], pairSlotId: "fullbodyC_5", pairRole: "b", pairType: "biserie", pairRest: 45, pairName: "Brazos", isSkippable: true },
       { slotId: "fullbodyC_7", defaultExId: "crunch", num: 5, sets: [["40", "15"], ["40", "14"], ["40", "12"]], isSkippable: true }
     ]
   },
@@ -73,11 +73,11 @@ export const ROUTINE_SLOTS = {
     slots: [
       { slotId: "torsoA_1", defaultExId: "banca", num: 1, sets: [["80", "8"], ["80", "8"], ["80", "7"], ["80", "6"]] },
       { slotId: "torsoA_2", defaultExId: "jalon", num: 2, sets: [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]] },
-      { slotId: "torsoA_3", defaultExId: "militar", num: 3, sets: [["24", "10"], ["24", "10"], ["24", "8"]] },
+      { slotId: "torsoA_3", defaultExId: "militar", num: 3, sets: [["22.5", "10"], ["22.5", "10"], ["22.5", "8"]] },
       { slotId: "torsoA_4", defaultExId: "remo", num: 4, sets: [["65", "10"], ["65", "10"], ["65", "9"]] },
-      { slotId: "torsoA_5", defaultExId: "laterales1", num: 5, sets: [["12", "15"], ["12", "14"], ["12", "12"]] },
+      { slotId: "torsoA_5", defaultExId: "laterales1", num: 5, sets: [["12.5", "15"], ["12.5", "14"], ["12.5", "12"]] },
       { slotId: "torsoA_6", defaultExId: "triceps1", num: 6, sets: [["30", "12"], ["30", "11"], ["30", "10"]] },
-      { slotId: "torsoA_7", defaultExId: "biceps1", num: 7, sets: [["16", "12"], ["16", "10"], ["16", "10"]] }
+      { slotId: "torsoA_7", defaultExId: "biceps1", num: 7, sets: [["15", "12"], ["15", "10"], ["15", "10"]] }
     ]
   },
   piernaA: {
@@ -103,13 +103,13 @@ export const ROUTINE_SLOTS = {
     shortName: "Torso B (Tracción)",
     totalSets: 24,
     slots: [
-      { slotId: "torsoB_1", defaultExId: "remouni", num: 1, sets: [["34", "10"], ["34", "10"], ["34", "9"], ["34", "8"]] },
+      { slotId: "torsoB_1", defaultExId: "remouni", num: 1, sets: [["35", "10"], ["35", "10"], ["35", "9"], ["35", "8"]] },
       { slotId: "torsoB_2", defaultExId: "inclinado", num: 2, sets: [["30", "10"], ["30", "10"], ["30", "8"], ["30", "8"]] },
       { slotId: "torsoB_3", defaultExId: "jalonneutro", num: 3, sets: [["70", "10"], ["70", "10"], ["70", "9"], ["70", "8"]] },
       { slotId: "torsoB_4", defaultExId: "laterales2", num: 4, sets: [["10", "15"], ["10", "14"], ["10", "12"]] },
       { slotId: "torsoB_5", defaultExId: "facepull", num: 5, sets: [["25", "15"], ["25", "14"], ["25", "12"]] },
-      { slotId: "torsoB_6", defaultExId: "frances", num: 6, sets: [["32", "12"], ["32", "10"], ["32", "10"]] },
-      { slotId: "torsoB_7", defaultExId: "martillo", num: 7, sets: [["16", "12"], ["16", "11"], ["16", "10"]] }
+      { slotId: "torsoB_6", defaultExId: "frances", num: 6, sets: [["32.5", "12"], ["32.5", "10"], ["32.5", "10"]] },
+      { slotId: "torsoB_7", defaultExId: "martillo", num: 7, sets: [["15", "12"], ["15", "11"], ["15", "10"]] }
     ]
   },
   piernaB: {
