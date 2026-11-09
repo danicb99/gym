@@ -382,8 +382,8 @@
       border: 1px solid rgba(255, 255, 255, 0.09);
       color: #94a3b8;
       border-radius: 10px;
-      height: 28px;
-      padding: 0 8px;
+      height: 30px;
+      padding: 3px 8px;
       font-size: 0.70rem;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
@@ -422,8 +422,8 @@
       color: #94a3b8;
       border: 1px solid rgba(255, 255, 255, 0.09);
       border-radius: 10px;
-      height: 28px;
-      padding: 0 8px;
+      height: 30px;
+      padding: 3px 8px;
       font-size: 0.70rem;
       font-weight: 600;
       cursor: pointer;
@@ -468,13 +468,15 @@
     .btn-finish-day:active { transform: scale(0.96); }
     .btn-reset-session {
       background: rgba(255, 255, 255, 0.04);
-      color: #64748b;
+      color: #94a3b8;
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 10px;
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      min-height: 32px;
       padding: 0;
-      font-size: 0.85rem;
+      font-size: 0.90rem;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
@@ -762,11 +764,11 @@
     .sets-table th {
       text-align: center;
       color: var(--text-dim);
-      font-size: 0.65rem;
+      font-size: 0.72rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding-bottom: 3px;
+      padding-bottom: 4px;
     }
     .set-row {
       background: rgba(255, 255, 255, 0.025);
@@ -824,10 +826,11 @@
       background: var(--cyan-subtle);
     }
 
-    /* Sets Inputs: 16px to prevent iOS auto-zoom, compact 38px touch height */
+    /* Sets Inputs: 16px to prevent iOS auto-zoom, ergonomic 42px touch height */
     .set-input {
       width: 64px;
-      height: 38px;
+      height: 42px;
+      min-height: 42px;
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(15, 23, 42, 0.75) 20%, rgba(15, 23, 42, 0.75) 80%, rgba(0, 0, 0, 0.5) 100%);
       border: 1.5px solid rgba(255, 255, 255, 0.1);
       border-radius: 10px;
@@ -1389,8 +1392,12 @@
       z-index: 1050;
       width: calc(100% - 24px);
       max-width: 460px;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s;
+      transition: bottom 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s;
       will-change: transform, opacity;
+    }
+    body:has(#navTimerDock.running) .stepper-dock,
+    body.nav-timer-running .stepper-dock {
+      bottom: calc(136px + env(safe-area-inset-bottom, 0px));
     }
     .stepper-dock.active {
       opacity: 1;
@@ -1449,7 +1456,7 @@
       font-weight: 800;
       height: 36px;
       min-width: 44px;
-      padding: 0 10px;
+      padding: 4px 10px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1503,10 +1510,12 @@
       color: #ffffff;
     }
 
-    /* Set Check Button: Compact 38x38px */
+    /* Set Check Button: Ergonomic 42x42px touch target */
     .check-btn {
-      width: 38px;
-      height: 38px;
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      min-height: 42px;
       border-radius: 10px;
       border: 1.5px solid rgba(255, 255, 255, 0.10);
       background: rgba(255, 255, 255, 0.04);
@@ -1515,9 +1524,10 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: background 0.16s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.16s, transform 0.16s;
       margin: 0 auto;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      touch-action: manipulation;
     }
     .check-btn svg {
       width: 17px;
@@ -1973,7 +1983,7 @@
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
     .stat-box { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 8px; text-align: center; }
     .stat-box-val { font-size: 1.25rem; font-weight: 800; color: #fff; margin-top: 2px; }
-    .stat-box-label { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .stat-box-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
     
     .ex-picker-wrap { margin-bottom: 18px; }
     .ex-picker-label { font-size: 0.74rem; font-weight: 700; color: var(--cyan); margin-bottom: 6px; display: block; }
@@ -2954,12 +2964,12 @@
       height: calc(58px + env(safe-area-inset-bottom, 0px));
     }
     .nav-tab {
-      flex: 0 0 64px;
+      flex: 0 0 60px;
       height: 44px;
       box-sizing: border-box;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.07);
-      color: #64748b;
+      color: #94a3b8;
       font-family: var(--bd, sans-serif);
       font-size: 11px;
       font-weight: 600;
@@ -3004,7 +3014,7 @@
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      padding: 0 6px 0 8px;
+      padding: 4px 6px 4px 8px;
       box-sizing: border-box;
       margin-left: auto;
       align-self: flex-end;
@@ -3205,7 +3215,7 @@
       background: #fbbf24;
       color: #060a12;
       border-color: #fbbf24;
-      padding: 0 10px;
+      padding: 4px 10px;
       min-width: 52px;
       font-size: 0.72rem;
       border-radius: 10px;
@@ -3520,14 +3530,12 @@
       margin-bottom: 14px;
       padding: 8px 8px 4px 8px;
       background: rgba(245, 158, 11, 0.035);
-      border: 1px solid rgba(245, 158, 11, 0.22);
-      border-left: 3px solid #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.28);
       border-radius: 16px;
-      transition: all 0.2s ease;
+      transition: border-color 0.2s ease, background 0.2s ease;
     }
     .exercise-pair-container:has(.exercise-card.exercise-completed):not(:has(.exercise-card:not(.exercise-completed))) {
-      border-left-color: #fbbf24 !important;
-      border-color: rgba(251, 191, 36, 0.40);
+      border-color: rgba(251, 191, 36, 0.45);
       background: rgba(251, 191, 36, 0.05);
     }
     .exercise-pair-container:has(.exercise-card.exercise-completed):not(:has(.exercise-card:not(.exercise-completed))) .pair-header-label {
@@ -3585,7 +3593,7 @@
     }
     .warmup-row .warmup-label {
       display: inline-block;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       font-weight: 800;
       color: #94a3b8;
       background: rgba(148, 163, 184, 0.15);
@@ -3600,8 +3608,8 @@
       background: rgba(148, 163, 184, 0.3);
     }
     .warmup-row .warmup-hint-cell {
-      font-size: 0.7rem;
-      color: #64748b;
+      font-size: 0.75rem;
+      color: #94a3b8;
       font-weight: 600;
     }
     .warmup-row .input-warmup-kg,
@@ -3613,9 +3621,9 @@
     .warmup-row .warmup-check-btn {
       background: rgba(148, 163, 184, 0.08);
       border: 1px solid rgba(148, 163, 184, 0.2);
-      color: #64748b;
-      width: 34px;
-      height: 34px;
+      color: #94a3b8;
+      width: 36px;
+      height: 36px;
       border-radius: 8px;
     }
     .warmup-row.done {
@@ -3633,8 +3641,8 @@
       color: #fbbf24;
     }
     .warmup-skip-hint {
-      font-size: 0.68rem;
-      color: #64748b;
+      font-size: 0.72rem;
+      color: #94a3b8;
       padding: 4px 10px;
       font-style: italic;
       display: flex;
@@ -3647,7 +3655,7 @@
     .card-actions {
       display: flex;
       gap: 6px;
-      margin: 10px 0 8px 0;
+      margin: 6px 0 8px 0;
       align-items: center;
       width: 100%;
     }
@@ -3656,18 +3664,18 @@
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
       color: #94a3b8;
-      border-radius: 10px;
-      height: 38px;
-      min-height: 38px;
+      border-radius: 9px;
+      height: 34px;
+      min-height: 34px;
       padding: 0 4px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
-      font-size: 0.72rem;
+      gap: 4px;
+      font-size: 0.70rem;
       font-weight: 650;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
       white-space: nowrap;
       position: relative;
     }
@@ -3691,7 +3699,7 @@
       height: 6px;
       border-radius: 50%;
       background: #f59e0b;
-      box-shadow: 0 0 6px rgba(245, 158, 11, 0.8);
+      box-shadow: 0 0 0 1.5px #0b1120;
       margin-left: 2px;
     }
     .note-indicator-dot.active {
@@ -3971,26 +3979,26 @@
       text-align: center;
     }
     .app-brand-sub {
-      font-size: 0.65rem;
+      font-size: 0.72rem;
       font-weight: 600;
       color: #94a3b8;
       text-align: center;
       white-space: nowrap;
     }
     .header-est-noss {
-      color: #64748b;
+      color: #94a3b8;
       font-weight: 500;
       margin-left: 2px;
       opacity: 0.9;
     }
     @media (max-width: 390px) {
       .app-brand-sub {
-        font-size: 0.60rem;
+        font-size: 0.70rem;
       }
     }
     @media (max-width: 345px) {
       .app-brand-sub {
-        font-size: 0.54rem;
+        font-size: 0.68rem;
       }
     }
     .header-top-right {
@@ -4174,7 +4182,7 @@
       color: var(--primary);
       font-size: 0.76rem;
       font-weight: 800;
-      padding: 0 10px;
+      padding: 4px 10px;
       height: 28px;
       min-height: 28px;
       border-radius: 10px;
@@ -4212,9 +4220,9 @@
       display: flex !important;
     }
     .dropdown-header {
-      font-size: 0.66rem;
+      font-size: 0.72rem;
       font-weight: 700;
-      color: #64748b;
+      color: #94a3b8;
       padding: 6px 10px 4px 10px;
       text-transform: uppercase;
       letter-spacing: 0.04em;
@@ -4364,7 +4372,7 @@
       color: #cbd5e1;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.10);
-      padding: 0 10px;
+      padding: 4px 10px;
       border-radius: 10px;
       height: 34px;
       min-height: 34px;
@@ -4500,7 +4508,7 @@
       font-size: 0.74rem;
       font-weight: 700;
       cursor: pointer;
-      padding: 0 10px;
+      padding: 4px 10px;
       box-sizing: border-box;
       transition: all 0.15s ease;
     }
@@ -4724,7 +4732,7 @@
     }
     .warmup-row .warmup-label {
       display: inline-block;
-      font-size: 0.68rem;
+      font-size: 0.75rem;
       font-weight: 800;
       color: #94a3b8;
       background: rgba(148, 163, 184, 0.14);
@@ -4734,7 +4742,7 @@
     }
     .warmup-cell-pct {
       font-weight: 600;
-      color: #64748b;
+      color: #94a3b8;
     }
     .warmup-cell-kg {
       font-weight: 700;
@@ -10128,6 +10136,20 @@
           Entrena a <strong>RIR 1-2</strong> en los ejercicios básicos principales: termina la serie sintiendo que podrías haber realizado 1 o como máximo 2 repeticiones más con técnica perfecta. En ejercicios accesorios y brazos puedes aproximarte a RIR 0-1.
         </p>
       </div>
+
+      <!-- Tarjeta: Sincronización Smartwatch Zepp OS -->
+      <div class="calendar-card history-card" style="margin-top: 14px;">
+        <div class="history-card-header" style="justify-content: space-between; align-items: center;">
+          <div class="history-card-title-group" style="display: flex; align-items: center; gap: 8px;">
+            <span class="history-card-icon" style="font-size: 1.15rem;">⌚</span>
+            <h3 class="history-card-title">Smartwatch (Amazfit Active 2)</h3>
+          </div>
+          <button type="button" class="btn-step" onclick="openWatchSyncModal()" style="height: 32px; padding: 0 12px; font-size: 0.76rem; font-weight: 700; border-radius: 8px;">Configurar</button>
+        </div>
+        <p style="font-size: 0.78rem; color: #94a3b8; line-height: 1.45; margin-top: 8px;">
+          Sincroniza tus series en tiempo real y registra repeticiones desde tu muñeca con Zepp OS y relay ntfy.sh.
+        </p>
+      </div>
     </section>
 
   </main>
@@ -15154,8 +15176,10 @@
       if (dock && !dock.classList.contains('finishing')) {
         if (isResting) {
           dock.classList.add('running');
+          document.body.classList.add('nav-timer-running');
         } else {
           dock.classList.remove('running');
+          document.body.classList.remove('nav-timer-running');
         }
       }
 
@@ -15409,6 +15433,7 @@
       if (navDock) {
         navDock.classList.remove('finishing');
         navDock.classList.remove('running');
+        document.body.classList.remove('nav-timer-running');
       }
       const restDock = document.getElementById('restTimerDock');
       if (restDock) restDock.classList.remove('on');
@@ -15447,6 +15472,7 @@
           if (navDock) {
             navDock.classList.remove('finishing');
             navDock.classList.remove('running');
+            document.body.classList.remove('nav-timer-running');
           }
           if (restDock) restDock.classList.remove('on');
           if (btn && btn.innerText === 'Listo') {
@@ -18526,6 +18552,10 @@
       <svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>
       <span>Entrenar</span>
     </button>
+    <button type="button" class="nav-tab" id="tabBtnPlan" onclick="switchMainTab('plan')">
+      <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h6"/></svg>
+      <span>Rutina</span>
+    </button>
     <button type="button" class="nav-tab" id="tabBtnHist" onclick="switchMainTab('hist')">
       <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
       <span>Historial</span>
@@ -18568,7 +18598,6 @@
 
   <!-- Hidden elements for test compatibility & legacy functions -->
   <div style="display:none !important; width:0; height:0; overflow:hidden;" aria-hidden="true">
-    <button type="button" id="tabBtnPlan" onclick="switchMainTab('plan')">Rutina</button>
     <div class="top-timer-widget" id="topTimerWidget"></div>
     <div class="workout-progress" id="workoutProgressBar"></div>
     <div id="headerProgSets">0 de 20 series</div>

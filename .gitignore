@@ -7,3 +7,5 @@ scratch/
 watch/app-side/config.js
 tests/fixtures/backup_real.json
 tests/fixtures/*.local.json
+.agent/
+.impeccable/

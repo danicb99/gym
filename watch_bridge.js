@@ -1314,7 +1314,7 @@
 
   function showWatchStatusToast(extra) {
     const info = getWatchStatusInfo(extra);
-    const msg = `${info.emoji} ${info.title}: ${info.desc}`;
+    const msg = `${info.emoji} Reloj (${info.title}): ${info.desc} · Doble toque o entra en Historial para configurar`;
     if (typeof window.showToast === 'function') {
       window.showToast(msg);
     } else {
