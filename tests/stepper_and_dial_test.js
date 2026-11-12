@@ -56,23 +56,23 @@ function simulateGetStep(exId, isKg) {
     if (ex && ex.metricType === 'isometria') return 5;
     return 1;
   }
-  if (ex && ex.stepKg) return Number(ex.stepKg);
-  if (ex && ex.equipment && ex.equipment.toLowerCase().includes('mancuerna')) return 2.5;
-  return 2.5;
+  if (ex && ex.stepKg !== undefined && ex.stepKg !== null) return Number(ex.stepKg);
+  if (ex && ex.equipment && ex.equipment.toLowerCase().includes('mancuerna')) return 0.5;
+  return 0.5;
 }
 
 // Squat con barra olímpica
-assert.strictEqual(simulateGetStep('squat', true), 2.5, 'Squat debe tener paso 2.5 kg');
+assert.strictEqual(simulateGetStep('squat', true), 0.5, 'Squat debe tener paso 0.5 kg');
 assert.strictEqual(simulateGetStep('squat', false), 1, 'Squat en reps debe tener paso 1 rep');
 
-// Pec Deck máquina de placas (stepKg: 5)
-assert.strictEqual(simulateGetStep('pec_deck', true), 5.0, 'Pec deck debe tener paso 5.0 kg');
+// Pec Deck máquina de placas (stepKg: 0.5)
+assert.strictEqual(simulateGetStep('pec_deck', true), 0.5, 'Pec deck debe tener paso 0.5 kg');
 
 // Plancha isométrica (metricType: isometria)
 assert.strictEqual(simulateGetStep('plancha', false), 5, 'Plancha debe tener paso 5 segundos');
 
-// Dumbbells / Mancuernas (saltos de 2.5 kg)
-assert.strictEqual(simulateGetStep('laterales1', true), 2.5, 'Laterales mancuerna debe tener paso 2.5 kg');
+// Dumbbells / Mancuernas (saltos de 0.5 kg)
+assert.strictEqual(simulateGetStep('laterales1', true), 0.5, 'Laterales mancuerna debe tener paso 0.5 kg');
 console.log('  ✓ Cuantización de stepKg y segundos isométricos correcta para todas las familias de ejercicios');
 
 // 5. Simulación de deltas de chips táctiles
@@ -88,8 +88,7 @@ function getDeltas(step, isKg, isIso) {
   }
 }
 
-assert.deepStrictEqual(getDeltas(2.5, true, false), [-5, -2.5, 2.5, 5], 'Barra 2.5kg debe tener [-5, -2.5, +2.5, +5]');
-assert.deepStrictEqual(getDeltas(5.0, true, false), [-10, -5, 5, 10], 'Máquina 5kg debe tener [-10, -5, +5, +10]');
+assert.deepStrictEqual(getDeltas(0.5, true, false), [-1, -0.5, 0.5, 1], 'Paso 0.5kg debe tener [-1, -0.5, +0.5, +1]');
 assert.deepStrictEqual(getDeltas(1, false, false), [-5, -1, 1, 5], 'Reps estándar debe tener [-5, -1, +1, +5]');
 assert.deepStrictEqual(getDeltas(5, false, true), [-10, -5, 5, 10], 'Isometría debe tener [-10s, -5s, +5s, +10s]');
 console.log('  ✓ Chips táctiles de 1 toque generan deltas coherentes con el equipamiento');
@@ -102,8 +101,8 @@ function applyDelta(current, delta, isKg) {
   return Math.max(0, Math.min(99, Math.round(val)));
 }
 
-assert.strictEqual(applyDelta(80, 2.5, true), 82.5);
-assert.strictEqual(applyDelta(82.5, -5, true), 77.5);
+assert.strictEqual(applyDelta(80, 0.5, true), 80.5);
+assert.strictEqual(applyDelta(80.5, -1, true), 79.5);
 assert.strictEqual(applyDelta(2.5, -5, true), 0, 'No debe bajar de 0 kg');
 assert.strictEqual(applyDelta(995, 10, true), 999, 'No debe superar 999 kg');
 assert.strictEqual(applyDelta(8, 1, false), 9);

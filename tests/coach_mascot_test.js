@@ -139,9 +139,9 @@ test('Globo contextual: markup accesible y estilos de cabecera', () => {
   assert(/\.coach-bubble\.show\s*\{[\s\S]*?pointer-events:\s*auto/.test(html), 'El globo visible debe ser interactivo');
 });
 
-test('Cache rev54 en sw.js y en el registro', () => {
-  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev54'/.test(sw), 'CACHE_NAME no es rev54');
-  assert(/sw\.js\?v=1\.8\.4-rev54/.test(html), 'El registro no apunta a rev54');
+test('Cache rev55 en sw.js y en el registro', () => {
+  assert(/const CACHE_NAME = 'vigorexiapp-v1\.8\.4-rev55'/.test(sw), 'CACHE_NAME no es rev55');
+  assert(/sw\.js\?v=1\.8\.4-rev55/.test(html), 'El registro no apunta a rev55');
 });
 
 test('Personalidad: whitelist y fallback a gymbro', () => {
@@ -372,7 +372,7 @@ test('Rampa 70/80/80 al techo sube a 82.5 kg x 6', () => {
   assert.strictEqual(res.reps, 6);
 });
 
-test('pec_deck usa su stepKg de 5 kg y svgSlug pec-deck', () => {
+test('pec_deck usa su stepKg de 0.5 kg y svgSlug pec-deck', () => {
   const ex = catalog.pec_deck;
   assert(ex, 'Falta pec_deck en el catalogo');
   assert.strictEqual(ex.svgSlug, 'pec-deck', 'pec_deck debe usar svgSlug pec-deck');
@@ -384,7 +384,7 @@ test('pec_deck usa su stepKg de 5 kg y svgSlug pec-deck', () => {
     { kg: 50, reps: t.max }, { kg: 50, reps: t.max }
   ]);
   assert.strictEqual(res.source, 'ceiling');
-  assert.strictEqual(res.kg, 55);
+  assert.strictEqual(res.kg, 50.5);
 });
 
 test('Sugerencia fresca de sobrecarga tiene precedencia', () => {
@@ -410,7 +410,7 @@ test('Paridad de getWeightStep en todo el catalogo', () => {
   const ids = Object.keys(catalog);
   assert(ids.length >= 100, 'Catalogo inesperadamente corto: ' + ids.length);
   ids.forEach(id => {
-    const expected = Number(catalog[id].stepKg) || 2.5;
+    const expected = Number(catalog[id].stepKg) || 0.5;
     assert.strictEqual(sandbox.getWeightStep(catalog[id]), expected, id);
   });
   assert.strictEqual(sandbox.supportsLoadProgression(catalog.squat), true);

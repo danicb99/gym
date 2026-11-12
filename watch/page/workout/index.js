@@ -37,7 +37,7 @@ Page(BasePage({
     clockWidget: null,
     currentKg: 80,
     currentReps: 8,
-    stepKg: 2.5,
+    stepKg: 0.5,
     tickerTimer: null,
     plankTimer: null,
     isPlankRunning: false,
@@ -60,7 +60,7 @@ Page(BasePage({
     const slot = app.getActiveSlot()
     const ex = app.getActiveExercise()
 
-    this.state.stepKg = (ex && ex.stepKg) ? ex.stepKg : 2.5
+    this.state.stepKg = (ex && ex.stepKg !== undefined) ? ex.stepKg : 0.5
 
     // Sin slot activo no hay serie que inicializar. build() redirige a day_select.
     // Evita el crash al arrancar con un día sin slots o un índice fuera de rango.
